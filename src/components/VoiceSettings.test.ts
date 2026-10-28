@@ -82,18 +82,22 @@ describe("VoiceSettings", () => {
     expect(onPatch).not.toHaveBeenCalled();
   });
 
-  it("lays the five voice services out as the panel's pill tabs, wrapping in a narrow panel", async () => {
+  it("lays the five voice services out as equal cells in the panel's pill track, three across once the panel is 420px", async () => {
     fixture.api.mockResolvedValue({ voices: [] });
     await render(bot("pepper"), vi.fn());
     const track = host.querySelector<HTMLElement>('[role="group"][aria-label="Voice provider"]')!;
-    expect(track.className).toContain("flex-wrap");
+    expect(track.className).toContain("grid-cols-2");
+    expect(track.className).toContain("@[420px]:grid-cols-3");
+    expect(track.className).not.toContain("flex-auto");
     const pills = [...track.querySelectorAll<HTMLButtonElement>("button")];
     expect(pills.map((pill) => pill.textContent)).toEqual(["ElevenLabs", "Fish Audio", "Grok (xAI)", "Built-in Mac voices", "Chatterbox (local)"]);
     for (const pill of pills) {
       expect(pill.getAttribute("aria-pressed")).toMatch(/true|false/);
       expect(pill.className).toContain("rounded-full");
-      expect(pill.className).toContain("flex-auto");
+      expect(pill.className).toContain("w-full");
       expect(pill.className).not.toMatch(/col-span-/);
+      expect(pill.getAttribute("title")!.startsWith(pill.textContent!)).toBe(true);
+      expect(pill.querySelector("span")!.className).toContain("truncate");
     }
     expect(pills.filter((pill) => pill.getAttribute("aria-pressed") === "true")).toHaveLength(1);
   });
