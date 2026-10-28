@@ -1182,7 +1182,7 @@ body {
     height: 1.75rem;
     padding-inline: 0.625rem;
     font-size: 13px;
-    line-height: 1rem;
+    line-height: 18px;
   }
 
   .ui-button,
@@ -1669,7 +1669,7 @@ body {
 
 /* One field radius: every text field takes the skin's control radius, so a
    dialog, a settings row and a sidebar filter agree. */
-:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea):not([data-menu-search], [data-tour="composer"] textarea) {
+:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea, select):not([data-menu-search], [data-tour="composer"] textarea) {
   border-radius: var(--radius-lg, 0.5rem);
 }
 
