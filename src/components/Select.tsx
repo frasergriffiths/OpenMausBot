@@ -1,4 +1,5 @@
 import { Children, isValidElement, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentProps, type KeyboardEvent as ReactKeyboardEvent, type ReactElement, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useAdvancedMode } from "@/lib/interface-mode";
@@ -320,7 +321,7 @@ function SimpleSelect({ className, variant = "field", size = "md", value, onChan
         />
       </button>
 
-      {motion.shown && typeof document !== "undefined" && (
+      {motion.shown && typeof document !== "undefined" && createPortal(
         <div
           ref={menuRef}
           id={menuId}
@@ -367,7 +368,8 @@ function SimpleSelect({ className, variant = "field", size = "md", value, onChan
               </button>
             );
           })}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

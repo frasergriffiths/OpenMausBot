@@ -64,6 +64,15 @@ describe("the app select", () => {
     expect(rows().map((row) => row.textContent)).toEqual(["Alpha", "Bravo", "Charlie"]);
   });
 
+  it("portals the listbox to the document body, out of a glass dialog's containing block", async () => {
+    fixture.advanced = false;
+    container.style.backdropFilter = "blur(28px) saturate(170%)";
+    await mount({ value: "b", onChange: () => {}, children: options() });
+    await act(async () => trigger().click());
+    expect(listbox()!.parentElement).toBe(document.body);
+    expect(container.querySelector('[role="listbox"]')).toBeNull();
+  });
+
   it("walks enabled rows with the keyboard, skips disabled options and applies Enter", async () => {
     const onChange = vi.fn();
     await mount({ value: "b", onChange, children: options() });
