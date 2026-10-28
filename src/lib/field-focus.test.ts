@@ -58,11 +58,13 @@ describe("text field focus", () => {
     ).toBe(true);
   });
 
-  it("gives every text field the same halo ring, except the composer and the model search", () => {
-    const rings = [...unlayered(css).matchAll(/([^{}]+)\{([^}]*box-shadow:[^}]*var\(--color-focus\)[^}]*)\}/g)].map((match) => match[1]!.trim());
-    expect(rings.length).toBeGreaterThan(0);
-    expect(rings.join("\n")).toContain("[data-menu-search]");
-    expect(rings.join("\n")).toContain('[data-tour="composer"] textarea');
+  it("gives every text field one focus edge and no second halo, leaving the composer and the model search their own chrome", () => {
+    const cssText = unlayered(css);
+    // The field's own 1px border takes the focus colour; nothing paints a halo outside it as well.
+    expect(cssText).toMatch(/:is\(input[^{]*:focus-visible[^{]*\{[^}]*border-color:\s*var\(--color-focus\)[^}]*box-shadow:\s*none/);
+    expect(cssText).not.toMatch(/box-shadow:[^;}]*var\(--color-focus\)/);
+    expect(cssText).toContain("[data-menu-search]");
+    expect(cssText).toContain('[data-tour="composer"] textarea');
   });
 
   it("gives every text field one radius from the skin's control scale", () => {

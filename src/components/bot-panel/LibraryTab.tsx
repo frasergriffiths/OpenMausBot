@@ -90,9 +90,11 @@ export function LibraryTab({ bot, onOpen }: { bot: Bot; onOpen: (page: SimplePag
   if (pages.length + apps.length + shared.length + unshared.length === 0) {
     return (
       <div data-panel-tabpanel="library">
-        <p data-panel-empty="library" className="px-3 py-7 text-center text-[13px] leading-[18px] text-ink-tertiary">
-          {t("botPanel.library.empty")}
-        </p>
+        <Card>
+          <p data-panel-empty="library" className="px-4 py-6 text-center text-[13px] leading-[18px] text-ink-tertiary">
+            {t("botPanel.library.empty")}
+          </p>
+        </Card>
         {keeps}
       </div>
     );

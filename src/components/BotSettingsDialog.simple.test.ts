@@ -117,7 +117,6 @@ const { BotPanel } = await import("./bot-panel/PanelShell");
 const { PanelHero } = await import("./bot-panel/PanelHero");
 const { AvatarEditorCard } = await import("./bot-panel/AvatarEditorCard");
 const { DetailsTab } = await import("./bot-panel/DetailsTab");
-const { BotConversations } = await import("./bot-panel/Conversations");
 const { SettingsPage } = await import("./bot-panel/SettingsPage");
 const { LibraryTab } = await import("./bot-panel/LibraryTab");
 const { ApprovalChip } = await import("./ComposerPlusMenu");
@@ -583,15 +582,15 @@ describe("the avatar editor", () => {
 
 
 describe("the Details tab", () => {
-  it("holds the model, the conversations, routines and this conversation's rows, in that order, with no switch or Thinking row", () => {
+  it("holds the model and the routines, with no thread list and no switch or Thinking row", () => {
     const rendered = botTab(makeBot());
     expect(ofType(rendered, ModelPicker)!.props).toMatchObject({ bot: expect.objectContaining({ id: "scout" }), threadId: "thread-scout", contained: true });
-    expect(ofType(rendered, BotConversations)!.props.bot).toMatchObject({ id: "scout" });
-    const order = ['data-panel-row="model"', 'data-panel-card="conversations"', 'data-panel-empty="routines"', 'data-panel-item="find"', 'data-panel-item="activity"']
+    const order = ['data-panel-row="model"', 'data-panel-empty="routines"']
       .map((marker) => rendered.html.indexOf(marker));
     expect(order.every((index) => index > -1)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
-    for (const gone of ['data-panel-row="thinking"', 'data-panel-edit="soul"', 'data-panel-row="approval"', 'data-panel-row="goal"', 'data-panel-row="call-mode"',
+    for (const gone of ['data-panel-card="conversations"', "data-conversation", "data-panel-item", "data-conversations-new",
+      'data-panel-row="thinking"', 'data-panel-edit="soul"', 'data-panel-row="approval"', 'data-panel-row="goal"', 'data-panel-row="call-mode"',
       'data-panel-page="apps"', 'data-panel-page="memory"', 'data-panel-page="skills"', 'data-panel-page="folder"']) {
       expect(rendered.html, gone).not.toContain(gone);
     }
@@ -611,7 +610,7 @@ describe("the Details tab", () => {
     fixture.derived.botRoutines = [routine()];
     const some = botTab(makeBot());
     expect(some.html).not.toContain('data-panel-empty="routines"');
-    expect(some.html.indexOf('data-panel-card="conversations"')).toBeLessThan(some.html.indexOf('data-panel-page="routines"'));
+    expect(some.html.indexOf('data-panel-row="model"')).toBeLessThan(some.html.indexOf('data-panel-page="routines"'));
   });
 
   it("values Routines by how many are on, and opens the routines page", () => {
@@ -622,15 +621,6 @@ describe("the Details tab", () => {
     expect(onOpen).toHaveBeenLastCalledWith("routines");
     fixture.derived.botRoutines = [routine({ enabled: false })];
     expect(rowValue(botTab(makeBot()), "routines")).toBe("None");
-  });
-
-  it("lists Find and Activity for this conversation as rows that run them, leaving Copy and Download to Share", () => {
-    const rendered = botTab(makeBot());
-    expect([...rendered.html.matchAll(/data-panel-item="(\w+)"/g)].map((match) => match[1])).toEqual(["find", "activity"]);
-    expect(rendered.html).toContain(">Find in conversation<");
-    const run = (key: string) => (rendered.nodes.find((node) => (node.props.item as { key?: string } | undefined)?.key === key)!.props.item as { onSelect: () => void }).onSelect();
-    run("activity");
-    expect(fixture.dispatch).toHaveBeenLastCalledWith({ type: "toggleActivity" });
   });
 });
 

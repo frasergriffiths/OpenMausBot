@@ -144,7 +144,7 @@ describe("bot-first sidebar", () => {
     expect(renderToStaticMarkup(createElement(BotListItem, rowProps(density)))).not.toContain('data-testid="bot-role"');
   });
 
-  it("puts one trailing cluster of three dots then the engine mark after the text block, with the unread dot still in the name line", () => {
+  it("puts one trailing cluster of the engine mark then three dots after the text block, with the unread dot still in the name line", () => {
     fixture.showThreads = false;
     fixture.state = { ...fixture.state, instances: [{ instanceId: "fake", driverKind: "claudeAgent", displayName: "Claude" }] as unknown as AppState["instances"] };
     const candidate = { ...bot, tasks: [], projects: [], unread: true, messages: [{ id: "m", role: "bot", kind: "text", text: "Done.", at: 1 }] } as Bot;
@@ -156,8 +156,9 @@ describe("bot-first sidebar", () => {
     expect(title).not.toContain('data-bot-actions="atlas"');
     expect(title).not.toContain('data-testid="model-badge"');
 
-    const cluster = markup.slice(markup.indexOf('data-bot-actions="atlas"'));
-    expect(cluster.indexOf('data-bot-actions="atlas"')).toBeLessThan(cluster.indexOf('data-testid="model-badge"'));
+    const cluster = markup.slice(markup.indexOf('class="ms-auto flex shrink-0 items-center gap-1 self-center"'));
+    expect(cluster.indexOf('data-provider-mark="brand"')).toBeGreaterThan(-1);
+    expect(cluster.indexOf('data-provider-mark="brand"')).toBeLessThan(cluster.indexOf('data-bot-actions="atlas"'));
     expect(markup).toContain('class="ms-auto flex shrink-0 items-center gap-1 self-center"');
     expect(markup).toContain('data-provider-mark="brand"');
     expect(markup).not.toContain('data-row-dot=""');

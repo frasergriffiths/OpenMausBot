@@ -21,7 +21,7 @@ import { orderedThreadList } from "./SidebarThreadRow";
 import { openBotSettings } from "./bot-panel/panel-link";
 
 /** One item list for the chat's ⋯ menu wherever it sits; it lists the threads whenever the sidebar hides them. The
- * Simple bot panel draws the same items as rows, and its Share button holds the two that export. */
+ * Simple bot panel's Share button holds the two that export. */
 export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: SidebarMenuItem[]; on: boolean } {
   const bot = useMemo(() => currentTaskBot(profile), [profile]);
   const messages = useMemo(() => visibleMessages(bot), [bot]);
