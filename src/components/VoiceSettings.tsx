@@ -311,27 +311,30 @@ export function VoiceSettings({
       {!workspaceConfigurationLocked && (
         <div className="mt-4">
           <div className="mb-2 text-[13px] text-ink-secondary">{t("voice.engine")}</div>
-          {/* One capsule track, as the bot panel's segmented rows use: five pills that wrap 3 + 2 in a 320px panel. */}
-          <div className={cn(PILL_TABS, "flex-wrap")} role="group" aria-label={t("voice.engine")}>
-            {([
-              { value: "elevenlabs", label: t("voice.elevenlabs.label"), available: true },
-              { value: "fish", label: t("voice.fish.label"), available: true },
-              { value: "xai", label: t("voice.grok.label"), available: true },
-              { value: "system", label: t("voice.macBuiltIn"), available: systemVoicesAvailable },
-              { value: "chatterbox", label: t("voice.chatterboxLocal"), available: true },
-            ] as const).map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                aria-pressed={provider === option.value}
-                disabled={switching || !option.available}
-                title={!option.available ? t("voice.macOnly") : undefined}
-                onClick={() => setProvider(option.value)}
-                className={cn(PILL_TAB, "flex-auto", provider === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
-              >
-                {option.label}
-              </button>
-            ))}
+          {/* One capsule track, as the bot panel's segmented rows use: equal cells, never a pill stretched across the
+              row. Two columns in a narrow panel, three from 420px of container width, so five read 3 + 2. */}
+          <div className="@container">
+            <div className={cn(PILL_TABS, "grid grid-cols-2 @[420px]:grid-cols-3")} role="group" aria-label={t("voice.engine")}>
+              {([
+                { value: "elevenlabs", label: t("voice.elevenlabs.label"), available: true },
+                { value: "fish", label: t("voice.fish.label"), available: true },
+                { value: "xai", label: t("voice.grok.label"), available: true },
+                { value: "system", label: t("voice.macBuiltIn"), available: systemVoicesAvailable },
+                { value: "chatterbox", label: t("voice.chatterboxLocal"), available: true },
+              ] as const).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={provider === option.value}
+                  disabled={switching || !option.available}
+                  title={option.available ? option.label : `${option.label} — ${t("voice.macOnly")}`}
+                  onClick={() => setProvider(option.value)}
+                  className={cn(PILL_TAB, "min-h-[30px] w-full", provider === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
+                >
+                  <span className="block w-full min-w-0 truncate">{option.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
