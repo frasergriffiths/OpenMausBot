@@ -24,6 +24,7 @@ import { revealPhonePairing } from "../lib/phone-pairing";
 import { PhonesList } from "./PhonesList";
 import { ConnectionDetail } from "./ConnectionDetail";
 import { Card, Switch } from "./SettingsPrimitives";
+import { SIMPLE_ROW_FOCUS } from "./SidebarSimpleTop";
 import { brand } from "../lib/brand";
 import { useStore } from "@/state/store";
 
@@ -190,7 +191,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
   return (
     <div className="flex flex-col gap-4">
       {remoteBlocked && <p role="status" className="text-[13px] leading-relaxed text-ink-secondary">{remoteBlocked}</p>}
-      <div ref={pairingFlow} tabIndex={-1} data-phone-pairing="computer" className="scroll-mt-4 rounded-xl ring-1 ring-accent/40 focus:outline-none">
+      <div ref={pairingFlow} tabIndex={-1} data-phone-pairing="computer" className={`scroll-mt-4 rounded-xl ${SIMPLE_ROW_FOCUS}`}>
         <Card title={pairingCopy.title} subtitle={pairingCopy.subtitle}>
           {(panelStatus || (pairedCount > 0 && c.hostedReady)) && (
             <div className="mb-4 flex items-center justify-between gap-3">
@@ -223,7 +224,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0">
               <div className="text-[13px] text-ink">{t("remote.title")}</div>
-              <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+              <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">
                 {t("remote.toggleDetail")}
               </div>
             </div>
@@ -237,12 +238,12 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
 
           <div className="border-t border-hairline/30 pt-4">
             <div className="text-[13px] text-ink">{t("remote.devices.title")}</div>
-            <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{pairedCount ? t("remote.devices.subtitle", { app: brand().name }) : t("remote.devices.empty")}</div>
+            <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">{pairedCount ? t("remote.devices.subtitle", { app: brand().name }) : t("remote.devices.empty")}</div>
             <div className="mt-3">
               {pairedCount > 0 && (
                 <ul className="flex flex-col gap-2">
                   {state.devices.map((device) => (
-                    <li key={device.id} className="rounded-xl bg-inset px-3 py-3">
+                    <li key={device.id} className="rounded-lg bg-inset px-3 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-control text-ink-secondary">
                           <Smartphone size={15} />
@@ -262,7 +263,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                       </div>
                       <div className="mt-3 flex items-center justify-between gap-3 border-t border-hairline/30 pt-3">
                         <div>
-                          <div className="text-[12px] text-ink">{t("remote.devices.allowView")}</div>
+                          <div className="text-[13px] text-ink">{t("remote.devices.allowView")}</div>
                           <div className="mt-0.5 text-[11px] text-ink-secondary">{t("remote.devices.allowViewDetail")}</div>
                         </div>
                         <Switch
@@ -278,7 +279,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                       </div>
                       <div className="mt-3 flex items-center justify-between gap-3 border-t border-hairline/30 pt-3">
                         <div>
-                          <div className="text-[12px] text-ink">{t("remote.devices.allowBrowser")}</div>
+                          <div className="text-[13px] text-ink">{t("remote.devices.allowBrowser")}</div>
                           <div className="mt-0.5 text-[11px] text-ink-secondary">{t("remote.devices.allowBrowserDetail")}</div>
                         </div>
                         <Switch
@@ -299,9 +300,9 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
 
           <div className="border-t border-hairline/30 pt-4">
             <div className="text-[13px] text-ink">{t("remote.pairing.tailscale.title")}</div>
-            <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">{t("remote.tailscaleCard.subtitle")}</div>
+            <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">{t("remote.tailscaleCard.subtitle")}</div>
             <div className="mt-3">
-              <div className="rounded-xl bg-inset px-3 py-3" aria-live="polite">
+              <div className="rounded-lg bg-inset px-3 py-3" aria-live="polite">
                 <div className="flex items-start gap-2.5">
                   <ShieldCheck
                     size={16}
@@ -309,7 +310,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                   />
                   <div className="min-w-0">
                     <div className="text-[13px] font-medium text-ink">{tailscaleStatus.title}</div>
-                    <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+                    <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">
                       {tailscaleStatus.detail}
                     </div>
                   </div>
@@ -326,7 +327,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                   pairingFlow.current?.focus({ preventScroll: true });
                 });
               }}
-              className="mt-3 rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] text-ink hover:bg-control disabled:opacity-40"
+              className="mt-3 inline-flex h-8 items-center justify-center rounded-lg border border-hairline/40 px-3 text-[13px] font-medium text-ink hover:bg-control disabled:opacity-40"
             >
               {t("remote.pairOverTailscale")}
             </button>
@@ -335,7 +336,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
               disabled={c.busy || c.accountBusy || (Boolean(managedBy) && !state.enabled)}
               title={managedBy ?? undefined}
               onClick={c.refreshTailscale}
-              className="mt-3 rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] text-ink hover:bg-control disabled:opacity-40"
+              className="mt-3 inline-flex h-8 items-center justify-center rounded-lg border border-hairline/40 px-3 text-[13px] font-medium text-ink hover:bg-control disabled:opacity-40"
             >
               {c.busy ? t("common.checking") : managedBy && !state.enabled ? managedBy : state.enabled ? t("remote.checkAgain") : t("remote.turnOnAndCheck")}
             </button>
@@ -346,7 +347,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
           <div className="flex items-center justify-between gap-4 border-t border-hairline/30 pt-4">
             <div className="min-w-0">
               <div className="text-[13px] text-ink">{t("remote.keepAwake")}</div>
-              <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+              <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">
                 {t("remote.keepAwakeDetail")}
               </div>
             </div>
@@ -364,7 +365,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                 <Cloud size={15} className="mt-0.5 shrink-0 text-accent" />
                 <div className="min-w-0">
                   <div className="text-[13px] text-ink">{t("remote.account.title")}</div>
-                  <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+                  <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">
                     {c.account?.status === "ready"
                       ? t("remote.account.signedIn", {
                           email: c.account.email ?? t("remote.account.yourAccount"),
@@ -381,7 +382,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
                 <button
                   disabled={c.accountBusy}
                   onClick={() => void c.accountAct((remote) => remote.signOut())}
-                  className="flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
+                  className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 text-[13px] font-medium text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
                 >
                   <LogOut size={12} /> {t("remote.account.signOut")}
                 </button>
@@ -391,24 +392,24 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
               <button
                 disabled={c.accountBusy}
                 onClick={c.retryAccount}
-                className="mt-3 rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] text-ink hover:bg-control disabled:opacity-40"
+                className="mt-3 inline-flex h-8 items-center justify-center rounded-lg border border-hairline/40 px-3 text-[13px] font-medium text-ink hover:bg-control disabled:opacity-40"
               >
                 {c.accountBusy ? t("remote.account.retrying") : t("remote.account.retry")}
               </button>
             )}
-            {accountActionError && <div className="mt-2 text-[12px] text-danger">{accountActionError}</div>}
+            {accountActionError && <div className="mt-2 text-[13px] text-danger">{accountActionError}</div>}
           </div>
 
           <div className="border-t border-hairline/30 pt-4">
             <div className="text-[13px] text-ink">{t("remote.connection.title")}</div>
-            <div className="mt-0.5 text-[12px] text-ink-secondary">
+            <div className="mt-0.5 text-[13px] text-ink-secondary">
               {t("remote.connection.detail")}
             </div>
             <div className="mt-3 flex flex-col gap-2">
               {hosted && <ConnectionDetail label={t("remote.connection.secureRoute")} value={endpointHost(hosted.url)} />}
               {localRoutes.map((route) => <ConnectionDetail key={`${route.label}:${route.value}`} {...route} />)}
               {!hosted && localRoutes.length === 0 && (
-                <div className="text-[12px] text-ink-secondary">{t("remote.connection.none")}</div>
+                <div className="text-[13px] text-ink-secondary">{t("remote.connection.none")}</div>
               )}
             </div>
           </div>
@@ -418,7 +419,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
               <Wifi size={15} className="mt-0.5 shrink-0 text-ink-secondary" />
               <div>
                 <div className="text-[13px] text-ink">{t("remote.pairing.wifi.title")}</div>
-                <div className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+                <div className="mt-0.5 text-[13px] leading-relaxed text-ink-secondary">
                   {t("remote.wifi.detail")}
                 </div>
               </div>
@@ -426,18 +427,18 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
             <button
               disabled={c.busy || c.accountBusy}
               onClick={c.useLocal}
-              className="mt-3 rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] text-ink hover:bg-control disabled:opacity-40"
+              className="mt-3 inline-flex h-8 items-center justify-center rounded-lg border border-hairline/40 px-3 text-[13px] font-medium text-ink hover:bg-control disabled:opacity-40"
             >
               {t("remote.wifi.pair")}
             </button>
           </div>
 
           {state.enabled && !hosted && !state.tailscale && (
-            <div className="rounded-lg bg-inset px-3 py-2 text-[12px] leading-relaxed text-ink-secondary">
+            <div className="rounded-lg bg-inset px-3 py-2 text-[13px] leading-relaxed text-ink-secondary">
               {t("remote.localOnly")}
             </div>
           )}
-          {(c.error || state.error) && <div className="text-[12px] text-danger">{c.error ?? state.error}</div>}
+          {(c.error || state.error) && <div className="text-[13px] text-danger">{c.error ?? state.error}</div>}
         </div>
       </details>
     </div>
