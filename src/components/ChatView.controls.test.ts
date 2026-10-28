@@ -435,7 +435,7 @@ describe("thread control placement", () => {
     const markup = renderToStaticMarkup(createElement(FailedTurnRow, { tool: { name: "error: Not logged in · Please run /login", ok: false, setup: true }, engine: claude, onRetry: () => {} }));
     expect(markup).toContain(">Claude isn&#x27;t signed in yet. Sign in below, then send your message again.</span>");
     expect(markup).toContain("Sign in to Claude</button>");
-    expect(markup).toMatch(/<summary[^>]*>Details<\/summary><p[^>]*>Not logged in · Please run \/login<\/p>/);
+    expect(markup).toMatch(/<summary[^>]*>.*?<\/summary><p[^>]*>Not logged in · Please run \/login<\/p>/);
     expect(markup).not.toContain(">Retry<");
     const update = { name: "error: Claude Code 2.1.268 does not support this model", ok: false, setup: true, claudeUpdate: true };
     for (const engine of [claude, { ...claude, readOnly: true }]) {
@@ -449,7 +449,7 @@ describe("thread control placement", () => {
     const raw = 'API Error: 529 {"type":"error","error":{"type":"overloaded_error","message":"Overloaded"}}';
     const markup = renderToStaticMarkup(createElement(FailedTurnRow, { tool: { name: `error: ${raw}`, ok: false }, engine: undefined, onRetry: () => {} }));
     expect(markup).toContain(">The service is busy right now. Try again in a moment.</span>");
-    expect(markup).toMatch(/<summary[^>]*>Details<\/summary><p[^>]*>API Error: 529/);
+    expect(markup).toMatch(/<summary[^>]*>.*?<\/summary><p[^>]*>API Error: 529/);
     expect(markup).toContain(" Retry</button>");
     const plain = renderToStaticMarkup(createElement(FailedTurnRow, { tool: { name: "error: no activity for 10 minutes — the turn was stopped", ok: false }, engine: undefined }));
     expect(plain).toContain(">no activity for 10 minutes — the turn was stopped</span>");
@@ -715,7 +715,7 @@ describe("the way back to the bot's own conversation", () => {
   });
 });
 
-describe("thread tabs in the chat header", () => {
+describe("the thread chip in the chat header", () => {
   const threaded: Bot = {
     ...bot,
     tasks: [
@@ -726,71 +726,17 @@ describe("thread tabs in the chat header", () => {
     ],
   };
 
-  it("puts a bot's threads as tabs to the left of the identity, clear of the model picker", () => {
+  it("names the open thread to the left of the identity, clear of the model picker", () => {
     const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
-    expect(markup).toContain("data-chathead-tabs");
-    expect(markup.indexOf("data-chathead-tabs")).toBeLessThan(markup.indexOf("data-chathead-identity"));
+    expect(markup).toContain("data-thread-chip-bar");
+    expect(markup.indexOf("data-thread-chip-bar")).toBeLessThan(markup.indexOf("data-chathead-identity"));
     expect(markup.indexOf("data-chathead-identity")).toBeLessThan(markup.indexOf("data-chathead-controls"));
-    const identity = markup.slice(markup.indexOf("data-chathead-tabs"), markup.indexOf("data-chathead-identity"));
-    expect(identity).toContain('data-thread-tab="selected"');
-    expect(identity).toContain('data-thread-tab="launch"');
-    expect(identity).toContain('data-thread-tab="pricing"');
-    expect(identity).not.toContain('data-thread-tab="routine"');
-    expect(identity).toContain('role="tablist"');
-    const selected = identity.match(/<button[^>]*data-thread-tab="selected"[^>]*>/)?.[0] ?? "";
-    const launch = identity.match(/<button[^>]*data-thread-tab="launch"[^>]*>/)?.[0] ?? "";
-    expect(selected).toContain('aria-selected="true"');
-    expect(launch).toContain('aria-selected="false"');
-    expect(selected).toContain('id="thread-tab-selected"');
-    expect(selected).toContain('aria-controls="chat-thread-panel"');
-    expect(launch).toContain('id="thread-tab-launch"');
-    expect(launch).toContain('aria-controls="chat-thread-panel"');
-    // The tabpanel relationship needs a measured strip, so it is asserted in ChatView.thread-panel.dom.test.ts.
+    const slot = markup.slice(markup.indexOf("data-chathead-tabbar"), markup.indexOf("data-chathead-identity"));
+    expect(slot).toContain("Selected");
+    expect(slot).not.toContain("Morning brief");
+    expect(slot).not.toContain("data-thread-tab=");
+    expect(slot).toContain('aria-haspopup="dialog"');
     const controls = markup.slice(markup.indexOf("data-chathead-controls"));
     expect(controls).toContain("data-test-model-control");
-    expect(controls).not.toContain("data-chathead-tabs");
-  });
-
-  it("shows the same tabs in Simple mode, where the panel list is unavailable", () => {
-    fixture.advanced = false;
-    try {
-      const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
-      expect(markup).toContain("data-chathead-tabs");
-      expect(markup).toContain('role="tablist"');
-      expect(markup).toContain('data-thread-tab="selected"');
-      expect(markup).toContain('data-thread-tab="launch"');
-    } finally {
-      fixture.advanced = true;
-    }
-  });
-
-  it("leaves the phone header alone", () => {
-    fixture.phone = true;
-    try {
-      const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
-      expect(markup).not.toContain("data-chathead-tabs");
-      expect(markup).not.toContain('role="tabpanel"');
-      expect(markup).not.toContain('aria-controls="chat-thread-panel"');
-    } finally {
-      fixture.phone = false;
-    }
-  });
-
-  it("still names a one-conversation bot's thread with a single tab", () => {
-    const markup = renderToStaticMarkup(createElement(ChatView, { bot }));
-    expect(markup).toContain("data-chathead-tabs");
-    expect(markup.match(/data-thread-tab="/g)).toHaveLength(1);
-  });
-
-  it("leaves the header alone when threads are switched off", () => {
-    fixture.threadsWanted = false;
-    try {
-      const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
-      expect(markup).not.toContain("data-chathead-tabs");
-      expect(markup).not.toContain('role="tabpanel"');
-      expect(markup).not.toContain('aria-controls="chat-thread-panel"');
-    } finally {
-      fixture.threadsWanted = true;
-    }
   });
 });

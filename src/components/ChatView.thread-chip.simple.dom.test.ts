@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-// Simple mode hides the bot panel's Conversations card, so the chat header is the only place to switch threads there.
-// These tests mount the real ChatView and fail if the strip goes back to being Advanced-mode only.
+// Simple mode hides the bot panel's Conversations card, so the chat header's thread chip is the only place to switch
+// threads there. These mount the real ChatView and fail if the chip or its switcher goes away.
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
@@ -86,24 +86,61 @@ afterAll(() => {
   vi.unstubAllGlobals();
 });
 
-const strip = () => document.querySelector('[role="tablist"]');
+const chip = () => document.querySelector<HTMLButtonElement>("[data-thread-chip-bar]");
+const sheet = () => document.querySelector<HTMLElement>("[data-thread-switcher]");
+const rows = () => [...document.querySelectorAll<HTMLButtonElement>("[data-thread-row]")];
 
-describe("the thread strip in Simple mode", () => {
-  it("renders the tabs in the chat header even though Simple mode hides the conversations panel", () => {
+describe("the thread chip in Simple mode", () => {
+  it("names the open thread in the chat header even though Simple mode hides the conversations panel", () => {
     fixture.advanced = false;
     fixture.threadsShown = false;
     fixture.threadsWanted = true;
     draw();
 
-    expect(strip()).not.toBeNull();
-    expect(document.querySelectorAll('[role="tab"]')).toHaveLength(4);
+    expect(chip()).not.toBeNull();
+    expect(chip()!.textContent).toContain("Conversation 1");
+    expect(chip()!.getAttribute("aria-expanded")).toBe("false");
   });
 
-  it("still hides the strip when the person has turned threads off", () => {
+  it("still hides the chip when the person has turned threads off", () => {
     fixture.threadsWanted = false;
     draw();
 
-    expect(strip()).toBeNull();
+    expect(chip()).toBeNull();
+  });
+
+  it("opens the switcher with every thread, the current one marked", () => {
+    fixture.threadsWanted = true;
+    draw();
+    flushSync(() => chip()!.click());
+    expect(sheet()).not.toBeNull();
+    expect(sheet()!.getAttribute("role")).toBe("dialog");
+    expect(rows()).toHaveLength(4);
+    expect(rows().filter((row) => row.getAttribute("aria-current") === "true")).toHaveLength(1);
+    expect(rows()[0]!.getAttribute("aria-current")).toBe("true");
+  });
+
+  const settle = async () => { await new Promise((resolve) => setTimeout(resolve, 260)); };
+
+  it("switches to the chosen thread and closes the switcher", async () => {
+    draw();
+    flushSync(() => chip()!.click());
+    actions.length = 0;
+    flushSync(() => rows()[2]!.click());
+    await settle();
+    expect(sheet()).toBeNull();
+    expect(actions.some((action) => action.type === "switchTask" || action.type === "select")).toBe(true);
+  });
+
+  it("closes on Escape and returns focus to the chip", async () => {
+    draw();
+    flushSync(() => chip()!.click());
+    flushSync(() => {
+      sheet()!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    });
+    await settle();
+    expect(sheet()).toBeNull();
+    expect(document.activeElement).toBe(chip());
   });
 
   it("puts a + beside the header controls that starts a conversation, named for a screen reader", () => {
@@ -115,7 +152,6 @@ describe("the thread strip in Simple mode", () => {
     const button = document.querySelector<HTMLButtonElement>("[data-chathead-new-thread]")!;
     expect(button.getAttribute("aria-label")).toBe("New conversation");
     expect(button.getAttribute("title")).toBe("New conversation");
-    expect(button.className).toContain("size-8");
     actions.length = 0;
     flushSync(() => button.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     expect(actions).toEqual([{ type: "newTask", botId: bot.id }]);

@@ -6647,5 +6647,6 @@
   "composer.send.steerUnavailable": "Queue for {name} — this engine can’t steer",
   "common.back": "Back",
   "settings.group.keys": "Keys",
-  "sidebar.update.failureDetails": "Update details"
+  "sidebar.update.failureDetails": "Update details",
+  "thread.switcher.empty": "No threads yet"
 }
