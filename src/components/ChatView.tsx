@@ -211,7 +211,7 @@ export function ErrorRow({
     return (
       <div className="flex justify-start">
         <div className="w-fit max-w-[min(var(--chat-bubble-max),var(--chat-bubble-pct))]">
-          <MacCuaPermissionCard reason={message} />
+          <MacCuaPermissionCard reason={capabilities.localComputer.message ?? message} />
         </div>
       </div>
     );
