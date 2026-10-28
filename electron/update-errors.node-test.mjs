@@ -22,6 +22,7 @@ test("update failures keep integrity and certificate errors distinct from recove
   assert.match(updateErrorMessage(Object.assign(new Error('publisherNames differ. SignerCertificate: {"Subject":"CN=Unexpected"}'), { code: "ERR_UPDATER_INVALID_SIGNATURE" })), /failed verification/);
   assert.match(updateErrorMessage(new Error('ERR_UPDATER_INVALID_SIGNATURE: SignerCertificate mismatch')), /failed verification/);
   assert.equal(updateErrorMessage(new Error("unknown failure")), "unknown failure");
+  assert.match(updateErrorMessage(Object.assign(new Error("ENOENT: no such file or directory, open '/Applications/OpenMausBot.app/Contents/Resources/app-update.yml'"), { code: "ENOENT" })), /not configured in this build/);
 });
 
 test("only failures the person must fix are theirs to see when nobody asked", () => {

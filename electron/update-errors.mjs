@@ -2,15 +2,18 @@ const INTEGRITY = "The update failed verification. Download a fresh installer fr
 const DISK = "Not enough disk space to prepare the update. Free some space, then try again.";
 const PERMISSION = "The update could not write to the app or its cache. Check folder permissions, or use the official installer.";
 const BUSY = "An update file is in use. Close other copies of OpenMausBot, then try again.";
+export const UNCONFIGURED = "Updates are not configured in this build.";
 const NEEDS_PERSON = new Set([INTEGRITY, DISK, PERMISSION, BUSY]);
 
 export function updateErrorNeedsPerson(error) {
-  return NEEDS_PERSON.has(updateErrorMessage(error));
+  const message = updateErrorMessage(error);
+  return message !== UNCONFIGURED && NEEDS_PERSON.has(message);
 }
 
 export function updateErrorMessage(error) {
   const message = String(error?.message ?? error ?? "Update failed");
   const detail = `${error?.code ?? ""} ${message}`;
+  if (/\bENOENT\b.*app-update\.yml|app-update\.yml.*\bENOENT\b/i.test(detail)) return UNCONFIGURED;
   // Installer errors may mention SignerCertificate details; that must not read as network advice.
   const integrity = /ERR_UPDATER_(?:INVALID_SIGNATURE|CHECKSUM_MISMATCH)/i.test(detail);
   const tls = /CERT_|ERR_TLS_|UNABLE_TO_VERIFY_LEAF_SIGNATURE|SSL_ERROR|SELF_SIGNED_CERT_IN_CHAIN/i.test(detail);

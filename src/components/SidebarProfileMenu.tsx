@@ -119,9 +119,11 @@ export function updateLabel(phase: UpdatePhase, state: UpdaterState | null): str
     case "handed-off":
       return t("sidebar.update.handedOff");
     case "error":
-      return state?.message?.trim() || t("sidebar.update.failed");
+      return t("sidebar.update.checkFailed");
     case "up-to-date":
       return t("sidebar.update.upToDate");
+    case "idle":
+      return state?.message?.trim() || t("sidebar.update.check");
     default:
       return t("sidebar.update.check");
   }
@@ -160,7 +162,7 @@ export function simpleUpdateTop(entry: Pick<UpdateEntry, "phase" | "source" | "i
   const ready = () => t("sidebar.update.readyShort");
   if (entry?.source === "desktop") {
     if (entry.phase === "downloaded") return { label: ready(), action: t(entry.installMode === "handoff" ? "sidebar.update.installAction" : "sidebar.update.restartAction") };
-    if (entry.phase === "error") return { label: t("sidebar.update.failedShort"), action: t("sidebar.update.retryAction") };
+    if (entry.phase === "error") return { label: t("sidebar.update.checkFailed"), action: t("sidebar.update.retryAction") };
   }
   if (entry?.source === "server") {
     if (entry.phase === "available") return { label: ready(), action: t("sidebar.update.installAction") };
@@ -203,6 +205,7 @@ export function useUpdateItem(): UpdateEntry | null {
       keepOpen: true,
       attention: phase === "downloaded" || phase === "error",
       attentionTone: phase === "error" ? "danger" : "accent",
+      technical: phase === "error" ? state?.message?.trim() : undefined,
       onSelect: () => {
         if (phase === "downloaded") {
           setPending(true);

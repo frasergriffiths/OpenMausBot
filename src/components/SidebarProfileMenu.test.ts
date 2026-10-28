@@ -128,11 +128,11 @@ describe("updateLabel", () => {
       .toBe("Opening a terminal…");
   });
 
-  it("carries the updater's own message when something failed", () => {
+  it("keeps a failed update's raw message out of the visible line", () => {
     expect(updateLabel("error", state({ status: "error", message: "Network unreachable" }))).toBe(
-      "Network unreachable",
+      "Couldn't check for updates — try again",
     );
-    expect(updateLabel("error", state({ status: "error" }))).toBe("Update failed — try again");
+    expect(updateLabel("error", state({ status: "error" }))).toBe("Couldn't check for updates — try again");
   });
 
   it("points a hand-off at the terminal that finishes it", () => {
@@ -455,7 +455,7 @@ describe("Simple mode's account menu", () => {
   it("raises a downloaded or failed app update and a newer server, and nothing else", () => {
     expect(simpleUpdateTop({ source: "desktop", phase: "downloaded" })).toEqual({ label: "Update ready", action: "Restart" });
     expect(simpleUpdateTop({ source: "desktop", phase: "downloaded", installMode: "handoff" })).toEqual({ label: "Update ready", action: "Install" });
-    expect(simpleUpdateTop({ source: "desktop", phase: "error" })).toEqual({ label: "Update failed", action: "Retry" });
+    expect(simpleUpdateTop({ source: "desktop", phase: "error" })).toEqual({ label: "Couldn't check for updates — try again", action: "Retry" });
     expect(simpleUpdateTop({ source: "server", phase: "available" })).toEqual({ label: "Update ready", action: "Install" });
     expect(simpleUpdateTop({ source: "server", phase: "reload" })).toEqual({ label: "Update ready", action: "Restart" });
     for (const phase of ["idle", "checking", "downloading", "up-to-date"] as const) expect(simpleUpdateTop({ source: "desktop", phase })).toBeNull();
