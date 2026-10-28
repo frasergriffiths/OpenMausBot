@@ -734,8 +734,15 @@ describe("thread tabs in the chat header", () => {
     expect(identity).toContain('data-thread-tab="pricing"');
     expect(identity).not.toContain('data-thread-tab="routine"');
     expect(identity).toContain('role="tablist"');
-    expect(identity.match(/<button[^>]*data-thread-tab="selected"[^>]*>/)?.[0]).toContain('aria-selected="true"');
-    expect(identity.match(/<button[^>]*data-thread-tab="launch"[^>]*>/)?.[0]).toContain('aria-selected="false"');
+    const selected = identity.match(/<button[^>]*data-thread-tab="selected"[^>]*>/)?.[0] ?? "";
+    const launch = identity.match(/<button[^>]*data-thread-tab="launch"[^>]*>/)?.[0] ?? "";
+    expect(selected).toContain('aria-selected="true"');
+    expect(launch).toContain('aria-selected="false"');
+    expect(selected).toContain('id="thread-tab-selected"');
+    expect(selected).toContain('aria-controls="chat-thread-panel"');
+    expect(launch).toContain('id="thread-tab-launch"');
+    expect(launch).toContain('aria-controls="chat-thread-panel"');
+    // The tabpanel relationship needs a measured strip, so it is asserted in ChatView.thread-panel.dom.test.ts.
     const controls = markup.slice(markup.indexOf("data-chathead-controls"));
     expect(controls).toContain("data-test-model-control");
     expect(controls).not.toContain("data-chathead-tabs");
@@ -744,7 +751,10 @@ describe("thread tabs in the chat header", () => {
   it("leaves the header alone in Simple mode", () => {
     fixture.advanced = false;
     try {
-      expect(renderToStaticMarkup(createElement(ChatView, { bot: threaded }))).not.toContain("data-chathead-tabs");
+      const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
+      expect(markup).not.toContain("data-chathead-tabs");
+      expect(markup).not.toContain('role="tabpanel"');
+      expect(markup).not.toContain('aria-controls="chat-thread-panel"');
     } finally {
       fixture.advanced = true;
     }
@@ -753,20 +763,29 @@ describe("thread tabs in the chat header", () => {
   it("leaves the phone header alone", () => {
     fixture.phone = true;
     try {
-      expect(renderToStaticMarkup(createElement(ChatView, { bot: threaded }))).not.toContain("data-chathead-tabs");
+      const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
+      expect(markup).not.toContain("data-chathead-tabs");
+      expect(markup).not.toContain('role="tabpanel"');
+      expect(markup).not.toContain('aria-controls="chat-thread-panel"');
     } finally {
       fixture.phone = false;
     }
   });
 
   it("leaves a one-conversation bot's header alone", () => {
-    expect(renderToStaticMarkup(createElement(ChatView, { bot }))).not.toContain("data-chathead-tabs");
+    const markup = renderToStaticMarkup(createElement(ChatView, { bot }));
+    expect(markup).not.toContain("data-chathead-tabs");
+    expect(markup).not.toContain('role="tabpanel"');
+    expect(markup).not.toContain('aria-controls="chat-thread-panel"');
   });
 
   it("leaves the header alone when threads are switched off", () => {
     fixture.showThreads = false;
     try {
-      expect(renderToStaticMarkup(createElement(ChatView, { bot: threaded }))).not.toContain("data-chathead-tabs");
+      const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
+      expect(markup).not.toContain("data-chathead-tabs");
+      expect(markup).not.toContain('role="tabpanel"');
+      expect(markup).not.toContain('aria-controls="chat-thread-panel"');
     } finally {
       fixture.showThreads = true;
     }

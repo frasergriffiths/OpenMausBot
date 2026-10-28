@@ -70,16 +70,22 @@ describe("a bot's threads in the chat header", () => {
     render(bot());
     expect(tabs().map((element) => element.dataset.threadTab)).toEqual(["hiring", "launch", "who", "pricing", "deck"]);
     expect(tab("who").getAttribute("aria-selected")).toBe("true");
+    expect(tab("who").id).toBe("thread-tab-who");
+    expect(tab("who").getAttribute("aria-controls")).toBe("chat-thread-panel");
     expect(tab("who").tabIndex).toBe(0);
+    expect(tab("who").className).toContain("focus-visible:ring-inset");
     expect(tab("launch").getAttribute("aria-selected")).toBe("false");
     expect(tab("launch").tabIndex).toBe(-1);
     expect(host.querySelector('[role="tablist"]')!.getAttribute("aria-label")).toBe("Conversations");
   });
 
-  it("keeps the archived thread that is open in the strip, so the tab for what is on screen is there", () => {
+  it("hides the strip when the open thread is archived or a routine run, so no tab is selected by a missing id", () => {
     render(bot({ threadId: "old" }));
-    expect(tabs().map((element) => element.dataset.threadTab)).toContain("old");
-    expect(tab("old").getAttribute("aria-selected")).toBe("true");
+    expect(host.querySelector("[data-chathead-tabs]")).toBeNull();
+    expect(tabs()).toHaveLength(0);
+    render(bot({ threadId: "run" }));
+    expect(host.querySelector("[data-chathead-tabs]")).toBeNull();
+    expect(tabs()).toHaveLength(0);
   });
 
   it("draws nothing for a bot with one conversation", () => {
@@ -150,6 +156,24 @@ describe("a bot's threads in the chat header", () => {
     expect(document.activeElement).toBe(tab("deck"));
     key(tab("deck"), "ArrowLeft");
     expect(document.activeElement).toBe(tab("pricing"));
+  });
+
+  it("clears a pending keyboard refocus when a mouse switch follows", async () => {
+    render(bot());
+    const pricingTab = tab("pricing");
+    pricingTab.focus();
+    // Enter/Space on a button is a click with detail 0.
+    flushSync(() => pricingTab.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 0 })));
+    const deckTab = tab("deck");
+    deckTab.focus();
+    flushSync(() => deckTab.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 })));
+
+    // The keyboard switch lands first and would refocus pricing on its second frame; the mouse switch must have cleared it.
+    render(bot({ threadId: "pricing" }));
+    await new Promise((resolve) => setTimeout(resolve, 80));
+    render(bot({ threadId: "deck" }));
+    expect(tab("deck").getAttribute("aria-selected")).toBe("true");
+    expect(document.activeElement).toBe(tab("deck"));
   });
 
   it("switches when the focused tab is pressed, not merely focused", () => {
@@ -234,11 +258,11 @@ describe("a bot's threads in the chat header", () => {
     expect(fixture.dispatch.mock.calls).toEqual([[{ type: "newTask", botId: "research", projectId: "p1" }]]);
   });
 
-  it("keeps a long strip scrolling rather than growing the header, and scrolls the open tab into view", () => {
+  it("keeps a long strip scrolling rather than growing the header, and scrolls the whole active row into view", () => {
     const scrolled: string[] = [];
     const original = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = function scrollIntoView(this: Element) {
-      scrolled.push(this.getAttribute("data-thread-tab") ?? "");
+      scrolled.push(this.getAttribute("data-thread-tab-item") ?? "");
     };
     try {
       render(bot());
@@ -248,12 +272,21 @@ describe("a bot's threads in the chat header", () => {
     } finally {
       Element.prototype.scrollIntoView = original;
     }
-    const list = host.querySelector('[role="tablist"]')!;
+    const list = host.querySelector<HTMLElement>('[role="tablist"]')!;
     expect(list.className).toContain("overflow-x-auto");
+    expect(list.className).toContain("py-1");
+    expect(list.className).toContain("-my-1");
     expect(list.className).toContain("[scrollbar-width:none]");
+    // The row is the scroll target because it also holds the 24px action trigger; scrolling the button would leave
+    // the trigger outside the visible scrollport.
+    expect(list.style.scrollPaddingInlineEnd).toBe("1.75rem");
+    const row = host.querySelector('[data-thread-tab-item="who"]')!;
+    expect(row.querySelector('[role="tab"]')).not.toBeNull();
+    expect(row.querySelector('button[aria-haspopup="menu"]')).not.toBeNull();
   });
 
   it("offers edge buttons only while tabs continue off-screen, and they scroll instead of switching", () => {
+    document.documentElement.dataset.reducedMotion = "false";
     render(bot());
     expect(host.querySelector("[data-thread-tabs-back]")).toBeNull();
     expect(host.querySelector("[data-thread-tabs-forward]")).toBeNull();
@@ -268,6 +301,8 @@ describe("a bot's threads in the chat header", () => {
     const back = host.querySelector<HTMLButtonElement>("[data-thread-tabs-back]")!;
     const forward = host.querySelector<HTMLButtonElement>("[data-thread-tabs-forward]")!;
     expect(back).not.toBeNull();
+    expect(back.className).toContain("focus-visible:ring-inset");
+    expect(forward.className).toContain("focus-visible:ring-inset");
     expect(forward).not.toBeNull();
     expect(back.getAttribute("aria-label")).toBe("Earlier threads");
     expect(forward.getAttribute("aria-label")).toBe("Later threads");
@@ -283,6 +318,43 @@ describe("a bot's threads in the chat header", () => {
     flushSync(() => list.dispatchEvent(new Event("scroll")));
     expect(host.querySelector<HTMLButtonElement>("[data-thread-tabs-forward]")!.disabled).toBe(true);
     expect(host.querySelector<HTMLButtonElement>("[data-thread-tabs-back]")!.disabled).toBe(false);
+  });
+
+  it("does not animate that scroll when the person has asked for less motion", () => {
+    render(bot());
+    const list = host.querySelector<HTMLElement>('[role="tablist"]')!;
+    Object.defineProperty(list, "scrollWidth", { configurable: true, value: 640 });
+    Object.defineProperty(list, "clientWidth", { configurable: true, value: 300 });
+    const scrollBy = vi.fn();
+    Object.defineProperty(list, "scrollBy", { configurable: true, value: scrollBy });
+    flushSync(() => list.dispatchEvent(new Event("scroll")));
+
+    click(host.querySelector("[data-thread-tabs-forward]"));
+    expect(scrollBy).toHaveBeenCalledWith({ left: 225, behavior: "auto" });
+  });
+
+  it("sets up its scroll handling when a second thread gives the strip something to scroll", () => {
+    render(bot({ tasks: [task("who", "Who am I?", 1)] }));
+    expect(host.querySelector('[role="tablist"]')).toBeNull();
+
+    render(bot());
+    const list = host.querySelector<HTMLElement>('[role="tablist"]')!;
+    Object.defineProperty(list, "scrollWidth", { configurable: true, value: 640 });
+    Object.defineProperty(list, "clientWidth", { configurable: true, value: 300 });
+    list.scrollLeft = 340;
+    flushSync(() => list.dispatchEvent(new Event("scroll")));
+
+    expect(host.querySelector<HTMLButtonElement>("[data-thread-tabs-back]")!.disabled).toBe(false);
+    expect(host.querySelector<HTMLButtonElement>("[data-thread-tabs-forward]")!.disabled).toBe(true);
+  });
+
+  it("gives the tab stop back to the open thread when focus leaves the strip", () => {
+    render(bot());
+    key(tab("who"), "ArrowRight");
+    expect(tab("pricing").tabIndex).toBe(0);
+    flushSync(() => tab("pricing").blur());
+    expect(tab("who").tabIndex).toBe(0);
+    expect(tab("pricing").tabIndex).toBe(-1);
   });
 
   it("reads RTL scroll offsets from the right edge, so the ends still disable", () => {
