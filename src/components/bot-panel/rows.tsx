@@ -39,16 +39,23 @@ export function LabelAction({ children, onClick, ...rest }: { children: ReactNod
 export function Card({ label, action, anchor, children }: { label?: ReactNode; action?: ReactNode; anchor?: string; children: ReactNode }) {
   const advanced = useAdvancedMode();
   return (
-    <section data-panel-card={anchor}>
-      {label ? <CardLabel action={action}>{label}</CardLabel> : <div className="h-3.5" />}
+    <section data-panel-card={anchor} className="mt-4 first:mt-0">
       <div
         data-panel-card-surface=""
         className={cn(
-          "divide-y divide-ink/[0.05] overflow-hidden max-md:rounded-[20px] max-md:border-hairline max-md:bg-card",
-          advanced ? "rounded-[14px] border border-ink/[0.04] bg-ink/[0.03]" : "rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu max-md:rounded-[var(--radius-card)]",
+          "overflow-hidden",
+          advanced
+            ? "rounded-[14px] border border-ink/[0.04] bg-ink/[0.03]"
+            : "rounded-[14px] bg-menu ring-[0.5px] ring-ink/[0.05] max-md:rounded-[16px]",
         )}
       >
-        {children}
+        {label && (
+          <div className="flex min-h-9 items-center justify-between gap-3 px-3.5 pb-0.5 pt-2.5 text-[12px] font-medium text-ink-tertiary">
+            <span className="min-w-0 truncate">{label}</span>
+            {action}
+          </div>
+        )}
+        <div className="divide-y divide-ink/[0.045]">{children}</div>
       </div>
     </section>
   );

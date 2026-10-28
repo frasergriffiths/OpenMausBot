@@ -136,24 +136,26 @@ export function BotPanel({ bot, derived, headerClassName, linkedSection, onClose
             <div
               role="tablist"
               aria-label={t("botSettings.simple.tabs")}
-              className="sticky top-0 z-[1] -mx-4 mt-[15px] flex justify-center gap-0.5 bg-app px-4 pb-2.5 pt-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-3 after:bg-linear-to-b after:from-app after:to-transparent"
+              className="sticky top-0 z-[1] -mx-4 mt-[15px] flex justify-center bg-app px-4 pb-2.5 pt-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-3 after:bg-linear-to-b after:from-app after:to-transparent"
             >
-              {PANEL_TABS.map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === id}
-                  data-panel-tab={id}
-                  onClick={() => openTab(id)}
-                  className={cn(
-                    "h-8 min-w-0 shrink truncate rounded-full px-2.5 text-[13px] leading-[18px] transition-colors",
-                    tab === id ? "bg-raised text-ink" : "text-ink-secondary hover:text-ink",
-                  )}
-                >
-                  {t(TAB_LABEL[id])}
-                </button>
-              ))}
+              <div className="flex items-center gap-0.5 rounded-full bg-ink/[0.05] p-[3px]">
+                {PANEL_TABS.map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === id}
+                    data-panel-tab={id}
+                    onClick={() => openTab(id)}
+                    className={cn(
+                      "h-7 min-w-0 shrink truncate rounded-full px-3 text-[13px] leading-[18px] transition-colors",
+                      tab === id ? "bg-menu text-ink shadow-[0_1px_2px_rgb(0_0_0/0.08)]" : "text-ink-secondary hover:text-ink",
+                    )}
+                  >
+                    {t(TAB_LABEL[id])}
+                  </button>
+                ))}
+              </div>
             </div>
             <div role="tabpanel">
               {tab === "details" && <DetailsTab bot={bot} derived={derived} onOpen={openPage} />}

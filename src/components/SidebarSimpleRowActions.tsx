@@ -3,7 +3,7 @@ import { t } from "@/lib/i18n";
 import type { AppState, Bot } from "@/state/store";
 import { BotEngineMark } from "./BotModelBadge";
 
-/** Simple mode's trailing row cluster: [three-dots][provider mark], with the dots' slot reserved and the mark last. */
+/** Simple mode's trailing row cluster: [provider mark][three-dots], with the mark's slot fixed so rows align. */
 export function SidebarSimpleRowActions({
   bot,
   instances,
@@ -17,6 +17,7 @@ export function SidebarSimpleRowActions({
 }) {
   return (
     <span className="ms-auto flex shrink-0 items-center gap-1 self-center">
+      <BotEngineMark bot={bot} instances={instances} />
       <button
         type="button"
         data-bot-actions={bot.id}
@@ -34,7 +35,6 @@ export function SidebarSimpleRowActions({
       >
         <MoreHorizontal size={15} />
       </button>
-      <BotEngineMark bot={bot} instances={instances} />
     </span>
   );
 }

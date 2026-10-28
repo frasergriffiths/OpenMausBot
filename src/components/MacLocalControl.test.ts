@@ -55,7 +55,8 @@ describe("Mac local computer permission card", () => {
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
     expect(markup).toContain('data-mac-permission-card=""');
     expect(markup).toContain("bg-card");
-    expect(markup).toContain("bg-accent/10 text-accent-text");
+    expect(markup).toContain("mb-2.5 flex text-accent-text");
+    expect(markup).not.toContain("bg-accent/10");
     expect(markup).not.toContain("border-warning/25");
     expect(markup).not.toContain("bg-warning/10 p-4");
     expect(markup).not.toContain("hover:bg-danger");
