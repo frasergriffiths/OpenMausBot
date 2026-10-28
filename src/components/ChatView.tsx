@@ -32,7 +32,7 @@ import {
   openBot,
 } from "@/state/store";
 import { EngineSetup } from "./EngineSetup";
-import { ChatNewThreadButton } from "./ChatNewThreadButton"; import { ChatPermissionNotice } from "./ChatPermissionNotice";
+import { ChatPermissionNotice } from "./ChatPermissionNotice";
 import { CHATGPT_USAGE_URL, ManageUsageLink } from "./ChatGptPlanStatus";
 import { CODEX_USAGE_URL, codexUsageLimitReached } from "../../shared/codex-usage-limit";
 import { ClaudeUpdatePrompt } from "./ClaudeUpdatePrompt";
@@ -1116,7 +1116,6 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
             </button>
           )}
           <EngineLimitNotice engine={bot.modelSelection?.instanceId} />
-          {!advanced && <ChatNewThreadButton onNew={() => dispatch({ type: "newTask", botId: bot.id })} />}
           {/* The model stays in the header in both modes; the computer is a header control in Advanced and a tab in Simple. */}
           {!remoteClient && !phone && <ModelPicker key={bot.threadId} bot={bot} threadId={bot.threadId} />}
           <LiveCallChip currentBotId={bot.id} onOpen={(botId, threadId) => openThread(dispatch, { botId, threadId }, state, showThreads)} />

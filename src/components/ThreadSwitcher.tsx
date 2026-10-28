@@ -230,7 +230,6 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
                         ariaLabel={t("task.actions", { title: displayTitle(task) })}
                         triggerLabel={t("task.actions", { title: displayTitle(task) })}
                         triggerClassName="flex size-7 items-center justify-center rounded-md text-ink-tertiary hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-                        placement="below"
                         renderTrigger={() => <MoreHorizontal size={14} />}
                       />
                     </div>

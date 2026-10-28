@@ -160,20 +160,30 @@ describe("the thread chip in Simple mode", () => {
     expect(document.activeElement).toBe(chip());
   });
 
-  it("puts a + beside the header controls that starts a conversation, named for a screen reader", () => {
+  it("puts no New thread button in the header; the switcher's New thread row starts a conversation", () => {
     fixture.advanced = false;
     fixture.threadsShown = false;
     fixture.threadsWanted = true;
     draw();
 
-    const button = document.querySelector<HTMLButtonElement>("[data-chathead-new-thread]")!;
-    expect(button.getAttribute("aria-label")).toBe("New conversation");
-    expect(button.getAttribute("title")).toBe("New conversation");
+    expect(document.querySelector("[data-chathead-new-thread]")).toBeNull();
+    flushSync(() => chip()!.click());
+    const button = sheet()!.querySelector<HTMLButtonElement>('[data-switcher-focus="new"]')!;
+    expect(button.textContent).toContain("New thread");
     actions.length = 0;
     flushSync(() => button.dispatchEvent(new MouseEvent("click", { bubbles: true })));
     expect(actions).toEqual([{ type: "newTask", botId: bot.id }]);
-    fixture.advanced = true;
+  });
+
+  it("opens a row's three-dot menu over the switcher, not clipped inside it", () => {
+    fixture.threadsWanted = true;
     draw();
-    expect(document.querySelector("[data-chathead-new-thread]")).toBeNull();
+    flushSync(() => chip()!.click());
+    const kebab = sheet()!.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;
+    flushSync(() => kebab.click());
+    const menu = document.querySelector<HTMLElement>('[data-sidebar-popover-menu="anchored"]');
+    expect(menu).not.toBeNull();
+    expect(sheet()!.contains(menu)).toBe(false);
+    expect(menu!.parentElement).toBe(document.body);
   });
 });
