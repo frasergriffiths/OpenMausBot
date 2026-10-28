@@ -40,21 +40,7 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
         <NavRow data-panel-page="threads" icon={MessagesSquare} title={t("botPanel.page.threads")} value={threads} onClick={() => onOpen("threads")} />
       </Card>
 
-      {derived.botRoutines.length === 0 ? (
-        <Card anchor="routines">
-          <div data-panel-empty="routines" className="px-4 py-6 text-center text-[13px] leading-[18px] text-ink-tertiary">
-            <p>{t("botPanel.routines.empty")}</p>
-            <button
-              type="button"
-              data-panel-page="routines"
-              onClick={() => onOpen("routines")}
-              className="mt-2 rounded-md px-1.5 py-0.5 text-[13px] font-medium text-ink-secondary hover:bg-ink/[0.04] hover:text-ink"
-            >
-              {t("botPanel.routines.add")}
-            </button>
-          </div>
-        </Card>
-      ) : (
+      {derived.botRoutines.length > 0 && (
         <Card label={t("botSettings.simple.routines")} anchor="routines">
           <NavRow
             data-panel-page="routines"

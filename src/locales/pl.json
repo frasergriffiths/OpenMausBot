@@ -3259,7 +3259,6 @@
   "botPanel.apps.intro": "Włącz aplikacje, których {name} może używać. Wszystko inne pozostaje wyłączone.",
   "botPanel.apps.connectAnother": "Połącz inną aplikację",
   "botPanel.routinesOn": "Włączone: {count}",
-  "botPanel.routines.add": "Dodaj rutynę",
   "botPanel.routines.ask": "Albo po prostu napisz na czacie do bota {name}: „codziennie od poniedziałku do piątku o 8 wyślij mi podsumowanie”.",
   "botPanel.memoryRow": "Co pamięta",
   "botPanel.memory.note": "1 notatka",

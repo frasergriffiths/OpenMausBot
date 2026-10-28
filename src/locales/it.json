@@ -3204,7 +3204,6 @@
   "botPanel.apps.intro": "Attiva le app che {name} può usare. Tutto il resto resta disattivato.",
   "botPanel.apps.connectAnother": "Collega un'altra app",
   "botPanel.routinesOn": "{count} attive",
-  "botPanel.routines.add": "Aggiungi una routine",
   "botPanel.routines.ask": "Oppure chiedilo a {name} in chat: “ogni giorno feriale alle 8, mandami un riepilogo”.",
   "botPanel.memoryRow": "Cosa ricorda",
   "botPanel.memory.note": "1 nota",

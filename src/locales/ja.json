@@ -3346,7 +3346,6 @@
   "botPanel.apps.intro": "{name} が使用できるアプリをオンにします。それ以外はすべてオフのままです。",
   "botPanel.apps.connectAnother": "別のアプリを接続",
   "botPanel.routinesOn": "{count} 件オン",
-  "botPanel.routines.add": "ルーティンを追加",
   "botPanel.routines.ask": "チャットで {name} に頼むこともできます。例:「平日の毎朝8時に要約を送って」",
   "botPanel.memoryRow": "記憶していること",
   "botPanel.memory.note": "メモ 1 件",

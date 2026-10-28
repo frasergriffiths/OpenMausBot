@@ -3322,7 +3322,6 @@
   "botPanel.apps.intro": "Включите приложения, которые может использовать {name}. Всё остальное остаётся выключенным.",
   "botPanel.apps.connectAnother": "Подключить другое приложение",
   "botPanel.routinesOn": "Включено: {count}",
-  "botPanel.routines.add": "Добавить задачу по расписанию",
   "botPanel.routines.ask": "Или просто попросите {name} в чате: «каждый будний день в 8 отправляй мне сводку».",
   "botPanel.memoryRow": "Что он запоминает",
   "botPanel.memory.note": "1 заметка",

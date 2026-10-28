@@ -571,10 +571,10 @@ describe("the avatar editor", () => {
 
 
 describe("the Details tab", () => {
-  it("holds the model and the routines, with no thread list and no switch or Thinking row", () => {
+  it("holds the model and the conversations, with no thread list and no switch or Thinking row", () => {
     const rendered = botTab(makeBot());
     expect(ofType(rendered, ModelPicker)!.props).toMatchObject({ bot: expect.objectContaining({ id: "scout" }), threadId: "thread-scout", contained: true });
-    const order = ['data-panel-row="model"', 'data-panel-empty="routines"']
+    const order = ['data-panel-row="model"', 'data-panel-page="threads"']
       .map((marker) => rendered.html.indexOf(marker));
     expect(order.every((index) => index > -1)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
@@ -587,19 +587,18 @@ describe("the Details tab", () => {
     expect(switches(rendered.html)).toBe(0);
   });
 
-  it("says what routines are while the bot has none, with Add a routine, and lists them once it has some", () => {
+  it("offers no Add a routine path while the bot has none, and lists routines once it has some", () => {
     const empty = botTab(makeBot());
-    expect(empty.html).toContain('data-panel-empty="routines"');
-    expect(empty.html).toContain(">Routines are recurring tasks this bot runs on a schedule. Ask it in chat to set one up.<");
-    expect(empty.html.match(/data-panel-page="routines"/g)).toHaveLength(1);
-    const add = find(empty, "data-panel-page", "routines");
-    expect(add.props.children).toBe("Add a routine");
-    click(add);
-    expect(onOpen).toHaveBeenLastCalledWith("routines");
+    expect(empty.html).not.toContain('data-panel-empty="routines"');
+    expect(empty.html).not.toContain("Add a routine");
+    expect(empty.html).not.toContain("Routines are recurring tasks");
+    expect(empty.html).not.toContain('data-panel-page="routines"');
     fixture.derived.botRoutines = [routine()];
     const some = botTab(makeBot());
     expect(some.html).not.toContain('data-panel-empty="routines"');
     expect(some.html.indexOf('data-panel-row="model"')).toBeLessThan(some.html.indexOf('data-panel-page="routines"'));
+    click(find(some, "data-panel-page", "routines"));
+    expect(onOpen).toHaveBeenLastCalledWith("routines");
   });
 
   it("values Routines by how many are on, and opens the routines page", () => {
