@@ -166,6 +166,15 @@ describe("bot-first sidebar", () => {
     expect(markup).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bright-2 bottom-1 top-auto translate-y-0\b/);
   });
 
+  it("keeps a Simple row's ⋯ visible while its menu is open", () => {
+    fixture.showThreads = false;
+    const candidate = { ...bot, tasks: [], projects: [] };
+    const closed = renderToStaticMarkup(createElement(BotListItem, { ...rowProps("comfortable", candidate), menuOpen: false }));
+    expect(closed).toMatch(/data-bot-actions="atlas"[^>]*aria-expanded="false"[^>]*class="[^"]*\baria-expanded:opacity-100\b/);
+    const open = renderToStaticMarkup(createElement(BotListItem, { ...rowProps("comfortable", candidate), menuOpen: true }));
+    expect(open).toMatch(/data-bot-actions="atlas"[^>]*aria-expanded="true"[^>]*class="[^"]*\baria-expanded:opacity-100\b/);
+  });
+
   it("fades the collapsed rail's engine badge in Simple mode and leaves Advanced's at full strength", () => {
     fixture.showThreads = false;
     fixture.state = { ...fixture.state, instances: [{ instanceId: "fake", driverKind: "claudeAgent", displayName: "Claude" }] as unknown as AppState["instances"] };
