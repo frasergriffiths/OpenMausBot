@@ -118,7 +118,6 @@
   "call.voiceSetup.loading": "正在載入語音設定…",
   "call.voiceSetup.ready": "語音已就緒，你現在可以與 {name} 通話。",
   "call.voiceSetup.startCall": "開始通話",
-  "call.voiceSetup.allSettings": "所有語音設定",
   "toolDetail.label": "{name} · {status} · 工具詳細資訊",
   "toolDetail.input": "輸入",
   "toolDetail.output": "結果",

@@ -251,7 +251,6 @@
   "call.voiceSetup.loading": "Cargando los ajustes de voz…",
   "call.voiceSetup.ready": "La voz está lista: ya puedes llamar a {name}.",
   "call.voiceSetup.startCall": "Iniciar llamada",
-  "call.voiceSetup.allSettings": "Todos los ajustes de voz",
   "toolDetail.label": "{name} · {status} · Detalles de la herramienta",
   "toolDetail.input": "Entrada",
   "toolDetail.output": "Resultado",

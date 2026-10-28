@@ -17,6 +17,7 @@ import {
 } from "@/lib/local-voice";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
+import { PILL_TABS, PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON } from "./pill-tabs";
 import { voiceKeyDraftValue, type VoiceKeyDraft } from "@/lib/voice-key-draft";
 import { VoicePicker, type PickerVoice } from "./VoicePicker";
 import { Select } from "./Select";
@@ -310,28 +311,23 @@ export function VoiceSettings({
       {!workspaceConfigurationLocked && (
         <div className="mt-4">
           <div className="mb-2 text-[13px] text-ink-secondary">{t("voice.engine")}</div>
-          {/* Six columns: the three online services share the top row, the two on this computer the bottom one. */}
-          <div className="grid grid-cols-6 gap-1 rounded-xl bg-inset p-1" role="radiogroup" aria-label={t("voice.engine")}>
+          {/* One capsule track, as the bot panel's segmented rows use: five pills that wrap 3 + 2 in a 320px panel. */}
+          <div className={cn(PILL_TABS, "flex-wrap")} role="group" aria-label={t("voice.engine")}>
             {([
-              { value: "elevenlabs", label: t("voice.elevenlabs.label"), available: true, span: "col-span-2" },
-              { value: "fish", label: t("voice.fish.label"), available: true, span: "col-span-2" },
-              { value: "xai", label: t("voice.grok.label"), available: true, span: "col-span-2" },
-              { value: "system", label: t("voice.macBuiltIn"), available: systemVoicesAvailable, span: "col-span-3" },
-              { value: "chatterbox", label: t("voice.chatterboxLocal"), available: true, span: "col-span-3" },
+              { value: "elevenlabs", label: t("voice.elevenlabs.label"), available: true },
+              { value: "fish", label: t("voice.fish.label"), available: true },
+              { value: "xai", label: t("voice.grok.label"), available: true },
+              { value: "system", label: t("voice.macBuiltIn"), available: systemVoicesAvailable },
+              { value: "chatterbox", label: t("voice.chatterboxLocal"), available: true },
             ] as const).map((option) => (
               <button
                 key={option.value}
                 type="button"
-                role="radio"
-                aria-checked={provider === option.value}
+                aria-pressed={provider === option.value}
                 disabled={switching || !option.available}
                 title={!option.available ? t("voice.macOnly") : undefined}
                 onClick={() => setProvider(option.value)}
-                className={cn(
-                  "min-w-0 rounded-lg px-2 py-1.5 text-[13px] leading-tight transition-colors disabled:opacity-50",
-                  option.span,
-                  provider === option.value ? "bg-raised text-ink shadow" : "text-ink-secondary hover:text-ink",
-                )}
+                className={cn(PILL_TAB, "flex-auto", provider === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
               >
                 {option.label}
               </button>

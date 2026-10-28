@@ -82,13 +82,19 @@ describe("VoiceSettings", () => {
     expect(onPatch).not.toHaveBeenCalled();
   });
 
-  it("lays the voice services out as three online ones above the two on this computer", async () => {
+  it("lays the five voice services out as the panel's pill tabs, wrapping in a narrow panel", async () => {
     fixture.api.mockResolvedValue({ voices: [] });
     await render(bot("pepper"), vi.fn());
-    const radios = [...host.querySelectorAll<HTMLElement>('[role="radiogroup"] [role="radio"]')];
-    expect(radios.map((radio) => radio.textContent)).toEqual(["ElevenLabs", "Fish Audio", "Grok (xAI)", "Built-in Mac voices", "Chatterbox (local)"]);
-    expect(radios.map((radio) => radio.className.match(/col-span-\d/)?.[0])).toEqual([
-      "col-span-2", "col-span-2", "col-span-2", "col-span-3", "col-span-3",
-    ]);
+    const track = host.querySelector<HTMLElement>('[role="group"][aria-label="Voice provider"]')!;
+    expect(track.className).toContain("flex-wrap");
+    const pills = [...track.querySelectorAll<HTMLButtonElement>("button")];
+    expect(pills.map((pill) => pill.textContent)).toEqual(["ElevenLabs", "Fish Audio", "Grok (xAI)", "Built-in Mac voices", "Chatterbox (local)"]);
+    for (const pill of pills) {
+      expect(pill.getAttribute("aria-pressed")).toMatch(/true|false/);
+      expect(pill.className).toContain("rounded-full");
+      expect(pill.className).toContain("flex-auto");
+      expect(pill.className).not.toMatch(/col-span-/);
+    }
+    expect(pills.filter((pill) => pill.getAttribute("aria-pressed") === "true")).toHaveLength(1);
   });
 });

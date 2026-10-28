@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronDown, Cloud, Laptop } from "lucide-react";
+import { Check, ChevronDown, Cloud, CloudUpload, Laptop, Server, Trash2 } from "lucide-react";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
 import type { Action } from "@/state/store";
@@ -12,6 +12,7 @@ import { CloudTile } from "./cloud-buy/parts";
 import { useMenuMotion } from "./MenuMotion";
 import { PlaceIcon } from "./PlaceIcon";
 import { SIMPLE_RAIL_BUTTON } from "./SidebarSimpleTop";
+import { MENU_GUTTER, MENU_ICON, MENU_ROW, MENU_SEPARATOR, SIMPLE_MENU_META, SIMPLE_MENU_ROW } from "./menu-recipe";
 
 export function openServerMenu(bridge: { menu: (options?: { from?: "howto" }) => Promise<void> }, { howTo = false, onClosed }: { howTo?: boolean; onClosed?: () => void } = {}): Promise<void> {
   return bridge.menu(howTo ? { from: "howto" } : undefined).finally(() => { if (howTo) onClosed?.(); });
@@ -51,7 +52,7 @@ export function useCloudPower(cloudHome: boolean): { sleeps: boolean | null; wak
 }
 
 /** One computer this app can switch to: this computer (id "local"), or a saved environment or server. */
-type SavedComputer = { id: string; name: string; kind?: string; origin?: string; color?: string; missing?: boolean };
+type SavedComputer = { id: string; name: string; kind?: string; origin?: string; color?: string; missing?: boolean; dataDir?: string; home?: boolean };
 type SavedComputers = { activeId: string; environments: SavedComputer[] };
 
 export type WorkspacePlace = ReturnType<typeof useWorkspacePlace>;
@@ -113,17 +114,36 @@ export function useWorkspacePlace({ cloudHome = false, howTo = false, onMenuClos
     }).catch(() => setError(t("sidebar.switchServerError")))
       .finally(() => setSwitching(null));
   };
-  return { bridge, current, cloudHome, open, error, onLine, waking, openMenu, closeMenu, saved, anchor, switching, pick, switchable: Boolean(bridge) && current?.home !== true };
+  const forget = async (id: string) => {
+    const entry = saved?.environments.find((item) => item.id === id);
+    if (!environments || !entry) return;
+    const message = t("sidebar.switchServerForget", { name: entry.name });
+    const confirmed = window.ogb?.confirm ? await window.ogb.confirm(message) : window.confirm(message);
+    if (!confirmed) return;
+    closeMenu();
+    setError("");
+    try {
+      await environments.forget(id);
+      const next = await environments.state();
+      if (next.remote !== true) setSaved(next);
+    } catch {
+      setError(t("sidebar.switchServerError"));
+    }
+  };
+  return { bridge, current, cloudHome, open, error, onLine, waking, openMenu, closeMenu, saved, anchor, switching, pick, forget, switchable: Boolean(bridge) && current?.home !== true };
 }
 
 /** The switcher's menu: one themed sheet, portaled past the sidebar, clamped to the window and flipping above its
  * trigger when there is no room below. */
-function WorkspaceMenu({ open, anchor, saved, switching, onPick, onClose }: {
+function WorkspaceMenu({ open, anchor, saved, switching, onPick, onForget, onConnect, onAddCloud, onClose }: {
   open: boolean;
   anchor: { left: number; right: number; top: number; bottom: number } | null;
   saved: SavedComputers | null;
   switching: string | null;
   onPick: (id: string) => void;
+  onForget: (id: string) => void;
+  onConnect?: () => void;
+  onAddCloud?: () => void;
   onClose: () => void;
 }) {
   const motion = useMenuMotion(open);
@@ -156,6 +176,18 @@ function WorkspaceMenu({ open, anchor, saved, switching, onPick, onClose }: {
   }, [motion.shown, anchor]);
   if (!motion.shown || !saved) return null;
   const rows: SavedComputer[] = [{ id: "local", name: t("automations.editor.app.thisComputer") }, ...saved.environments];
+  const active = saved.environments.find((entry) => entry.id === saved.activeId);
+  const forgettable = active && active.kind === "remote" && active.home !== true ? active : null;
+  const host = (entry: SavedComputer) => {
+    if (entry.origin) { try { return new URL(entry.origin).host; } catch { return entry.origin; } }
+    return entry.dataDir ?? "";
+  };
+  const action = (icon: ReactNode, label: string, run: () => void) => (
+    <button type="button" role="menuitem" onClick={run} className={cn(MENU_ROW, "text-start")}>
+      <span className={cn(MENU_GUTTER, MENU_ICON)}>{icon}</span>
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+    </button>
+  );
   return createPortal(
     <div
       ref={ref}
@@ -169,7 +201,7 @@ function WorkspaceMenu({ open, anchor, saved, switching, onPick, onClose }: {
         visibility: position ? undefined : "hidden",
       }}
       className={cn(
-        "popover-surface z-[60] flex w-[248px] max-w-[calc(100vw-16px)] flex-col gap-0.5 overflow-y-auto overscroll-contain rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-2 shadow-2xl shadow-black/50 [&_svg.lucide]:stroke-[1.5]",
+        "popover-surface z-[60] flex w-[240px] max-w-[calc(100vw-2rem)] flex-col gap-0.5 overflow-y-auto overscroll-contain rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]",
         motion.className,
       )}
       {...motion.exitProps}
@@ -177,6 +209,7 @@ function WorkspaceMenu({ open, anchor, saved, switching, onPick, onClose }: {
       {rows.map((entry) => {
         const checked = entry.id === saved.activeId;
         const busy = switching === entry.id;
+        const meta = host(entry);
         return (
           <button
             key={entry.id}
@@ -186,30 +219,39 @@ function WorkspaceMenu({ open, anchor, saved, switching, onPick, onClose }: {
             disabled={busy}
             title={entry.origin ? `${entry.name} · ${entry.origin}` : entry.name}
             onClick={() => onPick(entry.id)}
-            className={cn(
-              "flex min-h-8 w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] leading-[18px] text-ink",
-              "hover:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus",
-              checked && "bg-raised",
-              busy && "opacity-60",
-            )}
+            className={cn(SIMPLE_MENU_ROW, checked && "bg-ink/[0.06]", busy && "opacity-60")}
           >
-            {cloudColor(entry.color)
-              ? <CloudTile color={entry.color} size={18} />
-              : <PlaceIcon place={entry.origin || entry.kind === "remote" ? "cloud" : "local"} size={18} className="shrink-0 text-ink-secondary" aria-hidden="true" />}
-            <span className="min-w-0 flex-1 truncate">{entry.name}</span>
+            <span className={cn(MENU_GUTTER, MENU_ICON)}>
+              {cloudColor(entry.color)
+                ? <CloudTile color={entry.color} size={16} />
+                : <PlaceIcon place={entry.origin || entry.kind === "remote" ? "cloud" : "local"} size={16} aria-hidden="true" />}
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate">{entry.name}</span>
+              {meta && <span className={SIMPLE_MENU_META}>{meta}</span>}
+            </span>
             {checked && <Check size={14} className="shrink-0 text-accent" aria-hidden="true" />}
           </button>
         );
       })}
+      {(onAddCloud || onConnect || forgettable) && <div role="separator" className={MENU_SEPARATOR} />}
+      {onAddCloud && action(<CloudUpload size={16} aria-hidden="true" />, t("sidebar.switchServerAddCloud"), () => { onClose(); onAddCloud(); })}
+      {onConnect && action(<Server size={16} aria-hidden="true" />, t("sidebar.switchServerConnect"), () => { onClose(); onConnect(); })}
+      {forgettable && action(<Trash2 size={16} aria-hidden="true" />, t("sidebar.switchServerForget", { name: forgettable.name }), () => onForget(forgettable.id))}
     </div>,
     document.body,
   );
+
 }
 
-export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill = false, rail = false, cloudHome = false, owner = null, howTo = false, onMenuClosed }: {
+export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill = false, rail = false, cloudHome = false, owner = null, howTo = false, onMenuClosed, onConnectServer, onAddCloud }: {
   compact?: boolean; inline?: boolean; pill?: boolean; rail?: boolean; cloudHome?: boolean; owner?: string | null; howTo?: boolean; onMenuClosed?: () => void;
+  /** Opens Settings → Servers, as the native menu's "Connect to a server…" did. */
+  onConnectServer?: () => void;
+  /** Starts the Add a Cloud flow, when this build offers one. */
+  onAddCloud?: () => void;
 }) {
-  const { bridge, current, open, error, onLine, waking, openMenu, closeMenu, saved, anchor, switching, pick } = useWorkspacePlace({ cloudHome, howTo, onMenuClosed });
+  const { bridge, current, open, error, onLine, waking, openMenu, closeMenu, saved, anchor, switching, pick, forget } = useWorkspacePlace({ cloudHome, howTo, onMenuClosed });
   const withPower = (name: string) => (onLine ? `${name} · ${onLine}` : name);
   // This window's home is My Cloud: it opens nothing else, so there is nothing to switch.
   if (!bridge || current?.home === true) {
@@ -238,7 +280,7 @@ export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill
   const shown = cloudHome ? withPower(name) : name;
   const title = current?.origin ? `${shown} · ${current.origin}` : shown;
   const label = t("sidebar.switchServer", { name: shown });
-  const menu = <WorkspaceMenu open={open} anchor={anchor} saved={saved} switching={switching} onPick={pick} onClose={closeMenu} />;
+  const menu = <WorkspaceMenu open={open} anchor={anchor} saved={saved} switching={switching} onPick={pick} onForget={(id) => void forget(id)} onConnect={onConnectServer} onAddCloud={onAddCloud} onClose={closeMenu} />;
   if (rail) return <div data-workspace-switcher="rail" className="relative">
     <button type="button" aria-label={label} aria-haspopup="menu" aria-expanded={open} data-cloud-home-indicator={cloudHome || undefined}
       data-tour="server-switcher" title={title} onClick={(event) => openMenu(event.currentTarget.getBoundingClientRect())} className={cn(SIMPLE_RAIL_BUTTON, "aria-expanded:bg-raised")}

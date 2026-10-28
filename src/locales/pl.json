@@ -312,7 +312,6 @@
   "call.voiceSetup.loading": "Wczytywanie ustawień głosu…",
   "call.voiceSetup.ready": "Głos jest gotowy — możesz teraz zadzwonić do bota {name}.",
   "call.voiceSetup.startCall": "Rozpocznij rozmowę",
-  "call.voiceSetup.allSettings": "Wszystkie ustawienia głosu",
   "toolDetail.label": "{name} · {status} · Szczegóły narzędzia",
   "toolDetail.input": "Dane wejściowe",
   "toolDetail.output": "Wynik",

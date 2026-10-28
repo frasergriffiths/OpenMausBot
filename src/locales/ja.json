@@ -319,7 +319,6 @@
   "call.voiceSetup.loading": "音声設定を読み込んでいます…",
   "call.voiceSetup.ready": "音声の準備ができました。{name} に通話できます。",
   "call.voiceSetup.startCall": "通話を開始",
-  "call.voiceSetup.allSettings": "すべての音声設定",
   "toolDetail.label": "{name} · {status} · ツールの詳細",
   "toolDetail.input": "入力",
   "toolDetail.output": "結果",

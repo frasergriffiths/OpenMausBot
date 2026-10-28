@@ -112,7 +112,6 @@ describe("voice set-up pop-up", () => {
     expect(html).toContain("Choose a voice provider, add its key if it needs one, then pick a voice.");
     expect(html).toContain('data-voice-settings="pepper"');
     expect(html).toContain('aria-label="Close voice set-up"');
-    expect(html).toContain("All voice settings");
     expect(html).not.toContain("Voice is ready");
     expect(fixture.voiceSettings.at(-1)!.bot).toBe(pepper);
   });
@@ -129,33 +128,6 @@ describe("voice set-up pop-up", () => {
     renderToStaticMarkup(createElement(Section));
     fixture.voiceSettings.at(-1)!.onPatch({ voice: "voice-2" });
     expect(fixture.dispatch.mock.calls.at(-1)![0]).toEqual(fromPopUp);
-  });
-
-  it("opens the bot's full settings at Voice from All voice settings, closing itself", () => {
-    const view = render();
-    click(byAttribute(view, "data-voice-setup-all-settings"));
-    expect(view.props.onClose).toHaveBeenCalledOnce();
-    expect(fixture.dispatch.mock.calls).toEqual([[{ type: "toggleSettings", open: true, section: "voice" }]]);
-  });
-
-  it("opens a room member's chat first, as the call help always did", () => {
-    fixture.selectedId = "room-1";
-    click(byAttribute(render(), "data-voice-setup-all-settings"));
-    expect(fixture.dispatch.mock.calls).toEqual([
-      [{ type: "select", id: "pepper" }],
-      [{ type: "toggleSettings", open: true, section: "voice" }],
-    ]);
-  });
-
-  it("opens a room member's chat as its row does with threads hidden: at its main thread", () => {
-    fixture.selectedId = "room-1";
-    fixture.showThreads = false;
-    const left = { ...pepper, mainThreadId: "main", tasks: [{ threadId: "t", title: "Report", createdAt: 1 }, { threadId: "main", title: "Chat", createdAt: 2 }] };
-    click(byAttribute(render({ bot: left }), "data-voice-setup-all-settings"));
-    expect(fixture.dispatch.mock.calls).toEqual([
-      [{ type: "switchTask", botId: "pepper", threadId: "main" }],
-      [{ type: "toggleSettings", open: true, section: "voice" }],
-    ]);
   });
 
   it("closes from the close button and from a click on the scrim, not from inside", () => {

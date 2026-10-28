@@ -341,7 +341,6 @@
   "call.voiceSetup.loading": "Loading voice settings…",
   "call.voiceSetup.ready": "Voice is ready — you can call {name} now.",
   "call.voiceSetup.startCall": "Start call",
-  "call.voiceSetup.allSettings": "All voice settings",
   "toolDetail.label": "{name} · {status} · Tool details",
   "toolDetail.input": "Input",
   "toolDetail.output": "Result",
@@ -6641,5 +6640,8 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Threads",
   "botPanel.page.browser": "Browser",
-  "botPanel.library.data": "Data"
+  "botPanel.library.data": "Data",
+  "sidebar.switchServerAddCloud": "Add a Cloud…",
+  "sidebar.switchServerConnect": "Connect to a server…",
+  "sidebar.switchServerForget": "Forget “{name}”…"
 }

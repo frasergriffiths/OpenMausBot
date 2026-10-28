@@ -122,7 +122,6 @@
   "call.voiceSetup.loading": "Đang tải cài đặt giọng nói…",
   "call.voiceSetup.ready": "Giọng nói đã sẵn sàng — bạn đã có thể gọi cho {name}.",
   "call.voiceSetup.startCall": "Bắt đầu cuộc gọi",
-  "call.voiceSetup.allSettings": "Tất cả cài đặt giọng nói",
   "toolDetail.label": "{name} · {status} · Chi tiết công cụ",
   "toolDetail.input": "Đầu vào",
   "toolDetail.output": "Kết quả",

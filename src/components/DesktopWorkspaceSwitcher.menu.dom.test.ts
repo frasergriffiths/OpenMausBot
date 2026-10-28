@@ -9,7 +9,7 @@ import { DesktopWorkspaceSwitcher } from "./DesktopWorkspaceSwitcher";
 let host: HTMLDivElement;
 let root: Root;
 let worlds: { state: ReturnType<typeof vi.fn>; menu: ReturnType<typeof vi.fn> };
-let environments: { state: ReturnType<typeof vi.fn>; switch: ReturnType<typeof vi.fn> };
+let environments: { state: ReturnType<typeof vi.fn>; switch: ReturnType<typeof vi.fn>; forget: ReturnType<typeof vi.fn> };
 
 const trigger = () => host.querySelector<HTMLButtonElement>('[data-tour="server-switcher"]')!;
 const sheet = () => document.querySelector<HTMLElement>("[data-workspace-menu]");
@@ -25,6 +25,7 @@ beforeEach(() => {
       environments: [{ id: "mini", kind: "remote", name: "Mac mini", origin: "https://mini.example" }],
     })),
     switch: vi.fn(async () => ({ ok: true })),
+    forget: vi.fn(async () => ({ ok: true })),
   };
   host = document.createElement("div");
   document.body.append(host);
@@ -38,12 +39,19 @@ afterEach(async () => {
   delete (window as unknown as { ogb?: unknown }).ogb;
 });
 
-async function mount({ saved = true }: { saved?: boolean } = {}) {
+async function mount({ saved = true, activeId = "local", confirm = true, props = {} }: {
+  saved?: boolean; activeId?: string; confirm?: boolean; props?: Record<string, unknown>;
+} = {}) {
+  environments.state.mockImplementation(async () => ({
+    localOrigin: "http://127.0.0.1:8799", remote: false, packaged: true, activeId,
+    environments: [{ id: "mini", kind: "remote", name: "Mac mini", origin: "https://mini.example" }],
+  }));
   (window as unknown as { ogb: unknown }).ogb = {
     workspaces: worlds,
+    confirm: vi.fn(async () => confirm),
     ...(saved ? { environments } : {}),
   };
-  await act(async () => root.render(createElement(DesktopWorkspaceSwitcher, { inline: true, pill: true })));
+  await act(async () => root.render(createElement(DesktopWorkspaceSwitcher, { inline: true, pill: true, ...props })));
   await flush();
 }
 
@@ -59,12 +67,23 @@ describe("the Simple computer switcher", () => {
     expect(menu.className).toContain("bg-menu");
     expect(menu.className).toContain("border-hairline/50");
     expect(menu.className).toContain("rounded-[var(--radius-menu)]");
-    expect(menu.className).toContain("p-2");
+    expect(menu.className).toContain("p-1.5");
+    expect(menu.className).toContain("w-[240px]");
+    expect(menu.className).toContain("gap-0.5");
+    expect(menu.className).toContain("shadow-lg");
+    expect(menu.className).not.toContain("shadow-2xl");
     expect(menu.className).toContain("animate-pop-in");
-    expect(rows().map((row) => row.textContent?.trim())).toEqual(["This computer", "Mac mini"]);
+    const rowsNow = rows();
+    for (const token of ["min-h-[30px]", "text-[13px]", "rounded-md", "px-2"]) expect(rowsNow[1]!.className).toContain(token);
+    expect(rowsNow[1]!.querySelector("span")!.className).toContain("size-4");
+    expect(rowsNow[1]!.textContent).toContain("mini.example");
+    expect(rows()).toHaveLength(2);
+    expect(rows()[0]!.textContent).toBe("This computer");
+    expect(rows()[1]!.textContent).toContain("Mac mini");
+    expect(rows()[1]!.textContent).toContain("mini.example");
     expect(rows()[0]!.getAttribute("aria-checked")).toBe("true");
     expect(rows()[1]!.getAttribute("aria-checked")).toBe("false");
-    expect(rows()[0]!.className).toContain("bg-raised");
+    expect(rows()[0]!.className).toContain("bg-ink/[0.06]");
     expect(rows()[0]!.querySelector(".lucide-check")).not.toBeNull();
   });
 
@@ -87,5 +106,39 @@ describe("the Simple computer switcher", () => {
     await flush();
     expect(worlds.menu).toHaveBeenCalledTimes(1);
     expect(sheet()).toBeNull();
+  });
+
+  it("restores the server actions: Add a Cloud, Connect to a server, and Forget for a saved remote", async () => {
+    const onConnectServer = vi.fn();
+    const onAddCloud = vi.fn();
+    await mount({ activeId: "mini", props: { onConnectServer, onAddCloud } });
+    await act(async () => trigger().click());
+    const actions = [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].map((row) => row.textContent);
+    expect(actions).toEqual(["Add a Cloud…", "Connect to a server…", "Forget “Mac mini”…"]);
+    expect(document.querySelectorAll('[role="separator"]')).toHaveLength(1);
+
+    await act(async () => document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[1]!.click());
+    expect(onConnectServer).toHaveBeenCalledOnce();
+    await settle();
+
+    await act(async () => trigger().click());
+    await act(async () => document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[0]!.click());
+    expect(onAddCloud).toHaveBeenCalledOnce();
+  });
+
+  it("forgets a saved remote only after the person confirms", async () => {
+    await mount({ activeId: "mini", confirm: false });
+    await act(async () => trigger().click());
+    await act(async () => [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].find((row) => row.textContent?.startsWith("Forget"))!.click());
+    await flush();
+    expect(environments.forget).not.toHaveBeenCalled();
+
+    await act(async () => root.unmount());
+    root = createRoot(host);
+    await mount({ activeId: "mini", confirm: true });
+    await act(async () => trigger().click());
+    await act(async () => [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].find((row) => row.textContent?.startsWith("Forget"))!.click());
+    await flush();
+    expect(environments.forget).toHaveBeenCalledWith("mini");
   });
 });

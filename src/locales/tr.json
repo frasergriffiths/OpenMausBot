@@ -122,7 +122,6 @@
   "call.voiceSetup.loading": "Ses ayarları yükleniyor…",
   "call.voiceSetup.ready": "Ses hazır — artık {name} adlı botu arayabilirsiniz.",
   "call.voiceSetup.startCall": "Aramayı başlat",
-  "call.voiceSetup.allSettings": "Tüm ses ayarları",
   "toolDetail.label": "{name} · {status} · Araç ayrıntıları",
   "toolDetail.input": "Girdi",
   "toolDetail.output": "Sonuç",

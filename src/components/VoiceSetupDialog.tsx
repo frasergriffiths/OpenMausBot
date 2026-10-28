@@ -1,15 +1,13 @@
 import { useEffect, useId, useRef, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { CheckCircle2, ChevronRight, Loader2, Phone, X } from "lucide-react";
+import { CheckCircle2, Loader2, Phone, X } from "lucide-react";
 
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { t } from "@/lib/i18n";
-import { useShowThreads } from "@/lib/thread-preferences";
-import { openBot, useStore, type Bot } from "@/state/store";
+import { useStore, type Bot } from "@/state/store";
 import { BotAvatar } from "./Avatar";
 import { VoiceSettings } from "./VoiceSettings";
 import { useBotSettingsDerived } from "./bot-settings/useBotSettingsDerived";
-import { openBotSettings } from "./bot-panel/panel-link";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
@@ -31,8 +29,7 @@ export function VoiceSetupDialog({
   onStartCall: () => void;
   returnFocusRef?: RefObject<HTMLElement | null>;
 }) {
-  const { state, dispatch } = useStore();
-  const showThreads = useShowThreads();
+  const { state } = useStore();
   const { patch } = useBotSettingsDerived(bot);
   const dialogRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -86,12 +83,6 @@ export function VoiceSetupDialog({
       (returnFocusRef?.current ?? previousFocus)?.focus();
     };
   }, [returnFocusRef]);
-
-  const openAllSettings = () => {
-    close();
-    if (state.selectedId !== bot.id) openBot(dispatch, bot, showThreads);
-    openBotSettings(dispatch, "voice");
-  };
 
   return createPortal(
     <div
@@ -165,17 +156,6 @@ export function VoiceSetupDialog({
           )}
         </div>
 
-        <footer className="flex items-center border-t border-hairline/30 px-6 py-3.5 sm:px-7">
-          <button
-            type="button"
-            data-voice-setup-all-settings
-            onClick={openAllSettings}
-            className="inline-flex items-center gap-1 rounded-md text-[13px] font-medium text-accent-text underline-offset-2 hover:underline"
-          >
-            {t("call.voiceSetup.allSettings")}
-            <ChevronRight size={14} aria-hidden="true" />
-          </button>
-        </footer>
       </div>
     </div>,
     document.body,

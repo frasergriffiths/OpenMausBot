@@ -319,7 +319,6 @@
   "call.voiceSetup.loading": "Загрузка настроек голоса…",
   "call.voiceSetup.ready": "Голос готов — теперь вы можете позвонить {name}.",
   "call.voiceSetup.startCall": "Начать звонок",
-  "call.voiceSetup.allSettings": "Все настройки голоса",
   "toolDetail.label": "{name} · {status} · Сведения об инструменте",
   "toolDetail.input": "Входные данные",
   "toolDetail.output": "Результат",
