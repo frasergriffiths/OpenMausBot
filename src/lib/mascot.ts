@@ -72,6 +72,17 @@ export function spinnerColor(color: MausColor): string {
   return `color-mix(in oklab, ${MAUS_COLORS[color]} ${SPINNER_HUE_PERCENT}%, var(--color-ink))`;
 }
 
+/** A readable ink for a solid mascot-colour badge: white unless the hue is too light for 4.5:1. */
+export function mascotInk(color: MausColor): "#ffffff" | "#111111" {
+  const hex = MAUS_COLORS[color].replace("#", "");
+  const channels = [0, 2, 4].map((index) => Number.parseInt(hex.slice(index, index + 2), 16) / 255);
+  const [r, g, b] = channels.map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)) as [number, number, number];
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const white = 1.05 / (luminance + 0.05);
+  const black = (luminance + 0.05) / 0.05;
+  return white >= 4.5 && white >= black ? "#ffffff" : "#111111";
+}
+
 export const MAUS_COLOR_LABEL = {
   green: "mascotColor.green", blue: "mascotColor.blue", red: "mascotColor.red", orange: "mascotColor.orange",
   purple: "mascotColor.purple", cyan: "mascotColor.cyan", pink: "mascotColor.pink", yellow: "mascotColor.yellow",

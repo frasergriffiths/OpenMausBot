@@ -21,6 +21,8 @@ import { setShowRunCard, useShowRunCard } from "@/lib/run-card-preferences";
 import { parseSendKey, SEND_KEYS, sendKeyLabel, setSendKey, useSendKey } from "@/lib/send-key";
 import { effectiveLanguage, setLanguageChoice, useLanguageChoice } from "@/lib/language-preference";
 import { Select } from "./Select";
+import { Segmented } from "./bot-panel/rows";
+import { setBusySendMode, useBusySendMode, type BusySendMode } from "@/lib/busy-send";
 
 export function UpdatesRow({ title = t("settings.updates.title") }: { title?: string }) {
   const s = useUpdaterState();
@@ -199,6 +201,29 @@ export function LanguageRow({ simple = false }: { simple?: boolean }) {
           </option>
         ))}
       </Select>
+    </SettingRow>
+  );
+}
+
+export function BusySendRow({ simple = false }: { simple?: boolean }) {
+  const mode = useBusySendMode();
+  return (
+    <SettingRow
+      title={t("settings.simple.busySend")}
+      subtitle={simple ? t("settings.simple.busySendHint") : t("settings.simple.busySendHint")}
+    >
+      <div className="w-[180px]">
+        <Segmented<BusySendMode>
+          attr="data-busy-send"
+          label={t("settings.simple.busySend")}
+          value={mode}
+          onChange={setBusySendMode}
+          options={[
+            { value: "queue", label: t("settings.simple.busySendQueue") },
+            { value: "steer", label: t("settings.simple.busySendSteer") },
+          ]}
+        />
+      </div>
     </SettingRow>
   );
 }

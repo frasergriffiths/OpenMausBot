@@ -108,8 +108,9 @@ describe("a bot's threads in the chat header", () => {
     expect(timer.textContent).toMatch(/\d+s|\d+m/);
     expect(timer.className).toContain("text-[12px]");
     expect(timer.className).toContain("text-ink-secondary");
-    expect(timer.parentElement!.className).toContain("min-w-[2.75rem]");
-    expect(timer.parentElement!.className).toContain("@max-[10rem]:hidden");
+    expect(timer.parentElement!.className).not.toContain("w-[2.75rem]");
+    expect(timer.parentElement!.className).not.toContain("text-right");
+    expect(timer.parentElement!.className).not.toContain("@max-[12rem]:hidden");
   });
 
   it("shows a running turn and an unread reply from the tab itself", () => {

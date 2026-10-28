@@ -158,7 +158,7 @@ describe("bot-first sidebar", () => {
 
     const cluster = markup.slice(markup.indexOf('class="ms-auto flex shrink-0 items-center gap-1 self-center"'));
     expect(cluster.indexOf('data-provider-mark="brand"')).toBeGreaterThan(-1);
-    expect(cluster.indexOf('data-provider-mark="brand"')).toBeLessThan(cluster.indexOf('data-bot-actions="atlas"'));
+    expect(cluster.indexOf('data-bot-actions="atlas"')).toBeLessThan(cluster.indexOf('data-provider-mark="brand"'));
     expect(markup).toContain('class="ms-auto flex shrink-0 items-center gap-1 self-center"');
     expect(markup).toContain('data-provider-mark="brand"');
     expect(markup).not.toContain('data-row-dot=""');
@@ -260,7 +260,7 @@ describe("bot-first sidebar", () => {
     expect(markup).not.toContain('data-testid="bot-role"');
     expect(markup.match(/data-testid="model-badge"/g)).toHaveLength(1);
     expect(markup.match(/data-provider-mark=/g)).toHaveLength(1);
-    if (density === "comfortable") expect(markup).toMatch(/<span class="absolute -left-1 -top-1 flex rounded-full bg-raised p-\[3px\]"><svg[^>]*role="img"[^>]*aria-label="Chief of Staff"[^>]*data-testid="chief-crown"/);
+    if (density === "comfortable") expect(markup).toMatch(/<span class="absolute -left-1 -top-1 flex rounded-full p-\[3px\]" style="[^"]*background-color:[^"]*"><svg[^>]*data-testid="chief-crown"/);
     else expect(markup).not.toContain('data-testid="chief-crown"');
     expect(markup).not.toContain("lucide-pin");
     expect(markup).not.toMatch(/tabular-nums text-ink-secondary transition-opacity group-hover:opacity-0/);

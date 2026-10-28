@@ -3,7 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import afterPack from "./after-pack.mjs";
+import afterPack, { appUpdateYml } from "./after-pack.mjs";
 import { LICENSE_FILES } from "./cua-linux-release.mjs";
 
 const temporaryDirectories = [];
@@ -31,6 +31,15 @@ afterEach(() => {
   for (const directory of temporaryDirectories.splice(0)) {
     fs.rmSync(directory, { recursive: true, force: true });
   }
+});
+
+describe("desktop update feed", () => {
+  it("emits the GitHub feed even when electron-builder packages a dir", () => {
+    expect(appUpdateYml([{ provider: "github", owner: "frasergriffiths", repo: "OpenMausBot" }])).toBe(
+      "provider: github\nowner: frasergriffiths\nrepo: OpenMausBot\nupdaterCacheDirName: openmausbot-updater\n",
+    );
+    expect(appUpdateYml([{ provider: "generic", url: "https://example.test" }])).toBeNull();
+  });
 });
 
 describe.skipIf(process.platform === "win32")("Linux afterPack permissions", () => {

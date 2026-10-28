@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bug, ChevronDown, ChevronRight, RefreshCw, X } from "lucide-react";
 import { useStore, visibleMessages, type Bot } from "@/state/store";
 import { cn } from "@/lib/cn";
+import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "./pill-tabs";
 import { useCaptionChrome } from "@/components/DesktopCapabilities";
 import { formatTime, toRows, type InspectorEntry, type InspectorPage, type InspectorRow } from "@/lib/inspector";
 import { listenLiveFrames } from "@/lib/live-events";
@@ -12,7 +13,7 @@ import { t } from "@/lib/i18n";
 
 type Lens = "run" | "events" | "raw";
 
-export function InspectorPanel({ bot }: { bot: Bot }) {
+export function InspectorPanel({ bot, embedded = false }: { bot: Bot; embedded?: boolean }) {
   const { dispatch } = useStore();
   const { padClass, dragProps } = useCaptionChrome();
   const threadId = bot.threadId;
@@ -143,8 +144,10 @@ export function InspectorPanel({ bot }: { bot: Bot }) {
   const total = lens === "raw" ? (page?.total.native ?? 0) : (page?.total.runtime ?? 0);
 
   return (
-    <aside aria-label="Inspector" className="animate-panel-in absolute inset-0 z-40 flex h-full min-w-0 flex-col border-l border-hairline/40 bg-panel md:static md:z-auto md:w-[min(460px,45vw)] md:shrink-0">
-      <div {...dragProps} className={cn("flex items-center justify-between px-4 py-3", padClass)}>
+    <aside aria-label="Inspector" className={embedded
+      ? "flex min-h-0 min-w-0 flex-1 flex-col"
+      : "animate-panel-in absolute inset-0 z-40 flex h-full min-w-0 flex-col border-l border-hairline/40 bg-panel md:static md:z-auto md:w-[min(460px,45vw)] md:shrink-0"}>
+      {!embedded && <div {...dragProps} className={cn("flex items-center justify-between px-4 py-3", padClass)}>
         <span className="flex items-center gap-2 text-[15px] font-semibold text-ink">
           <Bug size={16} className="text-ink-secondary" /> Inspector
         </span>
@@ -156,10 +159,10 @@ export function InspectorPanel({ bot }: { bot: Bot }) {
         >
           <X size={18} />
         </button>
-      </div>
+      </div>}
 
       <div className="flex items-center gap-2 border-b border-hairline/40 px-4 pb-3">
-        <div role="tablist" aria-label={t("inspector.views")} className="flex rounded-lg bg-inset p-0.5" onKeyDown={(event) => {
+        <div role="tablist" aria-label={t("inspector.views")} className={PILL_TABS} onKeyDown={(event) => {
           const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
           const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
           const next = event.key === "ArrowRight" ? (current + 1) % tabs.length
@@ -180,10 +183,7 @@ export function InspectorPanel({ bot }: { bot: Bot }) {
               aria-controls={`inspector-panel-${l}`}
               tabIndex={lens === l ? 0 : -1}
               onClick={() => setLens(l)}
-              className={cn(
-                "rounded-md px-2.5 py-1 text-[12px] font-medium capitalize",
-                lens === l ? "bg-raised text-ink" : "text-ink-secondary hover:text-ink",
-              )}
+              className={cn(PILL_TAB, "capitalize", lens === l ? PILL_TAB_ON : PILL_TAB_OFF)}
             >
               {l === "run" ? t("inspector.run.title") : l}
             </button>

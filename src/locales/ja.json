@@ -1853,6 +1853,7 @@
   "chat.compactionExcerptTitle": "以前のコンテキストを最近の抜粋に短縮しました",
   "chat.compactionExcerptHint": "文章による要約を用意できなかったため、エージェントはこれらの抜粋と最近のメッセージをもとに続きを進めます。古い詳細はコンテキストから抜けている可能性があります。会話全体はここに残っています。",
   "contextWarning.short": "コンテキスト {percent}%",
+  "contextWarning.threadRow": "コンテキスト {percent}% 使用",
   "contextWarning.threadHint": "{name}のコンテキストが{percent}%に達しています。「今すぐ圧縮」を実行すると、古いメッセージが短いメモに要約されます。会話全体はここに残ります。",
   "contextWarning.compactNow": "今すぐ圧縮",
   "contextWarning.compacting": "圧縮中…",
@@ -3370,7 +3371,7 @@
   "botPanel.screen.idle": "待機中",
   "botPanel.screen.working": "タスクを実行中です。画面はまもなくここに表示されます。ライブで見るにはフルビューを開いてください。",
   "botPanel.none": "なし",
-  "botPanel.tab.computer": "コンピュータ",
+  "botPanel.tab.computer": "コンピューター",
   "botPanel.instructionsHint": "{name} に仕事の進め方を伝えます",
   "botSettings.simple.justDoIt": "お任せ",
   "botPanel.appsRow": "使用できるアプリ",
@@ -6376,5 +6377,11 @@
   "computer.problem.localNotReady": "ボットはまだこのコンピューターを使えません。OpenMausBot を再起動して、もう一度お試しください。",
   "computer.problem.localNeedsApp": "ボットにこのコンピューターを使わせることができるのは、ここにある OpenMausBot アプリだけです。使うには、ここでアプリを開いてください。",
   "computer.problem.localWindows": "ボットは今この PC を使えません。OpenMausBot を再起動し、それでも直らない場合は「設定 → 診断」を開いてください。",
-  "computer.problem.localMac": "ボットはまだこの Mac を使えません。「システム設定 → プライバシーとセキュリティ」の「画面収録」と「アクセシビリティ」で OpenMausBot が許可されているか確認してから、再起動してください。"
+  "computer.problem.localMac": "ボットはまだこの Mac を使えません。「システム設定 → プライバシーとセキュリティ」の「画面収録」と「アクセシビリティ」で OpenMausBot が許可されているか確認してから、再起動してください。",
+  "botPanel.tab.profile": "プロフィール",
+  "botPanel.tab.library": "ライブラリ",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "スレッド",
+  "botPanel.page.browser": "ブラウザー",
+  "botPanel.library.data": "データ"
 }

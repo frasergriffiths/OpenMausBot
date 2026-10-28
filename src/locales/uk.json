@@ -2894,5 +2894,12 @@
   "computer.mac.permission.title": "Дозволити керування цим комп’ютером",
   "computer.mac.permission.driverDetail": "Відомості про драйвер",
   "computer.mac.permission.relaunch": "Перезапустити OpenMausBot",
-  "permissions.openSystemSettings": "Відкрити Системні налаштування"
+  "permissions.openSystemSettings": "Відкрити Системні налаштування",
+  "botPanel.tab.profile": "Профіль",
+  "botPanel.tab.library": "Бібліотека",
+  "botPanel.tab.computer": "Комп'ютер",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Треди",
+  "botPanel.page.browser": "Браузер",
+  "botPanel.library.data": "Дані"
 }

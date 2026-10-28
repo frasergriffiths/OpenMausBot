@@ -4,12 +4,41 @@ import { MAUS_COLORS, SPINNER_HUE_PERCENT, spinnerColor, type MausColor } from "
 
 const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
 const SKINS = ["midnight", "atelier", "foundry", "lagoon", "graphite", "linen", "dusk", "daylight", "meadow", "pop", "halloween"] as const;
+const DEFAULTS = css.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 
-function varFor(skin: string, name: string): string {
+function rawVar(skin: string, name: string): string {
   const block = css.match(new RegExp(`\\[data-skin="${skin}"\\]\\s*\\{([\\s\\S]*?)\\n\\}`))?.[1] ?? "";
-  const value = block.match(new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{3,8})`))?.[1];
+  const value = (block.match(new RegExp(`--${name}:\\s*([^;]+);`)) ?? DEFAULTS.match(new RegExp(`--${name}:\\s*([^;]+);`)))?.[1]?.trim();
   if (!value) throw new Error(`missing --${name} for ${skin}`);
   return value;
+}
+
+function varFor(skin: string, name: string): string {
+  let value = rawVar(skin, name);
+  const seen = new Set<string>();
+  while (value.startsWith("var(")) {
+    const referenced = value.match(/^var\(--([\w-]+)\)$/)?.[1];
+    if (!referenced || seen.has(referenced)) throw new Error(`unresolved ${value} for ${skin}/${name}`);
+    seen.add(referenced);
+    value = rawVar(skin, referenced);
+  }
+  return value;
+}
+
+function parseColor(value: string, skin: string): [number, number, number] {
+  const text = value.trim();
+  if (text.startsWith("#")) return rgb(text);
+  const direct = text.match(/^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*[\d.]+)?\)$/);
+  if (direct) return [Number(direct[1]), Number(direct[2]), Number(direct[3])];
+  const mixed = text.match(/^color-mix\(in srgb,\s*(.+?)\s+([\d.]+)%,\s*(.+)\)$/);
+  if (mixed) {
+    const first = parseColor(mixed[1]!, skin);
+    const second = parseColor(mixed[3]!, skin);
+    const share = Number(mixed[2]) / 100;
+    return first.map((channel, index) => channel * share + second[index]! * (1 - share)) as [number, number, number];
+  }
+  if (text === "transparent") return [0, 0, 0];
+  throw new Error(`unsupported colour ${text} for ${skin}`);
 }
 
 const rgb = (hex: string): [number, number, number] => {
@@ -61,6 +90,21 @@ function statusInk(color: MausColor, skin: string): [number, number, number] {
 describe("the running mark on a tab", () => {
   it("uses a skin-aware ink mix, not the raw mascot hue", () => {
     expect(spinnerColor("green")).toBe("color-mix(in oklab, #009957 65%, var(--color-ink))");
+  });
+
+  it("gives the focused Simple menu row an inset ring with 3:1 contrast on every skin", () => {
+    const rule = css.match(/:root\[data-interface="simple"\] \[role="menu"\] :is\(button, \[role\^="menuitem"\]\):focus-visible\s*\{([^}]*)\}/)?.[1] ?? "";
+    expect(rule).toContain("outline: 2px solid var(--color-focus)");
+    expect(rule).toContain("outline-offset: -2px");
+    expect(rule).not.toContain("outline: none");
+    const failures: string[] = [];
+    for (const skin of SKINS) {
+      const focus = varFor(skin, "color-focus");
+      const menu = varFor(skin, "color-menu");
+      const ratio = contrast(parseColor(focus, skin), parseColor(menu, skin));
+      if (ratio < 3) failures.push(`${skin}: ${ratio.toFixed(2)}:1`);
+    }
+    expect(failures).toEqual([]);
   });
 
   it("clears 3:1 against every skin's active tab fill, for every mascot colour", () => {

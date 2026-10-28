@@ -162,8 +162,8 @@ describe("the Simple header", () => {
       expect(pill[1]).toContain(">Pepper</span>");
       expect(pill[1]).toContain('data-chathead-elsewhere="true"');
       expect(pill[0].match(/class="([^"]*)"/)![1]!.split(" ")).toEqual(expect.arrayContaining(["rounded-full", "bg-composer", "ring-[0.5px]", "py-[7.5px]", "pr-[13.5px]"]));
-      // Away from the bot's main conversation, the pill names the one on screen.
-      expect(pill[1]).toContain("data-chathead-conversation");
+      // The thread bar names the conversation on screen, so the pill never repeats it: no title, no chevron.
+      expect(pill[1]).not.toContain("data-chathead-conversation");
       for (const gone of ["data-chathead-role", "data-background-activity", "data-chathead-back", 'data-testid="chat-more"']) {
         expect(simple, gone).not.toContain(gone);
       }

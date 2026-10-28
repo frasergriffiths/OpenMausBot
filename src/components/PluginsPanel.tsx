@@ -558,7 +558,7 @@ export function PluginsPanel() {
           <ConnectAppsPillRestore className="mt-2" />
           </div>
           <div className="flex items-center gap-2">
-            <label data-field-shell="" className="flex h-9 min-w-0 flex-1 items-center gap-2.5 rounded-full bg-control/70 px-3.5 focus-within:ring-1 focus-within:ring-accent">
+            <label data-field-shell="" className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1 focus-within:ring-1 focus-within:ring-accent">
               <Search size={15} className="shrink-0 text-ink-secondary" />
               <input
                 value={search}

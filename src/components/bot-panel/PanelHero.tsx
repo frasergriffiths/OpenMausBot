@@ -3,7 +3,7 @@ import { Crown, Pencil } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
-import type { MausState } from "@/lib/mascot";
+import { MAUS_COLORS, mascotInk, type MausState } from "@/lib/mascot";
 import type { Bot } from "@/state/store";
 import { BOT_PROFILE_LIMITS } from "../../../shared/bot-profile";
 import { BotAvatar } from "../Avatar";
@@ -88,8 +88,8 @@ export function PanelHero({ bot, activeState, patch, editorOpen, onToggleEditor 
           <Pencil size={20} />
         </span>
         {bot.chiefOfStaff && (
-          <span data-panel-chief title={t("chat.chiefOfStaff")} className="absolute -bottom-0.5 -right-0.5 flex size-[22px] items-center justify-center rounded-full bg-accent text-accent-ink ring-[3px] ring-app">
-            <Crown size={12} aria-hidden="true" />
+          <span data-panel-chief title={t("chat.chiefOfStaff")} className="absolute -bottom-0.5 -right-0.5 flex size-[22px] items-center justify-center rounded-full ring-[3px] ring-app" style={{ backgroundColor: MAUS_COLORS[bot.color], color: mascotInk(bot.color) }}>
+            <Crown size={12} fill="currentColor" aria-hidden="true" />
             <span className="sr-only">{t("chat.chiefOfStaff")}</span>
           </span>
         )}

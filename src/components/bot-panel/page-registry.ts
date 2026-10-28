@@ -1,11 +1,11 @@
 import type { LocaleKey } from "@/locales";
 import type { BotSettingsSection } from "@/state/store";
 
-export const PANEL_TABS = ["details", "library", "computer"] as const;
+export const PANEL_TABS = ["profile", "library", "computer"] as const;
 export type PanelTab = (typeof PANEL_TABS)[number];
 
 export const TAB_LABEL: Record<PanelTab, LocaleKey> = {
-  details: "botPanel.tab.details",
+  profile: "botPanel.tab.profile",
   library: "botPanel.tab.library",
   computer: "botPanel.tab.computer",
 };
@@ -13,13 +13,13 @@ export const TAB_LABEL: Record<PanelTab, LocaleKey> = {
 export type PageId =
   | "settings" | "where"
   | "setup" | "model" | "instructions" | "approvals" | "always" | "routines" | "apps"
-  | "memory" | "skills"
-  | "browser" | "folder" | "android"
+  | "memory" | "skills" | "threads" | "activity" | "runlog" | "files" | "data" | "sites" | "usage"
+  | "browser" | "computer" | "folder" | "android"
   | "voice" | "blurb" | "team" | "chiefteams" | "mcp" | "tools" | "webhooks" | "visibility" | "slack"
   | "overview" | "prompt" | "history";
 
 /** The pages Simple mode draws; a link to any other page lands where its section does. */
-export const SIMPLE_PAGES = ["settings", "apps", "routines", "memory", "skills", "folder", "browser", "where"] as const satisfies readonly PageId[];
+export const SIMPLE_PAGES = ["apps", "routines", "memory", "skills", "folder", "browser", "computer", "where", "settings", "threads", "activity", "runlog", "files", "data", "sites", "android", "usage"] as const satisfies readonly PageId[];
 export type SimplePageId = (typeof SIMPLE_PAGES)[number];
 
 export function isSimplePage(page: PageId): page is SimplePageId {
@@ -33,32 +33,40 @@ export interface PageMeta {
 }
 
 export const PAGES: Record<PageId, PageMeta> = {
-  settings: { title: "botPanel.page.settings", home: "details" },
+  settings: { title: "botPanel.page.settings", home: "profile" },
   where: { title: "computer.simple.whereWorks", home: "computer" },
-  setup: { title: "botSetup.ideas", home: "details" },
-  model: { title: "model.simple.model", home: "details" },
-  instructions: { title: "botSettings.simple.instructions", home: "details" },
-  approvals: { title: "botPanel.page.approvals", home: "details" },
-  routines: { title: "botSettings.simple.routines", home: "details" },
-  apps: { title: "botPanel.appsRow", home: "details", intro: "botPanel.apps.intro" },
+  setup: { title: "botSetup.ideas", home: "profile" },
+  model: { title: "model.simple.model", home: "profile" },
+  instructions: { title: "botSettings.simple.instructions", home: "profile" },
+  approvals: { title: "botPanel.page.approvals", home: "profile" },
+  routines: { title: "botSettings.simple.routines", home: "profile" },
+  apps: { title: "botPanel.appsRow", home: "profile", intro: "botPanel.apps.intro" },
   memory: { title: "botPanel.memoryRow", home: "library", intro: "botPanel.memory.intro" },
   skills: { title: "botSettings.simple.skills", home: "library", intro: "botSettings.simple.skillsHint" },
-  browser: { title: "settings.sites.title", home: "computer" },
+  threads: { title: "botPanel.page.threads", home: "profile" },
+  activity: { title: "activity.panel.title", home: "profile" },
+  runlog: { title: "botPanel.page.runLog", home: "profile" },
+  usage: { title: "settings.section.usage", home: "profile" },
+  files: { title: "botPanel.library.files", home: "library" },
+  data: { title: "botPanel.library.data", home: "library" },
+  sites: { title: "settings.sites.title", home: "computer" },
+  browser: { title: "botPanel.page.browser", home: "computer" },
+  computer: { title: "botPanel.tab.computer", home: "computer" },
   folder: { title: "computer.files.folder", home: "library", intro: "botPanel.folder.intro" },
   android: { title: "botPanel.page.android", home: "computer" },
-  voice: { title: "botPanel.page.voice", home: "details" },
-  blurb: { title: "botPanel.page.blurb", home: "details" },
-  team: { title: "botPanel.page.team", home: "details" },
-  chiefteams: { title: "botPanel.page.chiefTeams", home: "details" },
-  mcp: { title: "connectors.tab.mcp", home: "details" },
-  tools: { title: "botAccess.tools.title", home: "details" },
-  webhooks: { title: "botPanel.page.webhooks", home: "details" },
-  always: { title: "botPanel.page.always", home: "details" },
-  visibility: { title: "botSettings.visibility.title", home: "details" },
-  slack: { title: "botPanel.page.slack", home: "details" },
-  overview: { title: "botPanel.page.overview", home: "details" },
-  prompt: { title: "botPanel.page.prompt", home: "details" },
-  history: { title: "botPanel.page.history", home: "details" },
+  voice: { title: "botPanel.page.voice", home: "profile" },
+  blurb: { title: "botPanel.page.blurb", home: "profile" },
+  team: { title: "botPanel.page.team", home: "profile" },
+  chiefteams: { title: "botPanel.page.chiefTeams", home: "profile" },
+  mcp: { title: "connectors.tab.mcp", home: "profile" },
+  tools: { title: "botAccess.tools.title", home: "profile" },
+  webhooks: { title: "botPanel.page.webhooks", home: "profile" },
+  always: { title: "botPanel.page.always", home: "profile" },
+  visibility: { title: "botSettings.visibility.title", home: "profile" },
+  slack: { title: "botPanel.page.slack", home: "profile" },
+  overview: { title: "botPanel.page.overview", home: "profile" },
+  prompt: { title: "botPanel.page.prompt", home: "profile" },
+  history: { title: "botPanel.page.history", home: "profile" },
 };
 
 export const PAGE_IDS = Object.keys(PAGES) as PageId[];
@@ -72,20 +80,20 @@ export interface PanelTarget {
 }
 
 const SECTION_TARGET: Record<BotSettingsSection, PanelTarget> = {
-  overview: { tab: "details" },
-  identity: { tab: "details" },
-  slack: { tab: "details" },
-  soul: { tab: "details", page: "settings", anchor: "instructions", editInstructions: true },
+  overview: { tab: "profile" },
+  identity: { tab: "profile" },
+  slack: { tab: "profile" },
+  soul: { tab: "profile", page: "settings", anchor: "instructions", editInstructions: true },
   skills: { tab: "library", page: "skills" },
   memory: { tab: "library", page: "memory" },
-  routines: { tab: "details", page: "routines" },
+  routines: { tab: "profile", page: "routines" },
   access: { tab: "computer" },
-  model: { tab: "details", anchor: "model" },
-  permissions: { tab: "details", page: "settings", anchor: "approval" },
-  voice: { tab: "details" },
-  visibility: { tab: "details" },
-  history: { tab: "details" },
-  usage: { tab: "details" },
+  model: { tab: "profile", anchor: "model" },
+  permissions: { tab: "profile", page: "settings", anchor: "approval" },
+  voice: { tab: "profile" },
+  visibility: { tab: "profile" },
+  history: { tab: "profile" },
+  usage: { tab: "profile" },
 };
 
 export function sectionTarget(section: BotSettingsSection): PanelTarget {

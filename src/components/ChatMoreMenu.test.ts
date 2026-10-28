@@ -11,13 +11,13 @@ const fixture = vi.hoisted(() => {
     threadsChosen: true,
     menus: [] as { ariaLabel: string; items: SidebarMenuItem[]; placement?: string; openOnHover?: boolean; compact?: boolean; trigger: string }[],
     dispatch: vi.fn(),
-    inspectorOpen: false,
+    inspectorOpen: false, settingsOpen: false,
     find: vi.fn(),
   };
 });
 vi.mock("@/state/store", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/state/store")>();
-  return { ...original, useStore: () => ({ state: { ...original.initialState, inspectorOpen: fixture.inspectorOpen }, dispatch: fixture.dispatch }) };
+  return { ...original, useStore: () => ({ state: { ...original.initialState, inspectorOpen: fixture.inspectorOpen, settingsOpen: fixture.settingsOpen, botSettingsSection: "usage" }, dispatch: fixture.dispatch }) };
 });
 vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: vi.fn() }));
 vi.mock("@/lib/thread-preferences", () => ({ useShowThreads: () => fixture.advanced && fixture.threadsChosen }));
@@ -64,6 +64,7 @@ beforeEach(() => {
   fixture.advanced = false;
   fixture.threadsChosen = true;
   fixture.inspectorOpen = false;
+  fixture.settingsOpen = false;
   fixture.dispatch.mockClear();
   fixture.find.mockClear();
 });
@@ -129,6 +130,7 @@ describe("ChatMoreMenu, the round ⋯ for the bot panel", () => {
 
   it("shows Usage when the thread has some, and opens the inspector from Simple mode", () => {
     fixture.inspectorOpen = true;
+    fixture.settingsOpen = true;
     const withUsage: Bot = { ...bot, tasks: bot.tasks!.map((entry) => entry.threadId === "side"
       ? { ...entry, usage: { input: 1200, output: 300, costUsd: null, turns: 2 } }
       : entry) };
@@ -139,7 +141,7 @@ describe("ChatMoreMenu, the round ⋯ for the bot panel", () => {
     const inspector = menu.items.find((item) => item.key === "inspector")!;
     expect(inspector.active).toBe(true);
     inspector.onSelect();
-    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "toggleInspector" });
+    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "toggleSettings", open: true, section: "usage" });
     expect(menu.trigger).toContain("text-accent");
   });
 });

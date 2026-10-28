@@ -1659,6 +1659,7 @@
   "chat.compactionExcerptTitle": "Contexto anterior reducido a fragmentos recientes",
   "chat.compactionExcerptHint": "No había un resumen escrito disponible, así que el agente continúa con estos fragmentos y los mensajes recientes. Pueden faltar detalles anteriores en su contexto. Tu conversación completa sigue aquí.",
   "contextWarning.short": "Contexto {percent}%",
+  "contextWarning.threadRow": "Contexto {percent}% usado",
   "contextWarning.threadHint": "El contexto de {name} está al {percent}%. «Compactar ahora» resume los mensajes antiguos en una nota breve; toda la conversación se queda aquí.",
   "contextWarning.compactNow": "Compactar ahora",
   "contextWarning.compacting": "Compactando…",
@@ -5425,5 +5426,12 @@
   "computer.problem.localNeedsApp": "Solo la app de OpenMausBot en este equipo puede dejar que un bot lo use. Abre la app aquí para usarlo.",
   "computer.problem.localWindows": "Los bots no pueden usar este PC ahora mismo. Reinicia OpenMausBot y, si no se arregla, abre Ajustes → Diagnóstico.",
   "computer.problem.localMac": "Los bots todavía no pueden usar este Mac. Comprueba que OpenMausBot está permitido en Grabación de pantalla y Accesibilidad, en Ajustes del Sistema → Privacidad y seguridad, y luego reinícialo.",
-  "templates.invalidJson": "Ese archivo de copia de seguridad o de equipo no es un JSON válido."
+  "templates.invalidJson": "Ese archivo de copia de seguridad o de equipo no es un JSON válido.",
+  "botPanel.tab.profile": "Perfil",
+  "botPanel.tab.library": "Biblioteca",
+  "botPanel.tab.computer": "Ordenador",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Hilos",
+  "botPanel.page.browser": "Navegador",
+  "botPanel.library.data": "Datos"
 }

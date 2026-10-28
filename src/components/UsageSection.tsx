@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ChevronRight, Download, Loader2 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "./pill-tabs";
 import { activeLocale, documentLanguage, t } from "@/lib/i18n";
 import { listenLiveFrames } from "@/lib/live-events";
 import { formatTokens, hasFiniteCost, headlineTokens } from "@/lib/usage";
@@ -118,7 +119,7 @@ function WhereItWent({ range, version, onBudget }: { range: { from: string; to: 
           {byBot ? <GroupBars groupBy="bot" groups={byBot.groups} /> : <Loader2 size={14} className="animate-spin text-ink-secondary" />}
         </div>
         <div>
-          <div role="tablist" aria-label={t("usage.history.groupBy")} className="-mt-1 mb-2 flex flex-wrap gap-1">
+          <div role="tablist" aria-label={t("usage.history.groupBy")} className={cn(PILL_TABS, "-mt-1 mb-2 flex-wrap")}>
             {OTHER_GROUPINGS.map((option) => (
               <button
                 key={option}
@@ -126,8 +127,7 @@ function WhereItWent({ range, version, onBudget }: { range: { from: string; to: 
                 role="tab"
                 aria-selected={other === option}
                 onClick={() => setOther(option)}
-                className={cn("rounded-md px-2 py-0.5 text-[11px] font-medium uppercase tracking-[0.06em]",
-                  other === option ? "bg-accent/12 text-accent" : "text-ink-secondary hover:bg-raised/60 hover:text-ink")}
+                className={cn(PILL_TAB, other === option ? PILL_TAB_ON : PILL_TAB_OFF)}
               >{t(GROUP_LABEL_KEYS[option])}</button>
             ))}
           </div>

@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
+import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "./pill-tabs";
 import { t } from "@/lib/i18n";
 import {
   applyTeamPlan,
@@ -97,8 +98,7 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
   };
   const close = () => { if (!running) onClose(); };
   const counts = results ? teamResultCounts(results) : null;
-  const tabClass = (active: boolean) => cn("flex-1 rounded-md px-2.5 py-1.5 text-[13px] font-medium",
-    active ? "bg-raised text-ink" : "text-ink-secondary hover:text-ink");
+  const tabClass = (active: boolean) => cn(PILL_TAB, "flex-1", active ? PILL_TAB_ON : PILL_TAB_OFF);
 
   return createPortal(
     <div className="ui-scrim fixed inset-0 z-50 flex items-center justify-center p-4" onMouseDown={(event) => {
@@ -124,7 +124,7 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
         ) : (
           <>
             <p className="mb-3 text-[13px] leading-relaxed text-ink-secondary">{t("teamSettings.intro", { count: bots.length })}</p>
-            <div className="mb-3 flex gap-1 rounded-lg bg-inset p-0.5" role="tablist">
+            <div className={cn(PILL_TABS, "mb-3")} role="tablist">
               <button type="button" role="tab" aria-selected={tab === "approval"} disabled={running} className={tabClass(tab === "approval")} onClick={() => setTab("approval")}>{t("teamSettings.tab.approval")}</button>
               <button type="button" role="tab" aria-selected={tab === "model"} disabled={running} className={tabClass(tab === "model")} onClick={() => setTab("model")}>{t("teamSettings.tab.model")}</button>
             </div>

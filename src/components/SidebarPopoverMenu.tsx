@@ -7,6 +7,7 @@ import { popoverClosesOnKey, usePopoverDismiss } from "@/hooks/use-popover-dismi
 import { submenuIntent, type Point, type SubmenuIntent } from "@/lib/submenu-intent";
 import { useAdvancedMode } from "@/lib/interface-mode";
 import { MENU_ROW } from "./menu-recipe";
+import { t } from "@/lib/i18n";
 
 export interface SidebarMenuItem {
   key: string;
@@ -27,6 +28,8 @@ export interface SidebarMenuItem {
   keepOpen?: boolean;
   submenu?: SidebarMenuItem[];
   chevron?: boolean;
+  /** Raw updater text shown only behind the shared Technical details disclosure. */
+  technical?: string;
   onSelect: () => void;
   tourId?: string;
 }
@@ -161,6 +164,14 @@ function MenuRows({
             )}
             {(item.submenu || item.chevron) && <ChevronRight size={look === "compact" ? 14 : 16} strokeWidth={look === "compact" ? 1.75 : 2} aria-hidden className="-me-0.5 shrink-0 text-ink-secondary rtl:-scale-x-100" />}
           </button>
+          {item.technical && (
+            <details className="mx-2 mb-1 rounded-lg bg-inset px-2.5 py-2">
+              <summary className="flex w-fit cursor-pointer list-none items-center gap-1 text-[12px] leading-4 text-ink-secondary hover:text-ink [&::-webkit-details-marker]:hidden">
+                {t("computer.mac.permission.technicalDetails")}
+              </summary>
+              <p className="mt-1.5 max-h-24 overflow-y-auto break-words text-[12px] leading-5 text-ink-secondary">{item.technical}</p>
+            </details>
+          )}
         </div>
       ))}
     </>

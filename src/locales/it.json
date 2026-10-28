@@ -1759,6 +1759,7 @@
   "chat.compactionExcerptTitle": "Contesto precedente ridotto a estratti recenti",
   "chat.compactionExcerptHint": "Un riassunto scritto non era disponibile, quindi l'agente continua da questi estratti e dai messaggi recenti. Nel suo contesto possono mancare dettagli più vecchi. La conversazione completa è ancora qui.",
   "contextWarning.short": "Contesto {percent}%",
+  "contextWarning.threadRow": "Contesto {percent}% usato",
   "contextWarning.threadHint": "Il contesto di {name} è pieno al {percent}%. Compatta ora riassume i messaggi più vecchi in una nota breve; l'intera conversazione resta qui.",
   "contextWarning.compactNow": "Compatta ora",
   "contextWarning.compacting": "Compattazione…",
@@ -6152,5 +6153,12 @@
   "computer.problem.localNotReady": "I bot non possono ancora usare questo computer. Riavvia OpenMausBot e riprova.",
   "computer.problem.localNeedsApp": "Solo l'app OpenMausBot su questo computer può farlo usare a un bot. Apri l'app qui per usarlo.",
   "computer.problem.localWindows": "Al momento i bot non possono usare questo PC. Riavvia OpenMausBot e, se non basta, apri Impostazioni → Diagnostica.",
-  "computer.problem.localMac": "I bot non possono ancora usare questo Mac. Controlla che OpenMausBot sia consentito in Registrazione schermo e Accessibilità, in Impostazioni di Sistema → Privacy e sicurezza, poi riavvialo."
+  "computer.problem.localMac": "I bot non possono ancora usare questo Mac. Controlla che OpenMausBot sia consentito in Registrazione schermo e Accessibilità, in Impostazioni di Sistema → Privacy e sicurezza, poi riavvialo.",
+  "botPanel.tab.profile": "Profilo",
+  "botPanel.tab.library": "Libreria",
+  "botPanel.tab.computer": "Computer",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Thread",
+  "botPanel.page.browser": "Browser",
+  "botPanel.library.data": "Dati"
 }

@@ -1918,6 +1918,7 @@
   "chat.compactionExcerptTitle": "Earlier context shortened to recent excerpts",
   "chat.compactionExcerptHint": "A written summary wasn't available, so the agent continues from these excerpts and recent messages. Older details may be missing from its context. Your full conversation is still here.",
   "contextWarning.short": "Context {percent}%",
+  "contextWarning.threadRow": "Context {percent}% used",
   "contextWarning.threadHint": "{name}'s context is {percent}% full. Compact now summarizes older messages into a short note; the whole conversation stays here.",
   "contextWarning.compactNow": "Compact now",
   "contextWarning.compacting": "Compacting…",
@@ -6631,5 +6632,14 @@
   "chat.setupCard.data": "Data, spreadsheets and reports",
   "composer.setupRequest.placeholder": "Tell {name} what you'd like help with",
   "composer.setupRequest.waiting": "{name} is ready to be set up",
-  "composer.setupRequest.cancel": "Stop setting up {name}"
+  "composer.setupRequest.cancel": "Stop setting up {name}",
+  "settings.simple.busySend": "When a bot is working",
+  "settings.simple.busySendHint": "Queue waits for the current turn. Steer adds your message to the turn already running.",
+  "settings.simple.busySendQueue": "Queue",
+  "settings.simple.busySendSteer": "Steer",
+  "botPanel.tab.profile": "Profile",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Threads",
+  "botPanel.page.browser": "Browser",
+  "botPanel.library.data": "Data"
 }

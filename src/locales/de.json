@@ -2467,5 +2467,12 @@
   "computer.mac.permission.title": "Steuerung dieses Computers erlauben",
   "computer.mac.permission.driverDetail": "Treiberdetails",
   "computer.mac.permission.relaunch": "OpenMausBot neu starten",
-  "permissions.openSystemSettings": "Systemeinstellungen öffnen"
+  "permissions.openSystemSettings": "Systemeinstellungen öffnen",
+  "botPanel.tab.profile": "Profil",
+  "botPanel.tab.library": "Bibliothek",
+  "botPanel.tab.computer": "Computer",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Threads",
+  "botPanel.page.browser": "Browser",
+  "botPanel.library.data": "Daten"
 }

@@ -14,6 +14,7 @@ import { canInstallElevated, installPackageElevated } from "./elevated-install.m
 import { releaseSingleInstanceLock } from "./single-instance.mjs";
 import { openBlankTerminal } from "./terminal-launch.mjs";
 import { createUpdaterCoordinator } from "./updater-coordinator.mjs";
+import { UNCONFIGURED } from "./update-errors.mjs";
 import { createQuietInstall, installFailed, launchAfter, LOOK_EVERY_MS, updateSeen } from "./update-when-quiet.mjs";
 
 export { quietSignals } from "./update-when-quiet-main.mjs";
@@ -149,6 +150,11 @@ export function startUpdater(signals = null) {
   if (!app.isPackaged) {
     updaterCoordinator = null;
     setState({ status: "idle" });
+    return;
+  }
+  if (!existsSync(join(process.resourcesPath, "app-update.yml"))) {
+    updaterCoordinator = null;
+    setState({ status: "idle", message: UNCONFIGURED, retryable: false });
     return;
   }
   try {

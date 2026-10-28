@@ -7,7 +7,7 @@ import { t } from "@/lib/i18n";
 import { ELEVATED_CONTROL, ELEVATED_HOVER } from "./elevated";
 
 export const SIMPLE_MENU = "popover-surface flex flex-col gap-1 rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]";
-export const SIMPLE_MENU_ITEM = "flex min-h-[30px] w-full shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-2 py-1.5 text-left text-[14px] leading-[18px] focus-visible:bg-menu-hover";
+export const SIMPLE_MENU_ITEM = "flex min-h-[30px] w-full shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-2 py-1.5 text-left text-[14px] leading-[18px] focus-visible:bg-menu-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus";
 export const SIMPLE_MENU_SEPARATOR = "mx-1.5 h-px shrink-0 bg-hairline/50";
 /** Keyboard focus on a Simple row or tile: the focus ring drawn inside its edge. */
 export const SIMPLE_ROW_FOCUS = "focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-focus";
@@ -92,10 +92,13 @@ export function SidebarSearchToggle({ open, onToggle, ref }: { open: boolean; on
   );
 }
 
+export const SIMPLE_SEARCH_SHELL = "flex h-8 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1.5 text-ink-secondary focus-within:ring-1 focus-within:ring-accent";
+export const SIMPLE_SEARCH_INPUT = "min-w-0 flex-1 bg-transparent text-[13px] leading-[18px] text-ink placeholder:text-ink-tertiary focus:outline-none";
+
 export function SidebarSearchPill({ query, onQuery, onClose }: { query: string; onQuery: (query: string) => void; onClose: () => void }) {
   return (
     <div data-sidebar-search-pill className="px-3 pb-2 pt-0.5">
-      <div className={cn("flex h-[34px] items-center gap-2 rounded-full pl-3 pr-1.5 text-ink-secondary focus-within:ring-focus", ELEVATED_CONTROL)}>
+      <div className={cn("flex h-8 items-center gap-2 rounded-[var(--radius-lg)] pl-2.5 pr-1 text-ink-secondary focus-within:ring-focus", ELEVATED_CONTROL)}>
         <Search size={15} aria-hidden="true" className="shrink-0" />
         <input
           autoFocus
@@ -108,7 +111,7 @@ export function SidebarSearchPill({ query, onQuery, onClose }: { query: string; 
           }}
           placeholder={t("sidebar.searchAria")}
           aria-label={t("sidebar.searchAria")}
-          className="min-w-0 flex-1 bg-transparent text-[13px] text-ink placeholder:text-ink-tertiary focus:outline-none"
+          className={SIMPLE_SEARCH_INPUT}
         />
         <button
           type="button"

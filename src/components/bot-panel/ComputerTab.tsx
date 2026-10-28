@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { KeyRound, Monitor } from "lucide-react";
+import { Globe2, KeyRound, Monitor, Smartphone } from "lucide-react";
 
 import { writeComputerPanelView, type ComputerPanelView } from "@/lib/computer-panel-view";
 import { t } from "@/lib/i18n";
@@ -10,6 +10,9 @@ import { api, useStore, type Bot } from "@/state/store";
 import { BotAvatar } from "../Avatar";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
 import { LocalComputerAutoWarning } from "../LocalComputerAutoWarning";
+import { MacLocalControl } from "../MacLocalControl";
+import { LinuxLocalControl } from "../LinuxLocalControl";
+import { useAndroidUsbDevices } from "../AndroidDevicePanel";
 import { usePlaceViews } from "../PlaceChip";
 import { screenFramePreview } from "../ScreenFrame";
 import type { BotPatch, useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
@@ -128,23 +131,25 @@ export function WherePage({ bot, derived }: { bot: Bot; derived: Derived }) {
 }
 
 export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
-  const openComputer = useOpenComputer(bot);
   const ownerOrAdmin = useOwnerOrAdmin();
   const { browserEnabled } = derived;
   const signedIn = useSignedInCount(bot, browserEnabled && bot.computer !== "off" && ownerOrAdmin !== false);
   const { currentLabel, usingNow } = usePlaceChoices(bot);
   const screenOf = t("computer.screenOf", { name: bot.name });
+  const android = useAndroidUsbDevices();
 
   const screen = [...bot.messages].reverse().find((message) => message.kind === "screen" && (message.hasImage || message.png));
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
 
   return (
     <div data-panel-tabpanel="computer">
+      <MacLocalControl />
+      <LinuxLocalControl />
       <button
         type="button"
         data-panel-action="open-computer"
         aria-label={`${t("place.action.watch")}: ${screenOf}`}
-        onClick={() => openComputer()}
+        onClick={() => onOpen("computer")}
         className="group relative mt-2.5 flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl bg-composer ring-1 ring-inset ring-ink/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-border"
       >
         {screenSrc ? (
@@ -181,11 +186,26 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
         />
         <NavRow
           data-panel-page="browser"
+          icon={Globe2}
+          title={t("botPanel.page.browser")}
+          onClick={() => onOpen("browser")}
+        />
+        <NavRow
+          data-panel-page="sites"
           icon={KeyRound}
           title={t("settings.sites.title")}
           value={signedIn ?? undefined}
-          onClick={() => onOpen("browser")}
+          onClick={() => onOpen("sites")}
         />
+        {android.devices.length > 0 && (
+          <NavRow
+            data-panel-page="android"
+            icon={Smartphone}
+            title={t("botPanel.page.android")}
+            value={android.devices.length}
+            onClick={() => onOpen("android")}
+          />
+        )}
       </Card>
     </div>
   );

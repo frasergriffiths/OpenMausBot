@@ -125,9 +125,11 @@ const computerControlSnapshotSchema = z.object({
 export function ComputerPanel({
   bot: profileBot,
   onOpenVmWorkspace,
+  embedded = false,
 }: {
   bot: Bot;
   onOpenVmWorkspace?: (botId: string) => void;
+  embedded?: boolean;
 }) {
   const { padClass, dragProps } = useCaptionChrome();
   const { panelWidth, separatorRef, separatorWidth, onSeparatorKeyDown, onResizeStart, onResizeMove, onResizeEnd } = useComputerPanelResize();
@@ -260,7 +262,7 @@ export function ComputerPanel({
   const androidStatus = useAndroidUsbDevices();
   const androidConnected = androidStatus.devices.length > 0;
   const panelTabs = computerPanelTabs({ advanced, androidConnected });
-  const panelView = resolveComputerPanelView(storedPanelView, { advanced, androidConnected });
+  const panelView = embedded ? "computer" as const : resolveComputerPanelView(storedPanelView, { advanced, androidConnected });
   const panelRef = useComputerPanelEntry(profileBot.id, panelView);
   const browserAvailableHere = browserAvailable(state.config);
   const browserEnabled = builtInBrowserEnabled(state.config) && bot.browser !== false
@@ -1192,14 +1194,16 @@ export function ComputerPanel({
     <>
     <aside
       className={cn(
-        "animate-panel-in relative flex h-full shrink-0 flex-col border-l border-hairline/40 bg-panel",
-        "max-md:absolute max-md:inset-0 max-md:z-40 max-md:w-full!",
+        embedded
+          ? "relative flex h-full min-h-0 w-full flex-col bg-panel"
+          : "animate-panel-in relative flex h-full shrink-0 flex-col border-l border-hairline/40 bg-panel max-md:absolute max-md:inset-0 max-md:z-40 max-md:w-full!",
       )}
       ref={panelRef}
       data-computer-panel
-      style={{ width: panelWidth }}
+      data-computer-panel-embedded={embedded ? "" : undefined}
+      style={embedded ? undefined : { width: panelWidth }}
     >
-      <div
+      {!embedded && <div
         ref={separatorRef}
         role="separator"
         aria-orientation="vertical"
@@ -1214,9 +1218,9 @@ export function ComputerPanel({
         onPointerUp={onResizeEnd}
         onPointerCancel={onResizeEnd}
         className="absolute inset-y-0 left-0 z-10 w-1.5 cursor-col-resize hover:bg-accent/40 focus-visible:bg-accent/60 max-md:hidden"
-      />
+      />}
       {/* ml-1.5 keeps the drag region clear of the resize handle: a later drag region in the DOM wins. */}
-      <div {...dragProps} className={cn("@container/paneltabs ml-1.5 py-3 pl-2.5 pr-4", padClass)}>
+      {!embedded && <div {...dragProps} className={cn("@container/paneltabs ml-1.5 py-3 pl-2.5 pr-4", padClass)}>
         <div className="relative flex min-h-7 items-center justify-center">
           {advanced && (
             <button
@@ -1258,7 +1262,7 @@ export function ComputerPanel({
             <X size={18} />
           </button>
         </div>
-      </div>
+      </div>}
 
       {panelView === "routines" ? (
         <div {...tabPanelProps("routines")} className={cn("min-h-0 flex-1 overflow-y-auto px-4 pb-4", TAB_PANEL_FOCUS)}>
@@ -1306,7 +1310,7 @@ export function ComputerPanel({
           <AndroidDevicePanel status={androidStatus} />
         </div>
       ) : (
-      <div {...tabPanelProps("computer")} className={cn("flex-1 overflow-y-auto px-5 pb-5", TAB_PANEL_FOCUS)}>
+      <div {...tabPanelProps("computer")} className={cn("min-h-0 flex-1 overflow-y-auto px-5 pb-5", TAB_PANEL_FOCUS)}>
           <div className="mb-1.5 mt-2 flex items-center justify-between text-[13px] text-ink-secondary">
             <span>{t("computer.screenOf", { name: bot.name })}</span>
             {currentTeamComputer && <span className="text-[11px]">{autoView.short}</span>}

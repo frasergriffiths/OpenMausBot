@@ -11,6 +11,9 @@ const primaryAction =
 // electron-updater surfaces failures as a whole HTTP dump (status line, every header, stack trace).
 function friendlyError(message?: string): string {
   if (!message) return "Something went wrong.";
+  if (/ERR_UPDATER_NO_PUBLISHED_VERSIONS|No published versions|No releases (?:have been )?published/i.test(message))
+    return "No releases have been published yet.";
+  if (/app-update\.yml/i.test(message)) return "Couldn't check for updates.";
   if (/cannot find .*\.yml|404/i.test(message))
     return "No update has been published for this platform yet.";
   if (/ENOTFOUND|ECONNREFUSED|ETIMEDOUT|net::/i.test(message))
@@ -70,7 +73,7 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
           : "Restarting to update…"
         : s.status === "handed-off"
           ? "Finish in a terminal"
-          : "Update failed";
+          : "Couldn't check for updates";
   const subtitle =
     s.status === "downloaded"
       ? handoff
@@ -115,6 +118,15 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
           </button>
         )}
       </div>
+
+      {s.status === "error" && s.message && !/ERR_UPDATER_NO_PUBLISHED_VERSIONS|no published versions/i.test(s.message) && (
+        <details className="mt-2 border-t border-hairline/30 pt-2">
+          <summary className="flex w-fit cursor-pointer list-none items-center gap-1 text-[12px] leading-4 text-ink-secondary hover:text-ink [&::-webkit-details-marker]:hidden">
+            Technical details
+          </summary>
+          <p className="mt-2 max-h-24 overflow-y-auto break-words rounded-lg bg-inset px-3 py-2 text-[12px] leading-5 text-ink-secondary">{s.message}</p>
+        </details>
+      )}
 
       {s.status === "handed-off" && s.command && (
         <code className="mt-2.5 block overflow-x-auto rounded-lg bg-control px-2 py-1.5 font-mono text-[12px] whitespace-pre text-ink-secondary">

@@ -26,7 +26,7 @@ import { ProfileSummaryRow } from "./ProfileSettings";
 import { ImportSettings } from "./ImportSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
-import { AdvancedModeRow, BrowserProfilesRow, ColorUserBubblesRow, LanguageRow, ReplayTourRow, SendKeyRow, UpdatesRow } from "./AppSettingsRows";
+import { AdvancedModeRow, BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, LanguageRow, ReplayTourRow, SendKeyRow, UpdatesRow } from "./AppSettingsRows";
 import { ThemeRow } from "./ThemeRow";
 
 export type SimpleDisclosureId = "ai-more" | "ai-keys" | "computer-elsewhere" | "billing-limits";
@@ -75,6 +75,7 @@ export function SimpleGeneralPage({ has, peopleOpen, onLooks }: { has: Has; peop
         <SettingsGroup label={t("settings.simple.group.system")}>
           <SettingsRows>
             <OpenAtLoginRow simple />
+            <BusySendRow simple />
             <DefaultBotSidebarRow simple />
             <AnalyticsRow simple />
           </SettingsRows>

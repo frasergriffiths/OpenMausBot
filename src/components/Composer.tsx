@@ -62,6 +62,7 @@ import {
 } from "@/lib/composer-attachments";
 import { goalCoordinatorForComposer, jevRoomRoutingOn, openTaskWorking, roomRespondersForComposer } from "@/lib/group-routing";
 import { composerPlaceholder, sendLabels, SIMPLE_CONTROL, slotColors } from "./composer-simple";
+import { useBusySendMode } from "@/lib/busy-send";
 import { PendingApprovalActions, PendingApprovalPanel, pendingApprovals } from "./PendingApproval";
 import { CallButton } from "./CallView";
 import { GroupCallButton } from "./GroupCallView";
@@ -144,6 +145,7 @@ export function Composer({
   const simpleDock = !advanced && !singleRow;
   const sendKey = useSendKey();
   const sendLabel = sendKeyLabel(sendKey);
+  const busySend = useBusySendMode();
   const remoteClient = window.ogb?.remoteClient?.active === true;
   const threadId = group?.threadId ?? bot?.threadId ?? "";
   const currentGroupTask = group?.tasks?.find((task) => task.threadId === threadId);
@@ -471,6 +473,21 @@ export function Composer({
     if (group) dispatch({ type: "cancelGroupQueued", groupId: group.id, threadId, queueId, onCancelled });
     else if (bot) dispatch({ type: "cancelQueued", botId: bot.id, threadId, queueId, onCancelled });
   };
+  const autoSteerAfterSendRef = useRef(false);
+  useEffect(() => {
+    if (!autoSteerAfterSendRef.current) return;
+    if (pendingCount > 0 && canSteerQueued) {
+      autoSteerAfterSendRef.current = false;
+      steerQueued();
+    } else if (!busy) {
+      autoSteerAfterSendRef.current = false;
+    }
+  }, [pendingCount, busy, canSteerQueued]);
+  useEffect(() => {
+    if (!autoSteerAfterSendRef.current) return;
+    const timer = window.setTimeout(() => { autoSteerAfterSendRef.current = false; }, 6_000);
+    return () => window.clearTimeout(timer);
+  }, [pendingCount, busy]);
   const steerAgainUntilRef = useRef(0);
   const prevPendingCountRef = useRef(pendingCount);
   useEffect(() => {
@@ -545,7 +562,7 @@ export function Composer({
   const stopInSlot = simpleDock && stoppable && !locked && !hasContent && !calling;
   const callShown = !simpleDock || (!hasContent && !stopInSlot);
   const slot = slotColors(bot?.color, Boolean(group));
-  const sendNames = sendLabels({ simple: !advanced, busy, canSteer, name: busyName, sendLabel });
+  const sendNames = sendLabels({ simple: !advanced, busySend, busy, canSteer, name: busyName, sendLabel });
   const retryFailedSend = (failed: FailedComposerSend) => {
     const failedMode = failed.channelMode ?? "chat";
     if (failed.requestText.includes("<attached-image ") && !imageTargetsSupport(failed.requestText, failedMode)) {
@@ -589,6 +606,7 @@ export function Composer({
     stopDictation();
     const body = restoredRequestText(draftId) ?? composed;
     const dataContext = dataContextFor(body, state.computerOpen ? state.dataView : null, !group && bot ? { botId: bot.id, threadId } : undefined);
+    const autoSteer = busy && busySend === "steer" && canSteer && pendingCount === 0;
     const sentDraft: ComposerDraftSnapshot = {
       draftId,
       revision: draftRevision(draftId),
@@ -610,16 +628,18 @@ export function Composer({
         replyToId: replyTo?.id,
         threadId,
         mode: effectiveChannelMode,
-        onError: () => restoreDraft(sentDraft),
+        onError: () => { autoSteerAfterSendRef.current = false; restoreDraft(sentDraft); },
       });
+      autoSteerAfterSendRef.current = autoSteer;
       roomMessageSent(effectiveChannelMode, busy);
     } else if (bot) {
       const points = effectiveChannelMode === "goal" ? null : takePointedChips(threadId);
       dispatch({
         type: "send", botId: bot.id, text: body, sendId: sentDraft.sendId, replyToId: replyTo?.id, threadId, dataContext, mode: effectiveChannelMode,
         ...(points ? { pointed: points.pointed } : {}),
-        onError: () => { points?.restore(); restoreDraft(sentDraft); },
+        onError: () => { autoSteerAfterSendRef.current = false; points?.restore(); restoreDraft(sentDraft); },
       });
+      autoSteerAfterSendRef.current = autoSteer;
       directMessageSent(state.instances, bot.modelSelection?.instanceId, busy && !canSteer);
     }
     setText("");
@@ -943,7 +963,7 @@ export function Composer({
             disabled={Boolean(approval) || locked}
             aria-busy={bot?.awaitingThreadSnapshot || undefined}
             placeholder={composerPlaceholder({
-              simple: !advanced, locked: setupLocked, approval: Boolean(approval), attaching: attachmentPending, listening: recording,
+              simple: !advanced, busySend, locked: setupLocked, approval: Boolean(approval), attaching: attachmentPending, listening: recording,
               replying: Boolean(replyTo), busy, canSteer, queued: pendingCount > 0, busyName, sendLabel, group, members: members ?? [],
               jevOn: jevRoomRoutingOn(state.config), goal: channelMode === "goal", botName: bot?.name ?? "",
               setupHint: group ? null : setupRequestPlaceholder(bot, threadId),

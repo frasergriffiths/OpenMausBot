@@ -1797,6 +1797,7 @@
   "chat.compactionTitle": "Wcześniejszy kontekst podsumowany",
   "chat.compactionHint": "Pełna rozmowa nadal tu jest. Agent korzysta z tego podsumowania i ostatnich wiadomości, gdy kontynuuje.",
   "contextWarning.short": "Kontekst {percent}%",
+  "contextWarning.threadRow": "Kontekst {percent}% wykorzystany",
   "contextWarning.threadHint": "Kontekst bota {name} jest zapełniony w {percent}%. Funkcja kompaktowania podsumowuje starsze wiadomości do krótkiej notatki; cała rozmowa zostaje tutaj.",
   "contextWarning.compactNow": "Kompaktuj teraz",
   "contextWarning.compacting": "Kompaktowanie…",
@@ -6270,5 +6271,11 @@
   "computer.problem.localNotReady": "Boty nie mogą jeszcze korzystać z tego komputera. Uruchom ponownie OpenMausBot i spróbuj jeszcze raz.",
   "computer.problem.localNeedsApp": "Tylko aplikacja OpenMausBot na tym komputerze może pozwolić botowi z niego korzystać. Otwórz tu aplikację, aby z niego korzystać.",
   "computer.problem.localWindows": "Boty nie mogą teraz korzystać z tego komputera PC. Uruchom ponownie OpenMausBot, a jeśli to nie pomoże, otwórz Ustawienia → Diagnostyka.",
-  "computer.problem.localMac": "Boty nie mogą jeszcze korzystać z tego Maca. Sprawdź, czy OpenMausBot ma zgodę w sekcjach Nagrywanie ekranu i Dostępność w Ustawieniach systemowych → Prywatność i ochrona, a potem uruchom go ponownie."
+  "computer.problem.localMac": "Boty nie mogą jeszcze korzystać z tego Maca. Sprawdź, czy OpenMausBot ma zgodę w sekcjach Nagrywanie ekranu i Dostępność w Ustawieniach systemowych → Prywatność i ochrona, a potem uruchom go ponownie.",
+  "botPanel.tab.profile": "Profil",
+  "botPanel.tab.library": "Biblioteka",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Wątki",
+  "botPanel.page.browser": "Przeglądarka",
+  "botPanel.library.data": "Dane"
 }

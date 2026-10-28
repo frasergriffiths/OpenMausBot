@@ -3292,5 +3292,12 @@
   "computer.mac.permission.title": "允许控制此电脑",
   "computer.mac.permission.driverDetail": "驱动程序详细信息",
   "computer.mac.permission.relaunch": "重新启动 OpenMausBot",
-  "permissions.openSystemSettings": "打开系统设置"
+  "permissions.openSystemSettings": "打开系统设置",
+  "botPanel.tab.profile": "个人资料",
+  "botPanel.tab.library": "资料库",
+  "botPanel.tab.computer": "电脑",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "对话",
+  "botPanel.page.browser": "浏览器",
+  "botPanel.library.data": "数据"
 }

@@ -1,4 +1,4 @@
-import { chmod, lstat, readFile, readdir } from "node:fs/promises";
+import { chmod, lstat, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { LICENSE_FILES } from "./cua-linux-release.mjs";
 import {
@@ -11,6 +11,18 @@ import { pinnedDuckdbVersion, pinnedOnePasswordVersion, pinnedResvgVersion, veri
 import { LIPO_ARCH, isMachO, writeThinMachO } from "./mac-thin.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+/** electron-builder omits app-update.yml for --dir builds; write the same GitHub feed it emits for installers. */
+export function appUpdateYml(publish) {
+  const entry = Array.isArray(publish) ? publish.find((candidate) => candidate?.provider === "github") : null;
+  if (!entry?.owner || !entry?.repo) return null;
+  return `provider: github\nowner: ${entry.owner}\nrepo: ${entry.repo}\nupdaterCacheDirName: openmausbot-updater\n`;
+}
+
+async function ensureAppUpdateYml(context, resources) {
+  const contents = appUpdateYml(context.packager?.config?.publish);
+  if (contents) await writeFile(path.join(resources, "app-update.yml"), contents, { mode: 0o644 });
+}
 
 async function requireRealDirectory(directory, mode = 0o755) {
   const details = await lstat(directory);
@@ -117,6 +129,7 @@ export default async function afterPack(context) {
       : path.join(context.appOutDir, "resources")
   );
   await validateCloudflared(resources, context.electronPlatformName, Boolean(context.packager));
+  await ensureAppUpdateYml(context, resources);
   const browserRoot = path.join(resources, "browser-engine");
   const hasBrowser = await lstat(browserRoot).then(() => true, (error) => {
     if (error?.code === "ENOENT") return false;

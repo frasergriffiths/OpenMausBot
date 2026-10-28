@@ -228,25 +228,25 @@ describe("Simple-mode sidebar layout", () => {
     expect(headers(tree).find((header) => header.props.name === "Work")!.props.collapsed).toBe(true);
   });
 
-  it("toggles a search pill from the round search button, and closing it clears the filter", () => {
+  it("keeps the search pill visible, focuses it from the round button, and clears the filter on close", () => {
     const toggle = () => render().tree.find((node) => node.type === SidebarSearchToggle)!.props as Parameters<typeof SidebarSearchToggle>[0];
     const pill = () => render().tree.find((node) => node.type === SidebarSearchPill)?.props as Parameters<typeof SidebarSearchPill>[0] | undefined;
-    expect(render().tree.some((node) => node.props["aria-label"] === "Search bots and messages" && node.type === "input")).toBe(false);
-    expect(pill()).toBeUndefined();
-    expect(toggle().open).toBe(false);
-    toggle().onToggle();
+    expect(pill()).toBeDefined();
     expect(toggle().open).toBe(true);
+    const focus = vi.fn();
+    const previous = globalThis.document;
+    vi.stubGlobal("document", { querySelector: () => ({ focus }) });
+    toggle().onToggle();
+    expect(focus).toHaveBeenCalled();
+    vi.stubGlobal("document", previous);
+    expect(pill()).toBeDefined();
     pill()!.onQuery("bea");
     expect(pill()!.query).toBe("bea");
     expect(listedBots(render().tree)).toEqual(["bea"]);
     pill()!.onClose();
-    expect(pill()).toBeUndefined();
+    expect(pill()).toBeDefined();
+    expect(pill()!.query).toBe("");
     expect(listedBots(render().tree)).toEqual(["atlas", "bea", "dodo"]);
-    toggle().onToggle();
-    pill()!.onQuery("atlas");
-    toggle().onToggle();
-    expect(pill()).toBeUndefined();
-    expect(listedBots(render().tree)).toHaveLength(3);
   });
 
   it("opens at 280px in Simple and 320px in Advanced, each remembering its own resized width", () => {

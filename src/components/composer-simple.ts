@@ -2,6 +2,7 @@ import type { Bot, Group } from "@/state/store";
 import { effectiveDefaultResponder, groupComposerHint } from "@/lib/group-routing";
 import { t } from "@/lib/i18n";
 import { userBubbleTone } from "@/lib/user-bubble-tone";
+import type { BusySendMode } from "@/lib/busy-send";
 
 /** Simple mode's small round controls in the composer: the +, the mic and Stop beside the round button. */
 export const SIMPLE_CONTROL = "size-7 rounded-full bg-ink/[0.05] ring-[0.5px] ring-inset ring-ink/[0.07] text-ink-tertiary hover:bg-ink/[0.09] hover:text-ink";
@@ -13,8 +14,9 @@ export function slotColors(color: Bot["color"] | undefined, room: boolean): { fi
   return { fill: tone.background, ink: tone.ink };
 }
 
-export function composerPlaceholder({ simple, locked, approval, attaching, listening, replying, busy, canSteer, queued, busyName, sendLabel, group, members, jevOn, goal, botName, setupHint }: {
+export function composerPlaceholder({ simple, busySend, locked, approval, attaching, listening, replying, busy, canSteer, queued, busyName, sendLabel, group, members, jevOn, goal, botName, setupHint }: {
   simple: boolean;
+  busySend: BusySendMode;
   locked: boolean;
   approval: boolean;
   attaching: boolean;
@@ -37,15 +39,8 @@ export function composerPlaceholder({ simple, locked, approval, attaching, liste
   if (attaching) return t("composer.placeholder.attaching");
   if (listening) return t("composer.placeholder.listening");
   if (replying && !busy) return t("composer.placeholder.reply");
-  if (simple) {
-    if (!busy && goal) return group ? t("composer.placeholder.goal", { name: group.name }) : t("composer.placeholder.goalSolo", { name: botName });
-    if (!busy && !group && setupHint) return setupHint;
-    if (group && !group.dm && effectiveDefaultResponder(group, members).kind === "mentions") {
-      return t("composer.placeholder.group", { name: group.name, hint: t("composer.hint.mentions") });
-    }
-    return t("composer.placeholder.bot", { name: group ? group.name : botName });
-  }
-  if (busy && canSteer) {
+  // The Queue/Steer preference decides the busy line in both modes; Stop still interrupts.
+  if (busy && canSteer && busySend === "steer") {
     return queued
       ? t("composer.placeholder.steerQueued", { name: busyName, key: sendLabel })
       : t("composer.placeholder.steer", { name: busyName, key: sendLabel });
@@ -54,6 +49,14 @@ export function composerPlaceholder({ simple, locked, approval, attaching, liste
     return group
       ? t("composer.placeholder.queueGroup", { name: busyName, key: sendLabel })
       : t("composer.placeholder.queue", { name: busyName });
+  }
+  if (simple) {
+    if (!busy && goal) return group ? t("composer.placeholder.goal", { name: group.name }) : t("composer.placeholder.goalSolo", { name: botName });
+    if (!busy && !group && setupHint) return setupHint;
+    if (group && !group.dm && effectiveDefaultResponder(group, members).kind === "mentions") {
+      return t("composer.placeholder.group", { name: group.name, hint: t("composer.hint.mentions") });
+    }
+    return t("composer.placeholder.bot", { name: group ? group.name : botName });
   }
   if (group) {
     return goal
@@ -64,8 +67,8 @@ export function composerPlaceholder({ simple, locked, approval, attaching, liste
 }
 
 /** The round Send button's name: what pressing it does now. Simple mode says it in the bot's terms. */
-export function sendLabels({ simple, busy, canSteer, name, sendLabel }: { simple: boolean; busy: boolean; canSteer: boolean; name: string; sendLabel: string }): { label: string; title: string } {
-  if (busy && canSteer) {
+export function sendLabels({ simple, busySend, busy, canSteer, name, sendLabel }: { simple: boolean; busySend: BusySendMode; busy: boolean; canSteer: boolean; name: string; sendLabel: string }): { label: string; title: string } {
+  if (busy && canSteer && busySend === "steer") {
     const steer = simple ? t("composer.send.steerSimple", { name }) : t("composer.send.steer");
     return { label: steer, title: steer };
   }

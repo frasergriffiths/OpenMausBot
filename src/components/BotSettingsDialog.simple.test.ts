@@ -122,11 +122,10 @@ const { LibraryTab } = await import("./bot-panel/LibraryTab");
 const { ApprovalChip } = await import("./ComposerPlusMenu");
 const { callMode, setCallMode } = await import("@/lib/call-mode");
 const { ComputerTab, WherePage } = await import("./bot-panel/ComputerTab");
-const { PageBody, AppsPage, RoutinesPage, MemoryPage, SkillsPage, FolderPage, BrowserPage } = await import("./bot-panel/pages");
+const { PageBody, AppsPage, RoutinesPage, MemoryPage, SkillsPage, FolderPage, BrowserLivePage, SitesPage } = await import("./bot-panel/pages");
 const { BrowserLogins } = await import("./bot-panel/browser-logins");
 const { PAGES, sectionTarget } = await import("./bot-panel/page-registry");
 const { openBotSettings } = await import("./bot-panel/panel-link");
-const { PageHeader } = await import("./bot-panel/rows");
 const { ChatShareMenu } = await import("./ChatMoreMenu");
 const { SoulField } = await import("./SoulField");
 const { LocalComputerAutoWarning } = await import("./LocalComputerAutoWarning");
@@ -267,48 +266,28 @@ beforeEach(() => {
 });
 
 describe("the bot panel in Simple mode", () => {
-  it("has Share, a gear for Bot settings and a close button on top, the hero, and three tabs: Details, Library, Computer", () => {
+  it("has a fixed identity header, Share and Close, and three root tabs: Profile, Library, Computer", () => {
     const bot = makeBot();
     const rendered = panel(bot);
     expect(ofType(rendered, ChatShareMenu)!.props.bot).toBe(bot);
-    const gear = find(rendered, "data-panel-gear");
-    expect([gear.props["aria-label"], gear.props.title]).toEqual(["Bot settings", "Bot settings"]);
     click(find(rendered, "aria-label", "Close settings"));
     expect(onClose).toHaveBeenCalled();
-    const hero = ofType(rendered, PanelHero)!;
-    expect(hero.props.bot).toBe(bot);
-    expect(hero.props.patch).toBe(patch);
+    expect(find(rendered, "data-panel-avatar").props["aria-expanded"]).toBe(false);
     const tabs = [...rendered.html.matchAll(/data-panel-tab="(\w+)"[^>]*>([^<]+)<\/button>/g)].map((match) => [match[1], match[2]]);
-    expect(tabs).toEqual([["details", "Details"], ["library", "Library"], ["computer", "Computer"]]);
-    expect(shown(rendered)).toEqual({ tab: "details", page: undefined });
+    expect(tabs).toEqual([["profile", "Profile"], ["library", "Library"], ["computer", "Computer"]]);
+    expect(shown(rendered)).toEqual({ tab: "profile", page: undefined });
     expect(ofType(rendered, DetailsTab)!.props.bot).toBe(bot);
     expect(rendered.html).toContain('id="bot-settings-title"');
   });
 
   it("switches tabs", () => {
     const bot = makeBot();
-    for (const [tab, type] of [["computer", ComputerTab], ["library", LibraryTab], ["details", DetailsTab]] as const) {
+    for (const [tab, type] of [["computer", ComputerTab], ["library", LibraryTab], ["profile", DetailsTab]] as const) {
       click(find(panel(bot), "data-panel-tab", tab));
       const rendered = panel(bot);
       expect(shown(rendered).tab).toBe(tab);
       expect(ofType(rendered, type)).toBeDefined();
     }
-  });
-
-  it("opens Bot settings from the gear on any tab, with Back to Details, and its apps with Back to Bot settings", () => {
-    const bot = makeBot();
-    click(find(panel(bot), "data-panel-tab", "library"));
-    click(find(panel(bot), "data-panel-gear"));
-    const settings = panel(bot);
-    expect(shown(settings)).toEqual({ tab: undefined, page: "settings" });
-    expect(ofType(settings, PageHeader)!.props).toMatchObject({ back: "Details", title: "Bot settings" });
-    (ofType(settings, PageBody)!.props.onOpen as (page: string) => void)("apps");
-    const apps = panel(bot);
-    expect(ofType(apps, PageHeader)!.props).toMatchObject({ back: "Bot settings", title: "Apps it can use", intro: "Switch on the apps Scout may use. Everything else stays off." });
-    (ofType(apps, PageHeader)!.props.onBack as () => void)();
-    expect(shown(panel(bot)).page).toBe("settings");
-    (ofType(panel(bot), PageHeader)!.props.onBack as () => void)();
-    expect(shown(panel(bot))).toEqual({ tab: "details", page: undefined });
   });
 
   it("drills into a page with its intro and back, naming where Back goes", () => {
@@ -317,46 +296,44 @@ describe("the bot panel in Simple mode", () => {
     const page = panel(bot);
     expect(shown(page)).toEqual({ tab: undefined, page: "routines" });
     expect(has(page, "role", "tablist")).toBe(false);
-    expect(ofType(page, PageHeader)!.props).toMatchObject({ back: "Details", title: "Routines" });
-    expect(page.html).toContain('id="bot-settings-title"');
-    (ofType(page, PageHeader)!.props.onBack as () => void)();
-    expect(shown(panel(bot))).toEqual({ tab: "details", page: undefined });
+    expect(page.html).toContain(">Routines<");
+    expect(page.html).toContain('data-panel-back="true"');
+    click(find(page, "data-panel-back"));
+    expect(shown(panel(bot))).toEqual({ tab: "profile", page: undefined });
 
     click(find(panel(bot), "data-panel-tab", "library"));
     (ofType(panel(bot), LibraryTab)!.props.onOpen as (page: string) => void)("memory");
-    expect(ofType(panel(bot), PageHeader)!.props).toMatchObject({ back: "Library", title: "What it remembers" });
-    (ofType(panel(bot), PageHeader)!.props.onBack as () => void)();
+    expect(panel(bot).html).toContain(">What it remembers<");
+    click(find(panel(bot), "data-panel-back"));
 
     click(find(panel(bot), "data-panel-tab", "computer"));
-    (ofType(panel(bot), ComputerTab)!.props.onOpen as (page: string) => void)("browser");
-    expect(ofType(panel(bot), PageHeader)!.props).toMatchObject({ back: "Computer", title: "Signed-in sites", intro: undefined });
+    (ofType(panel(bot), ComputerTab)!.props.onOpen as (page: string) => void)("sites");
+    expect(panel(bot).html).toContain(">Signed-in sites<");
   });
 
-  it("goes back on Escape from a page, and leaves Escape to the dialog on a tab", () => {
+  it("goes back on Escape from a page, then closes the panel on a root tab", () => {
     const bot = makeBot();
     (ofType(panel(bot), DetailsTab)!.props.onOpen as (page: string) => void)("routines");
     const event = key(panel(bot).nodes[0]!, "Escape");
     expect(event.stopPropagation).toHaveBeenCalled();
     expect(shown(panel(bot)).page).toBeUndefined();
     const onTab = key(panel(bot).nodes[0]!, "Escape");
-    expect(onTab.stopPropagation).not.toHaveBeenCalled();
+    expect(onTab.stopPropagation).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
   });
 
-  it("holds the Instructions editor open on Bot settings, and closes it when the panel moves on", () => {
+  it("opens the Instructions editor from a soul link and clears it when the panel moves on", () => {
     const bot = makeBot();
-    click(find(panel(bot), "data-panel-gear"));
-    expect(ofType(panel(bot), PageBody)!.props.editingInstructions).toBe(false);
-    (ofType(panel(bot), PageBody)!.props.onEditInstructions as (open: boolean) => void)(true);
-    expect(ofType(panel(bot), PageBody)!.props.editingInstructions).toBe(true);
-    (ofType(panel(bot), PageHeader)!.props.onBack as () => void)();
-    click(find(panel(bot), "data-panel-gear"));
-    expect(ofType(panel(bot), PageBody)!.props.editingInstructions).toBe(false);
+    expect(shown(panel(bot, "soul")).page).toBe("settings");
+    expect(panel(bot, "soul").html).toContain('data-panel-page-view="settings"');
+    click(find(panel(bot, "soul"), "data-panel-back"));
+    expect(shown(panel(bot))).toEqual({ tab: "profile", page: undefined });
   });
 
   it("opens the avatar editor from the avatar and closes it with Escape", () => {
     const bot = makeBot();
     expect(ofType(panel(bot), AvatarEditorCard)).toBeUndefined();
-    (ofType(panel(bot), PanelHero)!.props.onToggleEditor as () => void)();
+    click(find(panel(bot), "data-panel-avatar"));
     const open = panel(bot);
     const editor = ofType(open, AvatarEditorCard)!;
     expect(editor.props.onPatch).toBe(patch);
@@ -366,11 +343,11 @@ describe("the bot panel in Simple mode", () => {
   });
 
   it.each([
-    ["overview", "details", undefined], ["identity", "details", undefined], ["slack", "details", undefined],
-    ["soul", "details", "settings"], ["skills", "library", "skills"], ["memory", "library", "memory"],
-    ["routines", "details", "routines"], ["access", "computer", undefined], ["model", "details", undefined],
-    ["permissions", "details", "settings"], ["voice", "details", undefined], ["visibility", "details", undefined],
-    ["history", "details", undefined], ["usage", "details", undefined],
+    ["overview", "profile", undefined], ["identity", "profile", undefined], ["slack", "profile", undefined],
+    ["soul", "profile", "settings"], ["skills", "library", "skills"], ["memory", "library", "memory"],
+    ["routines", "profile", "routines"], ["access", "computer", undefined], ["model", "profile", undefined],
+    ["permissions", "profile", "settings"], ["voice", "profile", undefined], ["visibility", "profile", undefined],
+    ["history", "profile", undefined], ["usage", "profile", undefined],
   ] as const)("lands a deep link to %s on %s › %s", (section, tab, page) => {
     expect([sectionTarget(section).tab, sectionTarget(section).page]).toEqual([tab, page]);
     const rendered = panel(makeBot(), section);
@@ -412,7 +389,6 @@ describe("the bot panel in Simple mode", () => {
       expect(switches(rendered.html), tab).toBe(0);
       for (const text of ["Memory", "Upkeep", "Record"]) expect(rendered.html).not.toContain(`>${text}<`);
     }
-    click(find(panel(bot), "data-panel-gear"));
     expect(switches(panel(bot).html)).toBe(0);
   });
 });
@@ -589,12 +565,12 @@ describe("the Details tab", () => {
       .map((marker) => rendered.html.indexOf(marker));
     expect(order.every((index) => index > -1)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
-    for (const gone of ['data-panel-card="conversations"', "data-conversation", "data-panel-item", "data-conversations-new",
-      'data-panel-row="thinking"', 'data-panel-edit="soul"', 'data-panel-row="approval"', 'data-panel-row="goal"', 'data-panel-row="call-mode"',
-      'data-panel-page="apps"', 'data-panel-page="memory"', 'data-panel-page="skills"', 'data-panel-page="folder"']) {
+    for (const wanted of ['data-panel-edit="soul"', 'data-panel-row="approval"', 'data-panel-row="busy-send"', 'data-panel-row="call-mode"', 'data-panel-page="apps"', 'data-panel-page="threads"']) {
+      expect(rendered.html, wanted).toContain(wanted);
+    }
+    for (const gone of ["data-conversation", "data-panel-item", "data-conversations-new", 'data-panel-row="thinking"']) {
       expect(rendered.html, gone).not.toContain(gone);
     }
-    expect(rendered.html).not.toContain(">Settings<");
     expect(switches(rendered.html)).toBe(0);
   });
 
@@ -632,7 +608,7 @@ describe("the Bot settings page", () => {
     expect(order.every((index) => index > -1)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect(switches(rendered.html)).toBe(0);
-    expect(rendered.html.match(/pl-\[38px\]/g)).toHaveLength(2);
+    expect(rendered.html.match(/pl-\[38px\]/g)).toHaveLength(3);
   });
 
   it("shows the first line of the instructions, or how to start, and edits them in place with Done", () => {
@@ -761,7 +737,7 @@ describe("the Library tab", () => {
   it("says what it will hold while the bot has made nothing, then what it remembers, its skills and its folder", () => {
     const rendered = library(makeBot());
     expect(rendered.html).toContain('data-panel-empty="library"');
-    const order = ['data-panel-empty="library"', 'data-panel-page="memory"', 'data-panel-page="skills"', 'data-panel-page="folder"'].map((marker) => rendered.html.indexOf(marker));
+    const order = ['data-panel-empty="library"', 'data-panel-page="folder"', 'data-panel-page="memory"', 'data-panel-page="skills"'].map((marker) => rendered.html.indexOf(marker));
     expect(order.every((index) => index > -1)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });
@@ -833,15 +809,9 @@ describe("the Computer tab", () => {
     expect(onOpen).toHaveBeenLastCalledWith("browser");
     for (const page of ["folder", "logins", "android"]) expect(has(rendered, "data-panel-page", page)).toBe(false);
     expect(has(rendered, "data-panel-row", "data")).toBe(false);
-    const setItem = vi.fn();
-    vi.stubGlobal("localStorage", { getItem: () => null, setItem });
     click(find(rendered, "data-panel-action", "open-computer"));
-    expect(setItem).toHaveBeenLastCalledWith("omb-computer-panel-view:scout", "computer");
-    expect((fixture.dispatch as ReturnType<typeof vi.fn>).mock.calls.slice(-2)).toEqual([
-      [{ type: "toggleSettings", open: false }],
-      [{ type: "toggleComputer", open: true }],
-    ]);
-    vi.stubGlobal("localStorage", { getItem: () => null, setItem: () => {} });
+    expect(onOpen).toHaveBeenLastCalledWith("computer");
+    expect((fixture.dispatch as ReturnType<typeof vi.fn>).mock.calls.some(([action]) => (action as { type?: string }).type === "toggleComputer")).toBe(false);
   });
 });
 
@@ -919,7 +889,7 @@ describe("the Where it works page", () => {
 
 describe("the drill-in pages", () => {
   const PAGE = {
-    settings: SettingsPage, apps: AppsPage, routines: RoutinesPage, memory: MemoryPage, skills: SkillsPage, folder: FolderPage, browser: BrowserPage, where: WherePage,
+    apps: AppsPage, routines: RoutinesPage, memory: MemoryPage, skills: SkillsPage, folder: FolderPage, browser: BrowserLivePage, sites: SitesPage, where: WherePage,
   } as const;
   // The walker reads only what a component returns, so each page is called as the function PageBody picks.
   const body = (page: keyof typeof PAGE, bot = makeBot()) => capture(() => PAGE[page]({ bot, derived: derived() }) as ReactNode);
@@ -1106,7 +1076,7 @@ describe("the drill-in pages", () => {
 
   it("shows only the signed-in sites on the browser page, with no browser or record-steps switch", () => {
     fixture.ownerOrAdmin = true;
-    const page = body("browser");
+    const page = body("sites");
     expect(ofType(page, BrowserLogins)!.props).toMatchObject({ bot: expect.objectContaining({ id: "scout" }), browserEnabled: true });
     const rendered = capture(() => BrowserLogins({ bot: makeBot(), browserEnabled: true, onOpenBrowser: vi.fn() }));
     expect(ofType(rendered, SignedInSites)!.props).toMatchObject({ bare: true, target: { bot: "scout" }, sharedBy: ["Scout"], disabled: false });
@@ -1117,7 +1087,7 @@ describe("the drill-in pages", () => {
     click(find(capture(() => BrowserLogins({ bot: makeBot(), browserEnabled: true, onOpenBrowser })), "data-panel-action", "add-login"));
     expect(onOpenBrowser).toHaveBeenCalled();
     fixture.derived.browserEnabled = false;
-    expect(ofType(body("browser"), BrowserLogins)!.props.browserEnabled).toBe(false);
+    expect(ofType(body("sites"), BrowserLogins)!.props.browserEnabled).toBe(false);
     expect(capture(() => BrowserLogins({ bot: makeBot(), browserEnabled: false, onOpenBrowser: vi.fn() })).html).toContain("Scout&#x27;s browser is off.");
   });
 });
@@ -1209,7 +1179,8 @@ describe("the panel's switches", () => {
     fixture.apps = { phase: "ready", connectedSlugs: ["gmail"], apps: [app("gmail", "write")] };
     const html = capture(() => PageBody({ page: "apps", bot: makeBot({ color: "blue" }), derived: derived() }) as ReactNode).html;
     expect(html.match(/role="switch"/g)).toHaveLength(1);
-    expect(html).toContain("background-color:#377FE6");
+    expect(html).toContain("bg-accent");
+    expect(html).not.toContain("background-color:#377FE6");
     expect(Switch).toBeDefined();
   });
 });
