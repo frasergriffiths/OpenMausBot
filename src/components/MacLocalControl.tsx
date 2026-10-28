@@ -193,7 +193,7 @@ export function MacCuaPermissionCard({ permissions, logReason }: { permissions: 
             {pending && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {primaryLabel}
           </button>
-          <div className="mt-1 flex justify-end">
+          <div className="mt-2 flex min-h-10 items-center justify-between gap-3 border-t border-ink/[0.045] pt-1">
             <button type="button" onClick={() => void retry()} disabled={pending} className={TERTIARY}>
               {pending ? t("common.checking") : t("computer.mac.permission.retry")}
             </button>
