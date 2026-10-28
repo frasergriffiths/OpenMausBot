@@ -109,31 +109,26 @@ export function ConfirmDialogCard({
       aria-busy={pending}
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-body"
-      className={cn(
-        "w-full max-w-[420px] rounded-2xl border bg-panel p-5 shadow-2xl",
-        danger ? "border-danger/30" : "border-hairline/50",
-      )}
+      className="w-full max-w-[420px] rounded-2xl border border-hairline/50 bg-panel p-5 text-ink shadow-2xl"
     >
-      <div className="flex items-start gap-3">
-        <span className={cn("mt-0.5 shrink-0", danger ? "text-danger" : "text-warning")}>
-          {icon ?? <AlertTriangle size={18} />}
+      <div className="flex flex-col items-center text-center">
+        <span className={cn("flex size-9 items-center justify-center rounded-full", danger ? "bg-danger/10 text-danger" : "bg-warning/10 text-warning")}>
+          {icon ?? <AlertTriangle size={20} aria-hidden="true" />}
         </span>
-        <div className="min-w-0">
-          <h2 id="confirm-dialog-title" className="text-[15px] font-semibold text-ink">
-            {title}
-          </h2>
-          <p id="confirm-dialog-body" className="mt-1.5 text-[13px] leading-relaxed text-ink-secondary">
-            {body}
-          </p>
-        </div>
+        <h2 id="confirm-dialog-title" className="mt-3 text-[15px] font-semibold text-ink">
+          {title}
+        </h2>
+        <p id="confirm-dialog-body" className="mt-1.5 text-[13px] leading-relaxed text-ink-secondary">
+          {body}
+        </p>
       </div>
-      <div className="mt-5 flex justify-end gap-2">
+      <div className="mt-5 flex justify-center gap-2">
         <button
           ref={cancelRef}
           type="button"
           onClick={onCancel}
           disabled={pending}
-          className="rounded-xl px-4 py-2 text-[13px] text-ink-secondary hover:bg-raised hover:text-ink"
+          className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised hover:text-ink"
         >
           {cancelLabel}
         </button>
@@ -142,7 +137,7 @@ export function ConfirmDialogCard({
           onClick={onConfirm}
           disabled={pending}
           className={cn(
-            "rounded-xl px-4 py-2 text-[13px] font-medium",
+            "rounded-lg px-3 py-2 text-[13px] font-medium",
             danger ? "bg-danger text-white hover:brightness-110" : "bg-accent text-white hover:brightness-110",
           )}
         >

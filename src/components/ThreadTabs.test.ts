@@ -212,11 +212,14 @@ describe("a bot's threads in the chat header", () => {
     const sheet = menu("launch");
     const labels = [...sheet.querySelectorAll('[role="menuitem"]')].map((item) => item.textContent);
     expect(labels).toEqual([
-      "Copy link", "Rename thread", "No folder", "Launch", "Pin", "Archive", "Until new activity", "Until 6 PM", "Until 9 AM tomorrow", "Delete thread",
+      "Copy link", "Rename thread", "No folder", "Launch", "Pin", "Archive", "Until new activity", "Until 6 PM", "Until 9 AM tomorrow", "Delete",
     ]);
     expect(sheet.textContent).toContain("Move to folder");
     expect(sheet.textContent).toContain("Snooze");
     expect(labels).not.toContain("New conversation");
+    const remove = menuItem(sheet, "Delete");
+    expect(remove.className).toContain("text-danger");
+    expect(remove.querySelector("svg")?.parentElement?.className).toContain("text-danger");
   });
 
   it("pins, archives and snoozes through the sidebar's own actions", () => {
@@ -245,7 +248,7 @@ describe("a bot's threads in the chat header", () => {
 
   it("deletes behind the same confirmation the sidebar shows", () => {
     render(bot());
-    click(menuItem(menu("deck"), "Delete thread"));
+    click(menuItem(menu("deck"), "Delete"));
     const dialog = document.querySelector('[role="alertdialog"]')!;
     expect(dialog.textContent).toContain("Delete thread?");
     click([...dialog.querySelectorAll("button")].find((button) => button.textContent === "Delete thread"));

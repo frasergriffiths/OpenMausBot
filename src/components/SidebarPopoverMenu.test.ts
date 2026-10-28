@@ -23,8 +23,7 @@ it("draws an item's second line (where it connects) and third line (a note) unde
   expect(html).toContain('<span class="flex-1 truncate">Settings</span>');
 });
 
-it("draws an item's attention dot on the item itself, in its tone", () => {
-  const html = render([
+it("draws an item's attention dot on the item itself, in its tone", () => {  const html = render([
     { key: "ready", label: "Restart to update", attention: true, attentionTone: "accent", onSelect: () => {} },
     { key: "failed", label: "Update failed", attention: true, onSelect: () => {} },
     { key: "plain", label: "Settings", onSelect: () => {} },
@@ -34,4 +33,14 @@ it("draws an item's attention dot on the item itself, in its tone", () => {
   expect(item("Update failed")).toContain("rounded-full bg-danger");
   expect(item("Settings")).not.toMatch(/rounded-full bg-(accent|danger)/);
   expect(html.split('role="menu"')[0]).not.toMatch(/rounded-full bg-(accent|danger)/);
+});
+
+it("paints a destructive item's label and glyph in the danger colour", () => {
+  const html = render([
+    { key: "delete", label: "Delete", danger: true, icon: createElement("svg"), onSelect: () => {} },
+    { key: "archive", label: "Archive", onSelect: () => {} },
+  ]);
+  const destructive = html.slice(html.indexOf('data-menu-key="delete"'), html.indexOf(">Delete</span>"));
+  expect(destructive.match(/text-danger/g)).toHaveLength(2);
+  expect(html.slice(html.indexOf('data-menu-key="archive"'))).not.toContain("text-danger");
 });

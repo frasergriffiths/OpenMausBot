@@ -187,11 +187,13 @@ export function ChatShareMenu({ bot, className }: { bot: Bot; className: string 
 
 function ShareMenu({ bot, className }: { bot: Bot; className: string }) {
   const { items } = useChatMoreItems(bot);
+  const advanced = useAdvancedMode();
   return (
     <SidebarPopoverMenu
       items={items.filter((item) => EXPORT_ITEMS.includes(item.key)).map((item) => ({
         ...item, heading: undefined, separatorBefore: false, label: t(item.key === "copy" ? "chat.export.copyConversation" : "chat.export.downloadConversation"),
       }))}
+      compact={!advanced}
       ariaLabel={t("chat.export.heading")}
       triggerClassName="rounded-full"
       triggerTitle={t("chat.export.heading")}

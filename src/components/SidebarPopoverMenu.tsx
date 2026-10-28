@@ -13,6 +13,8 @@ export interface SidebarMenuItem {
   note?: string;
   icon?: React.ReactNode;
   active?: boolean;
+  /** Destructive: the label and its glyph carry the danger colour. */
+  danger?: boolean;
   attention?: boolean;
   attentionTone?: "danger" | "accent";
   disabled?: boolean;
@@ -121,7 +123,8 @@ function MenuRows({
                 : look === "compact"
                   ? "min-h-[30px] gap-2 rounded-md px-2 py-1.5 text-[14px] leading-[18px] focus-visible:bg-menu-hover"
                   : "gap-3 px-3.5 py-2 text-[14px] focus-visible:bg-menu-hover",
-              item.active ? "bg-menu-active text-ink" : item.submenu && openSubmenu === item.key && engaged ? cn(look === "compact" ? "bg-menu-active" : "bg-menu-hover", "text-ink") : "text-ink hover:bg-menu-hover",
+              item.danger ? "text-danger" : "text-ink",
+              item.active ? "bg-menu-active text-ink" : item.submenu && openSubmenu === item.key && engaged ? cn(look === "compact" ? "bg-menu-active" : "bg-menu-hover", "text-ink") : "hover:bg-menu-hover",
             )}
           >
             {item.icon && (
@@ -129,7 +132,7 @@ function MenuRows({
                 className={cn(
                   "flex shrink-0 items-center justify-center",
                   look === "compact" ? "size-4 [&>svg]:size-4" : "size-5",
-                  item.active ? "text-accent" : look === "roomy" ? "text-ink" : "text-ink-secondary",
+                  item.danger ? "text-danger" : item.active ? "text-accent" : look === "roomy" ? "text-ink" : "text-ink-secondary",
                 )}
               >
                 {item.icon}

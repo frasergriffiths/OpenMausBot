@@ -56,8 +56,19 @@ describe("text field focus", () => {
     for (const selector of selectors) expect(selector).toContain(':not([aria-invalid="true"])');
   });
 
-  it("never fades focus to the resting hairline", () => {
-    const faint: string[] = [];
+  it("gives every text field the same halo ring, except the composer and the model search", () => {
+    const rings = [...unlayered(css).matchAll(/([^{}]+)\{([^}]*box-shadow:[^}]*var\(--color-focus\)[^}]*)\}/g)].map((match) => match[1]!.trim());
+    expect(rings.length).toBeGreaterThan(0);
+    expect(rings.join("\n")).toContain("[data-menu-search]");
+    expect(rings.join("\n")).toContain('[data-tour="composer"] textarea');
+  });
+
+  it("gives every text field one radius from the skin's control scale", () => {
+    const rules = [...unlayered(css).matchAll(/([^{}]+)\{([^}]*border-radius:\s*var\(--radius-lg[^}]*)\}/g)].map((match) => match[1]!.trim());
+    expect(rules.some((selector) => selector.includes(":is(input") && selector.includes("textarea"))).toBe(true);
+  });
+
+  it("never fades focus to the resting hairline", () => {    const faint: string[] = [];
     for (const file of sources(src)) {
       readFileSync(file, "utf8").split("\n").forEach((line, index) => {
         for (const [utility] of line.matchAll(/focus(?:-within)?:border-hairline(?:\/\d+)?(?![\w-])/g)) {

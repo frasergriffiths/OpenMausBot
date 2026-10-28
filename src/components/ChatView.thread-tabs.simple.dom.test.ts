@@ -46,6 +46,7 @@ const bot: Bot = {
 };
 
 let state: AppState;
+const actions: Action[] = [];
 let root: Root;
 let container: HTMLDivElement;
 
@@ -53,6 +54,7 @@ const draw = () => {
   const value = {
     state,
     dispatch: (action: Action) => {
+      actions.push(action);
       state = reducer(state, action);
       draw();
     },
@@ -102,5 +104,23 @@ describe("the thread strip in Simple mode", () => {
     draw();
 
     expect(strip()).toBeNull();
+  });
+
+  it("puts a + beside the header controls that starts a conversation, named for a screen reader", () => {
+    fixture.advanced = false;
+    fixture.threadsShown = false;
+    fixture.threadsWanted = true;
+    draw();
+
+    const button = document.querySelector<HTMLButtonElement>("[data-chathead-new-thread]")!;
+    expect(button.getAttribute("aria-label")).toBe("New conversation");
+    expect(button.getAttribute("title")).toBe("New conversation");
+    expect(button.className).toContain("size-8");
+    actions.length = 0;
+    flushSync(() => button.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    expect(actions).toEqual([{ type: "newTask", botId: bot.id }]);
+    fixture.advanced = true;
+    draw();
+    expect(document.querySelector("[data-chathead-new-thread]")).toBeNull();
   });
 });

@@ -1622,6 +1622,23 @@ body {
   border-color: var(--color-focus);
 }
 
+/* One focus ring for every field: the border takes the focus colour and a
+   soft halo of the same token sits outside it, so a borderless field shows
+   focus too. Unlayered, so a component's own `focus:ring-*` cannot give a
+   neighbouring field a different ring. The prompt composer and the model
+   picker's search keep their own chrome. */
+:is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible:not([aria-invalid="true"]):not([data-menu-search]):not([data-tour="composer"] textarea) {
+  outline: none;
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus) 28%, transparent);
+}
+
+/* One field radius: every text field takes the skin's control radius, so a
+   dialog, a settings row and a sidebar filter agree. */
+:is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea):not([data-menu-search], [data-tour="composer"] textarea) {
+  border-radius: var(--radius-lg, 0.5rem);
+}
+
 ::selection {
   background: color-mix(in oklab, var(--color-accent) 45%, transparent);
   color: var(--color-ink);
