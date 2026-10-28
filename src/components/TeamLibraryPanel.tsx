@@ -618,9 +618,11 @@ export function TeamLibraryPanel({
           <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-7 sm:px-7">
             {error && <div role="alert" className="mb-3 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
 
-            {tab === "org" && orgListing?.organization && (
-              <div className="mb-4">{searchField}</div>
+            {/* One reserved search row for every source that filters: the field keeps its place when the source changes. */}
+            {(tab === "explore" || tab === "share" || (tab === "org" && orgListing?.organization)) && (
+              <div data-templates-search-row="" className="h-12 pt-1">{searchField}</div>
             )}
+
             {tab === "org" && orgListing?.organization && (
               <OrgLibraryTab
                 listing={orgListing as OrgLibraryListing & { organization: { id: string; name: string } }}
@@ -634,8 +636,7 @@ export function TeamLibraryPanel({
             )}
 
             {tab === "explore" && (
-              <div data-templates-grid className="@container flex flex-col gap-7 pt-1">
-                {searchField}
+              <div data-templates-grid className="@container flex flex-col gap-7">
                 <ReadyBotGallery search={search} onDialog={setNestedDialog} onAdded={onClose} />
                 <section aria-labelledby="community-templates-title">
                   <div className="mb-1.5 flex min-h-7 items-center justify-between gap-3 px-2">
@@ -781,7 +782,6 @@ export function TeamLibraryPanel({
 
             {tab === "share" && (
               <div>
-                <div className="mb-4">{searchField}</div>
                 <p className="max-w-2xl px-2 text-[13px] leading-[18px] text-ink-secondary">{t("teamLibrary.shareIntro")}</p>
                 {visibleShareTeams.length === 0 ? (
                   <div className="flex min-h-40 flex-col items-center justify-center text-center">

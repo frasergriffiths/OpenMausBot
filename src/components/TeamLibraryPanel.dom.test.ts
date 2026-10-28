@@ -144,6 +144,17 @@ describe("the Templates dialog shell", () => {
     expect((byLabel("Search templates") as HTMLInputElement).value).toBe("sales");
   });
 
+  it("keeps the search in one reserved row when switching between Explore and Share", async () => {
+    await mount();
+    const row = document.querySelector<HTMLElement>("[data-templates-search-row]")!;
+    expect(row.className).toContain("h-12");
+    expect(row.contains(byLabel("Search templates"))).toBe(true);
+    await act(async () => (document.querySelector('[data-template-tab="share"]') as HTMLButtonElement).click());
+    const nextRow = document.querySelector<HTMLElement>("[data-templates-search-row]")!;
+    expect(nextRow).toBe(row);
+    expect(nextRow.contains(byLabel("Search templates"))).toBe(true);
+  });
+
   it("is a labelled modal that closes on Escape", async () => {
     await mount();
     expect(document.activeElement).toBe(dialog());
