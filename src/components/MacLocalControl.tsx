@@ -22,7 +22,8 @@ const PANE_SETTINGS = {
 // Explicit controls, not .ui-button: Simple Settings rewrites every .ui-button into an ink pill, and this card
 // must look the same in the computer panel, in Settings and in the chat transcript.
 const PRIMARY = "inline-flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-ink hover:brightness-110 disabled:opacity-50";
-const SECONDARY = "inline-flex h-8 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-control px-3 text-[13px] font-medium text-ink hover:bg-raised-hover disabled:opacity-50";
+// The secondary sits beside Retry in a panel as narrow as 320px: its label wraps instead of pushing the pair out.
+const SECONDARY = "inline-flex min-h-8 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-normal rounded-lg bg-control px-3 py-1.5 text-center text-[13px] font-medium leading-4 text-ink hover:bg-raised-hover disabled:opacity-50";
 const TERTIARY = "shrink-0 rounded-md px-2 py-1 text-[13px] font-medium text-ink-secondary hover:bg-ink/[0.04] hover:text-ink disabled:opacity-50";
 
 /** The permission card's one look. `MacLocalControl` mounts it in the panel and Settings; ChatView mounts it
@@ -165,7 +166,8 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
                       type="button"
                       onClick={() => void openSettings(pane)}
                       disabled={pending}
-                      aria-label={t(PANE_SETTINGS[pane])}
+                      // The status is visible beside the name but an aria-label replaces that text for a screen reader.
+                      aria-label={`${t(PANE_NAME[pane])}, ${status}. ${t(PANE_SETTINGS[pane])}`}
                       title={t(PANE_SETTINGS[pane])}
                       className="flex min-h-10 w-full items-center gap-2.5 px-3 text-left hover:bg-ink/[0.03] disabled:opacity-60"
                     >
@@ -191,7 +193,7 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
             {pending && <Loader2 size={13} className="animate-spin" aria-hidden="true" />}
             {primaryLabel}
           </button>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             {!primaryIsRelaunch && known && relaunchAvailable && (
               <button type="button" onClick={() => void relaunch()} disabled={pending} className={SECONDARY}>
                 {t("computer.mac.permission.relaunch")}

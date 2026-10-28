@@ -38,6 +38,9 @@ const mount = async () => {
 
 const button = (label: string) =>
   [...container.querySelectorAll<HTMLButtonElement>("button")].find((candidate) => candidate.textContent === label);
+// A permission row's visible text is the pane and its status; the action lives in its accessible name.
+const row = (name: string) =>
+  [...container.querySelectorAll<HTMLButtonElement>("button[aria-label]")].find((candidate) => candidate.getAttribute("aria-label")!.startsWith(name));
 
 beforeEach(() => {
   (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -65,16 +68,19 @@ afterEach(async () => {
 describe("the Mac permission card actions", () => {
   it("offers one primary pane, secondary relaunch and a text retry", async () => {
     await mount();
-    const primary = button("Open Screen Recording Settings")!;
+    const primary = button("Open System Settings")!;
     const secondary = button("Relaunch OpenMausBot")!;
     const retry = button("Retry")!;
+    expect(primary.className).toContain("h-9");
+    expect(secondary.className).toContain("min-h-8");
     for (const control of [primary, secondary]) {
-      expect(control.className).toContain("h-8");
       expect(control.className).not.toContain("danger");
       expect(control.className).not.toContain("rounded-full");
     }
     expect(primary.className).toContain("bg-accent");
     expect(secondary.className).toContain("bg-control");
+    // The row's name carries the status the label would otherwise hide from a screen reader.
+    expect(row("Screen Recording")!.getAttribute("aria-label")).toBe("Screen Recording, Not granted. Open Screen Recording Settings");
     expect(retry.className).toContain("text-[13px]");
     expect(retry.className).not.toContain("bg-accent");
     expect(retry.className).not.toContain("rounded-full");
@@ -82,13 +88,13 @@ describe("the Mac permission card actions", () => {
 
   it("opens only the first missing pane from the primary action", async () => {
     await mount();
-    await act(async () => button("Open Screen Recording Settings")!.click());
+    await act(async () => button("Open System Settings")!.click());
     expect(fixture.permOpenSettings.mock.calls).toEqual([["screen"]]);
   });
 
   it("marks the opened row Waiting, then flips the primary to Relaunch when a retry is still missing", async () => {
     await mount();
-    await act(async () => button("Open Screen Recording Settings")!.click());
+    await act(async () => button("Open System Settings")!.click());
     expect(container.textContent).toContain("Waiting for you");
     expect(container.textContent).toContain("this card updates by itself");
 
@@ -112,7 +118,8 @@ describe("the Mac permission card actions", () => {
     await mount();
     expect(container.textContent).toContain("Accessibility is required");
     expect(container.textContent).toContain("Granted");
-    await act(async () => button("Open Accessibility Settings")!.click());
+    expect(row("Accessibility")!.getAttribute("aria-label")).toBe("Accessibility, Not granted. Open Accessibility Settings");
+    await act(async () => row("Accessibility")!.click());
     expect(fixture.permOpenSettings.mock.calls).toEqual([["accessibility"]]);
   });
 
@@ -143,6 +150,6 @@ describe("the Mac permission card actions", () => {
     const alerts = container.querySelectorAll('[role="alert"]');
     expect(alerts).toHaveLength(1);
     expect(alerts[0]!.textContent).toContain("boom");
-    expect(button("Open Screen Recording Settings")!.disabled).toBe(false);
+    expect(button("Open System Settings")!.disabled).toBe(false);
   });
 });

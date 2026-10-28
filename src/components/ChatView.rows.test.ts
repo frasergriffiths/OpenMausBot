@@ -98,7 +98,8 @@ async function menuOf(mid: string) {
   if (!more) return [];
   flushSync(() => more.click());
   await settle();
-  const items = [...document.querySelectorAll<HTMLButtonElement>(`[data-mid="${mid}"] [role=menuitem]`)]
+  // The menu lives on <body> now; only the open one counts (a closing one stays inert for its exit beat).
+  const items = [...(document.querySelector('[role="menu"]:not([inert])')?.querySelectorAll<HTMLButtonElement>("[role=menuitem]") ?? [])]
     .map((item) => ({ label: item.textContent ?? "", title: item.title, disabled: item.disabled }));
   flushSync(() => more.click());
   await settle();

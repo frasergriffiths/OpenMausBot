@@ -6,7 +6,7 @@ import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
-import { SidebarEdgeToggle } from "./SidebarSimpleTop";
+import { SidebarEdgeToggle, SidebarSearchPill } from "./SidebarSimpleTop";
 
 let container: HTMLDivElement;
 let root: Root;
@@ -82,4 +82,19 @@ it("stays out of sight until the sidebar or the bump is hovered, and reports the
   expect(onHover).toHaveBeenCalledWith(true);
   flushSync(() => root.render(createElement(Hidden, { shown: true })));
   expect(bump().className).toContain("opacity-100");
+});
+
+it("keeps the Simple search field's text and Escape clearing, and carries no visible clear button", () => {
+  const onQuery = vi.fn();
+  const onClear = vi.fn();
+  flushSync(() => root.render(createElement(SidebarSearchPill, { query: "atlas", onQuery, onClear })));
+  const input = container.querySelector<HTMLInputElement>("input")!;
+  expect(input.value).toBe("atlas");
+  expect(input.readOnly).toBe(false);
+  // No X to press: the field is always there, so a clear control that cannot be hidden is dead weight.
+  expect(container.querySelector("button")).toBeNull();
+  expect(container.querySelector('[aria-label="Clear search"]')).toBeNull();
+  flushSync(() => input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })));
+  expect(onClear).toHaveBeenCalledOnce();
+  expect(onQuery).not.toHaveBeenCalled();
 });

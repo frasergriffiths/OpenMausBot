@@ -56,7 +56,9 @@ async function regenerateOffers(): Promise<string[]> {
     if (!more) continue;
     flushSync(() => more.click());
     await settle();
-    if ([...row.querySelectorAll("[role=menuitem]")].some((item) => item.textContent === t("chat.regenerate"))) found.push(row.getAttribute("data-mid")!);
+    // The menu is portaled to <body>, so read the one open sheet, not the row.
+    const open = document.querySelector('[role="menu"]:not([inert])');
+    if ([...(open?.querySelectorAll("[role=menuitem]") ?? [])].some((item) => item.textContent === t("chat.regenerate"))) found.push(row.getAttribute("data-mid")!);
     flushSync(() => more.click());
     await settle();
   }

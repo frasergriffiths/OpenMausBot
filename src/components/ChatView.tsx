@@ -1132,7 +1132,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
           )}
           <EngineLimitNotice engine={bot.modelSelection?.instanceId} />
           {!advanced && <ChatNewThreadButton onNew={() => dispatch({ type: "newTask", botId: bot.id })} />}
-          {/* The model and the bot's computer stay in view in both modes; Simple mode moves only ⋯ into the bot panel. */}
+          {/* The model stays in the header in both modes; the computer is a header control in Advanced and a tab in Simple. */}
           {!remoteClient && !phone && <ModelPicker key={bot.threadId} bot={bot} threadId={bot.threadId} />}
           <LiveCallChip currentBotId={bot.id} onOpen={(botId, threadId) => openThread(dispatch, { botId, threadId }, state, showThreads)} />
           {/* The bot's computer lives in the side panel's Computer tab in Simple mode, so the header keeps no monitor. */}

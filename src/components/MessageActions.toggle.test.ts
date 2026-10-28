@@ -13,7 +13,8 @@ const body = () => host.querySelector<HTMLElement>("p")!;
 const tray = () => host.querySelector<HTMLElement>('[data-testid="message-actions"]')!;
 const shown = () => tray().dataset.shown === "true";
 const more = () => tray().querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;
-const items = () => [...host.querySelectorAll<HTMLButtonElement>("[role=menuitem]")];
+// The menu lives on <body>, outside the chat scroller, so the tests look there too.
+const items = () => [...document.querySelectorAll<HTMLButtonElement>("[role=menuitem]")];
 
 const pointer = (type: string, target: Element, pointerType: string) =>
   act(async () => {
@@ -111,13 +112,15 @@ describe("message actions row", () => {
     expect(shown()).toBe(true);
     await act(async () => items()[0]!.click());
     expect(picked).toEqual(["pin"]);
+    // The menu leaves with the shared 200ms exit, so it is still in the DOM for that beat.
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 260)); });
     expect(items()).toHaveLength(0);
   });
 
   it("renders the shared compact menu recipe and focuses the first item", async () => {
     await render();
     await act(async () => more().click());
-    const menu = host.querySelector<HTMLElement>('[role="menu"]')!;
+    const menu = document.querySelector<HTMLElement>('[role="menu"]')!;
     for (const token of ["w-[240px]", "rounded-[var(--radius-menu)]", "p-1.5", "gap-0.5", "shadow-lg", "border-hairline/50", "bg-menu", "overflow-y-auto", "max-h-[calc(100vh-1rem)]"]) {
       expect(menu.className).toContain(token);
     }
@@ -130,7 +133,7 @@ describe("message actions row", () => {
     expect(document.activeElement).toBe(first);
   });
 
-  it("opens above and flips when the row is near the right edge on a short window", async () => {
+  it("opens above and shifts inside the window when the row is near the right edge on a short window", async () => {
     const originalWidth = window.innerWidth;
     const originalHeight = window.innerHeight;
     Object.defineProperty(window, "innerWidth", { value: 800, configurable: true });
@@ -149,9 +152,11 @@ describe("message actions row", () => {
     try {
       await render();
       await act(async () => more().click());
-      const menu = host.querySelector<HTMLElement>('[role="menu"]')!;
-      expect(menu.className).toContain("bottom-full");
-      expect(menu.className).toContain("end-0");
+      const menu = document.querySelector<HTMLElement>('[role="menu"]')!;
+      // Fixed on <body>, above the trigger and clamped in from the right edge.
+      expect(menu.style.position).toBe("fixed");
+      expect(menu.style.top).toBe("296px");
+      expect(menu.style.left).toBe("552px");
     } finally {
       Object.defineProperty(window, "innerWidth", { value: originalWidth, configurable: true });
       Object.defineProperty(window, "innerHeight", { value: originalHeight, configurable: true });
@@ -165,8 +170,8 @@ describe("message actions row", () => {
       { key: "raw", icon: null, label: "Show raw markdown", separatorBefore: true, onSelect: () => picked.push("raw") },
     ]);
     await act(async () => more().click());
-    expect(host.querySelectorAll('[role="separator"]')).toHaveLength(1);
-    expect(host.querySelector('[role="separator"]')!.className).toContain("mx-2");
+    expect(document.querySelectorAll('[role="separator"]')).toHaveLength(1);
+    expect(document.querySelector('[role="separator"]')!.className).toContain("mx-2");
   });
 
   it("closes the menu on Escape", async () => {
@@ -176,6 +181,7 @@ describe("message actions row", () => {
     await act(async () => {
       document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
     });
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 260)); });
     expect(items()).toHaveLength(0);
   });
 

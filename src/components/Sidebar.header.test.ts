@@ -140,7 +140,7 @@ describe("sidebar top row", () => {
     expect(html.match(/Switch server:/g)).toHaveLength(1);
   });
 
-  it("in Simple mode puts a round search and a round + on the right of a 60px macOS row, with no server pill, and the collapse bump on the edge until hover", () => {
+  it("in Simple mode puts the computer pill between the traffic lights and a round + on the right of a 60px macOS row, and the collapse bump on the edge until hover", () => {
     fixture.advanced = false;
     fixture.windowChrome = "mac-inset";
     desktop();
@@ -148,14 +148,16 @@ describe("sidebar top row", () => {
     const row = topRow(html);
     expect(row).toMatch(/^data-sidebar-top-row="true" class="[^"]*\bh-\[60px\][^"]*\bitems-start\b[^"]*" style="-webkit-app-region:drag"/);
     expect(classesOf(row, "data-sidebar-top-row")).toEqual(expect.arrayContaining(["pl-4", "pr-4", "pt-3"]));
-    expect(row).not.toContain("data-workspace-switcher");
-    expect(html).not.toContain("Switch server:");
+    expect(row).toContain("data-workspace-switcher");
+    expect(row).toMatch(/aria-label="Switch server: Servers"[^>]*class="[^"]*\bh-8\b[^"]*\brounded-full\b/);
+    expect(html.match(/Switch server:/g)).toHaveLength(1);
     const { lights, slot, buttons } = order(row);
     expect(lights).toBeGreaterThan(-1);
     expect(slot).toBeGreaterThan(lights);
     expect(buttons).toBeGreaterThan(slot);
     expect(classesOf(row, "data-sidebar-top-buttons")).toEqual(expect.arrayContaining(["shrink-0", "gap-2"]));
     expect(row.slice(buttons).match(/<button/g)).toHaveLength(1);
+    expect(classesOf(row, "data-sidebar-top-slot")).toEqual(expect.arrayContaining(["@container/sidebar-top", "min-w-0", "flex-1"]));
     expect(row).not.toContain("data-sidebar-search-toggle");
     expect(html).toMatch(/aria-label="New or share" class="[^"]*\bsize-9\b[^"]*\brounded-full\b/);
     expect(html).toMatch(/data-sidebar-edge-toggle="true" aria-label="Collapse sidebar to avatars" aria-expanded="true" title="Collapse to avatars" style="-webkit-app-region:no-drag" class="[^"]*\babsolute\b[^"]*\bpointer-events-none opacity-0\b[^"]*\btouch:pointer-events-auto touch:opacity-100\b[^"]*\btop-\[14px\]/);

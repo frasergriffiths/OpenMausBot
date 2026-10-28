@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useEffect, useState, type CSSProperties, type RefObject } from "react";
 import { createPortal } from "react-dom";
 
@@ -75,11 +75,10 @@ export function SidebarEdgeToggle({ collapsed, onToggle, style, anchorRef, shown
   return pinned ? createPortal(button, document.body) : button;
 }
 
-export const SIMPLE_SEARCH_SHELL = "flex h-8 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1.5 text-ink-secondary focus-within:ring-1 focus-within:ring-accent";
 export const SIMPLE_SEARCH_INPUT = "min-w-0 flex-1 bg-transparent text-[13px] leading-[18px] text-ink placeholder:text-ink-tertiary focus:outline-none";
 
-/** Simple mode's search field, always on screen: no toggle to open it and no close to put it away. The clear button
- *  appears only once there is something to clear. */
+/** Simple mode's search field, always on screen: no toggle to open it and no close to put it away. Escape clears it; the
+ *  field carries no visible clear control, so one is never left over that cannot do anything. */
 export function SidebarSearchPill({ query, onQuery, onClear }: { query: string; onQuery: (query: string) => void; onClear: () => void }) {
   return (
     <div data-sidebar-search-pill className="px-3 pb-2 pt-0.5">
@@ -97,17 +96,6 @@ export function SidebarSearchPill({ query, onQuery, onClear }: { query: string; 
           aria-label={t("sidebar.searchAria")}
           className={SIMPLE_SEARCH_INPUT}
         />
-        {query !== "" && (
-          <button
-            type="button"
-            onClick={onClear}
-            aria-label={t("sidebar.searchClear")}
-            title={t("sidebar.searchClear")}
-            className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-tertiary hover:bg-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-          >
-            <X size={14} aria-hidden="true" />
-          </button>
-        )}
       </div>
     </div>
   );

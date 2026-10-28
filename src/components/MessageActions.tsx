@@ -1,10 +1,12 @@
 import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Check, Copy, Ellipsis, Reply, X } from "lucide-react";
 import { popoverClosesOnKey, usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { cn } from "@/lib/cn";
 import { useCopyFeedback } from "@/lib/copy-text";
 import { t } from "@/lib/i18n";
 import { MENU_GUTTER, MENU_ICON, MENU_ROW, MENU_SEPARATOR } from "./menu-recipe";
+import { useMenuMotion } from "./MenuMotion";
 
 export const ACTION_ICON = { size: 17, strokeWidth: 1.5 } as const;
 
@@ -56,10 +58,13 @@ export function MessageActions({
   const [keyboardFocus, setKeyboardFocus] = useState(false);
   const [tapped, setTapped] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [menuAbove, setMenuAbove] = useState(false);
-  const [menuFlipped, setMenuFlipped] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null);
   const mirrored = side === "user";
   const shown = forceOpen || menuOpen || hovered || keyboardFocus || tapped;
+  const motion = useMenuMotion(menuOpen);
+  // The chat scroller makes a stacking context, so an absolute menu inside it can never rise above the sidebar.
+  // The menu lives on <body>, fixed, clamped to the window and flipped above its trigger when below has no room.
+  const menuInside = useRef({ contains: (target: unknown) => rootRef.current?.contains(target as Node) === true || menuRef.current?.contains(target as Node) === true });
 
   useEffect(() => {
     const row = rootRef.current?.closest<HTMLElement>(`[${MESSAGE_ROW}]`) ?? rootRef.current;
@@ -121,25 +126,39 @@ export function MessageActions({
   }, []);
 
   usePopoverDismiss(tapped && !menuOpen, rowRef, () => setTapped(false));
-  usePopoverDismiss(menuOpen, rootRef, () => {
+  usePopoverDismiss(menuOpen, menuInside, () => {
     setMenuOpen(false);
-    if (rootRef.current?.contains(document.activeElement)) moreRef.current?.focus();
+    // Escape and a click elsewhere both put focus back on the control that owned the menu.
+    moreRef.current?.focus();
   });
 
   useLayoutEffect(() => {
+    if (!motion.shown) { setMenuPosition(null); return; }
+    const place = () => {
+      const menu = menuRef.current, more = moreRef.current;
+      if (!menu || !more) return;
+      const edge = 8, gap = 4;
+      const anchor = more.getBoundingClientRect();
+      const box = menu.getBoundingClientRect();
+      const width = box.width, height = box.height;
+      const below = anchor.bottom + gap;
+      const above = anchor.top - gap - height;
+      const top = below + height > window.innerHeight - edge && above >= edge ? above : below;
+      const anchored = mirrored ? anchor.right - width : anchor.left;
+      const left = Math.min(Math.max(edge, anchored), Math.max(edge, window.innerWidth - width - edge));
+      setMenuPosition({ left, top: Math.min(Math.max(edge, top), Math.max(edge, window.innerHeight - height - edge)) });
+    };
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [motion.shown, mirrored]);
+
+  useLayoutEffect(() => {
     if (!menuOpen) return;
-    const menuBox = menuRef.current?.getBoundingClientRect();
-    const more = moreRef.current?.getBoundingClientRect();
-    if (menuBox && more) setMenuAbove(more.bottom + 4 + menuBox.height > window.innerHeight - 8 && more.top - 4 - menuBox.height > 8);
-    const rowBox = rootRef.current?.getBoundingClientRect();
-    if (menuBox && rowBox) {
-      const rtl = getComputedStyle(rootRef.current!).direction === "rtl";
-      const fitsRight = rowBox.left + menuBox.width <= window.innerWidth - 8;
-      const fitsLeft = rowBox.right - menuBox.width >= 8;
-      const fitsStart = rtl ? fitsLeft : fitsRight;
-      const fitsEnd = rtl ? fitsRight : fitsLeft;
-      setMenuFlipped(mirrored ? !fitsEnd && fitsStart : !fitsStart && fitsEnd);
-    }
     menuRef.current?.querySelector<HTMLButtonElement>("[role=menuitem]:not(:disabled)")?.focus();
   }, [menuOpen]);
 
@@ -188,18 +207,24 @@ export function MessageActions({
           <Ellipsis {...ACTION_ICON} aria-hidden="true" />
         </button>
       )}
-      {menuOpen && (
+      {motion.shown && typeof document !== "undefined" && createPortal(
         <div
           ref={menuRef}
           id={menuId}
           role="menu"
           aria-label={t("chat.messageActions")}
           onKeyDown={moveFocus}
+          style={{
+            position: "fixed",
+            left: menuPosition?.left ?? moreRef.current?.getBoundingClientRect().left ?? 8,
+            top: menuPosition?.top ?? (moreRef.current ? moreRef.current.getBoundingClientRect().bottom + 4 : 8),
+            visibility: menuPosition ? undefined : "hidden",
+          }}
           className={cn(
-            "popover-surface absolute z-40 flex max-h-[calc(100vh-1rem)] w-[240px] max-w-[calc(100vw-2rem)] flex-col gap-0.5 overflow-y-auto overscroll-contain rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg",
-            menuAbove ? "bottom-full mb-1" : "top-full mt-1",
-            mirrored !== menuFlipped ? "end-0" : "start-0",
+            "popover-surface z-50 flex max-h-[calc(100vh-1rem)] w-[240px] max-w-[calc(100vw-2rem)] flex-col gap-0.5 overflow-y-auto overscroll-contain rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg",
+            motion.className,
           )}
+          {...motion.exitProps}
         >
           {menu.map((item) => (
             <Fragment key={item.key}>
@@ -221,7 +246,8 @@ export function MessageActions({
               </button>
             </Fragment>
           ))}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

@@ -76,7 +76,7 @@ describe("Mac local computer permission card", () => {
     fixture.localComputer = { available: false, message: "Screen Recording and Accessibility required" } as DesktopCapabilities["localComputer"];
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
     expect(markup).toContain("Screen Recording and Accessibility are required");
-    expect(markup.match(/Not granted/g)?.length).toBe(2);
+    expect(markup.match(/>Not granted</g)?.length).toBe(2);
     expect(markup.indexOf("Screen Recording")).toBeLessThan(markup.indexOf("Accessibility"));
     expect(markup).toContain("Open Screen Recording Settings");
     expect(markup).toContain("Open Accessibility Settings");
