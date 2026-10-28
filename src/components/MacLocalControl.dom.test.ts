@@ -137,7 +137,8 @@ describe("the Mac permission card actions", () => {
     expect(fixture.relaunch).toHaveBeenCalledTimes(1);
     await act(async () => button("Retry")!.click());
     await flush();
-    expect(fixture.retry).toHaveBeenCalledTimes(1);
+    // One automatic re-check when the window regains focus, then the quiet Retry button.
+    expect(fixture.retry).toHaveBeenCalledTimes(2);
   });
 
   it("shows a thrown retry as one alert line and keeps the card usable", async () => {
