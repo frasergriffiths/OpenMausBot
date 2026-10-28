@@ -2,7 +2,7 @@
 // area never clips it, and the focus stays in the search box while the arrow keys walk the rows.
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Check, Loader2, Search } from "lucide-react";
+import { Check, Loader2, Search, X } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
@@ -289,6 +289,20 @@ export function VoicePicker({
           spellCheck={false}
           className="min-w-0 flex-1 bg-transparent text-[13px] leading-[18px] text-ink outline-none placeholder:text-ink-tertiary [&::-webkit-search-cancel-button]:hidden"
         />
+        {query && (
+          <button
+            type="button"
+            aria-label={t("model.simple.clearSearch")}
+            onClick={() => {
+              setActiveId(null);
+              onQuery("");
+              inputRef.current?.focus();
+            }}
+            className="flex size-5 shrink-0 items-center justify-center rounded-full text-ink-tertiary hover:bg-ink/[0.06] hover:text-ink"
+          >
+            <X size={14} strokeWidth={MENU_STROKE} aria-hidden="true" />
+          </button>
+        )}
       </div>
       <div
         ref={listRef}

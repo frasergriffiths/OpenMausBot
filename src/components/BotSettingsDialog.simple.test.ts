@@ -823,10 +823,16 @@ describe("the Computer tab", () => {
     expect(has(rendered, "data-panel-row", "data")).toBe(false);
     (fixture.dispatch as ReturnType<typeof vi.fn>).mockClear();
     click(find(rendered, "data-panel-action", "open-computer"));
+    // Simple mode has no Computer panel to open: the tile takes over the panel in place instead of closing it on nothing.
+    expect(onOpen).toHaveBeenLastCalledWith("computer");
+    expect(fixture.dispatch).not.toHaveBeenCalled();
+
+    fixture.advanced = true;
+    (fixture.dispatch as ReturnType<typeof vi.fn>).mockClear();
+    click(find(computer(makeBot()), "data-panel-action", "open-computer"));
     const dispatches = (fixture.dispatch as ReturnType<typeof vi.fn>).mock.calls.map(([action]) => action as { type?: string; open?: boolean });
     expect(dispatches).toContainEqual({ type: "toggleSettings", open: false });
     expect(dispatches).toContainEqual({ type: "toggleComputer", open: true });
-    expect(onOpen).not.toHaveBeenLastCalledWith("computer");
   });
 });
 

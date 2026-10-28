@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n";
 import type { Place } from "@/lib/place";
 import { placeHasIssue, worksOnSimpleLabel } from "@/lib/place-view";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
+import { useAdvancedMode } from "@/lib/interface-mode";
 import { api, useStore, type Bot } from "@/state/store";
 import { BotAvatar } from "../Avatar";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
@@ -138,6 +139,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
   const screenOf = t("computer.screenOf", { name: bot.name });
   const android = useAndroidUsbDevices();
   const openComputer = useOpenComputer(bot);
+  const advanced = useAdvancedMode();
 
   const screen = [...bot.messages].reverse().find((message) => message.kind === "screen" && (message.hasImage || message.png));
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
@@ -150,7 +152,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
         type="button"
         data-panel-action="open-computer"
         aria-label={`${t("place.action.watch")}: ${screenOf}`}
-        onClick={() => openComputer("computer")}
+        onClick={() => (advanced ? openComputer("computer") : onOpen("computer"))}
         className="group relative mt-2.5 flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl bg-composer ring-1 ring-inset ring-ink/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-border"
       >
         {screenSrc ? (
