@@ -22,7 +22,7 @@ const pointer = (type: string, target: Element, pointerType: string) =>
 
 let picked: string[] = [];
 
-async function render(forceOpen = false) {
+async function render(forceOpen = false, menu?: Parameters<typeof MessageActions>[0]["menu"]) {
   await act(async () => {
     root.render(
       createElement("div", { [MESSAGE_ROW]: "" },
@@ -30,7 +30,7 @@ async function render(forceOpen = false) {
         createElement(MessageActions, {
           side: "bot",
           forceOpen,
-          menu: [
+          menu: menu ?? [
             { key: "pin", icon: null, label: "Pin message", onSelect: () => picked.push("pin") },
             { key: "raw", icon: null, label: "Show raw markdown", onSelect: () => picked.push("raw") },
           ],
@@ -112,6 +112,61 @@ describe("message actions row", () => {
     await act(async () => items()[0]!.click());
     expect(picked).toEqual(["pin"]);
     expect(items()).toHaveLength(0);
+  });
+
+  it("renders the shared compact menu recipe and focuses the first item", async () => {
+    await render();
+    await act(async () => more().click());
+    const menu = host.querySelector<HTMLElement>('[role="menu"]')!;
+    for (const token of ["w-[240px]", "rounded-[var(--radius-menu)]", "p-1.5", "gap-0.5", "shadow-lg", "border-hairline/50", "bg-menu", "overflow-y-auto", "max-h-[calc(100vh-1rem)]"]) {
+      expect(menu.className).toContain(token);
+    }
+    const first = items()[0]!;
+    for (const token of ["h-[30px]", "text-[13px]", "rounded-md", "px-2"]) expect(first.className).toContain(token);
+    expect(first.className).toContain("text-start");
+    const gutter = first.querySelector("span")!;
+    expect(gutter.className).toContain("size-4");
+    expect(gutter.className).toContain("[&_svg]:stroke-[1.75]");
+    expect(document.activeElement).toBe(first);
+  });
+
+  it("opens above and flips when the row is near the right edge on a short window", async () => {
+    const originalWidth = window.innerWidth;
+    const originalHeight = window.innerHeight;
+    Object.defineProperty(window, "innerWidth", { value: 800, configurable: true });
+    Object.defineProperty(window, "innerHeight", { value: 600, configurable: true });
+    const rect = (left: number, top: number, width: number, height: number) => ({
+      x: left, y: top, left, top, width, height, right: left + width, bottom: top + height, toJSON: () => ({}),
+    });
+    const originalRect = Element.prototype.getBoundingClientRect;
+    vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(function (this: Element) {
+      const element = this as HTMLElement;
+      if (element.getAttribute("role") === "menu") return rect(500, 200, 240, 200);
+      if (element.getAttribute("aria-haspopup") === "menu") return rect(700, 500, 28, 28);
+      if (element.dataset.testid === "message-actions") return rect(700, 500, 80, 28);
+      return originalRect.call(this);
+    });
+    try {
+      await render();
+      await act(async () => more().click());
+      const menu = host.querySelector<HTMLElement>('[role="menu"]')!;
+      expect(menu.className).toContain("bottom-full");
+      expect(menu.className).toContain("end-0");
+    } finally {
+      Object.defineProperty(window, "innerWidth", { value: originalWidth, configurable: true });
+      Object.defineProperty(window, "innerHeight", { value: originalHeight, configurable: true });
+      vi.restoreAllMocks();
+    }
+  });
+
+  it("renders a separator before a later action", async () => {
+    await render(false, [
+      { key: "pin", icon: null, label: "Pin message", onSelect: () => picked.push("pin") },
+      { key: "raw", icon: null, label: "Show raw markdown", separatorBefore: true, onSelect: () => picked.push("raw") },
+    ]);
+    await act(async () => more().click());
+    expect(host.querySelectorAll('[role="separator"]')).toHaveLength(1);
+    expect(host.querySelector('[role="separator"]')!.className).toContain("mx-2");
   });
 
   it("closes the menu on Escape", async () => {

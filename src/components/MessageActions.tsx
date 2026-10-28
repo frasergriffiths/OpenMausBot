@@ -1,9 +1,10 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Check, Copy, Ellipsis, Reply, X } from "lucide-react";
 import { popoverClosesOnKey, usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { cn } from "@/lib/cn";
 import { useCopyFeedback } from "@/lib/copy-text";
 import { t } from "@/lib/i18n";
+import { MENU_GUTTER, MENU_ICON, MENU_ROW, MENU_SEPARATOR } from "./menu-recipe";
 
 export const ACTION_ICON = { size: 17, strokeWidth: 1.5 } as const;
 
@@ -17,6 +18,7 @@ export type MessageMenuItem = {
   onSelect: () => void;
   title?: string;
   disabled?: boolean;
+  separatorBefore?: boolean;
 };
 
 export const MESSAGE_ROW = "data-message-row";
@@ -194,28 +196,30 @@ export function MessageActions({
           aria-label={t("chat.messageActions")}
           onKeyDown={moveFocus}
           className={cn(
-            "popover-surface absolute z-40 min-w-52 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-hairline/50 bg-menu py-1.5 shadow-2xl shadow-black/50",
+            "popover-surface absolute z-40 flex max-h-[calc(100vh-1rem)] w-[240px] max-w-[calc(100vw-2rem)] flex-col gap-0.5 overflow-y-auto overscroll-contain rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg",
             menuAbove ? "bottom-full mb-1" : "top-full mt-1",
             mirrored !== menuFlipped ? "end-0" : "start-0",
           )}
         >
           {menu.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              role="menuitem"
-              disabled={item.disabled}
-              title={item.title}
-              onClick={() => {
-                item.onSelect();
-                setMenuOpen(false);
-                moreRef.current?.focus();
-              }}
-              className="flex w-full items-center gap-3 px-3.5 py-2 text-start text-[14px] text-ink hover:bg-menu-hover focus-visible:bg-menu-hover focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <span className="flex size-5 shrink-0 items-center justify-center text-ink-secondary" aria-hidden="true">{item.icon}</span>
-              <span className="min-w-0 flex-1 truncate">{item.label}</span>
-            </button>
+            <Fragment key={item.key}>
+              {item.separatorBefore && <div role="separator" className={MENU_SEPARATOR} />}
+              <button
+                type="button"
+                role="menuitem"
+                disabled={item.disabled}
+                title={item.title}
+                onClick={() => {
+                  item.onSelect();
+                  setMenuOpen(false);
+                  moreRef.current?.focus();
+                }}
+                className={cn(MENU_ROW, "text-start")}
+              >
+                <span className={cn(MENU_GUTTER, MENU_ICON, "[&_svg]:size-4 [&_svg]:stroke-[1.75]")} aria-hidden="true">{item.icon}</span>
+                <span className="min-w-0 flex-1 truncate">{item.label}</span>
+              </button>
+            </Fragment>
           ))}
         </div>
       )}
