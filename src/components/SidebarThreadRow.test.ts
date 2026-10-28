@@ -90,6 +90,12 @@ describe("threads waiting on a teammate", () => {
     const waiting = [...rows, { threadId: "dispatch", title: "Dispatch", waitingForTeammates: true as const, busy: false }];
     expect(visibleSidebarThreads(waiting, "0").map((task) => task.threadId)).toEqual(["0", "1", "2", "3", "4", "5", "dispatch"]);
   });
+  it("uses the bot colour for the working spinner and its working line", () => {
+    const markup = render({ threadId: "live", title: "Live work", busy: true, activity: "working" }, { color: "#377fe6" });
+    expect(markup).toContain("color:#377fe6");
+    expect(markup).not.toContain("animate-spin text-success");
+  });
+
   it("surfaces the live activity label the chat pane derives while the row works", () => {
     const markup = render({ threadId: "live", title: "Live work", busy: true, activity: "working" }, { activityLabel: "Reading a file" });
     expect(markup).toContain('title="Live work · Reading a file"');

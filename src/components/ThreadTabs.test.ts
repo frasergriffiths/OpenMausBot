@@ -94,6 +94,20 @@ describe("a bot's threads in the chat header", () => {
     expect(tab("who").getAttribute("aria-selected")).toBe("true");
   });
 
+  it("uses the bot's colour for the spinner and shows elapsed time without clipping the label", () => {
+    render(bot({ color: "blue" }));
+    const pricing = tab("pricing");
+    const spinner = pricing.querySelector("svg.animate-spin")!;
+    expect(spinner.getAttribute("style")).toContain("color");
+    expect(spinner.classList.contains("text-success")).toBe(false);
+    expect(pricing.className).toContain("leading-4");
+    expect(pricing.className).not.toContain("leading-none");
+    const timer = pricing.querySelector("span.tabular-nums")!;
+    expect(timer).not.toBeNull();
+    expect(timer.textContent).not.toBe("");
+    expect(timer.textContent).toMatch(/\d+s|\d+m/);
+  });
+
   it("shows a running turn and an unread reply from the tab itself", () => {
     render(bot());
     expect(tab("pricing").querySelector("svg.animate-spin")).not.toBeNull();

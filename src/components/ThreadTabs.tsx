@@ -8,12 +8,14 @@ import { cn } from "@/lib/cn";
 import { copyText } from "@/lib/copy-text";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 import { t } from "@/lib/i18n";
+import { MAUS_COLORS } from "@/lib/mascot";
 import { reducedMotion } from "@/lib/onboarding";
 import { nextRename } from "@/lib/rename";
 import { localizedTaskTitle } from "@/lib/task-title";
 import { threadRefUrl } from "@/lib/thread-refs";
 import { currentTaskBot, openBotThread, useStore, type Action, type Bot, type Task } from "@/state/store";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { WorkingTimer } from "./WorkingIndicator";
 import { SidebarPopoverMenu, type SidebarMenuItem } from "./SidebarPopoverMenu";
 import {
   isArchived, isSnoozed, isWorking, nextSixPm, orderedThreadList, threadRowActions, tomorrowNineAm,
@@ -48,7 +50,7 @@ function tabStatus(task: TabTask): string {
   return task.unread ? t("task.unread") : "";
 }
 
-function ThreadTab({ task, ownerId, active, tabbable, folders, actions, onOpen, onFocus, register, registerRow }: {
+function ThreadTab({ task, ownerId, active, tabbable, folders, actions, color, onOpen, onFocus, register, registerRow }: {
   task: TabTask;
   ownerId: string;
   active: boolean;
@@ -56,6 +58,7 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, onOpen, 
   tabbable: boolean;
   folders: Bot["projects"];
   actions: ThreadActions;
+  color: string;
   onOpen: (task: TabTask, fromKeyboard: boolean) => void;
   onFocus: (threadId: string) => void;
   register: (threadId: string, element: HTMLButtonElement | null) => void;
@@ -155,7 +158,7 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, onOpen, 
             if (event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); finishRename(true); }
             else if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); finishRename(false); }
           }}
-          className="h-7 w-40 min-w-0 rounded-full border border-accent/50 bg-inset px-2.5 text-[12px] text-ink outline-none"
+          className="h-7 w-40 min-w-0 rounded-full border border-accent/50 bg-inset px-2.5 text-[12px] leading-4 text-ink outline-none"
         />
       ) : (
         <button
@@ -172,11 +175,16 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, onOpen, 
           onFocus={() => onFocus(task.threadId)}
           onDoubleClick={startRename}
           className={cn(
-            "flex h-7 max-w-[11rem] min-w-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] leading-none outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
+            "flex h-7 max-w-[12rem] min-w-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] leading-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
             active ? "bg-raised font-medium text-ink" : "text-ink-secondary hover:bg-raised/60 hover:text-ink",
           )}
         >
-          {running && <Loader2 size={12} aria-hidden="true" className="shrink-0 animate-spin text-success" />}
+          {running && <Loader2 size={12} aria-hidden="true" className="shrink-0 animate-spin" style={{ color }} />}
+          {running && task.turnStartedAt ? (
+            <span className="shrink-0">
+              <WorkingTimer since={task.turnStartedAt} className="text-[11px] tabular-nums text-ink-tertiary" />
+            </span>
+          ) : null}
           {waitingOnYou && <Clock size={12} aria-hidden="true" className="shrink-0 text-accent" />}
           {!running && !waitingOnYou && task.unread && <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-accent" />}
           <span dir="auto" className="truncate">{title}</span>
@@ -393,6 +401,7 @@ export function ThreadTabs({ bot, dispatch, onMeasuredWidthChange }: {
             tabbable={task.threadId === focusable}
             folders={bot.projects}
             actions={actions}
+            color={MAUS_COLORS[bot.color]}
             onOpen={open}
             onFocus={setFocusId}
             register={register}
