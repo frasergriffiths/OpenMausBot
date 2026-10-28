@@ -179,20 +179,20 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, color, o
           onFocus={() => onFocus(task.threadId)}
           onDoubleClick={startRename}
           className={cn(
-            "@container flex h-7 max-w-[12rem] min-w-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] leading-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
+            "@container flex h-7 max-w-[14rem] min-w-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] leading-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
             active ? "bg-raised font-medium text-ink" : "text-ink-secondary hover:bg-raised/60 hover:text-ink",
           )}
         >
           {running && <Loader2 size={12} aria-hidden="true" className="shrink-0 animate-spin" style={{ color }} />}
           {running && task.turnStartedAt ? (
-            <span className="shrink-0 min-w-[2.75rem] text-right @max-[10rem]:hidden">
+            <span className="shrink-0 min-w-[2.75rem] text-right @max-[12rem]:hidden">
               <WorkingTimer since={task.turnStartedAt} format={tabElapsed} className="text-[12px] tabular-nums text-ink-secondary" />
             </span>
           ) : null}
           {waitingOnYou && <Clock size={12} aria-hidden="true" className="shrink-0 text-accent" />}
           {!running && !waitingOnYou && task.unread && <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-accent" />}
-          <span dir="auto" className="truncate">{title}</span>
-          {task.pinned === true && <Pin size={10} aria-hidden="true" className="shrink-0 text-ink-tertiary" />}
+          <span dir="auto" className="min-w-0 flex-1 truncate">{title}</span>
+          {task.pinned === true && <Pin size={10} aria-hidden="true" className="shrink-0 text-ink-tertiary @max-[12rem]:hidden" />}
           {status && <span className="sr-only">{status}</span>}
         </button>
       )}
