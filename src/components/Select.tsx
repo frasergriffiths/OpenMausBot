@@ -1,4 +1,4 @@
-import { Children, isValidElement, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentProps, type KeyboardEvent as ReactKeyboardEvent, type ReactElement, type ReactNode } from "react";
+import { Children, Fragment, isValidElement, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentProps, type KeyboardEvent as ReactKeyboardEvent, type ReactElement, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -69,6 +69,10 @@ export function readSelectOptions(children: ReactNode): { options: OptionEntry[]
   const visit = (nodes: ReactNode) => {
     for (const child of Children.toArray(nodes)) {
       if (!isValidElement(child)) continue;
+      if (child.type === Fragment) {
+        visit((child as ReactElement<{ children?: ReactNode }>).props.children);
+        continue;
+      }
       if (child.type === "optgroup") {
         const group = child as ReactElement<{ label?: string; children?: ReactNode }>;
         entries.push({ kind: "group", label: group.props.label ?? "" });
@@ -330,6 +334,8 @@ function SimpleSelect({ className, variant = "field", size = "md", value, onChan
           aria-labelledby={ariaLabelledBy}
           tabIndex={-1}
           {...motion.exitProps}
+          onPointerDown={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
           onKeyDown={onMenuKey}
           style={{
             position: "fixed",

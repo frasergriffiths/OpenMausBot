@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { act, createElement } from "react";
+import { act, createElement, Fragment } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -52,6 +52,55 @@ describe("the app select", () => {
     expect(entries.filter((entry) => entry.kind === "group").map((entry) => entry.label)).toEqual(["More"]);
   });
 
+  it("reads options nested inside fragments", () => {
+    const { options: parsed } = readSelectOptions(
+      createElement(Fragment, null,
+        createElement("option", { value: "none" }, "Does not repeat"),
+        createElement(Fragment, null,
+          createElement("option", { value: "monthly" }, "Monthly"),
+          createElement("option", { value: "yearly" }, "Yearly"),
+          createElement("option", { value: "cron" }, "Custom cron"),
+        ),
+      ),
+    );
+    expect(parsed.map((option) => option.value)).toEqual(["none", "monthly", "yearly", "cron"]);
+  });
+
+  it("keeps pointer and mouse presses inside the portalled listbox away from window dismissers", async () => {
+    const onChange = vi.fn();
+    const pointerdown = vi.fn();
+    const mousedown = vi.fn();
+    window.addEventListener("pointerdown", pointerdown);
+    window.addEventListener("mousedown", mousedown);
+    try {
+      await mount({ value: "b", onChange, children: options() });
+      await act(async () => trigger().click());
+      pointerdown.mockClear();
+      mousedown.mockClear();
+      const alpha = rows()[0]!;
+      await act(async () => { alpha.dispatchEvent(new Event("pointerdown", { bubbles: true })); });
+      await act(async () => { alpha.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })); });
+      expect(pointerdown).not.toHaveBeenCalled();
+      expect(mousedown).not.toHaveBeenCalled();
+      await act(async () => alpha.click());
+      expect(onChange).toHaveBeenCalledWith({ target: { value: "a" } });
+    } finally {
+      window.removeEventListener("pointerdown", pointerdown);
+      window.removeEventListener("mousedown", mousedown);
+    }
+  });
+
+  it("reads options wrapped in a fragment, as routine repeat choices are", () => {
+    const { options: parsed } = readSelectOptions(createElement(Fragment, null,
+      createElement("option", { value: "daily" }, "Daily"),
+      createElement(Fragment, null,
+        createElement("option", { value: "monthly" }, "Monthly"),
+        createElement("option", { value: "cron" }, "Custom cron"),
+      ),
+    ));
+    expect(parsed.map((option) => option.value)).toEqual(["daily", "monthly", "cron"]);
+  });
+
   it("shows the selected label and opens a real listbox with groups", async () => {
     const onChange = vi.fn();
     await mount({ value: "b", onChange, children: options() });
@@ -71,6 +120,31 @@ describe("the app select", () => {
     await act(async () => trigger().click());
     expect(listbox()!.parentElement).toBe(document.body);
     expect(container.querySelector('[role="listbox"]')).toBeNull();
+  });
+
+  it("keeps presses inside the portalled listbox away from window dismissers", async () => {
+    const onChange = vi.fn();
+    const onPointer = vi.fn();
+    const onMouse = vi.fn();
+    window.addEventListener("pointerdown", onPointer);
+    window.addEventListener("mousedown", onMouse);
+    try {
+      await mount({ value: "b", onChange, children: options() });
+      await act(async () => trigger().click());
+      onPointer.mockClear();
+      onMouse.mockClear();
+      const alpha = rows()[0]!;
+      await act(async () => alpha.dispatchEvent(new Event("pointerdown", { bubbles: true })));
+      await act(async () => alpha.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })));
+      expect(onPointer).not.toHaveBeenCalled();
+      expect(onMouse).not.toHaveBeenCalled();
+      await act(async () => alpha.click());
+      expect(onChange).toHaveBeenCalledWith({ target: { value: "a" } });
+      expect(trigger().getAttribute("aria-expanded")).toBe("false");
+    } finally {
+      window.removeEventListener("pointerdown", onPointer);
+      window.removeEventListener("mousedown", onMouse);
+    }
   });
 
   it("walks enabled rows with the keyboard, skips disabled options and applies Enter", async () => {

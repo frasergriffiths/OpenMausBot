@@ -472,9 +472,10 @@ export function currentArchivableBot(bots: readonly Bot[], id: string): Bot | un
 
 const NO_FOLDERS: BotProject[] = [];
 
-export function BotThreadList({ bot, selected, density, query, pendingQueued, reveal, locale, generatedTitles, dispatch, activityLabel, hidden = false }: BotRowProps & {
+export function BotThreadList({ bot, selected, density, query, pendingQueued, reveal, locale, generatedTitles, dispatch, activityLabel, hidden = false, advanced = false }: BotRowProps & {
   activityLabel?: string;
   hidden?: boolean;
+  advanced?: boolean;
 }) {
   const now = useRelativeNow();
   const tasks = (bot.tasks ?? [{ threadId: bot.threadId, title: t("task.newShort"), createdAt: 0 }])
@@ -536,7 +537,7 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
   }), [botId, dispatch, generatedTitles]);
   const renderThread = (task: (typeof tasks)[number]) => {
     const thread = currentTaskBot(bot, task.threadId);
-    return <SidebarThreadRow key={task.threadId} task={{ ...task, busy: thread.busy, activity: thread.activity, waitingForTeammates: thread.waitingForTeammates }} ownerId={bot.id} current={selected && task.threadId === bot.threadId} compact={density === "compact"} folders={projects} color={spinnerColor(bot.color)}
+    return <SidebarThreadRow key={task.threadId} task={{ ...task, busy: thread.busy, activity: thread.activity, waitingForTeammates: thread.waitingForTeammates }} ownerId={bot.id} current={selected && task.threadId === bot.threadId} compact={density === "compact"} folders={projects} color={spinnerColor(bot.color)} advanced={advanced}
       activityLabel={task.threadId === bot.threadId ? activityLabel : undefined} now={stampClock(threadRecency(task), now)} locale={locale} {...actions}
       selectMode={bulk.active} checked={selection.has(task.threadId)} onToggleSelect={bulk.toggle} />;
   };
@@ -944,7 +945,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
         </span>
       )}
     </div>
-    {advanced && !iconOnly && threadsOpen && hasThreadList && <BotThreadList {...props} hidden={!showThreads}
+    {advanced && !iconOnly && threadsOpen && hasThreadList && <BotThreadList {...props} hidden={!showThreads} advanced={advanced}
       activityLabel={liveActivityLabel(last)}
       query={bot.name.toLowerCase().includes(query.toLowerCase()) || bot.title.toLowerCase().includes(query.toLowerCase()) ? "" : query} />}
     {advanced && !expanded && <SidebarBotActivity bot={bot} rowThreadId={selected ? bot.threadId : botOpensTo(bot, showThreads)} density={density} pendingQueued={pendingQueued} dispatch={dispatch} />}
