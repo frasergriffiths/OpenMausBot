@@ -208,7 +208,7 @@ export function MessageActions({
                 type="button"
                 role="menuitem"
                 disabled={item.disabled}
-                title={item.title}
+                title={item.title ?? item.label}
                 onClick={() => {
                   item.onSelect();
                   setMenuOpen(false);

@@ -1612,9 +1612,11 @@ body {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
-/* Simple mode shows keyboard focus on a menu row as the row's hover fill. */
+/* Simple mode shows keyboard focus on a menu row with an inset ring in the focus colour. The hover fill
+   alone is white-on-white on Atelier, Lagoon and Linen, so the ring is what carries focus on every skin. */
 :root[data-interface="simple"] [role="menu"] :is(button, [role^="menuitem"]):focus-visible {
-  outline: none;
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
   background-color: var(--color-menu-hover);
 }
 
