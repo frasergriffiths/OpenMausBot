@@ -185,7 +185,7 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, color, o
         >
           {running && <Loader2 size={12} aria-hidden="true" className="shrink-0 animate-spin" style={{ color }} />}
           {running && task.turnStartedAt ? (
-            <span className="shrink-0 min-w-[2.75rem] text-right">
+            <span className="shrink-0">
               <WorkingTimer since={task.turnStartedAt} format={tabElapsed} className="text-[12px] tabular-nums text-ink-secondary" />
             </span>
           ) : null}

@@ -1,4 +1,4 @@
-import { updateErrorMessage, updateErrorNeedsPerson } from "./update-errors.mjs";
+import { isNoReleasesError, updateErrorMessage, updateErrorNeedsPerson } from "./update-errors.mjs";
 
 /** electron-updater's GitHub provider gives the release body (HTML); a multi-release feed gives [{ version, note }]. */
 export function releaseNotesText(notes) {
@@ -59,6 +59,18 @@ export function createUpdaterCoordinator(
 
   const routeError = (manual, error) => {
     if (recoveryRequired) return;
+    // An empty release feed is the normal state before the first release, not a failure the person can act on.
+    if (isNoReleasesError(error)) {
+      if (checkOperation) checkOperation.failed = true;
+      if (downloadOperation) {
+        downloadOperation.failed = true;
+        clearTimeout(downloadOperation.timer);
+      }
+      quietFailures = 0;
+      actionOwnsState = false;
+      setState({ status: "idle" });
+      return;
+    }
     const shown = manual || updateErrorNeedsPerson(error);
     actionOwnsState = shown;
     if (error instanceof Error) routedErrors.add(error);

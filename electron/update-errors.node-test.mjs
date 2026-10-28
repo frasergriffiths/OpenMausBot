@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 import test from "node:test";
-import { updateErrorMessage, updateErrorNeedsPerson } from "./update-errors.mjs";
+import { isNoReleasesError, updateErrorMessage, updateErrorNeedsPerson } from "./update-errors.mjs";
 import { createUpdaterCoordinator } from "./updater-coordinator.mjs";
 
 test("update failures keep integrity and certificate errors distinct from recoverable environment errors", () => {
@@ -22,6 +22,7 @@ test("update failures keep integrity and certificate errors distinct from recove
   assert.match(updateErrorMessage(Object.assign(new Error('publisherNames differ. SignerCertificate: {"Subject":"CN=Unexpected"}'), { code: "ERR_UPDATER_INVALID_SIGNATURE" })), /failed verification/);
   assert.match(updateErrorMessage(new Error('ERR_UPDATER_INVALID_SIGNATURE: SignerCertificate mismatch')), /failed verification/);
   assert.equal(updateErrorMessage(new Error("unknown failure")), "unknown failure");
+  assert.match(updateErrorMessage(Object.assign(new Error("No published versions"), { code: "ERR_UPDATER_NO_PUBLISHED_VERSIONS" })), /No releases/);
   assert.match(updateErrorMessage(Object.assign(new Error("ENOENT: no such file or directory, open '/Applications/OpenMausBot.app/Contents/Resources/app-update.yml'"), { code: "ENOENT" })), /not configured in this build/);
 });
 
@@ -30,6 +31,8 @@ test("only failures the person must fix are theirs to see when nobody asked", ()
     assert.equal(updateErrorNeedsPerson(new Error(message)), true, message);
   }
   assert.equal(updateErrorNeedsPerson(Object.assign(new Error("sha512 mismatch"), { code: "ERR_UPDATER_CHECKSUM_MISMATCH" })), true);
+  assert.equal(isNoReleasesError(Object.assign(new Error("No published versions"), { code: "ERR_UPDATER_NO_PUBLISHED_VERSIONS" })), true);
+  assert.equal(updateErrorNeedsPerson(Object.assign(new Error("No published versions"), { code: "ERR_UPDATER_NO_PUBLISHED_VERSIONS" })), false);
   for (const message of ["ETIMEDOUT", "ECONNRESET", "HTTP 503 Service Unavailable", "net::ERR_INTERNET_DISCONNECTED", "Cannot find latest-mac.yml: 404", "net::ERR_CERT_AUTHORITY_INVALID", "unknown failure"]) {
     assert.equal(updateErrorNeedsPerson(new Error(message)), false, message);
   }

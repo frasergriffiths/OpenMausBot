@@ -101,9 +101,16 @@ export function LibraryTab({ bot, onOpen }: { bot: Bot; onOpen: (page: SimplePag
     return (
       <div data-panel-tabpanel="library">
         <Card>
-          <p data-panel-empty="library" className="px-4 py-6 text-center text-[13px] leading-[18px] text-ink-tertiary">
+          <p data-panel-empty="library" className="px-4 py-4 text-center text-[13px] leading-[18px] text-ink-tertiary">
             {t("botPanel.library.empty")}
           </p>
+          <NavRow
+            data-panel-page="folder"
+            icon={Folder}
+            title={t("files.outputs.open")}
+            value={bot.cwd ? shortPath(bot.cwd, capabilities.host?.homeDir) : t("botPanel.folder.private")}
+            onClick={() => onOpen("folder")}
+          />
         </Card>
         {keeps}
       </div>

@@ -126,8 +126,10 @@ describe("the Templates dialog shell", () => {
     await mount();
     const input = byLabel("Search templates") as HTMLInputElement;
     const pill = input.parentElement!;
-    expect(pill.className).toContain("h-9");
-    expect(pill.className).toContain("rounded-full");
+    expect(pill.className).toContain("h-8");
+    expect(pill.className).toContain("rounded-[var(--radius-lg)]");
+    expect(pill.className).toContain("pl-2.5");
+    expect(pill.className).toContain("pr-1");
     expect(pill.className).toContain("bg-control/70");
     expect(pill.className).toContain("focus-within:ring-1");
     expect(pill.className).toContain("focus-within:ring-accent");

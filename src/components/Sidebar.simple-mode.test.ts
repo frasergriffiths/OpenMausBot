@@ -158,7 +158,7 @@ describe("bot-first sidebar", () => {
 
     const cluster = markup.slice(markup.indexOf('class="ms-auto flex shrink-0 items-center gap-1 self-center"'));
     expect(cluster.indexOf('data-provider-mark="brand"')).toBeGreaterThan(-1);
-    expect(cluster.indexOf('data-provider-mark="brand"')).toBeLessThan(cluster.indexOf('data-bot-actions="atlas"'));
+    expect(cluster.indexOf('data-bot-actions="atlas"')).toBeLessThan(cluster.indexOf('data-provider-mark="brand"'));
     expect(markup).toContain('class="ms-auto flex shrink-0 items-center gap-1 self-center"');
     expect(markup).toContain('data-provider-mark="brand"');
     expect(markup).not.toContain('data-row-dot=""');

@@ -3,14 +3,14 @@ import { Check, ChevronLeft, ChevronRight, Trash2, type LucideIcon } from "lucid
 
 import { cn } from "@/lib/cn";
 import { useAdvancedMode } from "@/lib/interface-mode";
-import { MAUS_COLORS, type MausColor } from "@/lib/mascot";
+import type { MausColor } from "@/lib/mascot";
 import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "../pill-tabs";
 import { ELEVATED_CONTROL, ELEVATED_HOVER } from "../elevated";
 import { Switch } from "../SettingsPrimitives";
 
 export const rowCls = "flex min-h-[46px] items-center gap-2.5 px-3.5 py-[11px]";
-export const roundButtonCls = `flex size-[34px] shrink-0 items-center justify-center rounded-full text-ink ${ELEVATED_CONTROL} ${ELEVATED_HOVER} [:root[data-interface=simple][data-skin=daylight]_&]:shadow-[0_1px_3px_rgb(28_28_28/0.12)]`;
-const titleCls = "text-[14px] font-medium text-ink";
+export const roundButtonCls = `flex size-[34px] shrink-0 items-center justify-center rounded-full text-ink ${ELEVATED_CONTROL} ${ELEVATED_HOVER} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [:root[data-interface=simple][data-skin=daylight]_&]:shadow-[0_1px_3px_rgb(28_28_28/0.12)]`;
+const titleCls = "truncate text-[14px] font-medium text-ink";
 const hintCls = "mt-px text-[13px] leading-[1.35] text-ink-secondary";
 export const buttonCls =
   "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-control px-3.5 text-[13px] font-medium text-ink hover:bg-raised-hover disabled:cursor-not-allowed disabled:opacity-50";
@@ -47,7 +47,7 @@ export function Card({ label, action, anchor, children }: { label?: ReactNode; a
           "overflow-hidden",
           advanced
             ? "rounded-[14px] border border-ink/[0.04] bg-ink/[0.03]"
-            : "rounded-[14px] bg-menu ring-[0.5px] ring-ink/[0.05] max-md:rounded-[16px]",
+            : "rounded-[14px] border-[0.5px] border-ink/[0.05] bg-menu max-md:rounded-[16px]",
         )}
       >
         {label && (
@@ -79,8 +79,8 @@ export function RowIcon({ icon: Icon }: { icon: LucideIcon }) {
   );
 }
 
-export function BotSwitch({ color, checked, ...props }: Parameters<typeof Switch>[0] & { color: MausColor }) {
-  return <Switch {...props} checked={checked} style={checked ? { backgroundColor: MAUS_COLORS[color] } : undefined} />;
+export function BotSwitch({ color: _color, checked, ...props }: Parameters<typeof Switch>[0] & { color: MausColor }) {
+  return <Switch {...props} checked={checked} />;
 }
 
 export function SwitchRow({ title, hint, checked, onChange, disabled, color, label, tooltip, extra, ...rest }: {
@@ -137,7 +137,7 @@ export function NavRow({ title, hint, value, icon, onClick, drill = true, danger
     >
       {icon && <RowIcon icon={icon} />}
       <div className="min-w-0 flex-1">
-        <div className={cn(titleCls, danger && "text-danger")}>{title}</div>
+        <div className={cn(titleCls, danger && "text-danger")} title={typeof title === "string" ? title : undefined}>{title}</div>
         {hint && <div className={hintCls}>{hint}</div>}
       </div>
       {value !== undefined && value !== null && value !== "" && (

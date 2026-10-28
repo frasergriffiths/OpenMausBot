@@ -737,7 +737,7 @@ describe("the Library tab", () => {
   it("says what it will hold while the bot has made nothing, then what it remembers, its skills and its folder", () => {
     const rendered = library(makeBot());
     expect(rendered.html).toContain('data-panel-empty="library"');
-    const order = ['data-panel-empty="library"', 'data-panel-page="memory"', 'data-panel-page="skills"', 'data-panel-page="folder"'].map((marker) => rendered.html.indexOf(marker));
+    const order = ['data-panel-empty="library"', 'data-panel-page="folder"', 'data-panel-page="memory"', 'data-panel-page="skills"'].map((marker) => rendered.html.indexOf(marker));
     expect(order.every((index) => index > -1)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });
@@ -809,15 +809,9 @@ describe("the Computer tab", () => {
     expect(onOpen).toHaveBeenLastCalledWith("browser");
     for (const page of ["folder", "logins", "android"]) expect(has(rendered, "data-panel-page", page)).toBe(false);
     expect(has(rendered, "data-panel-row", "data")).toBe(false);
-    const setItem = vi.fn();
-    vi.stubGlobal("localStorage", { getItem: () => null, setItem });
     click(find(rendered, "data-panel-action", "open-computer"));
-    expect(setItem).toHaveBeenLastCalledWith("omb-computer-panel-view:scout", "computer");
-    expect((fixture.dispatch as ReturnType<typeof vi.fn>).mock.calls.slice(-2)).toEqual([
-      [{ type: "toggleSettings", open: false }],
-      [{ type: "toggleComputer", open: true }],
-    ]);
-    vi.stubGlobal("localStorage", { getItem: () => null, setItem: () => {} });
+    expect(onOpen).toHaveBeenLastCalledWith("computer");
+    expect((fixture.dispatch as ReturnType<typeof vi.fn>).mock.calls.some(([action]) => (action as { type?: string }).type === "toggleComputer")).toBe(false);
   });
 });
 
@@ -1185,7 +1179,8 @@ describe("the panel's switches", () => {
     fixture.apps = { phase: "ready", connectedSlugs: ["gmail"], apps: [app("gmail", "write")] };
     const html = capture(() => PageBody({ page: "apps", bot: makeBot({ color: "blue" }), derived: derived() }) as ReactNode).html;
     expect(html.match(/role="switch"/g)).toHaveLength(1);
-    expect(html).toContain("background-color:#377FE6");
+    expect(html).toContain("bg-accent");
+    expect(html).not.toContain("background-color:#377FE6");
     expect(Switch).toBeDefined();
   });
 });

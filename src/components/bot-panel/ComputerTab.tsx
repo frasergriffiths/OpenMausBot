@@ -131,7 +131,6 @@ export function WherePage({ bot, derived }: { bot: Bot; derived: Derived }) {
 }
 
 export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
-  const openComputer = useOpenComputer(bot);
   const ownerOrAdmin = useOwnerOrAdmin();
   const { browserEnabled } = derived;
   const signedIn = useSignedInCount(bot, browserEnabled && bot.computer !== "off" && ownerOrAdmin !== false);
@@ -150,7 +149,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
         type="button"
         data-panel-action="open-computer"
         aria-label={`${t("place.action.watch")}: ${screenOf}`}
-        onClick={() => openComputer()}
+        onClick={() => onOpen("computer")}
         className="group relative mt-2.5 flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl bg-composer ring-1 ring-inset ring-ink/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-border"
       >
         {screenSrc ? (

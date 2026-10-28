@@ -11,6 +11,8 @@ const primaryAction =
 // electron-updater surfaces failures as a whole HTTP dump (status line, every header, stack trace).
 function friendlyError(message?: string): string {
   if (!message) return "Something went wrong.";
+  if (/ERR_UPDATER_NO_PUBLISHED_VERSIONS|No published versions|No releases (?:have been )?published/i.test(message))
+    return "No releases have been published yet.";
   if (/app-update\.yml/i.test(message)) return "Couldn't check for updates.";
   if (/cannot find .*\.yml|404/i.test(message))
     return "No update has been published for this platform yet.";
@@ -117,7 +119,7 @@ export function UpdateBanner({ sidebarIndicator = false }: UpdateBannerProps) {
         )}
       </div>
 
-      {s.status === "error" && s.message && (
+      {s.status === "error" && s.message && !/ERR_UPDATER_NO_PUBLISHED_VERSIONS|no published versions/i.test(s.message) && (
         <details className="mt-2 border-t border-hairline/30 pt-2">
           <summary className="flex w-fit cursor-pointer list-none items-center gap-1 text-[12px] leading-4 text-ink-secondary hover:text-ink [&::-webkit-details-marker]:hidden">
             Technical details

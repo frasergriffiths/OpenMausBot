@@ -95,7 +95,7 @@ export function ActivityPanel({ bot, embedded = false }: { bot: Bot; embedded?: 
 
   const content = (
     <div className={embedded ? "min-h-0 flex-1 overflow-y-auto" : "min-h-0 flex-1 overflow-y-auto"}>
-        {error && <div className="px-4 py-3 text-[13px] text-danger">{t("activity.panel.error", { message: error })}</div>}
+        {error && <div role="alert" className="mx-4 my-3 rounded-xl border border-danger/30 bg-danger/10 px-3 py-2 text-[13px] leading-[18px] text-danger">{t("activity.panel.error", { message: error })}</div>}
         {rows && rows.length === 0 && !error && (
           <div className="px-4 py-6 text-[13px] text-ink-secondary">
             {t("activity.panel.empty", { name: bot.name })}

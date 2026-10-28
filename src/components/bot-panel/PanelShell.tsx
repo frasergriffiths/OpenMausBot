@@ -129,7 +129,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
                 </span>
                 {bot.chiefOfStaff && (
                   <span aria-hidden="true" className="absolute -left-1 -top-1 flex size-5 items-center justify-center rounded-full ring-2 ring-app" style={{ backgroundColor: MAUS_COLORS[bot.color], color: mascotInk(bot.color) }}>
-                    <Crown size={11} />
+                    <Crown size={11} fill="currentColor" />
                   </span>
                 )}
               </button>
@@ -193,7 +193,16 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
         </div>
       )}
 
-      <div ref={bodyRef} data-bot-panel-body className="min-h-0 flex-1 overflow-y-auto px-4 pb-6 pt-4">
+      <div
+        ref={bodyRef}
+        data-bot-panel-body
+        className={cn(
+          "min-h-0 flex-1",
+          page === "browser" || page === "data" || page === "files" || page === "computer"
+            ? "flex flex-col overflow-hidden p-3"
+            : "overflow-y-auto px-4 pb-6 pt-4",
+        )}
+      >
         {page === null ? (
           <div
             id="bot-panel-tabpanel"
@@ -206,9 +215,9 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
             {tab === "computer" && <ComputerTab bot={bot} derived={derived} onOpen={openPage} />}
           </div>
         ) : (
-          <div data-panel-page-view={page}>
+          <div data-panel-page-view={page} className={cn((page === "browser" || page === "data" || page === "files" || page === "computer") && "flex min-h-0 flex-1 flex-col")}>
             <span id="bot-settings-title" className="sr-only">{bot.name}</span>
-            <div className={pageSurfaceCls}>
+            <div className={cn(pageSurfaceCls, (page === "browser" || page === "data" || page === "files" || page === "computer") && "min-h-0 flex-1")}>
               <PageBody
                 page={page}
                 bot={bot}

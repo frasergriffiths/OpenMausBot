@@ -1130,7 +1130,6 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
               <span className="@max-4xl/chathead:hidden">{t("chat.stop")}</span>
             </button>
           )}
-          <ThreadContextWarning bot={bot} messages={messages} />
           <EngineLimitNotice engine={bot.modelSelection?.instanceId} />
           {!advanced && <ChatNewThreadButton onNew={() => dispatch({ type: "newTask", botId: bot.id })} />}
           {/* The model and the bot's computer stay in view in both modes; Simple mode moves only ⋯ into the bot panel. */}
@@ -1300,6 +1299,9 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
         </div>
       )}
       <LiveCallBar bot={bot} />
+      <div className="pointer-events-auto px-5 pb-1.5">
+        <ThreadContextWarning bot={bot} messages={messages} />
+      </div>
       {canWrite === false ? (
         <NewConversationInstead onNew={() => dispatch({ type: "newTask", botId: bot.id })} />
       ) : (

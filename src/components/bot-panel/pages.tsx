@@ -21,6 +21,7 @@ import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerive
 import { RoutineList } from "../routines/RoutineList";
 import { BrowserLogins } from "./browser-logins";
 import { BrowserPanel } from "../BrowserPanel";
+import { ComputerPanel } from "../ComputerPanel";
 import { AndroidDevicePanel, useAndroidUsbDevices } from "../AndroidDevicePanel";
 import { ActivityPanel } from "../ActivityPanel";
 import { InspectorPanel } from "../InspectorPanel";
@@ -441,6 +442,10 @@ export function BrowserLivePage({ bot, derived }: PageContext) {
   return derived.browserEnabled ? <BrowserPanel bot={bot} /> : <Card><NoteRow>{t("botAccess.browser.off")}</NoteRow></Card>;
 }
 
+export function ComputerPage({ bot }: PageContext) {
+  return <ComputerPanel bot={bot} embedded />;
+}
+
 export function SitesPage({ bot, derived, onOpen }: PageContext & { onOpen?: (page: SimplePageId) => void }) {
   return <BrowserLogins bot={bot} browserEnabled={derived.browserEnabled} onOpenBrowser={() => onOpen?.("browser")} />;
 }
@@ -477,6 +482,8 @@ export function PageBody({ page, onOpen, editingInstructions, onEditInstructions
       return <FolderPage {...context} />;
     case "browser":
       return <BrowserLivePage {...context} />;
+    case "computer":
+      return <ComputerPage {...context} />;
     case "sites":
       return <SitesPage {...context} onOpen={onOpen} />;
     case "threads":

@@ -7,7 +7,8 @@ import { t } from "@/lib/i18n";
 import { api, useStore, type Bot, type Group, type Message } from "@/state/store";
 
 const pill = "flex items-center gap-1.5 rounded-full border border-warning/40 bg-warning/10 px-2.5 py-1 text-[13px] text-ink";
-const action = "rounded-full px-1.5 font-medium text-accent hover:underline disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline";
+const threadRow = "flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-lg bg-warning/10 px-3 py-1.5 text-[12px] leading-[18px] text-ink";
+const action = "shrink-0 rounded px-1.5 font-medium text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-50 disabled:no-underline";
 
 function useCompact() {
   const { dispatch } = useStore();
@@ -26,11 +27,11 @@ export function ThreadContextWarningView({ name, percent, busy, pending, onCompa
   name: string; percent: number; busy: boolean; pending: boolean; onCompact: () => void;
 }) {
   return (
-    <span role="status" data-testid="context-warning" className={pill}
+    <span role="status" data-testid="context-warning" className={threadRow}
       title={t("contextWarning.threadHint", { name, percent })}>
       <Gauge size={13} className="shrink-0 text-warning" aria-hidden="true" />
-      <span className="tabular-nums">{t("contextWarning.short", { percent })}</span>
-      <button type="button" className={action} disabled={busy || pending} onClick={onCompact}
+      <span className="min-w-0 tabular-nums">{t("contextWarning.threadRow", { percent })}</span>
+      <button type="button" className={cn(action, "ms-auto")} disabled={busy || pending} onClick={onCompact}
         title={busy ? t("contextWarning.busy") : undefined}>
         {pending ? t("contextWarning.compacting") : t("contextWarning.compactNow")}
       </button>

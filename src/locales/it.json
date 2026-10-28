@@ -1759,6 +1759,7 @@
   "chat.compactionExcerptTitle": "Contesto precedente ridotto a estratti recenti",
   "chat.compactionExcerptHint": "Un riassunto scritto non era disponibile, quindi l'agente continua da questi estratti e dai messaggi recenti. Nel suo contesto possono mancare dettagli più vecchi. La conversazione completa è ancora qui.",
   "contextWarning.short": "Contesto {percent}%",
+  "contextWarning.threadRow": "Contesto {percent}% usato",
   "contextWarning.threadHint": "Il contesto di {name} è pieno al {percent}%. Compatta ora riassume i messaggi più vecchi in una nota breve; l'intera conversazione resta qui.",
   "contextWarning.compactNow": "Compatta ora",
   "contextWarning.compacting": "Compattazione…",

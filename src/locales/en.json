@@ -1918,6 +1918,7 @@
   "chat.compactionExcerptTitle": "Earlier context shortened to recent excerpts",
   "chat.compactionExcerptHint": "A written summary wasn't available, so the agent continues from these excerpts and recent messages. Older details may be missing from its context. Your full conversation is still here.",
   "contextWarning.short": "Context {percent}%",
+  "contextWarning.threadRow": "Context {percent}% used",
   "contextWarning.threadHint": "{name}'s context is {percent}% full. Compact now summarizes older messages into a short note; the whole conversation stays here.",
   "contextWarning.compactNow": "Compact now",
   "contextWarning.compacting": "Compacting…",

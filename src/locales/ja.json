@@ -1853,6 +1853,7 @@
   "chat.compactionExcerptTitle": "以前のコンテキストを最近の抜粋に短縮しました",
   "chat.compactionExcerptHint": "文章による要約を用意できなかったため、エージェントはこれらの抜粋と最近のメッセージをもとに続きを進めます。古い詳細はコンテキストから抜けている可能性があります。会話全体はここに残っています。",
   "contextWarning.short": "コンテキスト {percent}%",
+  "contextWarning.threadRow": "コンテキスト {percent}% 使用",
   "contextWarning.threadHint": "{name}のコンテキストが{percent}%に達しています。「今すぐ圧縮」を実行すると、古いメッセージが短いメモに要約されます。会話全体はここに残ります。",
   "contextWarning.compactNow": "今すぐ圧縮",
   "contextWarning.compacting": "圧縮中…",

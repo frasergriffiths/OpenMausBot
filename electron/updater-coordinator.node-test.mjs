@@ -72,6 +72,16 @@ test("manual check rejection is handled as a user-visible error", async () => {
   assert.deepEqual(getState(), { status: "error", message: "feed failed" });
 });
 
+test("a repository with no releases is up to date even after a manual check", async () => {
+  const { updater, coordinator, getState, states } = harness();
+  updater.checkForUpdates = () => Promise.reject(Object.assign(new Error("No published versions"), { code: "ERR_UPDATER_NO_PUBLISHED_VERSIONS" }));
+
+  await assert.doesNotReject(coordinator.check(true));
+
+  assert.deepEqual(getState(), { status: "idle" });
+  assert.equal(states.some((entry) => entry.status === "error"), false);
+});
+
 test("synchronous check and download throws are handled", async () => {
   const h = harness();
   h.updater.checkForUpdates = () => {

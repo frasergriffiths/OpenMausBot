@@ -3,16 +3,25 @@ const DISK = "Not enough disk space to prepare the update. Free some space, then
 const PERMISSION = "The update could not write to the app or its cache. Check folder permissions, or use the official installer.";
 const BUSY = "An update file is in use. Close other copies of OpenMausBot, then try again.";
 export const UNCONFIGURED = "Updates are not configured in this build.";
+export const NO_RELEASES = "No releases have been published yet.";
 const NEEDS_PERSON = new Set([INTEGRITY, DISK, PERMISSION, BUSY]);
 
 export function updateErrorNeedsPerson(error) {
+  if (isNoReleasesError(error)) return false;
   const message = updateErrorMessage(error);
   return message !== UNCONFIGURED && NEEDS_PERSON.has(message);
+}
+
+/** electron-updater reports an empty GitHub release feed as an error, but for the person it is simply no update yet. */
+export function isNoReleasesError(error) {
+  const detail = `${error?.code ?? ""} ${error?.message ?? error ?? ""}`;
+  return /ERR_UPDATER_NO_PUBLISHED_VERSIONS|No published versions|No releases (?:have been )?published/i.test(detail);
 }
 
 export function updateErrorMessage(error) {
   const message = String(error?.message ?? error ?? "Update failed");
   const detail = `${error?.code ?? ""} ${message}`;
+  if (isNoReleasesError(error)) return NO_RELEASES;
   if (/\bENOENT\b.*app-update\.yml|app-update\.yml.*\bENOENT\b/i.test(detail)) return UNCONFIGURED;
   // Installer errors may mention SignerCertificate details; that must not read as network advice.
   const integrity = /ERR_UPDATER_(?:INVALID_SIGNATURE|CHECKSUM_MISMATCH)/i.test(detail);

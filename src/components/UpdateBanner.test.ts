@@ -81,6 +81,12 @@ describe("UpdateBanner", () => {
     expect(html).not.toContain("Try again");
   });
 
+  it("does not surface an empty release feed as an error", () => {
+    const html = render({ status: "error", message: "ERR_UPDATER_NO_PUBLISHED_VERSIONS: No published versions" });
+    expect(html).toContain("No releases have been published yet.");
+    expect(html).not.toContain("ERR_UPDATER_NO_PUBLISHED_VERSIONS");
+  });
+
   it("shows a preparation failure with a recovery action", () => {
     const html = render({ status: "error", message: "Native staging failed" });
     expect(html).toContain("Couldn&#x27;t check for updates");
