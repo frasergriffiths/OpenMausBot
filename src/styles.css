@@ -213,6 +213,7 @@
   --chat-column-max: 60rem;
   /* Simple mode's menus; a phone rounds them like its sheets. */
   --radius-menu: 14px;
+  --radius-card: 12px;
 }
 :root[data-chat-width="wide"] {
   --chat-bubble-max: 64rem;
@@ -1163,6 +1164,27 @@ body {
    use utilities for placement and the control scale below for size, rather
    than inventing another button size. */
 @layer components {
+  /* One text-field recipe: 36px default, 28px dense, declared leading, one hairline edge. */
+  .ui-field {
+    height: 2.25rem;
+    width: 100%;
+    border-radius: var(--radius-lg, 0.5rem);
+    border: 1px solid color-mix(in srgb, var(--color-hairline) 40%, transparent);
+    background: var(--color-inset);
+    padding-inline: 0.75rem;
+    color: var(--color-ink);
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .ui-field::placeholder { color: var(--color-ink-secondary); }
+  .ui-field:disabled { opacity: 0.5; }
+  .ui-field-sm {
+    height: 1.75rem;
+    padding-inline: 0.625rem;
+    font-size: 13px;
+    line-height: 1rem;
+  }
+
   .ui-button,
   .ui-icon-button {
     display: inline-flex;

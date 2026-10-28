@@ -10,6 +10,7 @@ import { BotAvatar } from "./Avatar";
 import { InstanceProviderMark } from "./ProviderIcons";
 import { MENU_GUTTER, MENU_ICON, MENU_LABEL, MENU_LINE, MENU_NOTE, MENU_ROW, MENU_SEPARATOR, MENU_STROKE, MENU_TRAILING, SIMPLE_MENU_META, SIMPLE_MENU_ROW } from "./menu-recipe";
 import { effortLabel } from "./ModelPicker";
+import { Select } from "./Select";
 
 export type SimpleThinking =
   | { levels: readonly EffortLevel[]; current?: EffortLevel; onPick: (level: EffortLevel) => void; onReset: () => void }
@@ -151,40 +152,23 @@ function GroupBody({ group, props }: { group: MenuGroup; props: SimpleModelMenuP
 function Thinking({ thinking, labelId }: { thinking: SimpleThinking; labelId: string }) {
   if ("variants" in thinking) return <div data-simple-thinking>{thinking.variants}</div>;
   const levels = thinking;
-  const tabStop = Math.max(0, levels.levels.findIndex((level) => level === levels.current));
   return (
-    <div data-simple-thinking className="flex flex-col">
-      <div className="flex h-6 items-end justify-between gap-2 px-2 pb-0.5">
-        <span id={labelId} className="text-[12px] font-medium leading-4 text-ink-tertiary">{t("botSettings.simple.thinking")}</span>
-        {(levels.current === undefined
-          ? <span title={t("model.simple.thinkingDefault")} className="text-[12px] leading-4 text-ink-tertiary">{t("model.effort.default")}</span>
-          : (
-            <button type="button" data-simple-effort-default onClick={levels.onReset} title={t("model.simple.thinkingDefault")}
-              className="-mr-1 rounded-[5px] px-1 text-[12px] leading-4 text-ink-secondary hover:bg-ink/[0.06] hover:text-ink">
-              {t("model.simple.useDefault")}
-            </button>
-          ))}
-      </div>
-      <div data-simple-effort role="group" aria-labelledby={labelId} className="m-1 grid rounded-full bg-ink/[0.05] p-[3px]"
-        style={{ gridTemplateColumns: `repeat(${levels.levels.length}, minmax(0, 1fr))` }}>
-        {levels.levels.map((level, index) => (
-          <button
-            key={level}
-            type="button"
-            data-effort-pill
-            aria-pressed={levels.current === level}
-            tabIndex={index === tabStop ? 0 : -1}
-            title={t("model.simple.thinkingLevel", { level: effortLabel(level) })}
-            onClick={() => levels.onPick(level)}
-            className={cn(
-              "h-6 min-w-0 truncate rounded-full px-1 text-[12px] leading-4 transition-colors touch:h-8",
-              levels.current === level ? "bg-ink/[0.1] font-medium text-ink" : "text-ink-secondary hover:text-ink",
-            )}
-          >
-            {effortLabel(level)}
-          </button>
-        ))}
-      </div>
+    <div data-simple-thinking className="flex items-center justify-between gap-3 px-2 py-1">
+      <span id={labelId} className="shrink-0 text-[12px] font-medium leading-4 text-ink-tertiary">{t("botSettings.simple.thinking")}</span>
+      <Select
+        size="sm"
+        variant="quiet"
+        aria-labelledby={labelId}
+        value={levels.current ?? ""}
+        onChange={(event) => {
+          const level = event.target.value;
+          if (level) levels.onPick(level as EffortLevel);
+          else levels.onReset();
+        }}
+      >
+        <option value="">{t("model.effort.default")}</option>
+        {levels.levels.map((level) => <option key={level} value={level}>{effortLabel(level)}</option>)}
+      </Select>
     </div>
   );
 }

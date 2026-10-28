@@ -146,7 +146,7 @@ describe("Settings → Appearance", () => {
     const html = render();
     expect(html).not.toContain('<option value="general">');
     expect(html).toContain('aria-label="App language"');
-    expect(html).toContain('<option value="en">English</option>');
+    expect(html).toContain(advanced ? '<option value="en">English</option>' : 'data-select-values="|en|de|es|fr|hi|ja|pt-br|zh|zh-tw|uk|vi|tr|pl|ru|it"');
   });
 
   it("does not repeat the app language in Appearance on this computer", () => {

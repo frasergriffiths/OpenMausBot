@@ -40,14 +40,14 @@ beforeEach(() => {
 describe("room responder selector", () => {
   it("offers Auto (Jev) and shows it selected on an Auto room", () => {
     const markup = renderToStaticMarkup(createElement(DefaultResponderSelect, { group: room({ kind: "auto" }), members }));
-    expect(markup).toContain('<option value="auto" selected="">Auto (Jev)</option>');
+    expect(markup).toContain('>Auto (Jev)</span>');
     expect(markup).toContain("Jev picks who answers each plain message");
   });
 
   it("reads plain Auto, and names who answers, while Jev is off", () => {
     fixture.config = jev(false);
     const markup = renderToStaticMarkup(createElement(DefaultResponderSelect, { group: room({ kind: "auto", fallbackBotId: "theo" }), members }));
-    expect(markup).toContain('<option value="auto" selected="">Auto</option>');
+    expect(markup).toContain('>Auto</span>');
     expect(markup).toContain("Jev is off, so plain messages go to Theo");
   });
 

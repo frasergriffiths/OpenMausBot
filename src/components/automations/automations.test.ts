@@ -74,7 +74,7 @@ describe("+ New", () => {
     const onClose = vi.fn();
     const container = mount(createElement(NewAutomation, { initialText: "every morning at 9, send me a summary of my inbox", onClose, onSetUpYourself: vi.fn() }));
     expect(container.querySelector("textarea")!.getAttribute("placeholder")).toBe("e.g. every morning at 9, send me a summary of my inbox");
-    expect(container.querySelector('select[aria-label="Who should do it?"]')).not.toBeNull();
+    expect(container.querySelector('[aria-label="Who should do it?"]')).not.toBeNull();
     flushSync(() => button(container, "Set it up").click());
     expect(fixture.dispatch).toHaveBeenNthCalledWith(1, { type: "select", id: "bot-a" });
     expect(fixture.dispatch).toHaveBeenNthCalledWith(2, { type: "send", botId: "bot-a", text: "every morning at 9, send me a summary of my inbox", threadId: "thread-a" });

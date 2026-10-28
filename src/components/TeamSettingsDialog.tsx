@@ -101,15 +101,15 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
     active ? "bg-raised text-ink" : "text-ink-secondary hover:text-ink");
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onMouseDown={(event) => {
+    <div className="ui-scrim fixed inset-0 z-50 flex items-center justify-center p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget) close();
     }}>
       <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="team-settings-title" data-testid="team-settings-dialog"
-        className="max-h-[90vh] w-full max-w-[460px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-5 text-ink shadow-2xl"
+        className="menu-surface max-h-[90vh] w-full max-w-[460px] overflow-y-auto p-5 text-ink"
         onKeyDown={(event) => { if (event.key === "Escape" && !consent) { event.stopPropagation(); close(); } }}>
         <div className="mb-2 flex items-center justify-between gap-3">
-          <h2 id="team-settings-title" className="text-[17px] font-semibold">{t("teamSettings.title", { name: team || t("teamSettings.general") })}</h2>
-          <button type="button" aria-label={t("teamSettings.close")} disabled={running} onClick={close} className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised"><X size={18} /></button>
+          <h2 id="team-settings-title" className="text-[16px] font-semibold leading-[22px]">{t("teamSettings.title", { name: team || t("teamSettings.general") })}</h2>
+          <button type="button" aria-label={t("teamSettings.close")} disabled={running} onClick={close} className="flex size-8 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink"><X size={18} /></button>
         </div>
         {results && counts ? (
           <>

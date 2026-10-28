@@ -13,14 +13,16 @@ describe("ThreadConcurrencySettings", () => {
   it("keeps three as the legacy default and offers one through ten", () => {
     fixture.limit = undefined;
     const markup = renderToStaticMarkup(createElement(ThreadConcurrencySettings));
-    expect(markup).toContain('value="3" selected=""');
-    expect(markup.match(/<option /g)).toHaveLength(16);
-    expect(markup).toContain('value="16"');
+    expect(markup).toContain('>3</span>');
+    expect(markup.match(/role="combobox"/g)).toHaveLength(1);
+    expect(markup).toContain('data-select-values="1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16"');
     expect(markup).toContain("Extra messages queue until a slot opens.");
     expect(markup).toContain("Maximum running threads per bot");
   });
   it("shows the confirmed server value", () => {
     fixture.limit = 10;
-    expect(renderToStaticMarkup(createElement(ThreadConcurrencySettings))).toContain('value="10" selected=""');
+    const markup = renderToStaticMarkup(createElement(ThreadConcurrencySettings));
+    expect(markup).toContain('data-select-value="10"');
+    expect(markup).toContain('>10</span>');
   });
 });

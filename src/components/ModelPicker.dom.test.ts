@@ -161,10 +161,12 @@ describe("choosing a model with the keyboard", () => {
 
   it("moves through the Thinking steps with the arrow keys and applies one only on Enter, staying open", async () => {
     await openWith("click");
-    const low = document.querySelector<HTMLElement>("[data-effort-pill]")!;
-    low.focus();
-    press("ArrowRight");
-    expect(focused()?.textContent).toBe("Medium");
+    const trigger = document.querySelector<HTMLElement>("[data-simple-thinking] [role=\"combobox\"]")!;
+    flushSync(() => trigger.click());
+    const low = [...document.querySelectorAll<HTMLElement>('[role="option"]')].find((option) => option.textContent?.includes("Low"))!;
+    flushSync(() => low.focus());
+    press("ArrowDown");
+    expect(focused()?.textContent).toContain("Medium");
     expect(fixture.dispatch).not.toHaveBeenCalled();
     flushSync(() => focused()!.click());
     expect(fixture.dispatch).toHaveBeenLastCalledWith(expect.objectContaining({ selection: expect.objectContaining({ effort: "medium" }) }));

@@ -2,6 +2,7 @@ import { Check, Loader2, ShieldCheck, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { cn } from "@/lib/cn";
 import { t, tFromServer } from "@/lib/i18n";
 import { describePart, describeSkip, preparePictures, saveShareFile, type ShareSkip } from "@/lib/team-share";
 import { api } from "@/state/store";
@@ -166,13 +167,13 @@ export function SharePresetDialog({ onClose }: { onClose: () => void }) {
   }, []);
 
   const localSkips = includePicture ? picture?.skipped ?? [] : [];
-  const field = "mt-1 w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[14px] text-ink disabled:opacity-60";
+  const field = "ui-field mt-1 w-full disabled:opacity-60";
   return createPortal(
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/55 p-4" onMouseDown={(event) => {
+    <div className="ui-scrim fixed inset-0 z-[80] flex items-center justify-center p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget && !saving) onClose();
     }}>
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="share-preset-title" tabIndex={-1}
-        className="flex max-h-[90vh] w-full max-w-[560px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel text-ink shadow-2xl outline-none"
+        className="menu-surface flex max-h-[90vh] w-full max-w-[560px] flex-col overflow-hidden p-5 text-ink outline-none"
         onKeyDown={(event) => {
           if (event.key === "Escape" && !saving) { event.stopPropagation(); onClose(); }
           if (event.key === "Tab") {
@@ -183,15 +184,15 @@ export function SharePresetDialog({ onClose }: { onClose: () => void }) {
             else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
           }
         }}>
-        <header className="flex items-start justify-between gap-3 px-6 pb-2 pt-5">
+        <header className="flex items-start justify-between gap-3 pb-4">
           <div>
-            <h2 id="share-preset-title" className="text-[17px] font-semibold">{t("presetShare.title")}</h2>
+            <h2 id="share-preset-title" className="text-[16px] font-semibold leading-[22px]">{t("presetShare.title")}</h2>
             <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("presetShare.intro")}</p>
           </div>
           <button aria-label={t("presetShare.close")} disabled={saving} onClick={onClose} className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised"><X size={18} /></button>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-4 pt-2">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           {saved ? (
             <>
               <p className="flex items-center gap-2 text-[14px] font-medium text-ink"><Check size={16} className="text-success" />{t("teamShare.saved", { filename: saved.filename })}</p>
@@ -225,14 +226,14 @@ export function SharePresetDialog({ onClose }: { onClose: () => void }) {
                 <input value={description} maxLength={300} disabled={saving} onChange={(event) => setDescription(event.target.value)} className={field} />
               </label>
               <label className="mt-3 block text-[13px] text-ink-secondary">{t("teamShare.notes")}
-                <textarea value={notes} maxLength={4000} rows={2} disabled={saving} onChange={(event) => setNotes(event.target.value)} className={field} />
+                <textarea value={notes} maxLength={4000} rows={2} disabled={saving} onChange={(event) => setNotes(event.target.value)} className={cn(field, "h-auto py-2")} />
               </label>
             </>
           )}
         </div>
 
-        {error && <p role="alert" className="mx-6 mb-2 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</p>}
-        <footer className="flex justify-end gap-2 border-t border-hairline/35 px-6 py-3">
+        {error && <p role="alert" className="mb-2 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</p>}
+        <footer className="mt-4 flex justify-end gap-2 border-t border-hairline/35 pt-4">
           {saved ? (
             <button onClick={onClose} className="rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white">{t("teamShare.done")}</button>
           ) : (

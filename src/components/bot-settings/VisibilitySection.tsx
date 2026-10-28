@@ -123,7 +123,7 @@ export function VisibilitySection({ bot }: { bot: Bot }) {
             placeholder={t("botSettings.visibility.peoplePlaceholder")}
             rows={4}
             disabled={busy}
-            className="rounded-lg border border-hairline/40 bg-inset px-3 py-2 font-mono text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
+            className="ui-field h-auto py-2 font-mono"
           />
         </label>
       )}

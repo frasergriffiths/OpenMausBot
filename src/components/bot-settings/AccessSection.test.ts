@@ -119,7 +119,7 @@ describe("owner tool selection status", () => {
 
   it("keeps the selection editor disabled while a task is active", () => {
     const markup = render(makeBot({ busy: true }));
-    expect(markup).toContain('aria-label="Tool selection" disabled=""');
+    expect(markup).toMatch(/aria-label="Tool selection"[^>]*disabled=""/);
     expect(markup).toContain("Wait until this bot finishes all active tasks before changing its tool selection.");
   });
 });

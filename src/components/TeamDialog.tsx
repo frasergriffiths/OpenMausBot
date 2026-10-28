@@ -62,11 +62,11 @@ export function TeamDialog({ section, rename = false, onClose, onRenamed }: {
     } });
   };
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onMouseDown={(event) => {
+    <div className="ui-scrim fixed inset-0 z-50 flex items-center justify-center p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget && !saving) onClose();
     }}>
       <div ref={dialog} role="dialog" aria-modal="true" aria-labelledby="team-dialog-title"
-        className="max-h-[90vh] w-full max-w-[430px] overflow-y-auto rounded-2xl border border-hairline/50 bg-panel p-5 text-ink shadow-2xl"
+        className="menu-surface max-h-[90vh] w-full max-w-[430px] overflow-y-auto p-5 text-ink"
         onKeyDown={(event) => {
           if (event.key === "Escape" && !saving) { event.stopPropagation(); onClose(); }
           if (event.key === "Tab") {
@@ -78,8 +78,8 @@ export function TeamDialog({ section, rename = false, onClose, onRenamed }: {
           }
         }}>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 id="team-dialog-title" className="text-[17px] font-semibold">{title}</h2>
-          <button aria-label={t("team.closeDialog")} disabled={saving} onClick={onClose} className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised"><X size={18} /></button>
+          <h2 id="team-dialog-title" className="text-[16px] font-semibold leading-[22px]">{title}</h2>
+          <button aria-label={t("team.closeDialog")} disabled={saving} onClick={onClose} className="flex size-8 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink"><X size={18} /></button>
         </div>
         {(!moving || rename) && <label className="mb-3 block text-[13px] text-ink-secondary">{t("team.name")}
           <input value={name} maxLength={60} disabled={saving} onChange={(event) => setName(event.target.value)}

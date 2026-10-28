@@ -91,9 +91,9 @@ describe("app events, set up by the person", () => {
     });
     const onSaved = vi.fn();
     const container = mount(createElement(AppEventEditor, { bots: [scout], onClose: vi.fn(), onSaved }));
-    await vi.waitFor(() => expect(container.querySelector('select[aria-label="App"]')).not.toBeNull());
+    await vi.waitFor(() => expect(container.querySelector('[aria-label="App"]')).not.toBeNull());
     expect(fixture.api).toHaveBeenCalledWith("/api/app-triggers/events?botId=bot-a");
-    expect([...container.querySelectorAll('select[aria-label="App"] option')].map((option) => option.textContent)).toEqual(["Gmail"]);
+    expect(container.querySelector('[aria-label="App"]')?.getAttribute("data-select-labels")).toBe("Gmail");
     expect(container.textContent).toContain("Checks for new ones every 15 minutes.");
     type(container.querySelector('input[placeholder="acme.com"]') as HTMLInputElement, "acme.com");
     type(container.querySelector("textarea") as HTMLTextAreaElement, "Draft a reply.");

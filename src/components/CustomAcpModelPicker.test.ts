@@ -107,13 +107,14 @@ it.each(["zcode", "codebuddy", "qoder", "qodercn"])("offers discovered models in
   expect(variants.type).toBe(ModelVariantRow);
   const nativeRow = ModelVariantRow(variants.props);
   const thinking = elements(nativeRow).find((entry) => entry.type === Select)!;
-  expect(reopened.html).toContain(">high</option>");
-  expect(reopened.html).not.toContain(">Max</option>");
+  expect(reopened.html).toContain("data-select-labels=");
+  expect(reopened.html).toMatch(/data-select-labels="[^"]*high/i);
+  expect(reopened.html).not.toMatch(/data-select-labels="[^"]*max/i);
   thinking.props.onChange!({ target: { value: "1" } } as ChangeEvent<HTMLSelectElement>);
   expect(fixture.dispatch).toHaveBeenLastCalledWith({ type: "setModel", botId: selected.id, threadId: selected.threadId,
     updateBotDefault: true, selection: { instanceId, model: "glm-5.3-flash", variant: "high" } });
   fixture.values = []; fixture.index = 0; fixture.own = 0;
-  expect(openPicker({ ...saved, modelSelection: { ...saved.modelSelection, variant: "high" } }).html).toContain('selected="">high</option>');
+  expect(openPicker({ ...saved, modelSelection: { ...saved.modelSelection, variant: "high" } }).html).toContain('data-select-value="1"');
 });
 
 it.each(["zcode", "codebuddy", "qoder", "qodercn"])("uses model-specific thinking choices and saves only the selected %s bot", (instanceId) => {
@@ -123,9 +124,9 @@ it.each(["zcode", "codebuddy", "qoder", "qodercn"])("uses model-specific thinkin
   const picker = elements(row).find((entry) => entry.type === Select)!;
   const markup = renderToStaticMarkup(createElement(ModelVariantRow, { bot: selected, threadId: selected.threadId, compact: true }));
   expect(markup).toContain('aria-label="Reasoning variant"');
-  expect(markup).toContain(">Low</option>");
-  expect(markup).toContain(">Max</option>");
-  expect(markup).not.toContain(">High</option>");
+  expect(markup).toMatch(/data-select-labels="[^"]*low/i);
+  expect(markup).toMatch(/data-select-labels="[^"]*max/i);
+  expect(markup).not.toMatch(/data-select-labels="[^"]*high/i);
   picker.props.onChange!({ target: { value: "1" } } as ChangeEvent<HTMLSelectElement>);
   expect(fixture.dispatch).toHaveBeenCalledExactlyOnceWith({ type: "setModel", botId: selected.id, threadId: selected.threadId,
     updateBotDefault: true, selection: { instanceId, model: "full", variant: "max" } });
@@ -137,8 +138,8 @@ it("drops the previous model's thinking choice and displays the new model's supp
   const selection = modelSelectionForPick(bot("zcode", "full", "max").modelSelection, provider, "flash");
   expect(selection).toEqual({ instanceId: "zcode", model: "flash" });
   const markup = renderToStaticMarkup(createElement(ModelVariantRow, { bot: { ...bot("zcode"), modelSelection: selection }, compact: true }));
-  expect(markup).toContain(">Medium</option>");
-  expect(markup).toContain(">High</option>");
+  expect(markup).toMatch(/data-select-labels="[^"]*medium/i);
+  expect(markup).toMatch(/data-select-labels="[^"]*high/i);
   expect(markup).not.toContain(">Max</option>");
 });
 
@@ -147,7 +148,7 @@ it("does not borrow another custom instance's session options, and hides thinkin
   fixture.modelVariantSessions["thread-qoder"] = { instanceId: "codebuddy", model: "full", turnId: "other-turn",
     startedAt: new Date().toISOString(), acceptingUpdates: false, variants: { options: [{ id: "alien", label: "Alien" }] } };
   const markup = renderToStaticMarkup(createElement(ModelVariantRow, { bot: bot("qoder"), compact: true }));
-  expect(markup).toContain(">Max</option>");
+  expect(markup).toMatch(/data-select-labels="[^"]*max/i);
   expect(markup).not.toContain("Alien");
   fixture.instances[0] = { ...fixture.instances[0], capabilities: { modelVariants: false } };
   expect(renderToStaticMarkup(createElement(ModelVariantRow, { bot: bot("qoder"), compact: true }))).toBe("");

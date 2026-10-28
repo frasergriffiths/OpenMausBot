@@ -179,7 +179,7 @@ describe("the model picker in Simple mode", () => {
     expect(region(html, "data-current-model", 'data-simple-provider="claude"')).toContain(">Opus 5.5</span>");
     expect(labels(opened)).toEqual(["Sonnet 5.5", "Haiku 4.5"]);
     const bottom = region(html, "data-simple-effort-band");
-    for (const step of ["Low", "Medium", "High", "X-High", "Max"]) expect(bottom).toContain(`>${step}</button>`);
+    for (const step of ["Low", "Medium", "High", "X-High", "Max"]) expect(bottom).toContain(step);
     expect(bottom).toContain(">Thinking</span>");
     expect(bottom).toContain("Manage AI accounts");
     expect(html).not.toContain(">Quick</button>");
@@ -346,11 +346,10 @@ describe("the model picker in Simple mode", () => {
     const opened = open(bot("xhigh"));
     expect(thinking(opened).levels).toEqual(["low", "medium", "high", "xhigh", "max"]);
     const bottom = region(menu(opened.html), "data-simple-effort-band");
-    expect(bottom).toMatch(/aria-pressed="true"[^>]*>X-High<\/button>/);
-    expect(bottom).toContain('role="group" aria-labelledby=');
-    expect(bottom).toMatch(/data-simple-effort="true"[^>]*class="[^"]*rounded-full bg-ink\/\[0.05\] p-\[3px\]/);
-    expect(bottom).toContain('title="High thinking. Higher is slower but more careful."');
-    expect(bottom).toMatch(/title="The model decides how hard to think."[^>]*>Use default<\/button>/);
+    expect(bottom).toContain('data-select-value="xhigh"');
+    expect(bottom).toMatch(/data-select-labels="[^"]*X-High/);
+    expect(bottom).toContain('>Thinking</span>');
+    expect(bottom).not.toContain("data-simple-effort=");
     thinking(opened).onReset();
     expect(fixture.dispatch).toHaveBeenLastCalledWith({
       type: "setModel", botId: "scout", threadId: "thread-scout", updateBotDefault: true,
@@ -360,7 +359,8 @@ describe("the model picker in Simple mode", () => {
     const atDefault = region(menu(open(bot()).html), "data-simple-effort-band");
     expect(atDefault).not.toContain('aria-pressed="true"');
     expect(atDefault).not.toContain("Use default");
-    expect(atDefault).toContain('title="The model decides how hard to think." class="text-[12px] leading-4 text-ink-tertiary">Default</span>');
+    expect(atDefault).toContain('data-select-value=""');
+    expect(atDefault).toContain(">Default</span>");
   });
 
   it("names the model on the Simple chip, quiet until hovered; thinking and route stay in its tooltip and the menu", () => {
@@ -684,7 +684,7 @@ describe("the model picker in Simple mode", () => {
     fixture.values = [];
     pane(open(forBot))!.props.onSetUp(home, false);
     const full = render(forBot);
-    expect(full.html).toContain('<option value="claude-home" selected="">Home</option>');
+    expect(full.html).toContain('data-select-value="claude-home"');
   });
 
   it("lists Codex and the ChatGPT plan each under OpenAI", () => {
@@ -780,9 +780,8 @@ describe("the model picker in Simple mode", () => {
     const bottom = region(menu(opened.html), "data-simple-effort-band");
     expect(bottom).toContain('aria-label="Reasoning variant"');
     expect(bottom.indexOf(">Thinking</span>")).toBeGreaterThan(-1);
-    expect(bottom.indexOf(">Thinking</span>")).toBeLessThan(bottom.indexOf("<select"));
-    expect(bottom).toContain("bg-ink/[0.05]");
-    expect(bottom).not.toContain("data-simple-effort=");
+    expect(bottom.indexOf(">Thinking</span>")).toBeLessThan(bottom.indexOf('role="combobox"'));
+        expect(bottom).not.toContain("data-simple-effort=");
   });
 
   it("offers an OpenCode Copilot model's efforts from its catalog, and nothing for a model without them", () => {
@@ -797,12 +796,12 @@ describe("the model picker in Simple mode", () => {
     }];
     const band = (model: string) => region(menu(open(bot(undefined, "opencodeGo", model)).html), "data-simple-effort-band");
     const offered = band("github-copilot/gpt-5.3-codex");
-    expect([...offered.matchAll(/<option[^>]*>([^<]*)<\/option>/g)].map((match) => match[1]))
+    expect(offered.match(/data-select-labels="([^"]*)"/)?.[1]?.split("|"))
       .toEqual(["Use session setting", "Low", "Medium", "High", "Xhigh", "OpenCode default"]);
     fixture.values = [];
     const plain = band("github-copilot/gemini-3.8-flash");
     expect(plain).toContain("data-simple-effort-band");
-    expect(plain).not.toContain("<select");
+    expect(plain).not.toContain('role="combobox"');
     expect(plain).not.toContain("data-simple-thinking");
   });
 
@@ -938,7 +937,7 @@ describe("every capability of the picker stays reachable", () => {
       "a signed-out account signs in": body("claude-work") === "signIn",
       "a managed provider says who manages it": body("openai") === "policy" && html.includes("Managed by Acme"),
       "a provider with nothing listed checks again": body("chatgpt") === "empty" && html.includes("data-simple-refresh"),
-      "thinking levels in the provider's own names, and back to Default": html.includes(">X-High</button>") && html.includes(">Use default</button>"),
+      "thinking levels in the provider's own names, and back to Default": html.includes('data-select-labels="Default|') && html.includes(">High</span>"),
       "AI accounts in Settings": html.includes("data-simple-manage"),
     };
     expect(missingFrom(before)).toEqual([]);
@@ -953,7 +952,7 @@ describe("every capability of the picker stays reachable", () => {
       "engine rail with API keys": full.nodes.some((node) => node.type === ModelEngineRail) && fullHtml.includes(">API keys<"),
       "this thread or the bot's default": fullHtml.includes("Only this thread") && fullHtml.includes("Thread + bot default"),
       "engine status and refresh": fullHtml.includes("Sign-in required") && fullHtml.includes("data-model-refresh"),
-      "the account select": fullHtml.includes('<option value="claude-work" selected="">Work</option>'),
+      "the account select": fullHtml.includes('data-select-value="claude-work"'),
       "install and sign-in help": full.nodes.some((node) => node.type === EngineSetup),
       "providers and accounts, and API keys": fullHtml.includes("Model providers and accounts") && fullHtml.includes("data-model-add-api-keys"),
     };

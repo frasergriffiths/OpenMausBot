@@ -5,6 +5,8 @@ import { cn } from "@/lib/cn";
 import { useMenuMotion } from "./MenuMotion";
 import { popoverClosesOnKey, usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { submenuIntent, type Point, type SubmenuIntent } from "@/lib/submenu-intent";
+import { useAdvancedMode } from "@/lib/interface-mode";
+import { MENU_ROW } from "./menu-recipe";
 
 export interface SidebarMenuItem {
   key: string;
@@ -32,7 +34,7 @@ export interface SidebarMenuItem {
 const OPEN_DELAY_MS = 80;
 const CLOSE_DELAY_MS = 250;
 export const ANCHORED_MENU_WIDTH = 280;
-export const COMPACT_MENU_WIDTH = 237;
+export const COMPACT_MENU_WIDTH = 240;
 const COMPACT_SEPARATOR = "mx-2 my-[5px] h-[0.5px] shrink-0 bg-ink/10";
 const EDGE_MARGIN = 8;
 const ANCHOR_GAP = 6;
@@ -121,7 +123,7 @@ function MenuRows({
               look === "roomy"
                 ? "min-h-10 gap-3 rounded-lg px-3 py-2 text-[15px] font-medium leading-5 focus-visible:bg-menu-hover"
                 : look === "compact"
-                  ? "min-h-[30px] gap-2 rounded-md px-2 py-1.5 text-[13px] leading-[18px] focus-visible:bg-menu-hover"
+                  ? MENU_ROW
                   : "gap-3 px-3.5 py-2 text-[14px] focus-visible:bg-menu-hover",
               item.danger ? "text-danger" : "text-ink",
               item.active ? "bg-menu-active text-ink" : item.submenu && openSubmenu === item.key && engaged ? cn(look === "compact" ? "bg-menu-active" : "bg-menu-hover", "text-ink") : "hover:bg-menu-hover",
@@ -345,8 +347,10 @@ export function SidebarPopoverMenu({
   };
 
   const openItem = submenu ? items.find((item) => item.key === submenu) : undefined;
-  const look: MenuLook = !anchored ? "plain" : compact ? "compact" : "roomy";
-  const width = compact ? COMPACT_MENU_WIDTH : ANCHORED_MENU_WIDTH;
+  const advanced = useAdvancedMode();
+  // Simple mode has one anchored look: the compact menu. Advanced keeps its roomy/plain pair.
+  const look: MenuLook = !anchored ? "plain" : advanced ? (compact ? "compact" : "roomy") : "compact";
+  const width = look === "compact" ? COMPACT_MENU_WIDTH : ANCHORED_MENU_WIDTH;
   const sheetClass = look === "compact"
     ? "popover-surface flex flex-col gap-0.5 overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]"
     : cn("popover-surface overflow-hidden border border-hairline/50 bg-menu shadow-2xl shadow-black/50", look === "roomy" ? "rounded-2xl p-1.5" : "rounded-xl py-1.5");
@@ -396,7 +400,7 @@ export function SidebarPopoverMenu({
       onPointerLeave={() => setEngaged(false)}
       onFocus={() => setEngaged(true)}
       onBlur={(event) => { if (!(event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget))) setEngaged(false); }}
-      style={{ position: "fixed", left: subPosition?.left ?? 0, top: subPosition?.top ?? 0, minWidth: compact ? 200 : 220, width: "max-content", maxWidth: `min(${ANCHORED_MENU_WIDTH + 40}px, calc(100vw - ${EDGE_MARGIN * 2}px))`, maxHeight: `calc(100vh - ${EDGE_MARGIN * 2}px)`, visibility: subPosition ? undefined : "hidden" }}
+      style={{ position: "fixed", left: subPosition?.left ?? 0, top: subPosition?.top ?? 0, minWidth: look === "compact" ? 200 : 220, width: "max-content", maxWidth: `min(${ANCHORED_MENU_WIDTH + 40}px, calc(100vw - ${EDGE_MARGIN * 2}px))`, maxHeight: `calc(100vh - ${EDGE_MARGIN * 2}px)`, visibility: subPosition ? undefined : "hidden" }}
       className={cn(sheetClass, "z-[61] animate-pop-in overflow-y-auto")}
     >
       <MenuRows

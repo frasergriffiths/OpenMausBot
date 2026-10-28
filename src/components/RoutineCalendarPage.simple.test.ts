@@ -270,7 +270,7 @@ describe("routine editor", () => {
     seed: { kind: "routine", at: Date.now() + 3_600_000, durationMinutes: 30, botIds: [bot.id], routine: routineToEdit },
     bots: [bot], onClose: vi.fn(), onSavedCall: vi.fn(),
   }));
-  const hidden = ['<select aria-label="Repeat"', "Routine safety limit", "Runs the whole job on the bot&#x27;s cloud desktop", "Add attachment", "Post results to", "Routine type"];
+  const hidden = ["Routine safety limit", "Runs the whole job on the bot&#x27;s cloud desktop", "Add attachment", "Post results to", "Routine type"];
 
   it("keeps Simple mode to the basics with everything else behind More options", () => {
     const html = editor();
@@ -310,7 +310,7 @@ describe("routine editor", () => {
     const ownGoal: Routine = { ...routine, id: "own-goal", name: "Ship the fix", target: "room-goal", groupId: undefined, resultsThreadId: undefined };
     const html = editor(ownGoal);
     expect(html).toContain("Where it runs");
-    expect(html).toMatch(/<option value="" selected="">Just the bot, in its own chat<\/option>/);
+    expect(html).toContain('data-select-labels="Just the bot, in its own chat');
     expect(html).toContain("The bot works on the goal in its own chat until it is done.");
     expect(html).toContain("Runner");
     expect(html).not.toContain("Create a group from the sidebar first");

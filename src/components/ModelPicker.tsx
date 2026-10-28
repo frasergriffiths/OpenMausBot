@@ -615,19 +615,9 @@ export function ModelPicker({
       }
       return;
     }
-    if (target instanceof HTMLSelectElement) return;
+    // The thinking row is its own listbox: it owns its Arrow/Home/End keys.
+    if (target.closest("[data-simple-thinking]")) return;
     const rtl = getComputedStyle(menu).direction === "rtl";
-    const pills = target.closest("[data-simple-effort]");
-    if (pills) {
-      const buttons = [...pills.querySelectorAll<HTMLElement>("button:not(:disabled)")];
-      const step = { ArrowRight: rtl ? "ArrowUp" : "ArrowDown", ArrowLeft: rtl ? "ArrowDown" : "ArrowUp", Home: "Home", End: "End" }[event.key];
-      const next = step ? nextMenuIndex(step, buttons.indexOf(target), buttons.length) : null;
-      if (next !== null) {
-        handled();
-        buttons[next]?.focus();
-      }
-      return;
-    }
     const search = menu.querySelector<HTMLInputElement>("[data-menu-search]");
     if (target instanceof HTMLInputElement && target !== search) return;
     const rows = [...menu.querySelectorAll<HTMLElement>("[data-menu-row]:not(:disabled)")];

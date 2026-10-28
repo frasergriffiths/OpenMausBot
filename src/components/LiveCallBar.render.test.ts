@@ -138,7 +138,7 @@ describe("LiveCallSettings", () => {
     expect(markup).toContain("Read replies to typed messages");
     expect(markup).toContain(`When this is off, messages you type during a call and the bot&#x27;s answers to them are not sent to OpenAI.`);
     expect(markup).toContain(`A Live call sends your voice to OpenAI, along with the chat&#x27;s recent messages, the bot&#x27;s answers and the details of any approval it asks for. The OpenAI key stays on your computer.`);
-    expect(markup).toMatch(/<option value="5" selected="">5<\/option>/);
+    expect(markup).toContain('>5</span>');
     expect(markup).toContain("Change key");
     expect(markup).not.toContain("Remove key");
     expect(markup).toMatch(/role="dialog" tabindex="-1"/);

@@ -91,7 +91,7 @@ describe("the header model chip and Switch AI", () => {
     act(() => root.render(createElement(ModelPicker, { bot: busyBot, threadId: "thread-1", contained: true })));
     act(() => requestAiSwitch({ botId: "maus", threadId: "thread-1", turnId: "turn-1", place: "panel" }));
     expect(document.querySelector("[data-model-picker-content]")).not.toBeNull();
-    expect(document.querySelector("[data-simple-effort]")).toBeNull();
+    expect(document.querySelector("[data-simple-thinking]")).toBeNull();
   });
 
   it("shows no thinking-level buttons in the chat's menu while the turn runs: the server refuses them until it ends", () => {
@@ -101,9 +101,9 @@ describe("the header model chip and Switch AI", () => {
     show(busyBot);
     act(() => requestAiSwitch({ botId: "maus", threadId: "thread-1", turnId: "turn-1", place: "header" }));
     expect(document.querySelector("[data-model-picker-content]")).not.toBeNull();
-    expect(document.querySelector("[data-simple-effort]")).toBeNull();
+    expect(document.querySelector("[data-simple-thinking]")).toBeNull();
     show({ ...busyBot, busy: false });
-    expect(document.querySelector("[data-simple-effort]")).not.toBeNull();
+    expect(document.querySelector("[data-simple-thinking]")).not.toBeNull();
   });
 
   it("ignores an intent for another place", () => {

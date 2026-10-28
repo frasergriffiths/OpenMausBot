@@ -25,10 +25,9 @@ describe("a bot's backup models", () => {
 
   it("lets each backup choose any model its engine offers, not only the default", () => {
     const markup = renderToStaticMarkup(createElement(FallbackChain, { bot: bot([{ instanceId: "codex", model: "gpt-a" }]), onChange: vi.fn() }));
-    const picker = markup.match(/<select[^>]*aria-label="Model for Codex"[^>]*>(.*?)<\/select>/)?.[1];
-    expect(picker).toBeDefined();
-    expect(picker).toContain('<option value="gpt-a" selected="">GPT-A</option>');
-    expect(picker).toContain('<option value="gpt-b">GPT-B</option>');
+    expect(markup).toContain('aria-label="Model for Codex"');
+    expect(markup).toContain('data-select-value="gpt-a"');
+    expect(markup).toContain('data-select-values="gpt-a|gpt-b"');
   });
 
   it("saves the model chosen for a backup and leaves the other backups as they were", () => {
@@ -48,6 +47,7 @@ describe("a bot's backup models", () => {
 
   it("keeps showing a saved model the engine no longer lists", () => {
     const markup = renderToStaticMarkup(createElement(FallbackChain, { bot: bot([{ instanceId: "codex", model: "gpt-old" }]), onChange: vi.fn() }));
-    expect(markup).toMatch(/aria-label="Model for Codex"[^>]*>.*<option value="gpt-old" selected="">gpt-old<\/option>/);
+    expect(markup).toContain('aria-label="Model for Codex"');
+    expect(markup).toContain('data-select-value="gpt-old"');
   });
 });

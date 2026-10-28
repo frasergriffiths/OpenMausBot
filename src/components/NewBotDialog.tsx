@@ -179,7 +179,7 @@ export function NewBotDialog({ defaultsMode = false, onClose, onCreated, readyBo
                 onChange={(event) => setPeople(event.target.value)}
                 placeholder={t("botSettings.visibility.peoplePlaceholder")}
                 aria-label={t("botSettings.visibility.peopleLabel")}
-                className="min-w-[16rem] flex-1 rounded-lg border border-hairline/40 bg-inset px-3 py-1.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
+                className="ui-field min-w-[16rem] flex-1"
               />
             )}
           </div>

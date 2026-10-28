@@ -2,6 +2,7 @@ import { Check, Loader2, ShieldCheck, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { cn } from "@/lib/cn";
 import { t, tFromServer } from "@/lib/i18n";
 import {
   describePart,
@@ -230,15 +231,15 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
     else next.add(skill);
     setSkillChoice(next);
   };
-  const field = "mt-1 w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[14px] text-ink disabled:opacity-60";
+  const field = "ui-field mt-1 w-full disabled:opacity-60";
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" onMouseDown={(event) => {
+    <div className="ui-scrim fixed inset-0 z-[60] flex items-center justify-center p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget && !saving) onClose();
     }}>
       <div aria-hidden="true" className="glass-scrim pointer-events-none absolute inset-0" />
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="share-team-title" tabIndex={-1}
-        className="glass-surface relative flex max-h-[90vh] w-full max-w-[620px] flex-col overflow-hidden rounded-2xl text-ink outline-none"
+        className="menu-surface relative flex max-h-[90vh] w-full max-w-[620px] flex-col overflow-hidden p-5 text-ink outline-none"
         onKeyDown={(event) => {
           if (event.key === "Escape" && !saving) { event.stopPropagation(); onClose(); }
           if (event.key === "Tab") {
@@ -249,16 +250,16 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
             else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
           }
         }}>
-        <header className="flex items-start justify-between gap-3 px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
+        <header className="flex items-start justify-between gap-3 pb-4">
           <div className="min-w-0">
-            <h2 id="share-team-title" className="truncate text-[20px] font-semibold leading-7 tracking-[-0.01em]">{t("teamShare.title", { name: team || t("teamLibrary.general") })}</h2>
+            <h2 id="share-team-title" className="truncate text-[16px] font-semibold leading-[22px]">{t("teamShare.title", { name: team || t("teamLibrary.general") })}</h2>
             <p className="mt-0.5 text-[13px] leading-5 text-ink-secondary">{t("teamShare.intro")}</p>
           </div>
           <button type="button" aria-label={t("teamShare.close")} disabled={saving} onClick={onClose} className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink disabled:opacity-50"><X size={18} /></button>
         </header>
 
         {saved ? (
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-1 sm:px-7">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             <p className="flex items-center gap-2 text-[14px] font-medium text-ink"><Check size={16} className="text-success" />{t("teamShare.saved", { filename: saved.filename })}</p>
             <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("teamShare.savedHint")}</p>
             <div className="mt-4">
@@ -266,7 +267,7 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
             </div>
           </div>
         ) : (
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 pt-1 sm:px-7">
+          <div className="min-h-0 flex-1 overflow-y-auto">
             {preview
               ? <ShareTeamContents preview={preview} includeMemory={includeMemory} localSkips={includePictures ? pictures?.skipped ?? [] : []} />
               : !error && <div className="flex items-center gap-2 py-6 text-[13px] text-ink-secondary"><Loader2 size={15} className="animate-spin" />{t("teamShare.preparing")}</div>}
@@ -299,19 +300,19 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
             </div>
             <p className="mt-1 text-[12px] text-ink-secondary">{t("teamShare.releaseHint")}</p>
             <label className="mt-3 block text-[13px] text-ink-secondary">{t("teamShare.notes")}
-              <textarea value={notes} maxLength={4000} rows={2} disabled={saving} onChange={(event) => setNotes(event.target.value)} className={field} />
+              <textarea value={notes} maxLength={4000} rows={2} disabled={saving} onChange={(event) => setNotes(event.target.value)} className={cn(field, "h-auto py-2")} />
             </label>
             <label className="mt-3 block text-[13px] text-ink-secondary">{t("teamShare.tagline")}
               <input value={tagline} maxLength={160} disabled={saving} onChange={(event) => setTagline(event.target.value)} className={field} />
             </label>
             <label className="mt-3 block text-[13px] text-ink-secondary">{t("teamShare.summary")}
-              <textarea value={summary} maxLength={2000} rows={2} disabled={saving} onChange={(event) => setSummary(event.target.value)} className={field} />
+              <textarea value={summary} maxLength={2000} rows={2} disabled={saving} onChange={(event) => setSummary(event.target.value)} className={cn(field, "h-auto py-2")} />
             </label>
           </div>
         )}
 
-        {error && <p role="alert" className="mx-5 mb-2 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger sm:mx-7">{error}</p>}
-        <footer className="flex justify-end gap-2 border-t border-hairline/35 px-5 py-4 sm:px-7">
+        {error && <p role="alert" className="mb-2 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</p>}
+        <footer className="mt-4 flex justify-end gap-2 border-t border-hairline/35 pt-4">
           {saved ? (
             <button type="button" onClick={onClose} className="flex h-9 items-center rounded-full bg-accent px-4 text-[13px] font-medium text-white">{t("teamShare.done")}</button>
           ) : (

@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { useCopyFeedback } from "@/lib/copy-text";
 import { t } from "@/lib/i18n";
 
-export const SIMPLE_CARD = "rounded-[12px] border-[0.5px] border-(--settings-edge) bg-menu py-2";
+export const SIMPLE_CARD = "rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu py-2";
 
 export function Switch({
   checked,
@@ -45,7 +45,7 @@ export function Card({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl bg-card p-4 max-md:rounded-2xl in-data-[settings-look=simple]:rounded-[12px] in-data-[settings-look=simple]:border-[0.5px] in-data-[settings-look=simple]:border-(--settings-edge) in-data-[settings-look=simple]:bg-menu">
+    <div className="rounded-xl bg-card p-4 max-md:rounded-2xl in-data-[settings-look=simple]:rounded-[var(--radius-card)] in-data-[settings-look=simple]:border-[0.5px] in-data-[settings-look=simple]:border-(--settings-edge) in-data-[settings-look=simple]:bg-menu">
       {title && <div className="text-[16px] font-semibold text-ink in-data-[settings-look=simple]:text-[14px] in-data-[settings-look=simple]:leading-5 in-data-[settings-look=simple]:font-medium">{title}</div>}
       {subtitle && <div className={cn(title && "mt-0.5", "text-[13px] leading-relaxed text-ink-secondary in-data-[settings-look=simple]:leading-[18px]")}>{subtitle}</div>}
       {children && <div className={title || subtitle ? "mt-4" : undefined}>{children}</div>}

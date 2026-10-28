@@ -34,9 +34,9 @@ describe("conversation turn limit", () => {
     ));
     expect(markup).toContain('data-testid="conversation-turn-limit"');
     expect(markup).toContain("Default (5 min)");
-    expect(markup).toContain("30 minutes");
-    expect(markup).toContain("selected");
-    expect(markup).toContain('value="default"');
+    expect(markup).toMatch(/data-select-values="[^"]*\b30\b/);
+    expect(markup).toContain('aria-expanded="false"');
+    expect(markup).toContain("Default (5 min)");
   });
 
   it("selects a saved 30 minute limit on that conversation only", () => {
@@ -50,6 +50,6 @@ describe("conversation turn limit", () => {
         ]),
       }),
     ));
-    expect(markup).toContain('value="30" selected');
+    expect(markup).toMatch(/data-select-values="[^"]*\b30\b/);
   });
 });

@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   ANCHORED_MENU_WIDTH,
+  COMPACT_MENU_WIDTH,
   SidebarPopoverMenu,
   anchoredMenuPosition,
   nextMenuIndex,
@@ -102,19 +103,19 @@ describe("the anchored menu in a document", () => {
     host.remove();
   });
 
-  it("portals one 280px sheet to the body, with the group divider and the trailing value and chevron", async () => {
+  it("portals one 240px sheet to the body, with the group divider and the trailing value and chevron", async () => {
     await act(async () => trigger().click());
     const menu = sheet()!;
     expect(menu.parentElement).toBe(document.body);
     expect(menu.style.position).toBe("fixed");
-    expect(menu.style.width).toBe(`${ANCHORED_MENU_WIDTH}px`);
+    expect(menu.style.width).toBe(`${COMPACT_MENU_WIDTH}px`);
     expect(menu.getAttribute("role")).toBe("menu");
     expect(menu.querySelectorAll('[role="separator"]')).toHaveLength(1);
     expect(menu.textContent).toContain("Pro");
     const support = [...menu.querySelectorAll('[role="menuitem"]')].find((node) => node.textContent?.includes("Help and support"))!;
     expect(support.getAttribute("aria-haspopup")).toBe("menu");
     expect(support.querySelector("svg")).not.toBeNull();
-    expect(menu.querySelector('[role="menuitem"]')!.className).toContain("text-[15px]");
+    expect(menu.querySelector('[role="menuitem"]')!.className).toContain("text-[13px]");
   });
 
   it("opens from the keyboard on the first item and walks the items", async () => {

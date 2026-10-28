@@ -137,9 +137,9 @@ describe("Settings in Simple mode", () => {
     expect(html).not.toContain("data-settings-group=");
     expect(html).not.toContain("data-settings-section=");
     expect(html).not.toMatch(/class="(?:[^"]*\s)?uppercase(?:\s[^"]*)?"/);
-    for (const hidden of ["backups", "experimental", "workspaces", "skills"]) expect(html).not.toContain(`value="${hidden}"`);
-    const picker = html.match(/<select aria-label="Settings"[\s\S]*?<\/select>/)![0];
-    expect([...picker.matchAll(/<option value="([^"]+)"/g)].map((match) => match[1])).toEqual(["general", "ai", "computer", "billing", "updates"]);
+    const picker = html.match(/aria-label="Settings"[^>]*data-select-values="([^"]*)"/)![1].split("|");
+    expect(picker).toEqual(["general", "ai", "computer", "billing", "updates"]);
+    for (const hidden of ["backups", "experimental", "workspaces", "skills"]) expect(picker).not.toContain(hidden);
     expect(html).toContain('data-settings-look="simple"');
   });
 

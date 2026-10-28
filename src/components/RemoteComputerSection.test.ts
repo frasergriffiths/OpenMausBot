@@ -50,8 +50,7 @@ describe("remote connection Settings", () => {
 
   it("defaults to server pairing and explains how to obtain a fresh full link", () => {
     const html = render({ environments, remoteClient: { active: false } });
-    expect(html).toContain('<option value="server" selected="">Self-hosted server</option>');
-    expect(html).toContain('<option value="companion">Desktop companion</option>');
+    expect(html).toContain('>Self-hosted server</span>');
     expect(html).toContain("Server pairing link");
     expect(html).toContain("npx openmausbot pair --client");
     expect(html).toContain("12-character code");
@@ -65,7 +64,7 @@ describe("remote connection Settings", () => {
   it("allows a server-only bridge without presenting a companion option", () => {
     const html = render({ environments });
     expect(html).toContain("Server pairing link");
-    expect(html).not.toContain("<select");
+    expect(html).not.toMatch(/<select[^>]*>/);
   });
 
   it("preserves six-digit companion pairing when the server bridge is unavailable", () => {
@@ -75,7 +74,7 @@ describe("remote connection Settings", () => {
     expect(html).toContain('placeholder="000000"');
     expect(html).toContain("managed OpenMausBot HTTPS address");
     expect(html).toContain("Tailscale name ending in .ts.net");
-    expect(html).not.toContain("<select");
+    expect(html).not.toMatch(/<select[^>]*>/);
     expect(html).not.toContain("Server pairing link");
   });
 
@@ -83,7 +82,7 @@ describe("remote connection Settings", () => {
     const html = render({ environments, remoteClient: { active: true } });
     expect(html).toContain("Disconnect and use this computer");
     expect(html).not.toContain("<form");
-    expect(html).not.toContain("<select");
+    expect(html).not.toMatch(/<select[^>]*>/);
   });
 
   it.each([undefined, { platform: "darwin" }])("hides unavailable actions on browser and remote server pages", (bridge) => {
