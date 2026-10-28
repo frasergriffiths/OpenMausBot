@@ -126,6 +126,24 @@ describe("sidebar rows", () => {
     expect(document.body.textContent).toContain(t("task.updated.hours", { count: 1 }));
   });
 
+  it("keeps the advanced focus ring on expanded thread rows", () => {
+    const row = document.querySelector('[data-sidebar-thread-row="atlas-now"]')!;
+    expect(row.className).toContain("focus-visible:ring-1");
+    expect(row.className).not.toContain("focus-visible:outline-2");
+  });
+
+  it("gives expanded advanced thread rows the advanced focus ring", () => {
+    const row = document.querySelector<HTMLElement>('[data-sidebar-thread-row="atlas-now"]')!;
+    expect(row.className).toContain("focus-visible:ring-1");
+    expect(row.className).not.toContain("focus-visible:outline-focus");
+  });
+
+  it("gives expanded advanced thread rows the advanced focus ring", () => {
+    const row = document.querySelector<HTMLElement>('[data-sidebar-thread-row="atlas-now"]')!;
+    expect(row.className).toContain("focus-visible:ring-1");
+    expect(row.className).not.toContain("focus-visible:outline-focus");
+  });
+
   it("renders no row for a store event no row shows", async () => {
     expect(await rowRendersAfter(update((current) => reducer(current, { type: "toggleSettings", open: true }))))
       .toEqual({ bots: {}, threads: {} });
