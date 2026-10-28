@@ -3305,7 +3305,6 @@
   "computer.mac.permission.driverDetail": "Chi tiết trình điều khiển",
   "computer.mac.permission.allowControl": "Cho phép điều khiển máy tính này",
   "computer.mac.permission.openSystemSettings": "Mở Cài đặt Hệ thống",
-  "computer.mac.permission.retry": "Thử lại",
   "computer.mac.permission.openSettings": "Mở Cài đặt hệ thống",
   "computer.mac.permission.relaunchHint": "Đã cấp quyền rồi? Hãy khởi chạy lại OpenMausBot.",
   "computer.mac.permission.settingsHint": "Cấp quyền trong Cài đặt hệ thống rồi quay lại — thẻ này sẽ tự cập nhật.",

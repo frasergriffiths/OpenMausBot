@@ -3970,7 +3970,6 @@
   "computer.mac.permission.driverDetail": "Сведения о драйвере",
   "computer.mac.permission.allowControl": "Разрешить управление этим компьютером",
   "computer.mac.permission.openSystemSettings": "Открыть Системные настройки",
-  "computer.mac.permission.retry": "Повторить",
   "computer.mac.permission.openSettings": "Открыть Системные настройки",
   "computer.mac.permission.relaunchHint": "Уже разрешили? Перезапустите OpenMausBot.",
   "computer.mac.permission.settingsHint": "Разрешите доступ в Системных настройках и вернитесь — эта карточка обновится сама.",

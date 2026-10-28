@@ -2814,7 +2814,6 @@
   "computer.mac.permission.driverDetail": "驅動程式詳細資訊",
   "computer.mac.permission.allowControl": "允許控制此電腦",
   "computer.mac.permission.openSystemSettings": "開啟系統設定",
-  "computer.mac.permission.retry": "重試",
   "computer.mac.permission.openSettings": "開啟系統設定",
   "computer.mac.permission.relaunchHint": "已經授權？請重新啟動 OpenMausBot。",
   "computer.mac.permission.settingsHint": "請在系統設定中授予存取權，然後返回——此卡片會自動更新。",

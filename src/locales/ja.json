@@ -3994,7 +3994,6 @@
   "computer.mac.permission.driverDetail": "ドライバーの詳細",
   "computer.mac.permission.allowControl": "このコンピューターの制御を許可",
   "computer.mac.permission.openSystemSettings": "システム設定を開く",
-  "computer.mac.permission.retry": "再試行",
   "computer.mac.permission.openSettings": "システム設定を開く",
   "computer.mac.permission.relaunchHint": "すでに許可しましたか？OpenMausBot を再起動してください。",
   "computer.mac.permission.settingsHint": "システム設定でアクセスを許可してから戻ってください。このカードは自動的に更新されます。",

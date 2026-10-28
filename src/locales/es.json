@@ -3540,7 +3540,6 @@
   "computer.mac.permission.driverDetail": "Detalles del controlador",
   "computer.mac.permission.allowControl": "Permitir el control de este equipo",
   "computer.mac.permission.openSystemSettings": "Abrir Ajustes del sistema",
-  "computer.mac.permission.retry": "Reintentar",
   "computer.mac.permission.openSettings": "Abrir Ajustes del Sistema",
   "computer.mac.permission.relaunchHint": "¿Ya lo concediste? Reinicia OpenMausBot.",
   "computer.mac.permission.settingsHint": "Concede el acceso en Ajustes del Sistema y vuelve — esta tarjeta se actualiza sola.",

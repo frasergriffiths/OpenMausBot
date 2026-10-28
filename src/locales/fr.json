@@ -2431,7 +2431,6 @@
   "templates.invalidJson": "Ce fichier de sauvegarde ou d’équipe n’est pas un JSON valide.",
   "computer.mac.permission.allowControl": "Autoriser le contrôle de cet ordinateur",
   "computer.mac.permission.openSystemSettings": "Ouvrir les Réglages Système",
-  "computer.mac.permission.retry": "Réessayer",
   "computer.mac.permission.accessibilitySettings": "Ouvrir les réglages d’accessibilité",
   "computer.mac.permission.screenSettings": "Ouvrir les réglages d’enregistrement de l’écran",
   "computer.mac.permission.requiredBoth": "L’enregistrement de l’écran et l’accessibilité sont requis pour qu’OpenMausBot utilise cet ordinateur. Accordez-les dans Réglages Système → Confidentialité et sécurité, puis relancez OpenMausBot.",

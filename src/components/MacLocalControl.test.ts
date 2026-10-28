@@ -25,7 +25,6 @@ const ALWAYS_VISIBLE = [
   "computer.mac.permission.accessibilityName",
   "computer.mac.permission.granted",
   "computer.mac.permission.notGranted",
-  "computer.mac.permission.retry",
   "computer.mac.permission.relaunch",
 ] as const;
 
@@ -45,9 +44,9 @@ describe("Mac local computer permission card", () => {
     expect(markup).toContain("Granted");
     expect(markup).toContain("Not granted");
     expect(markup).toContain("Open Accessibility Settings");
-    expect(markup).toContain("Retry");
+    expect(markup).not.toContain("Retry");
+    expect(markup).not.toContain("border-t border-ink/[0.045]");
     expect(markup).not.toContain("Technical details");
-    expect(markup).toContain("Retry");
   });
 
   it("uses the app card surface and accent, never a warning or danger wash", () => {

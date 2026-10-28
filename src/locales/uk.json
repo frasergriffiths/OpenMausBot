@@ -2874,7 +2874,6 @@
   "templates.invalidJson": "Цей файл резервної копії або команди не є коректним JSON.",
   "computer.mac.permission.allowControl": "Дозволити керування цим комп’ютером",
   "computer.mac.permission.openSystemSettings": "Відкрити Системні налаштування",
-  "computer.mac.permission.retry": "Повторити",
   "computer.mac.permission.accessibilitySettings": "Відкрити налаштування універсального доступу",
   "computer.mac.permission.screenSettings": "Відкрити налаштування запису екрана",
   "computer.mac.permission.requiredBoth": "Для використання цього комп’ютера OpenMausBot потрібні дозволи «Запис екрана» та «Універсальний доступ». Надайте їх у Системних налаштуваннях → Конфіденційність і безпека, а потім перезапустіть OpenMausBot.",

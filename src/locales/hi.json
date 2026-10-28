@@ -2431,7 +2431,6 @@
   "templates.invalidJson": "यह बैकअप या टीम फ़ाइल मान्य JSON नहीं है।",
   "computer.mac.permission.allowControl": "इस कंप्यूटर पर नियंत्रण की अनुमति दें",
   "computer.mac.permission.openSystemSettings": "सिस्टम सेटिंग्स खोलें",
-  "computer.mac.permission.retry": "पुनः प्रयास करें",
   "computer.mac.permission.accessibilitySettings": "एक्सेसिबिलिटी सेटिंग्स खोलें",
   "computer.mac.permission.screenSettings": "स्क्रीन रिकॉर्डिंग सेटिंग्स खोलें",
   "computer.mac.permission.requiredBoth": "OpenMausBot को इस कंप्यूटर का उपयोग करने के लिए स्क्रीन रिकॉर्डिंग और एक्सेसिबिलिटी आवश्यक हैं। सिस्टम सेटिंग्स → गोपनीयता और सुरक्षा में इन्हें अनुमति दें, फिर OpenMausBot को फिर से शुरू करें।",

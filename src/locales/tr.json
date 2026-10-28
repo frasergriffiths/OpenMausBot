@@ -3305,7 +3305,6 @@
   "computer.mac.permission.driverDetail": "Sürücü ayrıntıları",
   "computer.mac.permission.allowControl": "Bu bilgisayarın denetimine izin ver",
   "computer.mac.permission.openSystemSettings": "Sistem Ayarlarını Aç",
-  "computer.mac.permission.retry": "Yeniden dene",
   "computer.mac.permission.openSettings": "Sistem Ayarları’nı Aç",
   "computer.mac.permission.relaunchHint": "Zaten izin verdiniz mi? OpenMausBot’u yeniden başlatın.",
   "computer.mac.permission.settingsHint": "Sistem Ayarları’nda erişime izin verin, sonra geri dönün — bu kart kendini günceller.",

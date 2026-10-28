@@ -3837,7 +3837,6 @@
   "computer.mac.permission.driverDetail": "Dettaglio driver",
   "computer.mac.permission.allowControl": "Consenti il controllo di questo computer",
   "computer.mac.permission.openSystemSettings": "Apri Impostazioni di Sistema",
-  "computer.mac.permission.retry": "Riprova",
   "computer.mac.permission.openSettings": "Apri Impostazioni di Sistema",
   "computer.mac.permission.relaunchHint": "Hai già concesso? Riavvia OpenMausBot.",
   "computer.mac.permission.settingsHint": "Concedi l’accesso in Impostazioni di Sistema, poi torna qui — questa scheda si aggiorna da sola.",

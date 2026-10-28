@@ -23,7 +23,6 @@ const PANE_SETTINGS = {
 // must look the same in the computer panel, in Settings and in the chat transcript.
 // One filled action at the panel's only button height; 288 cap keeps it from becoming a slab in Settings and chat.
 const PRIMARY = "inline-flex h-8 w-full max-w-[18rem] items-center justify-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium leading-[18px] text-accent-ink hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";
-const TERTIARY = "shrink-0 rounded-md px-2 py-1.5 text-[13px] font-medium text-ink-secondary hover:bg-ink/[0.04] hover:text-ink disabled:cursor-not-allowed disabled:opacity-50";
 
 /** The permission card's one look. `MacLocalControl` mounts it in the panel and Settings; ChatView mounts it
  * directly in a failed turn so a setup step is not painted as a crash. */
@@ -193,11 +192,6 @@ export function MacCuaPermissionCard({ permissions, logReason }: { permissions: 
             {pending && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {primaryLabel}
           </button>
-          <div className="mt-2 flex min-h-10 items-center justify-between gap-3 border-t border-ink/[0.045] pt-1">
-            <button type="button" onClick={() => void retry()} disabled={pending} className={TERTIARY}>
-              {pending ? t("common.checking") : t("computer.mac.permission.retry")}
-            </button>
-          </div>
         </div>
       </section>
     </Card>

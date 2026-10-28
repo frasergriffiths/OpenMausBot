@@ -551,7 +551,7 @@ describe("thread control placement", () => {
     expect(screen).toContain('data-mac-cua-actions=""');
     expect(screen).toContain("Open Screen Recording Settings");
     expect(screen).toContain("Open System Settings");
-    expect(screen).toContain("Retry");
+    expect(screen).not.toContain("Retry");
     expect(screen).not.toContain("Open Accessibility Settings");
     expect(screen).toContain(">Open System Settings<");
     fixture.localMessage = "Accessibility required";

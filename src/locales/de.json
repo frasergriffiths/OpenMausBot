@@ -2449,7 +2449,6 @@
   "templates.invalidJson": "Diese Sicherungs- oder Teamdatei ist kein gültiges JSON.",
   "computer.mac.permission.allowControl": "Steuerung dieses Computers erlauben",
   "computer.mac.permission.openSystemSettings": "Systemeinstellungen öffnen",
-  "computer.mac.permission.retry": "Wiederholen",
   "computer.mac.permission.accessibilitySettings": "Bedienungshilfen-Einstellungen öffnen",
   "computer.mac.permission.screenSettings": "Bildschirmaufnahme-Einstellungen öffnen",
   "computer.mac.permission.requiredBoth": "Bildschirmaufnahme und Bedienungshilfen werden benötigt, damit OpenMausBot diesen Computer verwenden kann. Erteile beide Berechtigungen in den Systemeinstellungen → Datenschutz & Sicherheit und starte OpenMausBot anschließend neu.",

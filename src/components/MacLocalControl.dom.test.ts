@@ -66,21 +66,19 @@ afterEach(async () => {
 });
 
 describe("the Mac permission card actions", () => {
-  it("offers one filled action and a quiet Retry", async () => {
+  it("offers one filled action and no Retry", async () => {
     await mount();
     const primary = button("Open System Settings")!;
-    const retry = button("Retry")!;
     expect(primary.className).toContain("h-8");
     expect(primary.className).toContain("max-w-[18rem]");
     expect(primary.className).not.toContain("danger");
     expect(primary.className).not.toContain("rounded-full");
     expect(primary.className).toContain("bg-accent");
     expect(button("Relaunch OpenMausBot")).toBeUndefined();
+    expect(button("Retry")).toBeUndefined();
+    expect(container.querySelector(".border-t")).toBeNull();
     // The row's name carries the status the label would otherwise hide from a screen reader.
     expect(row("Screen Recording")!.getAttribute("aria-label")).toBe("Screen Recording, Not granted. Open Screen Recording Settings");
-    expect(retry.className).toContain("text-[13px]");
-    expect(retry.className).not.toContain("bg-accent");
-    expect(retry.className).not.toContain("rounded-full");
   });
 
   it("opens only the first missing pane from the primary action", async () => {
@@ -128,23 +126,22 @@ describe("the Mac permission card actions", () => {
     expect(fixture.permOpenSettings.mock.calls).toEqual([["privacy"]]);
   });
 
-  it("relaunches from the filled slot once a grant is pending, and retries from the quiet button", async () => {
+  it("relaunches from the filled slot once a grant is pending", async () => {
     await mount();
     await act(async () => button("Open System Settings")!.click());
     await act(async () => { window.dispatchEvent(new Event("focus")); });
     await flush();
     await act(async () => button("Relaunch OpenMausBot")!.click());
     expect(fixture.relaunch).toHaveBeenCalledTimes(1);
-    await act(async () => button("Retry")!.click());
-    await flush();
-    // One automatic re-check when the window regains focus, then the quiet Retry button.
-    expect(fixture.retry).toHaveBeenCalledTimes(2);
+    // One automatic re-check when the window regains focus; there is no manual Retry.
+    expect(fixture.retry).toHaveBeenCalledTimes(1);
   });
 
-  it("shows a thrown retry as one alert line and keeps the card usable", async () => {
+  it("shows a thrown automatic re-check as one alert line and keeps the card usable", async () => {
     fixture.retry.mockRejectedValueOnce(new Error("boom"));
     await mount();
-    await act(async () => button("Retry")!.click());
+    await act(async () => button("Open System Settings")!.click());
+    await act(async () => { window.dispatchEvent(new Event("focus")); });
     await flush();
     const alerts = container.querySelectorAll('[role="alert"]');
     expect(alerts).toHaveLength(1);
