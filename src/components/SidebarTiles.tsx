@@ -5,7 +5,7 @@ import { botShowsUnread } from "@/lib/bot-unread";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { useLiveMedia } from "@/lib/live-call-media";
-import { stateForBot } from "@/lib/mascot";
+import { MAUS_COLORS, mascotInk, stateForBot } from "@/lib/mascot";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { api, openBot, useStore, type Bot } from "@/state/store";
 import { useChiefStepOpen } from "@/lib/default-bot";
@@ -90,7 +90,7 @@ export const SidebarBotTile = memo(function SidebarBotTile({ primary = false, dr
           animated={working || unread || (mascotMotion?.kind ?? "none") !== "none"}
         />
         {primary && bot.chiefOfStaff && (
-          <span data-testid="chief-badge" className={cn("absolute -bottom-px -right-px flex size-4 items-center justify-center rounded-full bg-[#E8993A] text-white", RING)}>
+          <span data-testid="chief-badge" className={cn("absolute -bottom-px -right-px flex size-4 items-center justify-center rounded-full", RING)} style={{ backgroundColor: MAUS_COLORS[bot.color], color: mascotInk(bot.color) }}>
             <Crown size={10} strokeWidth={1.5} fill="currentColor" aria-hidden="true" />
           </span>
         )}
