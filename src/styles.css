@@ -1625,8 +1625,8 @@ body {
    sliders, colour wells and file pickers are not text fields: they have no
    border to repaint, so they keep the ring, or a keyboard user tabbing onto
    one sees nothing. */
-:is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus,
-:is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible {
+:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus,
+:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible {
   outline: none;
 }
 
@@ -1640,7 +1640,7 @@ body {
    in the focus colour.
    A field reporting an error (aria-invalid) keeps its danger border, so the
    red does not vanish while the user is fixing it. */
-:is(input, textarea, select):focus-visible:not([aria-invalid="true"]) {
+:root[data-interface="simple"] :is(input, textarea, select):focus-visible:not([aria-invalid="true"]) {
   border-color: var(--color-focus);
 }
 
@@ -1649,7 +1649,7 @@ body {
    focus too. Unlayered, so a component's own `focus:ring-*` cannot give a
    neighbouring field a different ring. The prompt composer and the model
    picker's search keep their own chrome. */
-:is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible:not([aria-invalid="true"]):not([data-menu-search]):not([data-tour="composer"] textarea) {
+:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible:not([aria-invalid="true"]):not([data-menu-search]):not([data-tour="composer"] textarea) {
   outline: none;
   border-color: var(--color-focus);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus) 28%, transparent);
@@ -1657,7 +1657,7 @@ body {
 
 /* One field radius: every text field takes the skin's control radius, so a
    dialog, a settings row and a sidebar filter agree. */
-:is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea):not([data-menu-search], [data-tour="composer"] textarea) {
+:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea):not([data-menu-search], [data-tour="composer"] textarea) {
   border-radius: var(--radius-lg, 0.5rem);
 }
 
