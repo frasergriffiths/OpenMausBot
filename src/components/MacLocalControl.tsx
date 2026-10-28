@@ -3,6 +3,7 @@ import { AlertTriangle, Check, ChevronRight, Circle, Loader2, Shield } from "luc
 import { Card } from "./SettingsPrimitives";
 import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { macCuaPermissionMessage, missingMacCuaPermissions, type MacCuaPermission } from "@/lib/mac-cua-permissions";
+import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { plainErrorLine } from "@/lib/plain-error";
 
@@ -20,9 +21,9 @@ const PANE_SETTINGS = {
 
 // Explicit controls, not .ui-button: Simple Settings rewrites every .ui-button into an ink pill, and this card
 // must look the same in the computer panel, in Settings and in the chat transcript.
-const PRIMARY = "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-ink hover:brightness-110 disabled:opacity-50";
-const SECONDARY = "inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-control px-3 text-[13px] font-medium text-ink hover:bg-raised-hover disabled:opacity-50";
-const TERTIARY = "rounded-md px-1.5 py-1 text-[13px] font-medium text-ink-secondary hover:bg-ink/[0.04] hover:text-ink disabled:opacity-50";
+const PRIMARY = "inline-flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-ink hover:brightness-110 disabled:opacity-50";
+const SECONDARY = "inline-flex h-8 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-control px-3 text-[13px] font-medium text-ink hover:bg-raised-hover disabled:opacity-50";
+const TERTIARY = "shrink-0 rounded-md px-2 py-1 text-[13px] font-medium text-ink-secondary hover:bg-ink/[0.04] hover:text-ink disabled:opacity-50";
 
 /** The permission card's one look. `MacLocalControl` mounts it in the panel and Settings; ChatView mounts it
  * directly in a failed turn so a setup step is not painted as a crash. */
@@ -113,9 +114,7 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
     ? t("common.checking")
     : primaryIsRelaunch
       ? t("computer.mac.permission.relaunch")
-      : missingPane
-        ? t(PANE_SETTINGS[missingPane])
-        : t("computer.mac.permission.openSettings");
+      : t("computer.mac.permission.openSystemSettings");
   const primaryAction = () => {
     if (primaryIsRelaunch) void relaunch();
     else if (missingPane) void openSettings(missingPane);
@@ -124,49 +123,75 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
 
   return (
     <Card>
-      <section data-mac-permission-card="" className="px-3.5 py-3.5">
-        <span className="mb-2.5 flex text-accent-text">
-          <Shield size={20} aria-hidden="true" />
-        </span>
-        <div className="min-w-0">
-          <h3 className="text-[16px] font-semibold leading-[22px] text-ink">{t("computer.mac.permission.title")}</h3>
-          <p className="mt-1.5 text-[13px] leading-5 text-ink-secondary">
-            {known ? macCuaPermissionMessage(permissions) : t("computer.mac.permission.generic")}
-          </p>
-          {known && (
-            <ul className="mt-3 divide-y divide-hairline/30 rounded-lg border border-hairline/40 px-3">
-              {PANE_ORDER.map((pane) => {
-                const granted = !permissions.includes(pane);
-                const waiting = awaitingGrant && !granted && pane === missingPane;
-                return (
-                  <li key={pane} className="flex min-h-8 items-center gap-2 text-[13px] text-ink">
-                    {granted
-                      ? <Check size={14} className="shrink-0 text-success" aria-hidden="true" />
-                      : waiting
-                        ? <Loader2 size={14} className="shrink-0 animate-spin text-ink-tertiary" aria-hidden="true" />
-                        : <Circle size={14} className="shrink-0 text-ink-tertiary" aria-hidden="true" />}
-                    <span className="min-w-0 flex-1 truncate">{t(PANE_NAME[pane])}</span>
-                    <span className={granted ? "shrink-0 text-[11px] font-medium text-success" : waiting ? "shrink-0 text-[11px] font-medium text-ink-tertiary" : "shrink-0 text-[11px] font-medium text-ink-secondary"}>
-                      {granted ? t("computer.mac.permission.granted") : waiting ? t("computer.mac.permission.waiting") : t("computer.mac.permission.notGranted")}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-          {awaitingGrant && <p className="mt-2 text-[12px] leading-4 text-ink-secondary">{t("computer.mac.permission.settingsHint")}</p>}
-          {stillMissing && relaunchAvailable && <p className="mt-2 text-[12px] leading-4 text-ink-secondary">{t("computer.mac.permission.relaunchHint")}</p>}
-          {error && (
-            <p role="alert" className="mt-2 flex items-start gap-1.5 text-[13px] leading-5 text-danger">
-              <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-              <span className="min-w-0 break-words">{error}</span>
+      <section data-mac-permission-card="" className="px-4 py-4">
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent-text">
+            <Shield size={17} aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-[15px] font-semibold leading-5 text-ink">{t("computer.mac.permission.title")}</h3>
+            <p className="mt-1 text-[13px] leading-[18px] text-ink-secondary">
+              {known ? macCuaPermissionMessage(permissions) : t("computer.mac.permission.generic")}
             </p>
-          )}
-          <div data-mac-cua-actions="" className="mt-3 flex flex-wrap items-center gap-2">
-            <button type="button" onClick={primaryAction} disabled={pending} className={PRIMARY}>
-              {pending && <Loader2 size={13} className="animate-spin" aria-hidden="true" />}
-              {primaryLabel}
-            </button>
+          </div>
+        </div>
+        {known && (
+          <ul className="mt-3 overflow-hidden divide-y divide-hairline/30 rounded-xl border border-hairline/40">
+            {PANE_ORDER.map((pane) => {
+              const granted = !permissions.includes(pane);
+              const waiting = awaitingGrant && !granted && pane === missingPane;
+              const status = granted
+                ? t("computer.mac.permission.granted")
+                : waiting
+                  ? t("computer.mac.permission.waiting")
+                  : t("computer.mac.permission.notGranted");
+              const body = (
+                <>
+                  {granted
+                    ? <Check size={14} className="shrink-0 text-success" aria-hidden="true" />
+                    : waiting
+                      ? <Loader2 size={14} className="shrink-0 animate-spin text-ink-tertiary" aria-hidden="true" />
+                      : <Circle size={14} className="shrink-0 text-ink-tertiary" aria-hidden="true" />}
+                  <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink">{t(PANE_NAME[pane])}</span>
+                  <span className={cn("shrink-0 whitespace-nowrap text-[12px]", granted ? "text-success" : waiting ? "text-ink-tertiary" : "text-ink-secondary")}>{status}</span>
+                </>
+              );
+              return (
+                <li key={pane} className="min-w-0">
+                  {granted ? (
+                    <div className="flex min-h-10 items-center gap-2.5 px-3">{body}</div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void openSettings(pane)}
+                      disabled={pending}
+                      aria-label={t(PANE_SETTINGS[pane])}
+                      title={t(PANE_SETTINGS[pane])}
+                      className="flex min-h-10 w-full items-center gap-2.5 px-3 text-left hover:bg-ink/[0.03] disabled:opacity-60"
+                    >
+                      {body}
+                      <ChevronRight size={14} className="shrink-0 text-ink-tertiary" aria-hidden="true" />
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        {awaitingGrant && <p className="mt-2 text-[12px] leading-4 text-ink-secondary">{t("computer.mac.permission.settingsHint")}</p>}
+        {stillMissing && relaunchAvailable && <p className="mt-2 text-[12px] leading-4 text-ink-secondary">{t("computer.mac.permission.relaunchHint")}</p>}
+        {error && (
+          <p role="alert" className="mt-2 flex items-start gap-1.5 text-[13px] leading-5 text-danger">
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <span className="min-w-0 break-words">{error}</span>
+          </p>
+        )}
+        <div data-mac-cua-actions="" className="mt-3.5">
+          <button type="button" onClick={primaryAction} disabled={pending} className={PRIMARY}>
+            {pending && <Loader2 size={13} className="animate-spin" aria-hidden="true" />}
+            {primaryLabel}
+          </button>
+          <div className="mt-2 flex items-center gap-2">
             {!primaryIsRelaunch && known && relaunchAvailable && (
               <button type="button" onClick={() => void relaunch()} disabled={pending} className={SECONDARY}>
                 {t("computer.mac.permission.relaunch")}
@@ -177,20 +202,20 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
                 {t(PANE_SETTINGS[missingPane])}
               </button>
             )}
-            <button type="button" onClick={() => void retry()} disabled={pending} className={TERTIARY}>
+            <button type="button" onClick={() => void retry()} disabled={pending} className={cn(TERTIARY, "ml-auto")}>
               {t("computer.mac.permission.retry")}
             </button>
           </div>
-          {reason && (
-            <details className="group mt-3 border-t border-hairline/30 pt-2">
-              <summary className="flex w-fit cursor-pointer list-none items-center gap-1 text-[12px] leading-4 text-ink-secondary hover:text-ink [&::-webkit-details-marker]:hidden">
-                <ChevronRight size={14} className="transition-transform group-open:rotate-90" aria-hidden="true" />
-                {t("computer.mac.permission.technicalDetails")}
-              </summary>
-              <p className="mt-2 max-h-24 overflow-y-auto break-words rounded-lg bg-inset px-3 py-2 text-[12px] leading-5 text-ink-secondary">{reason}</p>
-            </details>
-          )}
         </div>
+        {reason && (
+          <details className="group mt-3 border-t border-hairline/30 pt-2.5">
+            <summary className="flex w-fit cursor-pointer list-none items-center gap-1 rounded-md py-0.5 text-[12px] leading-4 text-ink-secondary hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [&::-webkit-details-marker]:hidden">
+              <ChevronRight size={14} className="transition-transform group-open:rotate-90" aria-hidden="true" />
+              {t("computer.mac.permission.technicalDetails")}
+            </summary>
+            <p className="mt-2 max-h-24 overflow-y-auto break-words rounded-lg bg-inset px-3 py-2 text-[12px] leading-5 text-ink-secondary">{reason}</p>
+          </details>
+        )}
       </section>
     </Card>
   );

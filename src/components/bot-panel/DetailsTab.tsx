@@ -34,7 +34,7 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
         </div>
       </Card>
 
-      <SettingsPage bot={bot} derived={derived} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} />
+      <SettingsPage bot={bot} derived={derived} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} embedded />
 
       <Card anchor="conversations">
         <NavRow data-panel-page="threads" icon={MessagesSquare} title={t("botPanel.page.threads")} value={threads} onClick={() => onOpen("threads")} />

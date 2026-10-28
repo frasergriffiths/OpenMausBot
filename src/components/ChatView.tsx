@@ -1135,13 +1135,13 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
           {/* The model and the bot's computer stay in view in both modes; Simple mode moves only ⋯ into the bot panel. */}
           {!remoteClient && !phone && <ModelPicker key={bot.threadId} bot={bot} threadId={bot.threadId} />}
           <LiveCallChip currentBotId={bot.id} onOpen={(botId, threadId) => openThread(dispatch, { botId, threadId }, state, showThreads)} />
-          {!phoneMenu && <button
+          {/* The bot's computer lives in the side panel's Computer tab in Simple mode, so the header keeps no monitor. */}
+          {!phoneMenu && !simpleHead && <button
             data-tour="computer"
             onClick={(event) => { if (advanced) { if (!state.computerOpen) rememberComputerPanelOpen({ botId: bot.id, opener: event.currentTarget, tabs: event.detail === 0 }); dispatch({ type: "toggleComputer" }); } else dispatch({ type: "toggleSettings", open: true, section: "access", botId: bot.id }); }}
             className={cn(
-              "relative",
-              simpleHead ? "flex size-8 items-center justify-center rounded-full transition-colors hover:bg-ink/[0.06]" : "rounded-md p-1.5 hover:bg-raised",
-              (advanced ? state.computerOpen : state.settingsOpen && state.botSettingsSection === "access") ? "text-accent" : "text-ink-secondary hover:text-ink",
+              "relative rounded-md p-1.5 hover:bg-raised",
+              state.computerOpen ? "text-accent" : "text-ink-secondary hover:text-ink",
             )}
             title={t("chat.computer")} aria-label={busy && place === "browser" ? `${t("chat.computer")}, ${t("place.live")}` : t("chat.computer")}
           >

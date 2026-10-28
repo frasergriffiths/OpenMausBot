@@ -81,14 +81,13 @@ describe("the header's right side", () => {
     return { markup, controls: markup.slice(markup.indexOf("data-chathead-controls"), markup.indexOf("role=\"log\"")) };
   };
 
-  it("keeps the model picker and the bot's computer in view in Simple mode, with ⋯ left to the bot panel", () => {
+  it("keeps the model picker in view in Simple mode, leaving the computer to the bot panel", () => {
     fixture.advanced = false;
     try {
       const { markup, controls } = header();
       expect(controls).toContain("data-test-model-control");
       expect(fixture.model).toMatchObject({ threadId: "selected" });
-      const computer = controls.match(/<button[^>]*data-tour="computer"[^>]*>/)?.[0] ?? "";
-      expect(computer.split(" ")).toEqual(expect.arrayContaining(["rounded-full", "size-8"]));
+      expect(controls).not.toContain('data-tour="computer"');
       expect(markup).not.toContain('data-testid="chat-more"');
       expect(fixture.menus.find((menu) => menu.ariaLabel === "More")).toBeUndefined();
       expect(markup).toContain("data-chathead-pill");
@@ -558,7 +557,7 @@ describe("thread control placement", () => {
     expect(screen).toContain("Relaunch OpenMausBot");
     expect(screen).toContain("Retry");
     expect(screen).not.toContain("Open Accessibility Settings");
-    expect(screen).not.toContain(">Open System Settings<");
+    expect(screen).toContain(">Open System Settings<");
     fixture.localMessage = "Accessibility required";
     const accessibility = renderToStaticMarkup(createElement(ErrorRow, {
       message: "OpenMausBot can't use this computer yet — Accessibility required",
