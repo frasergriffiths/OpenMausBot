@@ -6643,5 +6643,7 @@
   "botPanel.library.data": "Data",
   "sidebar.switchServerAddCloud": "Add a Cloud…",
   "sidebar.switchServerConnect": "Connect to a server…",
-  "sidebar.switchServerForget": "Forget “{name}”…"
+  "sidebar.switchServerForget": "Forget “{name}”…",
+  "composer.placeholder.steerUnavailable": "{name} is working — this engine can’t take steering, so {key} queues it",
+  "composer.send.steerUnavailable": "Queue for {name} — this engine can’t steer"
 }

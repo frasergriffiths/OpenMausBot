@@ -45,6 +45,10 @@ export function composerPlaceholder({ simple, busySend, locked, approval, attach
       ? t("composer.placeholder.steerQueued", { name: busyName, key: sendLabel })
       : t("composer.placeholder.steer", { name: busyName, key: sendLabel });
   }
+  // Steer is chosen but this engine cannot take a message mid-turn: say so instead of queueing as if nothing was picked.
+  if (busy && busySend === "steer") {
+    return t("composer.placeholder.steerUnavailable", { name: busyName, key: sendLabel });
+  }
   if (busy) {
     return group
       ? t("composer.placeholder.queueGroup", { name: busyName, key: sendLabel })
@@ -71,6 +75,10 @@ export function sendLabels({ simple, busySend, busy, canSteer, name, sendLabel }
   if (busy && canSteer && busySend === "steer") {
     const steer = simple ? t("composer.send.steerSimple", { name }) : t("composer.send.steer");
     return { label: steer, title: steer };
+  }
+  if (busy && busySend === "steer") {
+    const queue = t("composer.send.steerUnavailable", { name });
+    return { label: queue, title: queue };
   }
   if (busy) {
     return simple

@@ -125,16 +125,12 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
   return (
     <Card>
       <section data-mac-permission-card="" className="px-4 py-4">
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent-text">
-            <Shield size={17} aria-hidden="true" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-[15px] font-semibold leading-5 text-ink">{t("computer.mac.permission.title")}</h3>
-            <p className="mt-1 text-[13px] leading-[18px] text-ink-secondary">
-              {known ? macCuaPermissionMessage(permissions) : t("computer.mac.permission.generic")}
-            </p>
-          </div>
+        <div className="min-w-0">
+          <Shield size={17} className="text-accent-text" aria-hidden="true" />
+          <h3 className="mt-2 text-[15px] font-semibold leading-5 text-ink">{t("computer.mac.permission.title")}</h3>
+          <p className="mt-1 text-[13px] leading-[18px] text-ink-secondary">
+            {known ? macCuaPermissionMessage(permissions) : t("computer.mac.permission.generic")}
+          </p>
         </div>
         {known && (
           <ul className="mt-3 overflow-hidden divide-y divide-hairline/30 rounded-xl border border-hairline/40">

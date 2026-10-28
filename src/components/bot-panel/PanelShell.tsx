@@ -114,33 +114,37 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
       {page === null ? (
         <>
           <div ref={editorRef} className="relative">
-            <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-hairline/40 px-4">
-              <button
-                type="button"
-                data-panel-avatar
-                aria-label={t("botPanel.avatar.edit", { name: bot.name })}
-                aria-expanded={editorOpen}
-                onClick={() => setEditorOpen((open) => !open)}
-                className="group relative shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-border"
-              >
-                <BotAvatar bot={bot} size={32} state={derived.activeState} />
-                <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center rounded-full bg-black/0 text-white opacity-0 transition-[opacity,background-color] group-hover:bg-black/40 group-hover:opacity-100 group-focus-visible:bg-black/40 group-focus-visible:opacity-100 group-focus-within:bg-black/40 group-focus-within:opacity-100 touch:opacity-100">
-                  <Pencil size={14} />
-                </span>
-                {bot.chiefOfStaff && (
-                  <span aria-hidden="true" className="absolute -left-1 -top-1 flex size-5 items-center justify-center rounded-full ring-2 ring-app" style={{ backgroundColor: MAUS_COLORS[bot.color], color: mascotInk(bot.color) }}>
-                    <Crown size={11} fill="currentColor" />
+            <div data-panel-header="" className="flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3">
+              <div data-panel-leading="" className="flex w-[34px] shrink-0 justify-center">
+                <button
+                  type="button"
+                  data-panel-avatar
+                  aria-label={t("botPanel.avatar.edit", { name: bot.name })}
+                  aria-expanded={editorOpen}
+                  onClick={() => setEditorOpen((open) => !open)}
+                  className="group relative shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-border"
+                >
+                  <BotAvatar bot={bot} size={32} state={derived.activeState} />
+                  <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center rounded-full bg-black/0 text-white opacity-0 transition-[opacity,background-color] group-hover:bg-black/40 group-hover:opacity-100 group-focus-visible:bg-black/40 group-focus-visible:opacity-100 group-focus-within:bg-black/40 group-focus-within:opacity-100 touch:opacity-100">
+                    <Pencil size={14} />
                   </span>
-                )}
-              </button>
+                  {bot.chiefOfStaff && (
+                    <span aria-hidden="true" className="absolute -left-1 -top-1 flex size-5 items-center justify-center rounded-full ring-2 ring-app" style={{ backgroundColor: MAUS_COLORS[bot.color], color: mascotInk(bot.color) }}>
+                      <Crown size={11} fill="currentColor" />
+                    </span>
+                  )}
+                </button>
+              </div>
               <div className="min-w-0 flex-1">
                 <h2 id="bot-settings-title" className="truncate text-[15px] font-semibold leading-5 text-ink" title={bot.name}>{bot.name}</h2>
                 {bot.title.trim() && <p className="truncate text-[12px] leading-4 text-ink-secondary" title={bot.title}>{bot.title}</p>}
               </div>
               <ChatShareMenu bot={bot} className={roundButtonCls} />
-              <button type="button" onClick={onClose} aria-label={t("botSettings.simple.close")} className={roundButtonCls}>
-                <X size={16} className="pointer-events-none" />
-              </button>
+              <div data-panel-close="" className="flex w-[34px] shrink-0 justify-end">
+                <button type="button" onClick={onClose} aria-label={t("botSettings.simple.close")} className={roundButtonCls}>
+                  <X size={16} className="pointer-events-none" />
+                </button>
+              </div>
             </div>
             {editorOpen && (
               <>
@@ -182,14 +186,18 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           </div>
         </>
       ) : (
-        <div className="flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3">
-          <button type="button" data-panel-back onClick={back} aria-label={backLabel} className={cn(roundButtonCls, "shrink-0")}>
-            <ArrowLeft size={16} className="pointer-events-none" />
-          </button>
+        <div data-panel-header="" className="flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3">
+          <div data-panel-leading="" className="flex w-[34px] shrink-0 justify-start">
+            <button type="button" data-panel-back onClick={back} aria-label={backLabel} className={cn(roundButtonCls, "shrink-0")}>
+              <ArrowLeft size={16} className="pointer-events-none" />
+            </button>
+          </div>
           <h2 className="min-w-0 flex-1 truncate text-[17px] font-semibold leading-6 text-ink">{t(PAGES[page].title, { name: bot.name })}</h2>
-          <button type="button" onClick={onClose} aria-label={t("botSettings.simple.close")} className={roundButtonCls}>
-            <X size={16} className="pointer-events-none" />
-          </button>
+          <div data-panel-close="" className="flex w-[34px] shrink-0 justify-end">
+            <button type="button" onClick={onClose} aria-label={t("botSettings.simple.close")} className={roundButtonCls}>
+              <X size={16} className="pointer-events-none" />
+            </button>
+          </div>
         </div>
       )}
 
