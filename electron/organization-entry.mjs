@@ -71,9 +71,9 @@ export function createOrganizationEntry({ readState, confirm, saveEnvironments, 
       const state = readState();
       if (!state.restartIntent || state.remoteAccess) return false;
       await saveEnvironments(environments.withActive(state.environments, environments.LOCAL_ID));
-        // Document loading is not React readiness: keep the intent until the Organisation panel acknowledges its mount.
-      await openLocalSettings();
-      return true;
+      // Organization sign-in lives only in the welcome row now: clear the old Settings intent and show home.
+      await clearRestartIntent();
+      return false;
     },
     async settingsOpened() {
       const state = readState();

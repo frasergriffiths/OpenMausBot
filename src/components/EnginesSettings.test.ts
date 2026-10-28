@@ -166,7 +166,8 @@ describe("Settings → Engines → setup cards", () => {
     }));
     const companyOnly = renderToStaticMarkup(createElement(EnginesSettings));
     for (const driver of ["claudeAgent", "codex", "openai-compat"]) expect(companyOnly).toContain(`Company ${driver}`);
-    expect(companyOnly).toContain("managed by your organization");
+    expect(companyOnly).toContain("data-company-models");
+    expect(companyOnly).not.toContain("managed by your organization");
     for (const control of ["Set CLI", "CLI path and updates", "Sign out of ChatGPT", "Update Claude", "fixture login", "Add another Claude account", "Add another ChatGPT account"]) expect(companyOnly).not.toContain(control);
     fixture.instances.push({ instanceId: "personal", displayName: "Personal Claude", driverKind: "claudeAgent", cliDefault: "claude",
       snapshot: { state: "available" }, models: { default: "sonnet", options: [] } });

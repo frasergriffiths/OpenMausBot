@@ -55,8 +55,6 @@ import { Select } from "./Select";
 import { BrowserProfilesRow, ColorUserBubblesRow, AdvancedModeRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, RunCardRow, SendKeyRow, ShowThreadsRow, SidebarDensityRow, ToolCallsRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
 import { SIMPLE_ADVANCED_ONLY, SimpleAiPage, SimpleBillingPage, SimpleComputerPage, SimpleGeneralPage, SimpleKeysPage, SimpleLooksPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId } from "./SettingsSimplePages";
 import { Chevron } from "./chevron";
-import { companyInstanceFor } from "@/lib/company-models";
-import { CompanyModels } from "./CompanyModels";
 
 // labelKey, not a label: t() reads the active pack when called, so a label resolved at module scope would freeze the
 // boot language.
@@ -368,19 +366,6 @@ export function SettingsModal() {
             subtitle={t("settings.connections.subtitle")}
           >
             <div className="flex flex-col gap-4">
-              {(() => {
-                const company = ["anthropic", "openai", "openrouter"].map((id) => {
-                  const instance = companyInstanceFor(state.instances, id);
-                  return { id, configured: Boolean(instance), models: instance?.models.options.map((option) => option.id) ?? [] };
-                });
-                if (!company.some((provider) => provider.configured)) return null;
-                return (
-                  <div data-company-models className="flex flex-col gap-2">
-                    <div className="text-[12px] font-medium uppercase tracking-wide text-ink-secondary">{t("settings.companyModels.title")}</div>
-                    <CompanyModels providers={company} />
-                  </div>
-                );
-              })()}
               {state.config?.composio.mode === "managed" ? (
                 <div className="rounded-lg border border-success/25 bg-success/10 px-3 py-2 text-[13px] text-success">
                   {t("settings.connections.ready")}

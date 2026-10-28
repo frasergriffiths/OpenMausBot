@@ -1,6 +1,6 @@
 # Optional personal OMB Cloud account
 
-Personal Cloud is independent of Settings → Organization, the hosted Companion
+Personal Cloud is independent of organization sign-in during onboarding, the hosted Companion
 account, local profile fields, providers, bots and chat history. Fresh startup
 without a saved Cloud credential makes no Cloud request and opens no browser.
 Cloud authentication is optional; its failure never blocks free local use.

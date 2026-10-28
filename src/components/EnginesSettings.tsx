@@ -16,6 +16,7 @@ import { Select } from "./Select";
 import { SettingsDisclosureRow, SettingsGroup, SettingsRows } from "./SettingsPrimitives";
 import { InstanceProviderMark } from "./ProviderIcons";
 import { Chevron } from "./chevron";
+import { CompanyModels } from "./CompanyModels";
 
 interface ProbeResult {
   ok: boolean;
@@ -342,7 +343,6 @@ function EngineRow({ instance, bare = false }: { instance: InstanceInfo; bare?: 
   </EngineCard>;
   if (instance.readOnly) return <EngineCard instance={instance} bare={bare}>
     {policyNote}
-    <p className="text-[13px] leading-relaxed text-ink-secondary">{t("organization.managedEngine")}</p>
     {!engineReady(instance) && <p className="mt-2 text-[12px] text-ink-secondary">{t("organization.engineUnavailable")}</p>}
   </EngineCard>;
 
@@ -454,6 +454,14 @@ export function EnginesSettings({ simple = false, more }: { simple?: boolean; mo
 
   if (simple && more) return <SimpleEngines rows={rows} isReady={isReady} renderEngine={renderEngine} more={more} />;
 
+  // Company models ride on managed instances; group them by the provider family they belong to.
+  const companyProvider = (instance: InstanceInfo) =>
+    instance.driverKind === "claudeAgent" ? "anthropic" : instance.driverKind === "codex" ? "openai" : "openrouter";
+  const company = ["anthropic", "openai", "openrouter"].map((id) => {
+    const instances = state.instances.filter((instance) => (instance.managed || instance.readOnly) && companyProvider(instance) === id);
+    return { id, configured: instances.length > 0, models: instances.flatMap((instance) => instance.models.options.map((option) => option.id)) };
+  });
+
   return (
     <div className="flex min-w-0 flex-col gap-6 pb-2">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -463,6 +471,12 @@ export function EnginesSettings({ simple = false, more }: { simple?: boolean; mo
         </div>
         <RefreshEngines />
       </div>
+      {company.some((provider) => provider.configured) && (
+        <div data-company-models className="mx-4 flex flex-col gap-2 rounded-xl border border-hairline/40 bg-card p-3">
+          <div className="text-[12px] font-medium uppercase tracking-wide text-ink-secondary">{t("settings.companyModels.title")}</div>
+          <CompanyModels providers={company} />
+        </div>
+      )}
       <EngineSections instances={rows} isReady={isReady} renderEngine={renderEngine} />
       <CacheKeepWarmSettings />
     </div>

@@ -466,7 +466,6 @@
   "organization.actionFailed": "无法完成此操作。请刷新连接后再试一次。",
   "organization.working": "正在打开浏览器…",
   "organization.cancel": "取消登录",
-  "organization.managedEngine": "此公司连接由你的组织管理。若要刷新或中断连接，请前往“设置 → 组织”。个人提供者账户各自独立。",
   "organization.engineUnavailable": "公司访问权目前无法使用。请检查组织连接及对应个人模型提供方的安装；请勿在此登录个人账户。",
   "organization.modelCount": "已核准的模型：{count}",
   "organization.notConfigured": "尚未设置",

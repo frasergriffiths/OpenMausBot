@@ -147,14 +147,11 @@ test("companion confirmation commits restart intent before relaunch and only loc
   await h.entry.request();
   assert.equal(h.calls.length, 3, "a second link cannot repeat the pending restart");
   const restarted = createOrganizationEntry(h.options);
-  assert.equal(await restarted.restore(), true);
-  assert.deepEqual(h.calls.slice(3).map(call => call[0]), ["save", "open-local"]);
+  assert.equal(await restarted.restore(), false, "there is no settings page to reopen");
+  assert.deepEqual(h.calls.slice(3).map(call => call[0]), ["save", "clear"]);
   assert.equal(h.state.environments.activeId, "local");
   assert.deepEqual(h.state.environments.environments, [remote]);
-  assert.equal(h.state.restartIntent, true, "document loading must not consume the durable intent");
-  assert.equal(await restarted.settingsOpened(), true);
-  assert.deepEqual(h.calls.at(-1), ["clear"]);
-  assert.equal(h.state.restartIntent, false);
+  assert.equal(h.state.restartIntent, false, "the old Settings intent clears at launch");
   assert.equal(await restarted.settingsOpened(), false);
   assert.equal(await restarted.restore(), false);
 });
@@ -173,17 +170,6 @@ test("remote or unsolicited panel acknowledgments cannot clear a confirmed resta
   }
 });
 
-test("a process exit between document loading and panel mount retries the destination on restart", async () => {
-  const h = fixture({ restartIntent: true });
-  await h.entry.restore();
-  assert.equal(h.state.restartIntent, true);
-  const restarted = createOrganizationEntry(h.options);
-  assert.equal(await restarted.restore(), true);
-  assert.equal(h.calls.filter(call => call[0] === "open-local").length, 2);
-  assert.equal(await restarted.settingsOpened(), true);
-  assert.equal(h.state.restartIntent, false);
-});
-
 test("a failed credential write cannot disconnect or restart", async () => {
   const h = fixture({ remoteAccess: companion });
   const entry = createOrganizationEntry({ ...h.options, disconnectAndRemember: async () => { throw new Error("write failed"); } });
@@ -193,30 +179,23 @@ test("a failed credential write cannot disconnect or restart", async () => {
   assert.deepEqual(h.calls.map(call => call[0]), ["confirm"]);
 });
 
-test("failed local loading keeps the confirmed restart intent for the next launch", async () => {
-  const h = fixture({ restartIntent: true });
-  const entry = createOrganizationEntry({ ...h.options, openLocalSettings: async () => { throw new Error("load failed"); } });
-  await assert.rejects(entry.restore(), /load failed/);
-  assert.equal(h.state.restartIntent, true);
-  assert.deepEqual(h.calls.map(call => call[0]), ["save"]);
-});
-
 test("native entry checks owned server readiness before creating, sending to, or navigating a window", () => {
   const main = readFileSync(new URL("./main.mjs", import.meta.url), "utf8");
   const navigation = main.slice(main.indexOf("  openLocalSettings: async () => {"), main.indexOf("  relaunch: relaunchAfterDesktopRemoteChange"));
   assert.match(navigation, /if \(!serverReady\) throw new Error\(/);
   const guard = navigation.indexOf("if (!serverReady)");
-  for (const action of ["createWindow(", "win.webContents.send(", "win.loadURL("]) {
-    assert.ok(navigation.indexOf(action) > guard, `${action} must follow the owned-server guard`);
-  }
+  assert.ok(navigation.indexOf("await showHome()") > guard, "home must follow the owned-server guard");
+  assert.ok(!navigation.includes("desktop-settings=organization"), "no route to the removed settings page");
+  assert.ok(!navigation.includes('send("app:open-settings", "organization")'), "no route to the removed settings page");
 });
 
-test("startup delivers a pending organisation action before default navigation and falls back after cancellation", () => {
+test("startup clears an old organisation intent and falls back to home", () => {
   const main = readFileSync(new URL("./main.mjs", import.meta.url), "utf8");
   const startup = main.slice(main.indexOf("  let restoredOrganizationEntry = false;"), main.indexOf("  // Reconcile incomplete setup"));
-  assert.ok(startup.indexOf("await deliverOrganizationEntry()") < startup.indexOf("await showHome()"));
+  assert.ok(startup.includes("organizationEntry.restore()"));
+  assert.ok(!startup.includes("deliverOrganizationEntry"));
   // A launch from the login item lending added opens no window: lending runs out of sight until the person opens it.
-  assert.match(startup, /if \(!hiddenStart && !restoredOrganizationEntry && !deliveredOrganizationEntry && !deliveredCloudEntry\) await showHome\(\);/);
+  assert.match(startup, /if \(!hiddenStart && !restoredOrganizationEntry && !deliveredCloudEntry\) await showHome\(\);/);
 });
 
 test("concurrent links share one confirmation and stale confirmations cannot change a new selection", async () => {

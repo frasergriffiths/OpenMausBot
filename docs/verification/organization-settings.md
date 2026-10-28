@@ -21,9 +21,8 @@ The smoke checks:
   and library after Refresh without changing the bot's chosen local avatar.
   Branding is excluded from the strict runtime model grant and credential store.
 
-- Loading Settings does not enroll or open a browser. **Sign in with your
-  organization** uses the standard OpenMaus Admin; a separate custom Admin
-  address remains available under **Advanced**.
+- The welcome row does not enroll or open a browser until **Sign in** is
+  pressed. It uses the standard OpenMaus Admin; there is no custom address.
 - The production client opens the browser and connects automatically after
   approval. The optional verification code stays collapsed under **Security
   details**, and cancelling returns to the signed-out view.
@@ -42,14 +41,12 @@ The smoke checks:
 - The 390px layout has no horizontal overflow.
 - A remote-origin page gets neither the organization bridge nor Node access.
 - The actual fresh app still opens its existing optional welcome flow, not an
-  organization sign-in wall. Explicit Settings → Organization works before
-  completing local provider onboarding.
+  organization sign-in wall. The welcome row is the only organization surface.
 - A persisted old hosted selection loads the old server's page without an
   organization bridge. Cancelling native organization sign-in leaves the saved
   selection byte-for-byte unchanged. Confirming through the production native
-  menu opens local Organization Settings, preserves the hosted entry and does
-  not enroll automatically. Recreating the renderer from the saved choice
-  stays local. A completion receipt is required, not merely an exit code.
+  menu preserves the hosted entry and does not enroll automatically. Recreating
+  the renderer from the saved choice stays local. A completion receipt is required, not merely an exit code.
 
 The printed evidence directory retains `receipt.json`, `electron.log`, and
 connected, narrow confirmation and in-app screenshots. Cleanup removes only

@@ -332,7 +332,7 @@ notice with the exact command. `claude update` clears it.
 
 ## When your organization manages MCP servers
 
-If this computer is connected to an organization (Settings → Organization)
+If this computer is connected to an organization (from the welcome row)
 and its Admin turns off custom MCP servers, only servers whose name or address
 is on the organization's approved list reach bots. Other configured servers
 stay in your list, marked **Managed by** your organization, but bots do not
