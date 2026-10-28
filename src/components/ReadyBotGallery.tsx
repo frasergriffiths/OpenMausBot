@@ -19,6 +19,8 @@ const CATEGORY_KEYS: Record<ReadyBotCategory, LocaleKey> = {
   design: "readyBots.category.design", sales: "readyBots.category.sales", personal: "readyBots.category.personal",
 };
 
+const PILL = "inline-flex h-7 shrink-0 items-center justify-center gap-2 rounded-full px-3 text-[13px] font-medium leading-5 transition-colors";
+
 export function ReadyBotGallery({ search, onDialog, onAdded }: {
   search: string;
   /** The New bot dialog is open over Templates, so Templates must leave its keys alone. */
@@ -35,35 +37,34 @@ export function ReadyBotGallery({ search, onDialog, onAdded }: {
   };
   const visible = READY_BOTS.filter((bot) => (!category || bot.category === category) && matchesReadyBot(bot, search));
   if (search.trim() && visible.length === 0) return null;
-  return <section className="mb-8" aria-labelledby="ready-bots-title">
-    <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
-      <h3 id="ready-bots-title" className="text-[12px] font-medium text-ink-secondary">{t("readyBots.title")}</h3>
-      <p className="text-[12px] text-ink-tertiary">{t("readyBots.subtitle")}</p>
+  return <section aria-labelledby="ready-bots-title">
+    <div className="mb-1.5 flex min-h-7 items-center justify-between gap-3 px-2">
+      <h3 id="ready-bots-title" className="min-w-0 truncate text-[14px] font-semibold leading-5 text-ink">{t("readyBots.title")}</h3>
+      <p className="hidden shrink-0 text-[12px] leading-4 text-ink-tertiary sm:block">{t("readyBots.subtitle")}</p>
     </div>
-    <div className="mb-3 mt-2 flex flex-wrap gap-1.5" role="group" aria-label={t("readyBots.categories")}>
+    <div className="mb-2 flex flex-wrap items-center gap-2 px-2" role="group" aria-label={t("readyBots.categories")}>
       {[null, ...READY_BOT_CATEGORIES].map((value) => <button key={value ?? "all"} type="button" aria-pressed={category === value}
         onClick={() => setCategory(value)}
-        className={cn("rounded-full px-3 py-1 text-[13px] transition-colors",
-          category === value ? "bg-ink text-panel" : "bg-raised/70 text-ink-secondary hover:text-ink")}>
+        className={cn(PILL, category === value ? "bg-ink text-app" : "bg-control/70 text-ink-secondary hover:bg-raised-hover hover:text-ink")}>
         {value ? t(CATEGORY_KEYS[value]) : t("readyBots.all")}
       </button>)}
     </div>
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-      {visible.map((bot) => <article key={bot.id} data-ready-bot={bot.id} className="flex flex-col rounded-2xl border border-hairline/40 bg-card p-4">
+    <div className="grid grid-cols-1 items-start gap-x-6 gap-y-1 @xl:grid-cols-2">
+      {visible.map((bot) => <article key={bot.id} data-ready-bot={bot.id} className="flex min-w-0 flex-col rounded-xl px-2 py-2 transition-colors hover:bg-raised/40">
         <div className="flex items-center gap-3">
           <MausAvatar color={bot.look.color} bodyId={bot.look.mascotBody} size={40} animated={false} label={bot.name} />
           <div className="min-w-0 flex-1">
-            <h4 className="truncate text-[14px] font-medium text-ink">{bot.name}</h4>
-            <p className="truncate text-[12px] text-ink-secondary">{bot.title} · {t(CATEGORY_KEYS[bot.category])}</p>
+            <h4 className="truncate text-[14px] font-semibold leading-5 text-ink">{bot.name}</h4>
+            <p className="truncate text-[13px] leading-[18px] text-ink-secondary">{bot.title} · {t(CATEGORY_KEYS[bot.category])}</p>
           </div>
           <button type="button" onClick={() => open(bot.id)} aria-label={t("readyBots.addAria", { name: bot.name, title: bot.title })}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-full bg-raised px-3 text-[13px] font-medium text-ink hover:bg-raised-hover focus-visible:outline-2 focus-visible:outline-accent">
-            <Plus size={14} aria-hidden="true" />{t("readyBots.add")}
+            className="inline-flex h-7 min-w-[64px] shrink-0 items-center justify-center gap-1.5 rounded-full bg-control/80 px-3 text-[13px] font-medium leading-5 text-ink transition-colors hover:bg-raised-hover focus-visible:outline-2 focus-visible:outline-accent">
+            <Plus size={13} aria-hidden="true" />{t("readyBots.add")}
           </button>
         </div>
-        <p className="mt-3 text-[13px] leading-[1.45] text-ink-secondary">{bot.description}</p>
-        <p className="mt-2 text-[12px] italic text-ink-tertiary">{t("readyBots.try", { prompt: bot.tryAsking[0]! })}</p>
-        {(bot.apps.length > 0 || bot.routines?.length) && <p className="mt-auto pt-2 text-[12px] text-ink-tertiary">
+        <p className="mt-2 ps-[52px] text-[13px] leading-[18px] text-ink-secondary">{bot.description}</p>
+        <p className="mt-1 ps-[52px] text-[12px] leading-4 italic text-ink-tertiary">{t("readyBots.try", { prompt: bot.tryAsking[0]! })}</p>
+        {(bot.apps.length > 0 || bot.routines?.length) && <p className="mt-1 ps-[52px] text-[12px] leading-4 text-ink-tertiary">
           {[bot.apps.length > 0 && t("readyBots.worksWith", { apps: bot.apps.map((app) => APP_LABELS[app] ?? app).join(", ") }),
             bot.routines?.length && t("readyBots.pausedRoutine")].filter(Boolean).join(" · ")}
         </p>}

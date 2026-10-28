@@ -1158,6 +1158,7 @@
   "task.renameNamed": "重命名 {title}",
   "task.renameTitle": "重命名此对话",
   "task.deleteAria": "删除对话",
+  "thread.menu.delete": "删除",
   "task.deleteTitle": "删除此对话及其聊天记录",
   "model.setupRequired": "需要设置",
   "model.signInRequired": "需要登录",
@@ -3269,5 +3270,6 @@
   "place.action.addBoatKey": "连接 Boat",
   "place.view.vm.short": "与你的屏幕分开",
   "place.view.browserOff.short": "已关闭",
-  "place.view.browserOff.line": "机器人自己的浏览器已关闭，因此无法打开网页。"
+  "place.view.browserOff.line": "机器人自己的浏览器已关闭，因此无法打开网页。",
+  "templates.invalidJson": "此备份或团队文件不是有效的 JSON。"
 }

@@ -1521,6 +1521,7 @@
   "task.regenerateTitle": "重新產生標題",
   "task.regeneratingTitle": "正在重新產生…",
   "task.deleteAria": "刪除對話",
+  "thread.menu.delete": "刪除",
   "task.deleteTitle": "刪除此對話及其對話紀錄",
   "model.effort.off": "關閉",
   "model.effort.quick": "快速",
@@ -4281,5 +4282,6 @@
   "computer.problem.localNotReady": "機器人目前還無法使用這台電腦。請重新啟動 OpenMausBot 後再試一次。",
   "computer.problem.localNeedsApp": "只有這台電腦上的 OpenMausBot 應用程式能讓機器人使用它。請在這裡開啟應用程式來使用。",
   "computer.problem.localWindows": "機器人目前無法使用這台 PC。請重新啟動 OpenMausBot；若仍無法解決，請開啟「設定 → 診斷」。",
-  "computer.problem.localMac": "機器人目前還無法使用這台 Mac。請到「系統設定 → 隱私權與安全性」確認 OpenMausBot 已在「螢幕錄製」和「輔助使用」中獲得允許，然後重新啟動它。"
+  "computer.problem.localMac": "機器人目前還無法使用這台 Mac。請到「系統設定 → 隱私權與安全性」確認 OpenMausBot 已在「螢幕錄製」和「輔助使用」中獲得允許，然後重新啟動它。",
+  "templates.invalidJson": "此備份或團隊檔案不是有效的 JSON。"
 }

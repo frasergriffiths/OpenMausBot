@@ -9,7 +9,7 @@ const fixture = vi.hoisted(() => {
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: () => {} });
   return { state: undefined as AppState | undefined, dispatch: vi.fn(), showThreads: true };
 });
-vi.mock("@/lib/thread-preferences", () => ({ useShowThreads: () => fixture.showThreads }));
+vi.mock("@/lib/thread-preferences", () => ({ useShowThreads: () => fixture.showThreads, useShowThreadsChoice: () => fixture.showThreads }));
 vi.mock("@/state/store", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/state/store")>();
   return { ...original, useStore: () => ({ state: fixture.state ?? original.initialState, dispatch: fixture.dispatch }) };

@@ -33,7 +33,7 @@ const OPEN_DELAY_MS = 80;
 const CLOSE_DELAY_MS = 250;
 export const ANCHORED_MENU_WIDTH = 280;
 export const COMPACT_MENU_WIDTH = 237;
-const COMPACT_SEPARATOR = "mx-1.5 h-px shrink-0 bg-hairline/50";
+const COMPACT_SEPARATOR = "mx-2 my-[5px] h-[0.5px] shrink-0 bg-ink/10";
 const EDGE_MARGIN = 8;
 const ANCHOR_GAP = 6;
 
@@ -121,7 +121,7 @@ function MenuRows({
               look === "roomy"
                 ? "min-h-10 gap-3 rounded-lg px-3 py-2 text-[15px] font-medium leading-5 focus-visible:bg-menu-hover"
                 : look === "compact"
-                  ? "min-h-[30px] gap-2 rounded-md px-2 py-1.5 text-[14px] leading-[18px] focus-visible:bg-menu-hover"
+                  ? "min-h-[30px] gap-2 rounded-md px-2 py-1.5 text-[13px] leading-[18px] focus-visible:bg-menu-hover"
                   : "gap-3 px-3.5 py-2 text-[14px] focus-visible:bg-menu-hover",
               item.danger ? "text-danger" : "text-ink",
               item.active ? "bg-menu-active text-ink" : item.submenu && openSubmenu === item.key && engaged ? cn(look === "compact" ? "bg-menu-active" : "bg-menu-hover", "text-ink") : "hover:bg-menu-hover",
@@ -348,7 +348,7 @@ export function SidebarPopoverMenu({
   const look: MenuLook = !anchored ? "plain" : compact ? "compact" : "roomy";
   const width = compact ? COMPACT_MENU_WIDTH : ANCHORED_MENU_WIDTH;
   const sheetClass = look === "compact"
-    ? "popover-surface flex flex-col gap-1 overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]"
+    ? "popover-surface flex flex-col gap-0.5 overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]"
     : cn("popover-surface overflow-hidden border border-hairline/50 bg-menu shadow-2xl shadow-black/50", look === "roomy" ? "rounded-2xl p-1.5" : "rounded-xl py-1.5");
 
   const sheet = motion.shown && (

@@ -791,6 +791,7 @@
   "task.renameNamed": "Renommer {title}",
   "task.renameTitle": "Renommer ce fil",
   "task.deleteAria": "Supprimer le fil",
+  "thread.menu.delete": "Supprimer",
   "task.deleteTitle": "Supprimer ce fil et sa conversation",
   "task.deleteAll": "Supprimer tous les fils…",
   "task.deleteAllConfirm": "Supprimer tous les fils ({count}) ?",
@@ -2426,5 +2427,6 @@
   "place.action.addBoatKey": "Connecter Boat",
   "place.view.vm.short": "Séparé de votre écran",
   "place.view.browserOff.short": "Désactivé",
-  "place.view.browserOff.line": "Le navigateur du bot est désactivé : il ne peut pas ouvrir de pages web."
+  "place.view.browserOff.line": "Le navigateur du bot est désactivé : il ne peut pas ouvrir de pages web.",
+  "templates.invalidJson": "Ce fichier de sauvegarde ou d’équipe n’est pas un JSON valide."
 }

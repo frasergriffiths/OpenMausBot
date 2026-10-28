@@ -125,7 +125,7 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, onOpen, 
     ...(snoozed ? [{ key: "unsnooze", label: t("task.stopSnoozing"), icon: <BellOff size={12} />, onSelect: () => actions.onSnooze(task, null) } satisfies SidebarMenuItem] : []),
     {
       key: "delete",
-      label: t("common.delete"),
+      label: t("thread.menu.delete"),
       icon: <Trash2 size={12} />,
       danger: true,
       separatorBefore: true,
@@ -192,7 +192,7 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, onOpen, 
         triggerTitle={t("task.actions", { title })}
         triggerClassName={cn(
           "flex size-6 shrink-0 items-center justify-center rounded-full text-ink-secondary transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100",
-          active ? "opacity-100" : "pointer-events-none opacity-0 group-hover/tab:pointer-events-auto group-hover/tab:opacity-100 group-focus-within/tab:pointer-events-auto group-focus-within/tab:opacity-100",
+          active ? "opacity-100" : "pointer-events-none opacity-0 group-hover/tab:pointer-events-auto group-hover/tab:opacity-100 group-focus-within/tab:pointer-events-auto group-focus-within/tab:opacity-100 touch:pointer-events-auto touch:opacity-100",
         )}
         renderTrigger={({ open }) => <MoreHorizontal size={13} className={cn(open && "text-ink")} />}
       />

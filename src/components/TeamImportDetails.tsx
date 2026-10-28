@@ -21,15 +21,15 @@ export function TeamImportDetails({ pending, importedNames, org = false }: {
   return (
     <>
       {pending.description && (
-        <p className="max-w-2xl text-[14px] leading-relaxed text-ink-secondary">{pending.description}</p>
+        <p className="px-2 text-[13px] leading-[18px] text-ink-secondary">{pending.description}</p>
       )}
       {pending.brief && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl bg-control/40 px-4 py-3 text-[13px] leading-[18px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.brief")}</div>
           <p className="mt-1 line-clamp-4 whitespace-pre-wrap break-words">{pending.brief}</p>
         </div>
       )}
-      {Boolean(pending.warnings?.length) && <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+      {Boolean(pending.warnings?.length) && <div className="mt-4 rounded-xl bg-control/40 px-4 py-3 text-[13px] leading-[18px] text-ink-secondary">
         <div className="mb-2 font-medium text-ink">{pending.leftOut ? t("grokImport.leftOut") : t("templates.backupNotes")}</div>
         {pending.warnings?.map((warning, index) => <p key={index}>{warning}</p>)}
       </div>}
@@ -46,26 +46,26 @@ export function TeamImportDetails({ pending, importedNames, org = false }: {
         </div>
       )}
       {Boolean(pending.skills?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl bg-control/40 px-4 py-3 text-[13px] leading-[18px] text-ink-secondary">
           <div className="font-medium text-ink">{org ? t("orgLibrary.skillsOn") : pending.version === 2 ? t("teamImport.skillsOff") : t("templates.skillsDisabled")}</div>
           <p className="mt-1 break-words">{pending.skills?.join(", ")}</p>
           {!org && <p className="mt-1">{pending.version === 2 ? t("teamImport.skillsReview") : t("templates.skillsReview")}</p>}
         </div>
       )}
       {pending.library && Boolean(pending.presets?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl bg-control/40 px-4 py-3 text-[13px] leading-[18px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.presetList")}</div>
           <p className="mt-1 break-words">{pending.presets?.join(", ")}</p>
         </div>
       )}
       {Boolean(pending.offeredSkills?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl bg-control/40 px-4 py-3 text-[13px] leading-[18px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.offeredSkills")}</div>
           <p className="mt-1 break-words">{pending.offeredSkills?.join(", ")}</p>
         </div>
       )}
       {Boolean(pending.connections?.length) && (
-        <div className="mt-4 rounded-xl border border-hairline px-4 py-3 text-[13px] text-ink-secondary">
+        <div className="mt-4 rounded-xl bg-control/40 px-4 py-3 text-[13px] leading-[18px] text-ink-secondary">
           <div className="font-medium text-ink">{t("teamImport.connections", { count: pending.connections?.length ?? 0 })}</div>
           <ul className="mt-1">
             {pending.connections?.map((connection, index) => (
@@ -74,26 +74,26 @@ export function TeamImportDetails({ pending, importedNames, org = false }: {
           </ul>
         </div>
       )}
-      {pending.members.length > 0 && <div className="mt-6 text-[12px] font-medium text-ink-secondary">{t("templates.teamMembers")}</div>}
-      <div className="mt-2 grid grid-cols-1 gap-x-10 md:grid-cols-2">
+      {pending.members.length > 0 && <div className="mb-1.5 mt-5 flex min-h-7 items-center px-2 text-[14px] font-semibold leading-5 text-ink">{t("templates.teamMembers")}</div>}
+      <div className="grid grid-cols-1 items-start gap-x-6 gap-y-1 md:grid-cols-2">
         {pending.members.map((member, index) => (
-          <div key={`${member.name}-${index}`} className="flex min-h-[72px] items-center gap-3 border-b border-hairline/35 px-1 py-3">
+          <div key={`${member.name}-${index}`} className="flex min-w-0 items-center rounded-xl px-2 py-2 transition-colors hover:bg-raised/40">
             {pending.pictures?.[index]
-              ? <img src={pending.pictures[index]!} alt="" className="size-9 shrink-0 rounded-lg object-cover" />
+              ? <img src={pending.pictures[index]!} alt="" className="size-10 shrink-0 rounded-[10px] object-cover" />
               : (
-                <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold", TEAM_GLYPHS[index % TEAM_GLYPHS.length])}>
+                <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-[10px] text-[13px] font-semibold", TEAM_GLYPHS[index % TEAM_GLYPHS.length])}>
                   {member.name.slice(0, 1).toUpperCase()}
                 </div>
               )}
             <div className="min-w-0">
-              <div className="truncate text-[14px] font-medium text-ink">{importedNames[index]}</div>
+              <div className="truncate text-[14px] font-semibold leading-5 text-ink">{importedNames[index]}</div>
               {importedNames[index] !== member.name && <div className="text-[12px] text-ink-secondary">{t("templates.newCopyOf", { name: member.name })}</div>}
-              <div className="mt-0.5 truncate text-[13px] text-ink-secondary">{member.title || t("templates.generalAssistant")}</div>
+              <div className="truncate text-[13px] leading-[18px] text-ink-secondary">{member.title || t("templates.generalAssistant")}</div>
             </div>
           </div>
         ))}
       </div>
-      <div className="mt-6 flex items-start gap-2.5 rounded-xl bg-raised/45 px-4 py-3 text-[13px] leading-relaxed text-ink-secondary">
+      <div className="mt-5 flex items-start gap-2.5 rounded-xl bg-control/40 px-4 py-3 text-[13px] leading-[18px] text-ink-secondary">
         <Check size={15} className="mt-0.5 shrink-0 text-success" />
         <p>
           {pending.kind === "backup"

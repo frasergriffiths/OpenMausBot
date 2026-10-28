@@ -791,6 +791,7 @@
   "task.renameNamed": "{title} का नाम बदलें",
   "task.renameTitle": "इस थ्रेड का नाम बदलें",
   "task.deleteAria": "थ्रेड हटाएँ",
+  "thread.menu.delete": "हटाएँ",
   "task.deleteTitle": "इस थ्रेड और इसकी बातचीत को हटाएँ",
   "task.deleteAll": "सभी थ्रेड हटाएँ…",
   "task.deleteAllConfirm": "सभी थ्रेड हटाएँ ({count})?",
@@ -2426,5 +2427,6 @@
   "place.action.addBoatKey": "Boat कनेक्ट करें",
   "place.view.vm.short": "आपकी स्क्रीन से अलग",
   "place.view.browserOff.short": "बंद है",
-  "place.view.browserOff.line": "बॉट का अपना ब्राउज़र बंद है, इसलिए वह वेब पेज नहीं खोल सकता।"
+  "place.view.browserOff.line": "बॉट का अपना ब्राउज़र बंद है, इसलिए वह वेब पेज नहीं खोल सकता।",
+  "templates.invalidJson": "यह बैकअप या टीम फ़ाइल मान्य JSON नहीं है।"
 }

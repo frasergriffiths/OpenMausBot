@@ -962,6 +962,7 @@
   "task.renameNamed": "Перейменувати {title}",
   "task.renameTitle": "Перейменувати цю гілку",
   "task.deleteAria": "Видалити гілку",
+  "thread.menu.delete": "Видалити",
   "task.deleteTitle": "Видалити цю гілку та її розмову",
   "model.setupRequired": "Потрібне налаштування",
   "model.signInRequired": "Потрібен вхід",
@@ -2871,5 +2872,6 @@
   "place.action.addBoatKey": "Підключити Boat",
   "place.view.vm.short": "Окремо від вашого екрана",
   "place.view.browserOff.short": "Вимкнено",
-  "place.view.browserOff.line": "Власний браузер бота вимкнено, тож він не може відкривати вебсторінки."
+  "place.view.browserOff.line": "Власний браузер бота вимкнено, тож він не може відкривати вебсторінки.",
+  "templates.invalidJson": "Цей файл резервної копії або команди не є коректним JSON."
 }

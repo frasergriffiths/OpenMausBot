@@ -9,7 +9,7 @@ const fixture = vi.hoisted(() => {
   return {
     advanced: false,
     threadsChosen: true,
-    menus: [] as { ariaLabel: string; items: SidebarMenuItem[]; placement?: string; openOnHover?: boolean; trigger: string }[],
+    menus: [] as { ariaLabel: string; items: SidebarMenuItem[]; placement?: string; openOnHover?: boolean; compact?: boolean; trigger: string }[],
     dispatch: vi.fn(),
     inspectorOpen: false,
     find: vi.fn(),
@@ -27,7 +27,7 @@ vi.mock("@/lib/chat-find", async (importOriginal) => ({
 }));
 vi.mock("./SidebarPopoverMenu", async (importOriginal) => ({
   ...await importOriginal<typeof import("./SidebarPopoverMenu")>(),
-  SidebarPopoverMenu: (props: { ariaLabel: string; items: SidebarMenuItem[]; placement?: string; openOnHover?: boolean; renderTrigger: (state: { open: boolean }) => React.ReactNode }) => {
+  SidebarPopoverMenu: (props: { ariaLabel: string; items: SidebarMenuItem[]; placement?: string; openOnHover?: boolean; compact?: boolean; renderTrigger: (state: { open: boolean }) => React.ReactNode }) => {
     const trigger = props.renderTrigger({ open: false });
     fixture.menus.push({ ...props, trigger: renderToStaticMarkup(createElement("div", null, trigger)) });
     return trigger;
@@ -148,6 +148,10 @@ describe("ChatShareMenu, the bot panel's Share", () => {
   it("copies or downloads the conversation, in those words", () => {
     const menu = menuOf(createElement(ChatShareMenu, { bot, className: "" }));
     expect(menu.items.map((item) => [item.key, item.label])).toEqual([["copy", "Copy conversation"], ["download", "Download conversation"]]);
+    // Decision 3: the Share popover takes the standard compact menu recipe in Simple mode.
+    expect(menu.compact).toBe(true);
+    fixture.advanced = true;
+    expect(menuOf(createElement(ChatShareMenu, { bot, className: "" })).compact).toBe(false);
   });
 });
 

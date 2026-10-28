@@ -879,6 +879,7 @@
   "task.renameNamed": "{title} umbenennen",
   "task.renameTitle": "Diesen Thread umbenennen",
   "task.deleteAria": "Thread löschen",
+  "thread.menu.delete": "Löschen",
   "task.deleteTitle": "Diesen Thread und sein Gespräch löschen",
   "task.deleteAll": "Alle Threads löschen…",
   "task.deleteAllConfirm": "Alle Threads löschen ({count})?",
@@ -2444,5 +2445,6 @@
   "place.action.addBoatKey": "Boat verbinden",
   "place.view.vm.short": "Getrennt von deinem Bildschirm",
   "place.view.browserOff.short": "Ausgeschaltet",
-  "place.view.browserOff.line": "Der eigene Browser des Bots ist ausgeschaltet, daher kann er keine Webseiten öffnen."
+  "place.view.browserOff.line": "Der eigene Browser des Bots ist ausgeschaltet, daher kann er keine Webseiten öffnen.",
+  "templates.invalidJson": "Diese Sicherungs- oder Teamdatei ist kein gültiges JSON."
 }

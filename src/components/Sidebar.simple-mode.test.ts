@@ -144,26 +144,26 @@ describe("bot-first sidebar", () => {
     expect(renderToStaticMarkup(createElement(BotListItem, rowProps(density)))).not.toContain('data-testid="bot-role"');
   });
 
-  it("puts a Simple row's engine mark on the name line and moves ⋯ to the preview line's end, leaving the unread dot at the top right", () => {
+  it("puts the three-dots slot then the engine's faded mark at the end of the name line, with the unread dot before them", () => {
     fixture.showThreads = false;
     fixture.state = { ...fixture.state, instances: [{ instanceId: "fake", driverKind: "claudeAgent", displayName: "Claude" }] as unknown as AppState["instances"] };
     const candidate = { ...bot, tasks: [], projects: [], unread: true, messages: [{ id: "m", role: "bot", kind: "text", text: "Done.", at: 1 }] } as Bot;
     let tree: ReactNode;
     function Capture() { tree = botRow(rowProps("comfortable", candidate)); return tree; }
     const markup = renderToStaticMarkup(createElement(Capture));
-    const title = markup.slice(markup.indexOf('data-sidebar-bot-title=""'), markup.indexOf('data-sidebar-bot-status=""'));
-    expect(title).toMatch(/data-sidebar-bot-title="" class="flex items-baseline justify-between gap-2"/);
-    expect(title).toMatch(/<span data-testid="model-badge" role="img" aria-label="Model: [^"]+ \(Claude\)" class="[^"]*\bself-center\b[^"]*"><span data-provider-mark="brand" class="[^"]*\bopacity-60\b/);
-    expect(title).toMatch(/<span aria-hidden="true" data-row-dot="" class="pointer-events-none absolute right-2 top-1 flex size-7 items-center justify-center transition-opacity group-hover:opacity-0 group-focus-within:opacity-0 touch:opacity-0 max-md:hidden"><span data-testid="unread-dot" title="Unread" class="size-2 shrink-0 rounded-full bg-accent"><\/span><\/span>/);
-    expect(title).toContain('<span aria-hidden="true" title="Unread" class="size-2 shrink-0 rounded-full bg-accent hidden self-center max-md:block touch:block"></span>');
-    const status = markup.slice(markup.indexOf('data-sidebar-bot-status=""'), markup.indexOf("data-bot-actions"));
-    expect(status).toMatch(/data-sidebar-bot-status="" class="flex items-center justify-between gap-2 pr-7"/);
-    expect(status).toContain(">Done.<");
-    expect(status).not.toContain("data-provider-mark");
+    const trailing = markup.match(/<span data-simple-row-trailing="" class="[^"]*">([\s\S]*?)<\/span><\/div>/)?.[1] ?? "";
+    expect(trailing).toContain('<span aria-hidden="true" class="size-6 shrink-0"></span>');
+    expect(trailing).toContain('<span data-testid="model-badge" role="img" aria-label="Model: test (Claude)" class="flex shrink-0 self-center">');
+    expect(trailing).toContain('data-provider-mark="brand"');
+    const name = markup.slice(0, markup.indexOf(">Done.<"));
+    expect(name).toContain('<span data-testid="unread-dot" title="Unread" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent self-center"></span>');
+    expect(markup).not.toContain('data-row-dot=""');
+    expect(name.indexOf('data-testid="unread-dot"')).toBeLessThan(name.indexOf("data-simple-row-trailing"));
     expect(markup.match(/data-provider-mark=/g)).toHaveLength(1);
+    expect(markup).toContain('class="flex items-baseline justify-between gap-2"');
     expect(String(findElement(tree, "data-sidebar-bot-row", bot.id)!.props.className)).not.toContain("group-hover:pr-9");
     expect(markup).not.toContain("group-hover:pr-7");
-    expect(markup).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bright-2 bottom-1 top-auto translate-y-0\b/);
+    expect(markup).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bright-\[26px\] top-1 size-6 rounded-md\b/);
   });
 
   it("keeps a Simple row's ⋯ visible while its menu is open", () => {
@@ -191,7 +191,7 @@ describe("bot-first sidebar", () => {
     fixture.showThreads = false;
     const quiet = { ...bot, tasks: [], projects: [], unread: false };
     const waiting = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...quiet, activity: "waiting-on-you" })));
-    expect(waiting).toContain('data-testid="waiting-dot" title="Waiting for you…" class="size-2 shrink-0 rounded-full bg-warning"');
+    expect(waiting).toContain('data-testid="waiting-dot" title="Waiting for you…" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-warning self-center"');
     expect(waiting).not.toContain(">!<");
     expect(waiting).not.toContain("font-semibold text-warning");
     expect(waiting).not.toContain('role="status"');
@@ -219,17 +219,17 @@ describe("bot-first sidebar", () => {
     const simple = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", candidate)));
     expect(simple).toContain("[--row:var(--color-raised)]");
     expect(simple).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bpointer-events-none opacity-0 group-hover:pointer-events-auto/);
-    expect(simple).toMatch(/data-sidebar-bot-title="" class="flex items-baseline justify-between gap-2"/);
+    expect(simple).toContain('class="flex items-baseline justify-between gap-2"');
     fixture.advanced = true;
     expect(renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", candidate)))).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bpointer-events-auto opacity-100/);
   });
 
-  it("marks an unread Simple group chat with the same top-right dot as a bot row, said once for a screen reader", () => {
+  it("marks an unread Simple group chat with one dot in its name line, said once for a screen reader", () => {
+    fixture.showThreads = false;
     const group: Group = { id: "room", threadId: "room-thread", name: "Launch", memberIds: [bot.id], messages: [], defaultResponder: { kind: "mentions" }, bulletin: "", unread: true, createdAt: 1 };
     const markup = renderToStaticMarkup(createElement(GroupListItem, { group, density: "comfortable", onMenu: vi.fn() }));
-    const name = markup.slice(markup.indexOf('class="flex items-baseline justify-between gap-2 pr-7"'));
-    expect(name.indexOf('data-row-dot=""')).toBeLessThan(name.indexOf("</div>"));
     expect(markup.match(/data-testid="unread-dot"/g)).toHaveLength(1);
+    expect(markup).toContain('data-testid="unread-dot" title="Unread"');
     expect(markup).toContain('<span class="sr-only">Unread</span>');
   });
 

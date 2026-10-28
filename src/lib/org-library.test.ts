@@ -76,7 +76,7 @@ describe("the shelf card", () => {
           entry({ packageId: "p3", name: "Future desk", blob: "unsupported" }),
         ],
       },
-      busy: null, notice: "", error: "", onAdd, onDetails: vi.fn(),
+      busy: null, notice: "", error: "", search: "", onAdd, onDetails: vi.fn(),
     }));
     const shown = text(markup);
     for (const line of ["Packages Customer Co shares with you", "Sales desk", "Recommended by Acme Partners", "From Acme Partners", "Added", "Update OpenMausBot to add this"]) {
@@ -87,7 +87,7 @@ describe("the shelf card", () => {
     expect(markup).not.toContain('aria-label="Add Future desk"');
     expect(onAdd).not.toHaveBeenCalled();
     expect(text(renderToStaticMarkup(createElement(OrgLibraryTab, {
-      listing: { organization: { id: "o", name: "Customer Co" }, packages: [] }, busy: null, notice: "", error: "", onAdd, onDetails: vi.fn(),
+      listing: { organization: { id: "o", name: "Customer Co" }, packages: [] }, busy: null, notice: "", error: "", search: "", onAdd, onDetails: vi.fn(),
     })))).toContain("Customer Co hasn't shared any packages with you yet.");
   });
 });

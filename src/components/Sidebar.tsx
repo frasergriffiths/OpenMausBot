@@ -846,7 +846,6 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
             )}
             {!simpleList && title && !renaming && <SidebarBotRole role={title} />}
           </span>
-          {simpleRow && <BotEngineMark bot={bot} instances={instances} className="self-center" />}
           {last && !renaming && !expanded && (
             <span className={cn(
               "shrink-0 text-[12px] tabular-nums text-ink-secondary transition-opacity",
@@ -860,9 +859,16 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
           {simpleList && density === "compact" && <BotEngineMark bot={bot} instances={instances} className="self-center" />}
           {(expanded || (quiet && !statusLine)) && unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
           {!renaming && <span className="flex shrink-0 self-center"><OwnerFace bot={bot} /></span>}
-          {simpleRow && (unread || waiting) && <RowDot waiting={waiting} />}
+          {simpleRow && (unread || waiting) && <RowDot waiting={waiting} inline />}
+          {simpleRow && (
+            // [⋯][provider mark]: the dots' 24px slot stays reserved, so revealing them on hover or focus moves nothing.
+            <span data-simple-row-trailing="" className="flex shrink-0 items-center gap-1 self-center">
+              <span aria-hidden="true" className="size-6 shrink-0" />
+              <BotEngineMark bot={bot} instances={instances} className="self-center" />
+            </span>
+          )}
         </div>
-        {(!expanded || deleting) && (!quiet || statusLine) && <div data-sidebar-bot-status="" className={cn("flex items-center justify-between gap-2", simpleRow && "pr-7")}>
+        {(!expanded || deleting) && (!quiet || statusLine) && <div className="flex items-center justify-between gap-2">
           {deleting ? (
             <span role="status" className="flex min-w-0 items-center gap-1.5 truncate text-[13px] leading-[18px] text-ink-secondary">
               <Loader2 size={12} className="shrink-0 animate-spin" />
@@ -947,7 +953,8 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
         {showThreads && <button type="button" aria-label={t("folder.newNamed", { name: bot.name })} title={t("folder.new")} onClick={() => { setThreadsOpen(true); setCreatingProject(true); }}
           className="pointer-events-none absolute right-8 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:hidden touch:pointer-events-auto touch:opacity-70"><FolderPlus size={14} /></button>}
         <button type="button" data-bot-actions={bot.id} aria-label={t("sidebar.bot.actions", { name: bot.name })} title={t("sidebar.bot.actions", { name: bot.name })} aria-haspopup="menu" aria-expanded={menuOpen} onClick={(event) => { const rect = event.currentTarget.getBoundingClientRect(); onMenu({ botId: bot.id, x: rect.left, y: rect.bottom }); }}
-          className={cn("absolute right-1 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary hover:bg-raised hover:text-ink aria-expanded:pointer-events-auto aria-expanded:opacity-100", simpleRow && "right-2 bottom-1 top-auto translate-y-0 rounded-lg",
+          className={cn("absolute flex items-center justify-center text-ink-secondary hover:bg-raised hover:text-ink aria-expanded:pointer-events-auto aria-expanded:opacity-100",
+            simpleRow ? "right-[26px] top-1 size-6 rounded-md" : "right-1 top-1/2 size-7 -translate-y-1/2 rounded",
             selected && !simpleRow ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70")}><MoreHorizontal size={15} /></button>
       </>}
       {deleting && iconOnly && (

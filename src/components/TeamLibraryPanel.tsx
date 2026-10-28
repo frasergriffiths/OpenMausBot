@@ -1,5 +1,6 @@
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/cn";
+import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { t } from "@/lib/i18n";
 import { teamImportPreview, type PendingTeamImport } from "@/lib/team-import";
 import { addTemplate } from "@/lib/template-add";
@@ -58,6 +59,10 @@ interface DirectoryCandidate {
 
 const DIRECTORY_COLORS = ["cyan", "red", "purple", "green", "orange"] as const;
 
+/** The Apps dialog's pill, reused for every filter and small action in this one. */
+const PILL = "inline-flex h-7 shrink-0 items-center justify-center gap-2 rounded-full px-3 text-[13px] font-medium leading-5 transition-colors";
+const PILL_TONE = (selected: boolean) => selected ? "bg-ink text-app" : "bg-control/70 text-ink-secondary hover:bg-raised-hover hover:text-ink";
+
 async function openExternal(url: string): Promise<void> {
   if (window.ogb?.openExternal) {
     await window.ogb.openExternal(url);
@@ -81,8 +86,8 @@ export function shareableTeamList(sections: readonly string[], bots: ReadonlyArr
 
 function TeamGlyph({ index }: { index: number }) {
   return (
-    <div className={cn("flex size-11 shrink-0 items-center justify-center rounded-xl", TEAM_GLYPHS[index % TEAM_GLYPHS.length])}>
-      <Users size={20} />
+    <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-[10px]", TEAM_GLYPHS[index % TEAM_GLYPHS.length])}>
+      <Users size={18} />
     </div>
   );
 }
@@ -226,7 +231,7 @@ export function TeamLibraryPanel({
       try {
         manifest = JSON.parse(raw);
       } catch (cause) {
-        if (cause instanceof SyntaxError) throw new Error("That backup or team file is not valid JSON.");
+        if (cause instanceof SyntaxError) throw new Error(t("templates.invalidJson"));
         throw cause;
       }
     }
@@ -445,209 +450,101 @@ export function TeamLibraryPanel({
 
   const normalizedSearch = search.trim().toLowerCase();
   const visibleTeams = (catalog?.teams ?? []).filter((entry) => !normalizedSearch || catalogMatches(entry, normalizedSearch));
+  const visibleShareTeams = shareableTeams.filter((team) => !normalizedSearch || (team.name || t("teamLibrary.general")).toLowerCase().includes(normalizedSearch));
+  const tabs: Array<{ key: TeamTab; label: string }> = [
+    ...(orgListing?.organization ? [{ key: "org" as const, label: t("orgLibrary.tab", { name: orgListing.organization.name }) }] : []),
+    { key: "explore", label: t("templates.explore") },
+    { key: "import", label: t("templates.import") },
+    { key: "scout", label: t("templates.fromFolder") },
+    { key: "share", label: t("teamLibrary.shareTab") },
+  ];
+  const chooseTab = (next: TeamTab) => {
+    tabChosen.current = true;
+    setTab(next);
+    setError("");
+  };
+  const subtitle = pending
+    ? pending.kind === "backup"
+      ? t("templates.backupSummary", { bots: pending.members.length, conversations: pending.conversations ?? 0 })
+      : pending.kind === "package"
+        ? pending.library
+          ? t("teamImport.library")
+          : pending.version === 2
+            ? t("teamImport.sharedTeam", { count: pending.members.length })
+            : t("templates.playbookSummary", { count: pending.members.length })
+        : t("templates.readyBots", { count: pending.members.length })
+    : t("templates.subtitle");
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-[2px] sm:p-6"
+      className="glass-popup-frame"
+      style={glassPopupFrameStyle()}
       onMouseDown={(event) => event.target === event.currentTarget && !importing && onClose()}
     >
+      {/* A sibling, not the parent: a backdrop-filter on an ancestor would stop the pop-up's own glass from seeing the app behind it. */}
+      <div aria-hidden="true" className="glass-scrim pointer-events-none absolute inset-0" />
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="team-library-title"
         tabIndex={-1}
-        className="animate-pop-in flex h-[min(780px,calc(100dvh-2rem))] w-full max-w-[1040px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel shadow-2xl shadow-black/50 outline-none"
+        className="glass-surface glass-popup animate-pop-in relative flex max-w-[780px] flex-col overflow-hidden rounded-2xl outline-none"
       >
-        <header className="flex items-start justify-between gap-4 px-6 pb-3 pt-6 sm:px-8 sm:pt-7">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              {pending && !finishing && (
-                <button
-                  onClick={() => {
-                    setPending(null);
-                    setPendingOrg(null);
-                    setError("");
-                  }}
-                  disabled={importing}
-                  className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised hover:text-ink disabled:opacity-50"
-                  aria-label={t("templates.back")}
-                >
-                  <ArrowLeft size={18} />
-                </button>
-              )}
-              <h2 id="team-library-title" className="truncate text-[22px] font-semibold tracking-[-0.01em] text-ink">
-                {pending ? pending.name : t("templates.title")}
-              </h2>
-            </div>
-            <p className={cn("mt-1 text-[13px] text-ink-secondary", pending && "ml-9")}>
-                {pending
-                  ? pending.kind === "backup"
-                    ? t("templates.backupSummary", { bots: pending.members.length, conversations: pending.conversations ?? 0 })
-                    : pending.kind === "package"
-                    ? pending.library
-                      ? t("teamImport.library")
-                      : pending.version === 2
-                      ? t("teamImport.sharedTeam", { count: pending.members.length })
-                      : t("templates.playbookSummary", { count: pending.members.length })
-                    : t("templates.readyBots", { count: pending.members.length })
-                  : t("templates.subtitle")}
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-1">
-            {!pending && (
-              <button
-                onClick={() => void openExternal(catalog?.repositoryUrl ?? COMMUNITY_TEAMS_REPOSITORY)}
-                className="flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[13px] text-ink-secondary hover:bg-raised hover:text-ink"
-                title={t("templates.openRepository")}
-              >
-                <Github size={16} />
-                <span className="max-sm:hidden">{t("templates.communityRepo")}</span>
-                <ExternalLink size={12} />
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              disabled={importing}
-              className="rounded-lg p-2 text-ink-secondary hover:bg-raised hover:text-ink disabled:opacity-50"
-              aria-label={t("templates.close")}
-            >
-              <X size={21} />
-            </button>
-          </div>
-        </header>
-
-        {finishing ? <GrokFinishSetup notes={finishing.notes} imported={finishing.bot} onDone={() => onImported(finishing.result)} /> : pending ? (
-          <>
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6 pt-6 sm:px-8">
-              <TeamImportDetails pending={pending} importedNames={importedNames} org={pendingOrg !== null} />
-              {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
-            </div>
-
-            <footer className="flex flex-col gap-3 border-t border-hairline/35 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-              <div className="text-[13px] text-ink-secondary">
-                {t(currentBotCount === 0 ? "templates.existingNone" : currentBotCount === 1 ? "templates.existingOne" : "templates.existingMany", { count: currentBotCount })}
-                {" "}{pending.kind === "backup"
-                  ? t("teamImport.backupCopies")
-                  : pending.library
-                  ? t("teamImport.libraryAdds")
-                  : pending.members.length === 0
-                  ? ""
-                  : t("teamImport.newSection", { name: pending.teamName ?? pending.name })}
-              </div>
-              {pendingOrg ? (
-                orgCardAction(pendingOrg) === "add" ? (
+        <header className="flex flex-col gap-4 px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 items-center gap-1.5">
+                {pending && !finishing && (
                   <button
-                    onClick={() => void addOrgPackage(pendingOrg)}
-                    disabled={importing}
-                    aria-label={t("orgLibrary.addAria", { name: pendingOrg.name })}
-                    className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-white hover:bg-accent/90 disabled:opacity-60"
-                  >
-                    {importing && <Loader2 size={15} className="animate-spin" />}
-                    {importing ? t("orgLibrary.adding") : t("orgLibrary.add")}
-                  </button>
-                ) : (
-                  <span className="flex shrink-0 items-center gap-1 rounded-full bg-raised px-4 py-2 text-[13px] text-ink-secondary">
-                    <Check size={14} className="text-success" />{t("orgLibrary.added")}
-                  </span>
-                )
-              ) : <button
-                onClick={() => void importTeam()}
-                disabled={importing}
-                className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-white hover:bg-accent/90 disabled:opacity-60"
-              >
-                {importing && <Loader2 size={15} className="animate-spin" />}
-                {importing
-                  ? t("templates.importing")
-                  : pending.kind === "backup" ? t("templates.importBackup") : pending.library ? t("teamImport.addPresets") : t("templates.addTeam")}
-              </button>}
-            </footer>
-          </>
-        ) : (
-          <>
-            <div className="flex flex-col gap-3 px-6 pb-4 pt-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-              <div className="flex w-fit rounded-xl bg-raised/70 p-1" role="tablist" aria-label={t("templates.source") }>
-                {orgListing?.organization && (
-                  <button
-                    role="tab"
-                    aria-selected={tab === "org"}
+                    type="button"
                     onClick={() => {
-                      tabChosen.current = true;
-                      setTab("org");
+                      setPending(null);
+                      setPendingOrg(null);
                       setError("");
                     }}
-                    className={cn(
-                      "max-w-[220px] truncate rounded-lg px-4 py-2 text-[14px] transition-colors",
-                      tab === "org" ? "bg-card text-ink shadow-sm" : "text-ink-secondary hover:text-ink",
-                    )}
+                    disabled={importing}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink disabled:opacity-50"
+                    aria-label={t("templates.back")}
                   >
-                    {t("orgLibrary.tab", { name: orgListing.organization.name })}
+                    <ArrowLeft size={18} />
+                  </button>
+                )}
+                <h2 id="team-library-title" className="min-w-0 truncate text-[20px] font-semibold leading-7 tracking-[-0.01em] text-ink">
+                  {pending ? pending.name : t("templates.title")}
+                </h2>
+              </div>
+              <div className="flex shrink-0 items-center gap-1">
+                {!pending && (
+                  <button
+                    type="button"
+                    onClick={() => void openExternal(catalog?.repositoryUrl ?? COMMUNITY_TEAMS_REPOSITORY)}
+                    className="flex size-8 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink"
+                    title={t("templates.openRepository")}
+                    aria-label={t("templates.openRepository")}
+                  >
+                    <Github size={16} />
                   </button>
                 )}
                 <button
-                  role="tab"
-                  aria-selected={tab === "explore"}
-                  onClick={() => {
-                    tabChosen.current = true;
-                    setTab("explore");
-                    setError("");
-                  }}
-                  className={cn(
-                    "rounded-lg px-4 py-2 text-[14px] transition-colors",
-                    tab === "explore" ? "bg-card text-ink shadow-sm" : "text-ink-secondary hover:text-ink",
-                  )}
+                  type="button"
+                  onClick={onClose}
+                  disabled={importing}
+                  className="flex size-8 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink disabled:opacity-50"
+                  aria-label={t("templates.close")}
                 >
-                  {t("templates.explore")}
-                </button>
-                <button
-                  role="tab"
-                  aria-selected={tab === "import"}
-                  onClick={() => {
-                    tabChosen.current = true;
-                    setTab("import");
-                    setError("");
-                  }}
-                  className={cn(
-                    "rounded-lg px-4 py-2 text-[14px] transition-colors",
-                    tab === "import" ? "bg-card text-ink shadow-sm" : "text-ink-secondary hover:text-ink",
-                  )}
-                >
-                  {t("templates.import")}
-                </button>
-                <button
-                  role="tab"
-                  aria-selected={tab === "scout"}
-                  onClick={() => {
-                    tabChosen.current = true;
-                    setTab("scout");
-                    setError("");
-                  }}
-                  className={cn(
-                    "rounded-lg px-4 py-2 text-[14px] transition-colors",
-                    tab === "scout" ? "bg-card text-ink shadow-sm" : "text-ink-secondary hover:text-ink",
-                  )}
-                >
-                  {t("templates.fromFolder")}
-                </button>
-                <button
-                  role="tab"
-                  aria-selected={tab === "share"}
-                  onClick={() => {
-                    tabChosen.current = true;
-                    setTab("share");
-                    setError("");
-                  }}
-                  className={cn(
-                    "rounded-lg px-4 py-2 text-[14px] transition-colors",
-                    tab === "share" ? "bg-card text-ink shadow-sm" : "text-ink-secondary hover:text-ink",
-                  )}
-                >
-                  {t("teamLibrary.shareTab")}
+                  <X size={18} />
                 </button>
               </div>
-              {tab === "explore" && (
-                <label className="flex h-11 w-full items-center gap-2.5 rounded-xl bg-raised/70 px-3.5 sm:w-[320px]">
-                  <Search size={17} className="shrink-0 text-ink-secondary" />
+            </div>
+            <p className="mt-0.5 truncate text-[13px] leading-5 text-ink-secondary" title={subtitle}>{subtitle}</p>
+          </div>
+
+          {!pending && !finishing && (
+            <>
+              {(tab === "explore" || tab === "org" || tab === "share") && (
+                <label className="flex h-9 min-w-0 items-center gap-2.5 rounded-full bg-control/70 px-3.5 focus-within:ring-1 focus-within:ring-accent">
+                  <Search size={15} className="shrink-0 text-ink-secondary" />
                   <input
                     value={search}
                     onChange={(event) => setSearch(event.target.value)}
@@ -657,314 +554,412 @@ export function TeamLibraryPanel({
                   />
                 </label>
               )}
+              <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("templates.source")}>
+                {tabs.map((entry) => (
+                  <button
+                    key={entry.key}
+                    type="button"
+                    data-template-tab={entry.key}
+                    aria-pressed={tab === entry.key}
+                    onClick={() => chooseTab(entry.key)}
+                    className={cn(PILL, PILL_TONE(tab === entry.key), entry.key === "org" && "max-w-[220px]")}
+                  >
+                    <span className="truncate">{entry.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </header>
+
+        {finishing ? (
+          <GrokFinishSetup notes={finishing.notes} imported={finishing.bot} onDone={() => onImported(finishing.result)} className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-5 sm:px-7" />
+        ) : pending ? (
+          <>
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-5 sm:px-7">
+              <TeamImportDetails pending={pending} importedNames={importedNames} org={pendingOrg !== null} />
+              {error && <div role="alert" className="mt-4 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-7 pt-5 sm:px-8">
-              {tab === "org" && orgListing?.organization && (
-                <OrgLibraryTab
-                  listing={orgListing as OrgLibraryListing & { organization: { id: string; name: string } }}
-                  busy={orgBusy}
-                  notice={orgNotice}
-                  error={orgError}
-                  onAdd={(entry) => void addOrgPackage(entry)}
-                  onDetails={(entry) => void loadOrgDetails(entry)}
-                />
+            <footer className="flex flex-col gap-3 border-t border-hairline/35 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
+              <div className="text-[13px] leading-5 text-ink-secondary">
+                {t(currentBotCount === 0 ? "templates.existingNone" : currentBotCount === 1 ? "templates.existingOne" : "templates.existingMany", { count: currentBotCount })}
+                {" "}{pending.kind === "backup"
+                  ? t("teamImport.backupCopies")
+                  : pending.library
+                    ? t("teamImport.libraryAdds")
+                    : pending.members.length === 0
+                      ? ""
+                      : t("teamImport.newSection", { name: pending.teamName ?? pending.name })}
+              </div>
+              {pendingOrg ? (
+                orgCardAction(pendingOrg) === "add" ? (
+                  <button
+                    type="button"
+                    onClick={() => void addOrgPackage(pendingOrg)}
+                    disabled={importing}
+                    aria-label={t("orgLibrary.addAria", { name: pendingOrg.name })}
+                    className="flex h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-60"
+                  >
+                    {importing && <Loader2 size={14} className="animate-spin" />}
+                    {importing ? t("orgLibrary.adding") : t("orgLibrary.add")}
+                  </button>
+                ) : (
+                  <span className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-raised px-3.5 text-[13px] text-ink-secondary">
+                    <Check size={14} className="text-success" />{t("orgLibrary.added")}
+                  </span>
+                )
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void importTeam()}
+                  disabled={importing}
+                  className="flex h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-60"
+                >
+                  {importing && <Loader2 size={14} className="animate-spin" />}
+                  {importing
+                    ? t("templates.importing")
+                    : pending.kind === "backup" ? t("templates.importBackup") : pending.library ? t("teamImport.addPresets") : t("templates.addTeam")}
+                </button>
               )}
-              {tab === "explore" && (
-                <div>
-                  <ReadyBotGallery search={search} onDialog={setNestedDialog} onAdded={onClose} />
-                  <div className="mb-3 text-[12px] font-medium text-ink-secondary">
-                    {search ? t("templates.searchResults") : t("templates.communityTemplates")}
+            </footer>
+          </>
+        ) : (
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-7 sm:px-7">
+            {error && <div role="alert" className="mb-3 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
+
+            {tab === "org" && orgListing?.organization && (
+              <OrgLibraryTab
+                listing={orgListing as OrgLibraryListing & { organization: { id: string; name: string } }}
+                busy={orgBusy}
+                notice={orgNotice}
+                error={orgError}
+                search={normalizedSearch}
+                onAdd={(entry) => void addOrgPackage(entry)}
+                onDetails={(entry) => void loadOrgDetails(entry)}
+              />
+            )}
+
+            {tab === "explore" && (
+              <div data-templates-grid className="@container flex flex-col gap-7 pt-1">
+                <ReadyBotGallery search={search} onDialog={setNestedDialog} onAdded={onClose} />
+                <section aria-labelledby="community-templates-title">
+                  <div className="mb-1.5 flex min-h-7 items-center justify-between gap-3 px-2">
+                    <h3 id="community-templates-title" className="min-w-0 truncate text-[14px] font-semibold leading-5 text-ink">
+                      {search ? t("templates.searchResults") : t("templates.communityTemplates")}
+                    </h3>
                   </div>
                   {catalogLoading && (
                     <div className="flex items-center justify-center gap-2 py-24 text-[13px] text-ink-secondary">
-                      <Loader2 size={16} className="animate-spin" /> {t("templates.loading")}
+                      <Loader2 size={14} className="animate-spin" /> {t("templates.loading")}
                     </div>
                   )}
                   {!catalogLoading && catalogError && (
-                    <div className="rounded-xl bg-danger/10 p-4 text-[13px] text-danger">
+                    <div className="rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">
                       <p>{catalogError}</p>
-                      <button onClick={() => void loadCatalog()} className="mt-3 rounded-full bg-raised px-3.5 py-2 text-ink hover:bg-raised-hover">{t("common.tryAgain")}</button>
+                      <button type="button" onClick={() => void loadCatalog()} className={cn(PILL, "mt-2 bg-raised text-ink hover:bg-raised-hover")}>{t("common.tryAgain")}</button>
                     </div>
                   )}
-                  {!catalogLoading && catalog && (
-                    <div className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
+                  {!catalogLoading && catalog && visibleTeams.length > 0 && (
+                    <div className="grid grid-cols-1 items-start gap-x-6 gap-y-1 @xl:grid-cols-2">
                       {visibleTeams.map((entry, index) => {
                         const copy = catalogCopy(entry);
                         return (
-                        <article key={entry.slug} className="flex min-h-[104px] items-center gap-3 border-b border-hairline/35 px-1 py-4">
-                          <TeamGlyph index={index} />
-                          <div className="min-w-0 flex-1">
-                            <h3 className="truncate text-[14px] font-medium text-ink">{copy.name}</h3>
-                            <p className="mt-0.5 truncate text-[13px] text-ink-secondary">{copy.outcome ?? copy.summary}</p>
-                            <p className="mt-1 truncate text-[12px] text-ink-tertiary">
-                              {t("templates.botCount", { count: entry.members })} · {t("templates.playbookCount", { count: entry.skills.length })}
-                              {entry.requires.apps.length > 0 && ` · ${entry.requires.apps.join(", ")}`}
-                              {entry.setupMinutes && ` · ${t("templates.minutes", { count: entry.setupMinutes })}`}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => void loadLibraryTeam(entry)}
-                            disabled={busySlug !== null}
-                            className="flex min-w-[72px] items-center justify-center gap-1.5 rounded-full bg-raised px-3.5 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-40"
-                          >
-                            {busySlug === entry.slug && <Loader2 size={13} className="animate-spin" />}
-                            {busySlug === entry.slug ? t("templates.loadingShort") : t("templates.load")}
-                          </button>
-                        </article>
+                          <article key={entry.slug} data-template={entry.slug} className="flex min-w-0 flex-col rounded-xl px-2 py-2 transition-colors hover:bg-raised/40">
+                            <div className="flex items-center gap-3">
+                              <TeamGlyph index={index} />
+                              <div className="min-w-0 flex-1">
+                                <h3 className="truncate text-[14px] font-semibold leading-5 text-ink">{copy.name}</h3>
+                                <p className="truncate text-[13px] leading-[18px] text-ink-secondary">{copy.outcome ?? copy.summary}</p>
+                                <p className="mt-0.5 truncate text-[12px] leading-4 text-ink-tertiary">
+                                  {t("templates.botCount", { count: entry.members })} · {t("templates.playbookCount", { count: entry.skills.length })}
+                                  {entry.requires.apps.length > 0 && ` · ${entry.requires.apps.join(", ")}`}
+                                  {entry.setupMinutes && ` · ${t("templates.minutes", { count: entry.setupMinutes })}`}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => void loadLibraryTeam(entry)}
+                                disabled={busySlug !== null}
+                                className="inline-flex h-7 min-w-[64px] shrink-0 items-center justify-center gap-2 rounded-full bg-control/80 px-3 text-[13px] font-medium leading-5 text-ink transition-colors hover:bg-raised-hover disabled:opacity-40"
+                              >
+                                {busySlug === entry.slug && <Loader2 size={13} className="animate-spin" />}
+                                {busySlug === entry.slug ? t("templates.loadingShort") : t("templates.load")}
+                              </button>
+                            </div>
+                          </article>
                         );
                       })}
                     </div>
                   )}
                   {!catalogLoading && catalog && visibleTeams.length === 0 && (
-                    <div className="flex min-h-56 flex-col items-center justify-center text-center">
+                    <div className="flex min-h-40 flex-col items-center justify-center text-center">
                       <div className="text-[14px] font-medium text-ink">{t("templates.noneFound")}</div>
                       <div className="mt-1 text-[13px] text-ink-secondary">{t("templates.tryDifferentSearch")}</div>
                     </div>
                   )}
+                </section>
+              </div>
+            )}
+
+            {tab === "import" && (
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".md,.json,.mausbackup.json,.mausteam.json,text/markdown,application/json"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+                    event.currentTarget.value = "";
+                    if (!file) return;
+                    void readFile(file).catch((cause) => setError(cause instanceof Error ? cause.message : String(cause)));
+                  }}
+                />
+                <div className="mb-1.5 flex min-h-7 items-center px-2">
+                  <h3 className="text-[14px] font-semibold leading-5 text-ink">{t("templates.bringYourOwn")}</h3>
                 </div>
-              )}
-
-              {tab === "import" && (
-                <div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".md,.json,.mausbackup.json,.mausteam.json,text/markdown,application/json"
-                    className="hidden"
-                    onChange={(event) => {
-                      const file = event.currentTarget.files?.[0];
-                      event.currentTarget.value = "";
-                      if (!file) return;
-                      void readFile(file).catch((cause) => setError(cause instanceof Error ? cause.message : String(cause)));
+                <div className="grid gap-4 @xl:grid-cols-2 md:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragEnter={(event) => {
+                      event.preventDefault();
+                      setDragging(true);
                     }}
-                  />
-                  <div className="mb-3 text-[12px] font-medium text-ink-secondary">{t("templates.bringYourOwn")}</div>
-                  <div className="grid gap-5 md:grid-cols-2">
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      onDragEnter={(event) => {
-                        event.preventDefault();
-                        setDragging(true);
-                      }}
-                      onDragOver={(event) => event.preventDefault()}
-                      onDragLeave={() => setDragging(false)}
-                      onDrop={(event) => {
-                        event.preventDefault();
-                        setDragging(false);
-                        const file = event.dataTransfer.files[0];
-                        if (file) void readFile(file).catch((cause) => setError(cause instanceof Error ? cause.message : String(cause)));
-                      }}
-                      className={cn(
-                        "flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed px-6 text-center transition-colors",
-                        dragging ? "border-accent bg-accent/5" : "border-hairline/60 bg-raised/20 hover:bg-raised/35",
-                      )}
-                    >
-                      <UploadCloud size={27} className="text-accent" />
-                      <span className="mt-3 text-[14px] font-medium text-ink">{t("templates.chooseFile")}</span>
-                      <span className="mt-1 text-[13px] text-ink-secondary">{t("templates.dropFile")}</span>
-                    </button>
+                    onDragOver={(event) => event.preventDefault()}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      setDragging(false);
+                      const file = event.dataTransfer.files[0];
+                      if (file) void readFile(file).catch((cause) => setError(cause instanceof Error ? cause.message : String(cause)));
+                    }}
+                    className={cn(
+                      "flex min-h-56 flex-col items-center justify-center rounded-xl border border-dashed px-6 text-center transition-colors",
+                      dragging ? "border-accent bg-accent/5" : "border-hairline/60 bg-control/30 hover:bg-raised/40",
+                    )}
+                  >
+                    <UploadCloud size={24} className="text-accent" />
+                    <span className="mt-3 text-[14px] font-medium leading-5 text-ink">{t("templates.chooseFile")}</span>
+                    <span className="mt-1 max-w-[280px] text-[13px] leading-[18px] text-ink-secondary">{t("templates.dropFile")}</span>
+                  </button>
 
-                    <div className="flex min-h-56 flex-col justify-center rounded-2xl bg-raised/25 px-6">
-                      <Github size={25} className="text-ink-secondary" />
-                      <h3 className="mt-3 text-[14px] font-medium text-ink">{t("templates.loadGithub")}</h3>
-                      <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("templates.githubHint")}</p>
-                      <div className="mt-4 flex gap-2">
-                        <input
-                          value={githubUrl}
-                          onChange={(event) => setGithubUrl(event.target.value)}
-                          onKeyDown={(event) => event.key === "Enter" && void loadGithubTeam()}
-                          placeholder={t("templates.githubPlaceholder")}
-                          aria-label={t("templates.githubUrl")}
-                          className="min-w-0 flex-1 rounded-xl bg-raised/80 px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
-                        />
-                        <button
-                          onClick={() => void loadGithubTeam()}
-                          disabled={!githubUrl.trim() || githubLoading}
-                          className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[13px] font-medium text-white hover:bg-accent/90 disabled:opacity-40"
-                        >
-                          {githubLoading && <Loader2 size={13} className="animate-spin" />}
-                          {t("templates.load")}
-                        </button>
-                      </div>
+                  <div className="flex min-h-56 flex-col justify-center rounded-xl bg-control/30 px-4 py-4">
+                    <Github size={22} className="text-ink-secondary" />
+                    <h3 className="mt-3 text-[14px] font-semibold leading-5 text-ink">{t("templates.loadGithub")}</h3>
+                    <p className="mt-1 text-[13px] leading-[18px] text-ink-secondary">{t("templates.githubHint")}</p>
+                    <div className="mt-4 flex gap-2">
+                      <input
+                        value={githubUrl}
+                        onChange={(event) => setGithubUrl(event.target.value)}
+                        onKeyDown={(event) => event.key === "Enter" && void loadGithubTeam()}
+                        placeholder={t("templates.githubPlaceholder")}
+                        aria-label={t("templates.githubUrl")}
+                        className="h-9 min-w-0 flex-1 rounded-full bg-control/70 px-3.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => void loadGithubTeam()}
+                        disabled={!githubUrl.trim() || githubLoading}
+                        className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-40"
+                      >
+                        {githubLoading && <Loader2 size={13} className="animate-spin" />}
+                        {t("templates.load")}
+                      </button>
                     </div>
                   </div>
-                  <GrokImportFlow link={grokLink} onPreview={(preview) => { setGrokLink(null); previewManifest(preview, "grok"); }} />
-                  {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
                 </div>
-              )}
+                <GrokImportFlow link={grokLink} onPreview={(preview) => { setGrokLink(null); previewManifest(preview, "grok"); }} />
+              </div>
+            )}
 
-              {tab === "share" && (
-                <div>
-                  <p className="max-w-2xl text-[13px] leading-relaxed text-ink-secondary">{t("teamLibrary.shareIntro")}</p>
-                  {shareableTeams.length === 0 ? (
-                    <p className="mt-6 text-[13px] text-ink-secondary">{t("teamLibrary.shareEmpty")}</p>
-                  ) : (
-                    <div className="mt-4 grid grid-cols-1 gap-x-10 md:grid-cols-2">
-                      {shareableTeams.map((team, index) => (
-                        <article key={team.name || "general"} className="flex min-h-[84px] items-center gap-3 border-b border-hairline/35 px-1 py-4">
+            {tab === "share" && (
+              <div>
+                <p className="max-w-2xl px-2 text-[13px] leading-[18px] text-ink-secondary">{t("teamLibrary.shareIntro")}</p>
+                {visibleShareTeams.length === 0 ? (
+                  <div className="flex min-h-40 flex-col items-center justify-center text-center">
+                    <div className="text-[14px] font-medium text-ink">{t("teamLibrary.shareEmpty")}</div>
+                  </div>
+                ) : (
+                  <div className="mt-3 grid grid-cols-1 items-start gap-x-6 gap-y-1 @xl:grid-cols-2">
+                    {visibleShareTeams.map((team, index) => (
+                      <article key={team.name || "general"} className="flex min-w-0 flex-col rounded-xl px-2 py-2 transition-colors hover:bg-raised/40">
+                        <div className="flex items-center gap-3">
                           <TeamGlyph index={index} />
                           <div className="min-w-0 flex-1">
-                            <h3 className="truncate text-[14px] font-medium text-ink">{team.name || t("teamLibrary.general")}</h3>
-                            <p className="mt-0.5 text-[13px] text-ink-secondary">{t("teamLibrary.shareBots", { count: team.bots })}</p>
+                            <h3 className="truncate text-[14px] font-semibold leading-5 text-ink">{team.name || t("teamLibrary.general")}</h3>
+                            <p className="truncate text-[13px] leading-[18px] text-ink-secondary">{t("teamLibrary.shareBots", { count: team.bots })}</p>
                           </div>
                           <button
+                            type="button"
                             onClick={() => setSharing(team.name)}
                             aria-label={t("teamLibrary.shareTeamAria", { name: team.name || t("teamLibrary.general") })}
-                            className="flex items-center gap-1.5 rounded-full bg-raised px-3.5 py-2 text-[13px] text-ink hover:bg-raised-hover"
+                            className="inline-flex h-7 shrink-0 items-center gap-2 rounded-full bg-control/80 px-3 text-[13px] font-medium leading-5 text-ink transition-colors hover:bg-raised-hover"
                           >
                             <Share2 size={13} />
-                            {t("teamLibrary.shareTeam")}
+                            <span className="max-sm:sr-only">{t("teamLibrary.shareTeam")}</span>
                           </button>
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {tab === "scout" && (
-                <div>
-                  <div className="mb-3 text-[12px] font-medium text-ink-secondary">{t("templates.startFolder")}</div>
-                  <p className="max-w-2xl text-[13px] leading-relaxed text-ink-secondary">
-                    {t("templates.scoutHint")}
-                  </p>
-                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                    <input
-                      value={scoutFolder}
-                      onChange={(event) => setScoutFolder(event.target.value)}
-                      onKeyDown={(event) => event.key === "Enter" && scoutTarget && void runScout(scoutTarget)}
-                      placeholder="/path/to/your/project"
-                      aria-label={t("templates.projectFolder")}
-                      className="min-w-0 flex-1 rounded-xl bg-raised/80 px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
-                    />
-                    {Boolean(window.ogb?.pickFolder) && (
-                      <button
-                        onClick={() => void pickScoutFolder()}
-                        disabled={scouting}
-                        className="flex items-center justify-center gap-1.5 rounded-full bg-raised px-4 py-2.5 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-40"
-                      >
-                        <FolderOpen size={14} />
-                        {t("templates.browse")}
-                      </button>
-                    )}
-                    <button
-                      onClick={() => void runScout(scoutTarget)}
-                      disabled={!scoutTarget || scouting}
-                      className="flex items-center justify-center gap-1.5 rounded-full bg-accent px-4 py-2.5 text-[13px] font-medium text-white hover:bg-accent/90 disabled:opacity-40"
-                    >
-                      {scouting ? <Loader2 size={14} className="animate-spin" /> : <Compass size={14} />}
-                      {scouting ? t("templates.scouting") : t("templates.scout")}
-                    </button>
+                        </div>
+                      </article>
+                    ))}
                   </div>
+                )}
+              </div>
+            )}
 
-                  {scouted && (
-                    <div className="mt-6">
-                      <div className="rounded-2xl bg-raised/25 px-5 py-4">
-                        <div className="text-[15px] font-semibold text-ink">{scouted.profile.name}</div>
-                        {scouted.profile.summary && (
-                          <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{scouted.profile.summary}</p>
-                        )}
-                        {scouted.profile.stacks.length > 0 && (
-                          <div className="mt-2.5 flex flex-wrap gap-1.5">
-                            {scouted.profile.stacks.map((stack) => (
-                              <span key={stack} className="rounded-full bg-raised px-2.5 py-1 text-[12px] text-ink-secondary">
-                                {stack}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+            {tab === "scout" && (
+              <div>
+                <div className="mb-1.5 flex min-h-7 items-center px-2">
+                  <h3 className="text-[14px] font-semibold leading-5 text-ink">{t("templates.startFolder")}</h3>
+                </div>
+                <p className="max-w-2xl px-2 text-[13px] leading-[18px] text-ink-secondary">
+                  {t("templates.scoutHint")}
+                </p>
+                <div className="mt-3 flex flex-col gap-2 px-2 sm:flex-row">
+                  <input
+                    value={scoutFolder}
+                    onChange={(event) => setScoutFolder(event.target.value)}
+                    onKeyDown={(event) => event.key === "Enter" && scoutTarget && void runScout(scoutTarget)}
+                    placeholder="/path/to/your/project"
+                    aria-label={t("templates.projectFolder")}
+                    className="h-9 min-w-0 flex-1 rounded-full bg-control/70 px-3.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
+                  />
+                  {Boolean(window.ogb?.pickFolder) && (
+                    <button
+                      type="button"
+                      onClick={() => void pickScoutFolder()}
+                      disabled={scouting}
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-control/80 px-4 text-[13px] font-medium leading-5 text-ink hover:bg-raised-hover disabled:opacity-40"
+                    >
+                      <FolderOpen size={14} />
+                      {t("templates.browse")}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => void runScout(scoutTarget)}
+                    disabled={!scoutTarget || scouting}
+                    className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-40"
+                  >
+                    {scouting ? <Loader2 size={14} className="animate-spin" /> : <Compass size={14} />}
+                    {scouting ? t("templates.scouting") : t("templates.scout")}
+                  </button>
+                </div>
 
-                      <div className="mt-5 text-[12px] font-medium text-ink-secondary">{t("templates.suggestedTeam")}</div>
-                      <div className="mt-1 grid grid-cols-1 gap-x-10 md:grid-cols-2">
-                        {scouted.suggestion.manifest.team.members.map((member, index) => (
-                          <div key={member.key} className="flex min-h-[64px] items-center gap-3 border-b border-hairline/35 px-1 py-3">
-                            <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold", TEAM_GLYPHS[index % TEAM_GLYPHS.length])}>
+                {scouted && (
+                  <div className="mt-5">
+                    <div className="rounded-xl bg-control/30 px-4 py-3">
+                      <div className="text-[14px] font-semibold leading-5 text-ink">{scouted.profile.name}</div>
+                      {scouted.profile.summary && (
+                        <p className="mt-1 text-[13px] leading-[18px] text-ink-secondary">{scouted.profile.summary}</p>
+                      )}
+                      {scouted.profile.stacks.length > 0 && (
+                        <div className="mt-2.5 flex flex-wrap gap-1.5">
+                          {scouted.profile.stacks.map((stack) => (
+                            <span key={stack} className={cn(PILL, "bg-control/70 px-2.5 text-[12px] text-ink-secondary")}>
+                              {stack}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mb-1.5 mt-5 flex min-h-7 items-center px-2">
+                      <h3 className="text-[14px] font-semibold leading-5 text-ink">{t("templates.suggestedTeam")}</h3>
+                    </div>
+                    <div className="grid grid-cols-1 items-start gap-x-6 gap-y-1 @xl:grid-cols-2">
+                      {scouted.suggestion.manifest.team.members.map((member, index) => (
+                        <div key={member.key} className="flex min-w-0 rounded-xl px-2 py-2 transition-colors hover:bg-raised/40">
+                          <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <div className={cn("flex size-10 shrink-0 items-center justify-center rounded-[10px] text-[13px] font-semibold", TEAM_GLYPHS[index % TEAM_GLYPHS.length])}>
                               {member.name.slice(0, 1).toUpperCase()}
                             </div>
                             <div className="min-w-0">
-                              <div className="truncate text-[14px] font-medium text-ink">
+                              <div className="truncate text-[14px] font-semibold leading-5 text-ink">
                                 {member.name} <span className="font-normal text-ink-secondary">· {member.title}</span>
                               </div>
-                              <div className="mt-0.5 truncate text-[12px] text-ink-secondary">
+                              <div className="truncate text-[13px] leading-[18px] text-ink-secondary">
                                 {scouted.suggestion.reasons[member.key] ?? ""}
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-
-                      {directory && directory.length > 0 && (
-                        <>
-                          <div className="mt-5 text-[12px] font-medium text-ink-secondary">{t("templates.communityDirectory")}</div>
-                          <div className="mt-1 flex flex-col">
-                            {directory.map((candidate) => (
-                              <div key={candidate.slug} className="flex items-center gap-3 border-b border-hairline/35 px-1 py-3">
-                                <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
-                                  <input
-                                    type="checkbox"
-                                    checked={pickedDirectory.has(candidate.slug)}
-                                    onChange={() =>
-                                      setPickedDirectory((prev) => {
-                                        const next = new Set(prev);
-                                        if (next.has(candidate.slug)) next.delete(candidate.slug);
-                                        else next.add(candidate.slug);
-                                        return next;
-                                      })
-                                    }
-                                    className="size-4 accent-accent"
-                                  />
-                                  <div className="min-w-0 flex-1">
-                                    <div className="truncate text-[14px] font-medium text-ink">
-                                      {candidate.name}
-                                      {candidate.category && <span className="font-normal text-ink-secondary"> · {candidate.category}</span>}
-                                    </div>
-                                    <div className="mt-0.5 truncate text-[12px] text-ink-secondary">
-                                      {t("templates.matches", { values: candidate.matched.join(", ") })}
-                                    </div>
-                                  </div>
-                                </label>
-                                <button
-                                  onClick={() => void openExternal(candidate.detailUrl)}
-                                  aria-label={t("templates.openDirectory", { name: candidate.name })}
-                                  title={t("templates.readBeforeAdding")}
-                                  className="rounded-lg p-1.5 text-ink-secondary hover:bg-raised hover:text-ink"
-                                >
-                                  <ExternalLink size={14} />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </>
-                      )}
-
-                      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <input
-                          value={roomName}
-                          onChange={(event) => setRoomName(event.target.value)}
-                          aria-label={t("templates.groupChatName")}
-                          className="min-w-0 flex-1 rounded-xl bg-raised/80 px-3 py-2.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
-                        />
-                        <button
-                          onClick={() => void createProject()}
-                          disabled={creating}
-                          className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-white hover:bg-accent/90 disabled:opacity-60"
-                        >
-                          {creating && <Loader2 size={15} className="animate-spin" />}
-                          {creating ? t("templates.creating") : t("templates.createGroupChat")}
-                        </button>
-                      </div>
-                      <p className="mt-2 text-[12px] text-ink-secondary">
-                        {t("templates.createGroupHint")}
-                      </p>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                  {error && <div role="alert" className="mt-4 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
-                </div>
-              )}
-            </div>
-          </>
+
+                    {directory && directory.length > 0 && (
+                      <>
+                        <div className="mb-1.5 mt-5 flex min-h-7 items-center px-2">
+                          <h3 className="text-[14px] font-semibold leading-5 text-ink">{t("templates.communityDirectory")}</h3>
+                        </div>
+                        <div className="flex flex-col gap-y-1">
+                          {directory.map((candidate) => (
+                            <div key={candidate.slug} className="flex min-w-0 items-center rounded-xl px-2 py-2 transition-colors hover:bg-raised/40">
+                              <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-3">
+                                <input
+                                  type="checkbox"
+                                  checked={pickedDirectory.has(candidate.slug)}
+                                  onChange={() =>
+                                    setPickedDirectory((prev) => {
+                                      const next = new Set(prev);
+                                      if (next.has(candidate.slug)) next.delete(candidate.slug);
+                                      else next.add(candidate.slug);
+                                      return next;
+                                    })
+                                  }
+                                  className="size-4 shrink-0 accent-accent"
+                                />
+                                <div className="min-w-0 flex-1">
+                                  <div className="truncate text-[14px] font-semibold leading-5 text-ink">
+                                    {candidate.name}
+                                    {candidate.category && <span className="font-normal text-ink-secondary"> · {candidate.category}</span>}
+                                  </div>
+                                  <div className="truncate text-[13px] leading-[18px] text-ink-secondary">
+                                    {t("templates.matches", { values: candidate.matched.join(", ") })}
+                                  </div>
+                                </div>
+                              </label>
+                              <button
+                                type="button"
+                                onClick={() => void openExternal(candidate.detailUrl)}
+                                aria-label={t("templates.openDirectory", { name: candidate.name })}
+                                title={t("templates.readBeforeAdding")}
+                                className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink"
+                              >
+                                <ExternalLink size={14} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
+
+                    <div className="mt-5 flex flex-col gap-2 px-2 sm:flex-row sm:items-center">
+                      <input
+                        value={roomName}
+                        onChange={(event) => setRoomName(event.target.value)}
+                        aria-label={t("templates.groupChatName")}
+                        className="h-9 min-w-0 flex-1 rounded-full bg-control/70 px-3.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => void createProject()}
+                        disabled={creating}
+                        className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-60"
+                      >
+                        {creating && <Loader2 size={14} className="animate-spin" />}
+                        {creating ? t("templates.creating") : t("templates.createGroupChat")}
+                      </button>
+                    </div>
+                    <p className="mt-2 px-2 text-[12px] leading-4 text-ink-tertiary">
+                      {t("templates.createGroupHint")}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
       {sharing !== null && <ShareTeamDialog team={sharing} onClose={() => setSharing(null)} />}

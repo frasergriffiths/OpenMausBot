@@ -24,10 +24,14 @@ export function AvatarActivityDot({ activity }: { activity: RowActivity | null }
 }
 
 /** Unread, or waiting for the person (which wins): one dot at the row's top right, in the spot its ⋯ takes on hover
- * or focus. A touch screen always shows the ⋯, so there the dot sits just before it, at the end of the name line. */
-export function RowDot({ waiting = false }: { waiting?: boolean }) {
+ * or focus. A touch screen always shows the ⋯, so there the dot sits just before it, at the end of the name line.
+ * Simple rows pass `inline`: the dot sits in the title line, before the reserved ⋯ slot and the provider mark. */
+export function RowDot({ waiting = false, inline = false }: { waiting?: boolean; inline?: boolean }) {
   const label = waiting ? t("sidebar.preview.waiting") : t("task.unread");
   const tone = cn("size-2 shrink-0 rounded-full", waiting ? "bg-warning" : "bg-accent");
+  if (inline) {
+    return <span data-testid={waiting ? "waiting-dot" : "unread-dot"} title={label} aria-hidden="true" className={cn(tone, "self-center")} />;
+  }
   return (
     <>
       <span aria-hidden="true" data-row-dot="" className="pointer-events-none absolute right-2 top-1 flex size-7 items-center justify-center transition-opacity group-hover:opacity-0 group-focus-within:opacity-0 touch:opacity-0 max-md:hidden">
