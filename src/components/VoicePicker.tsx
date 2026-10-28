@@ -7,6 +7,7 @@ import { Check, Loader2, Search } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { usePopoverDismiss } from "@/hooks/use-popover-dismiss";
+import { MENU_LABEL, MENU_NOTE, MENU_SEPARATOR, MENU_STROKE, SIMPLE_MENU_ROW } from "./menu-recipe";
 import { useMenuMotion } from "./MenuMotion";
 import { Chevron } from "./chevron";
 
@@ -188,10 +189,10 @@ export function VoicePicker({
   };
 
   const heading = (text: string, hint?: string) => (
-    <div role="presentation" className="px-2.5 pb-1 pt-2">
-      <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-secondary">{text}</div>
-      {hint && <div className="mt-0.5 text-[11px] leading-4 text-ink-tertiary">{hint}</div>}
-    </div>
+    <>
+      <div role="presentation" className={MENU_LABEL}>{text}</div>
+      {hint && <p role="presentation" className={cn(MENU_NOTE, "pb-1")}>{hint}</p>}
+    </>
   );
 
   let body: ReactNode;
@@ -199,7 +200,7 @@ export function VoicePicker({
     body = (
       <div role="status" aria-label={t("voice.loading")}>
         {Array.from({ length: SKELETON_ROWS }, (_, row) => (
-          <div key={row} data-voice-skeleton className="animate-pulse px-2.5 py-2">
+          <div key={row} data-voice-skeleton className="animate-pulse px-2 py-2">
             <span className="block h-3.5 w-2/5 rounded bg-raised" />
             <span className="mt-1.5 block h-3 w-4/5 rounded bg-raised/70" />
           </div>
@@ -219,7 +220,7 @@ export function VoicePicker({
       return (
         <div key={voice.id || "default"}>
           {index === mineStart && heading(t("voice.yourVoices"))}
-          {index === libraryStart && index > 0 && <div role="separator" className="mx-2.5 my-1 h-px bg-hairline/50" />}
+          {index === libraryStart && index > 0 && <div role="separator" className={MENU_SEPARATOR} />}
           {index === libraryStart && heading(t("voice.library"), t("voice.libraryHint"))}
           <div
             id={`${listId}-${index}`}
@@ -231,13 +232,13 @@ export function VoicePicker({
             onMouseMove={() => index !== active && setActiveId(voice.id)}
             onClick={() => pick(voice)}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-2.5 py-1.5",
+              SIMPLE_MENU_ROW,
               loading ? "cursor-default" : "cursor-pointer",
-              index === active && "bg-raised",
+              index === active && "bg-ink/[0.06]",
             )}
           >
             <span className="min-w-0 flex-1">
-              <span className={cn("block truncate text-[13px] leading-5 text-ink", current && "font-medium")}>{voice.label}</span>
+              <span className={cn("block truncate text-[13px] leading-[18px] text-ink", current && "font-medium")}>{voice.label}</span>
               {voice.description && (
                 <span title={voice.description} className="block truncate text-[12px] leading-4 text-ink-secondary">
                   {voice.description}
@@ -258,38 +259,36 @@ export function VoicePicker({
       {...motion.exitProps}
       style={{ position: "fixed", ...place, visibility: place ? undefined : "hidden" }}
       className={cn(
-        "popover-surface z-[70] flex flex-col overflow-hidden rounded-xl border border-hairline/50 bg-menu shadow-2xl shadow-black/50",
+        "menu-surface z-[70] flex flex-col overflow-hidden",
         motion.className,
       )}
     >
-      <div className="shrink-0 p-1.5">
-        <div className="flex items-center gap-2 rounded-lg border border-hairline/40 bg-inset px-2.5 py-1.5 focus-within:border-focus">
-          {loading ? (
-            <Loader2 size={13} aria-hidden className="shrink-0 animate-spin text-ink-secondary" />
-          ) : (
-            <Search size={13} aria-hidden className="shrink-0 text-ink-secondary" />
-          )}
-          <input
-            ref={inputRef}
-            type="search"
-            role="combobox"
-            aria-expanded={open}
-            aria-controls={listId}
-            aria-autocomplete="list"
-            aria-activedescendant={!skeleton && !empty && rows[active] ? `${listId}-${active}` : undefined}
-            value={query}
-            onChange={(event) => {
-              setActiveId(null);
-              onQuery(event.target.value);
-            }}
-            onKeyDown={onSearchKey}
-            placeholder={t("voice.search")}
-            aria-label={t("voice.search")}
-            autoComplete="off"
-            spellCheck={false}
-            className="w-full bg-transparent text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none [&::-webkit-search-cancel-button]:hidden"
-          />
-        </div>
+      <div className="group/search flex h-9 shrink-0 items-center gap-2 border-b-[0.5px] border-ink/10 pl-3.5 pr-2">
+        {loading ? (
+          <Loader2 size={16} strokeWidth={MENU_STROKE} aria-hidden className="shrink-0 animate-spin text-ink-tertiary group-focus-within/search:text-ink-secondary" />
+        ) : (
+          <Search size={16} strokeWidth={MENU_STROKE} aria-hidden className="shrink-0 text-ink-tertiary group-focus-within/search:text-ink-secondary" />
+        )}
+        <input
+          ref={inputRef}
+          type="search"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={!skeleton && !empty && rows[active] ? `${listId}-${active}` : undefined}
+          value={query}
+          onChange={(event) => {
+            setActiveId(null);
+            onQuery(event.target.value);
+          }}
+          onKeyDown={onSearchKey}
+          placeholder={t("voice.search")}
+          aria-label={t("voice.search")}
+          autoComplete="off"
+          spellCheck={false}
+          className="min-w-0 flex-1 bg-transparent text-[13px] leading-[18px] text-ink outline-none placeholder:text-ink-tertiary [&::-webkit-search-cancel-button]:hidden"
+        />
       </div>
       <div
         ref={listRef}
@@ -300,11 +299,11 @@ export function VoicePicker({
         // Keep the focus in the search box when a row is clicked.
         onMouseDown={(event) => event.preventDefault()}
         className={cn(
-          "min-h-0 flex-1 overflow-y-auto overscroll-contain px-1.5 pb-1.5 transition-opacity",
+          "min-h-0 flex-1 overflow-y-auto overscroll-contain transition-opacity",
           loading && !skeleton && "opacity-60",
         )}
       >
-        {body}
+        <div className="flex flex-col gap-0.5 p-1.5">{body}</div>
       </div>
     </div>
   );
