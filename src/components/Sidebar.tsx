@@ -903,7 +903,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
               onMenu({ botId: bot.id, x: rect.left, y: rect.bottom });
             }}
             onKeyDown={(event) => event.stopPropagation()}
-            className="pointer-events-none flex size-7 shrink-0 items-center justify-center rounded-md text-ink-secondary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 aria-expanded:pointer-events-auto aria-expanded:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70"
+            className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-md text-ink-secondary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 aria-expanded:pointer-events-auto aria-expanded:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70"
           >
             <MoreHorizontal size={15} />
           </button>

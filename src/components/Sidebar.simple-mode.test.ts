@@ -165,7 +165,7 @@ describe("bot-first sidebar", () => {
     expect(markup).toContain('class="flex items-baseline justify-between gap-2"');
     expect(String(findElement(tree, "data-sidebar-bot-row", bot.id)!.props.className)).not.toContain("group-hover:pr-9");
     expect(markup).not.toContain("group-hover:pr-7");
-    expect(markup).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bsize-7\b[^"]*\bopacity-0\b/);
+    expect(markup).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bsize-6\b[^"]*\bopacity-0\b/);
   });
 
   it("keeps a Simple row's ⋯ visible while its menu is open", () => {
