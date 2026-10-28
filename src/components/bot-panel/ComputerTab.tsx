@@ -137,6 +137,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
   const { currentLabel, usingNow } = usePlaceChoices(bot);
   const screenOf = t("computer.screenOf", { name: bot.name });
   const android = useAndroidUsbDevices();
+  const openComputer = useOpenComputer(bot);
 
   const screen = [...bot.messages].reverse().find((message) => message.kind === "screen" && (message.hasImage || message.png));
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
@@ -149,7 +150,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
         type="button"
         data-panel-action="open-computer"
         aria-label={`${t("place.action.watch")}: ${screenOf}`}
-        onClick={() => onOpen("computer")}
+        onClick={() => openComputer("computer")}
         className="group relative mt-2.5 flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl bg-composer ring-1 ring-inset ring-ink/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-border"
       >
         {screenSrc ? (

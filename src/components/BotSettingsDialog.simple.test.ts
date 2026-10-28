@@ -821,9 +821,12 @@ describe("the Computer tab", () => {
     expect(onOpen).toHaveBeenLastCalledWith("browser");
     for (const page of ["folder", "logins", "android"]) expect(has(rendered, "data-panel-page", page)).toBe(false);
     expect(has(rendered, "data-panel-row", "data")).toBe(false);
+    (fixture.dispatch as ReturnType<typeof vi.fn>).mockClear();
     click(find(rendered, "data-panel-action", "open-computer"));
-    expect(onOpen).toHaveBeenLastCalledWith("computer");
-    expect((fixture.dispatch as ReturnType<typeof vi.fn>).mock.calls.some(([action]) => (action as { type?: string }).type === "toggleComputer")).toBe(false);
+    const dispatches = (fixture.dispatch as ReturnType<typeof vi.fn>).mock.calls.map(([action]) => action as { type?: string; open?: boolean });
+    expect(dispatches).toContainEqual({ type: "toggleSettings", open: false });
+    expect(dispatches).toContainEqual({ type: "toggleComputer", open: true });
+    expect(onOpen).not.toHaveBeenLastCalledWith("computer");
   });
 });
 
