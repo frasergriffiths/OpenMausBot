@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Check, ChevronDown, FolderInput, Pencil, Pin, PinOff, Plus, Search, Trash2 } from "lucide-react";
+import { Activity, Check, FolderInput, Pencil, Pin, PinOff, Plus, Search, Trash2 } from "lucide-react";
 import { useStore, type Bot, type BotProject, type Group, type Task } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { roomThreadsWorkingElsewhere } from "@/lib/room-threads";
@@ -15,6 +15,7 @@ import { useAdvancedMode } from "@/lib/interface-mode";
 import { attentionJumpAction, attentionOwnerName, AttentionThreadRows, crossBotAttentionThreads, threadsWhenTreeHidden, type AttentionThread } from "./SidebarBotActivity";
 import { formatUpdatedAt, orderedThreadList, threadByline, threadRecency, threadUpdatedLabel, useRelativeNow } from "./SidebarThreadRow";
 import { Select } from "./Select";
+import { Chevron } from "./chevron";
 
 /** Advanced keeps the old hidden chevron below the chathead breakpoint; Simple shows it so the switch is named. */
 export function taskPickerChevronClass(advanced: boolean): string {
@@ -248,7 +249,7 @@ function ConversationTaskPicker({
             className="size-1.5 shrink-0 animate-pulse rounded-full bg-accent"
           />
         )}
-        <ChevronDown size={12} className={taskPickerChevronClass(advanced)} />
+        <Chevron kind="menu" size="inline" className={taskPickerChevronClass(advanced)} />
       </button>
 
       {motion.shown && (

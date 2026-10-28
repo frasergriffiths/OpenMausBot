@@ -2,12 +2,13 @@
 // area never clips it, and the focus stays in the search box while the arrow keys walk the rows.
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronDown, Loader2, Search } from "lucide-react";
+import { Check, Loader2, Search } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { useMenuMotion } from "./MenuMotion";
+import { Chevron } from "./chevron";
 
 export interface PickerVoice {
   id: string;
@@ -337,7 +338,7 @@ export function VoicePicker({
         {pending ? (
           <Loader2 size={14} aria-hidden className="shrink-0 animate-spin text-ink-secondary" />
         ) : (
-          <ChevronDown size={14} aria-hidden className={cn("shrink-0 text-ink-secondary transition-transform", open && "rotate-180")} />
+          <Chevron kind="menu" open={open} size="row" className="text-ink-secondary" />
         )}
       </button>
       {sheet && typeof document !== "undefined" ? createPortal(sheet, document.body) : null}

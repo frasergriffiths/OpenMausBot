@@ -48,7 +48,6 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
 
   const motion = useMenuMotion(open);
   const headingId = useId();
-  const menuId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
@@ -97,6 +96,11 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
     const next = save ? nextRename(task.title, draft) : null;
     setRenaming(null);
     if (next) actions.onRename(task, next);
+    requestAnimationFrame(() => {
+      const row = panelRef.current?.querySelector<HTMLElement>(`[data-thread-row="${task.threadId}"]`);
+      if (row) row.focus();
+      else onClose(true);
+    });
   };
 
   const rowMenu = (task: RowTask): SidebarMenuItem[] => {
@@ -124,13 +128,22 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
   return createPortal(
     <div
       ref={panelRef}
-      id={menuId}
+      id="thread-switcher"
       role="dialog"
       aria-labelledby={headingId}
       data-thread-switcher
       style={{ position: "fixed", left: position?.left ?? 8, top: position?.top ?? 8, maxHeight: "calc(100vh - 16px)", visibility: position ? undefined : "hidden" }}
       onKeyDown={(event) => {
-        if (event.key === "Tab") { event.preventDefault(); onClose(true); return; }
+        if (event.key === "Tab") {
+          // Tab moves through the panel's own controls; wrap at the ends so it never falls behind the sheet.
+          const focusables = [...(panelRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])') ?? [])]
+            .filter((element) => element.tabIndex !== -1 || element === document.activeElement);
+          if (!focusables.length) return;
+          const first = focusables[0]!, last = focusables[focusables.length - 1]!;
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+          return;
+        }
         if (event.key !== "ArrowDown" && event.key !== "ArrowUp" && event.key !== "Home" && event.key !== "End") return;
         event.preventDefault();
         const items = [...(panelRef.current?.querySelectorAll<HTMLElement>("[data-switcher-focus]") ?? [])];
@@ -188,7 +201,7 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
                         data-switcher-focus={task.threadId}
                         aria-current={isCurrent ? "true" : undefined}
                         tabIndex={isCurrent ? 0 : -1}
-                        onClick={() => { openBotThread(dispatch, bot, task.threadId, false); onClose(false); }}
+                        onClick={() => { openBotThread(dispatch, bot, task.threadId, false); onClose(true); }}
                         className={cn(
                           "flex h-10 min-w-0 flex-1 items-center gap-2 rounded-md pl-2 pr-1 text-left focus:bg-ink/[0.06]",
                           SIMPLE_ROW_FOCUS,
@@ -233,7 +246,7 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
         type="button"
         data-switcher-focus="new"
         tabIndex={-1}
-        onClick={() => { dispatch({ type: "newTask", botId: bot.id }); onClose(false); }}
+        onClick={() => { dispatch({ type: "newTask", botId: bot.id }); onClose(true); }}
         className={cn("flex h-10 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium text-ink hover:bg-menu-hover", MENU_ROW, "h-10")}
       >
         <span className="flex size-4 shrink-0 items-center justify-center"><Plus size={14} /></span>
@@ -246,7 +259,7 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
           body={t("task.deleteBody", { title: displayTitle(deleting) })}
           confirmLabel={t("task.deleteAria")}
           onCancel={() => setDeleting(null)}
-          onConfirm={() => { actions.onDelete(deleting); setDeleting(null); }}
+          onConfirm={() => { actions.onDelete(deleting); setDeleting(null); onClose(true); }}
         />
       )}
     </div>,

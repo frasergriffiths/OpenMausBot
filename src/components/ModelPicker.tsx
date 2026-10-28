@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, ChevronLeft, ChevronRight, KeyRound, Loader2, RefreshCw, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, KeyRound, Loader2, RefreshCw, X } from "lucide-react";
 import { useStore, currentTaskBot, type AppState, type Bot, type InstanceInfo, type ModelSelection } from "@/state/store";
 import type { EffortLevel } from "../../shared/wire";
 import type { ModelVariantOption } from "../../shared/runtime-events";
@@ -743,14 +743,7 @@ export function ModelPicker({
           </span>
         )}
       </span>
-      <ChevronDown
-        size={14}
-        className={cn(
-          "text-ink-secondary transition-transform",
-          open && "rotate-180",
-          !contained && active && "@max-4xl/chathead:hidden",
-        )}
-      />
+      <Chevron kind="menu" open={open} size="row" className={cn("text-ink-secondary", !contained && active && "@max-4xl/chathead:hidden")} />
     </button>
   ) : (
     <button

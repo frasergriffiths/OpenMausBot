@@ -115,6 +115,8 @@ describe("the thread chip in Simple mode", () => {
     flushSync(() => chip()!.click());
     expect(sheet()).not.toBeNull();
     expect(sheet()!.getAttribute("role")).toBe("dialog");
+    expect(sheet()!.id).toBe("thread-switcher");
+    expect(chip()!.getAttribute("aria-controls")).toBe("thread-switcher");
     expect(rows()).toHaveLength(4);
     expect(rows().filter((row) => row.getAttribute("aria-current") === "true")).toHaveLength(1);
     expect(rows()[0]!.getAttribute("aria-current")).toBe("true");
@@ -130,6 +132,21 @@ describe("the thread chip in Simple mode", () => {
     await settle();
     expect(sheet()).toBeNull();
     expect(actions.some((action) => action.type === "switchTask" || action.type === "select")).toBe(true);
+    expect(document.activeElement).toBe(chip());
+  });
+
+  it("lets Tab move to the row actions instead of closing the sheet", () => {
+    draw();
+    flushSync(() => chip()!.click());
+    expect(sheet()).not.toBeNull();
+    flushSync(() => {
+      (document.activeElement ?? sheet()!).dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+    });
+    // Tab is no longer swallowed: the sheet stays open, and its kebab buttons are real tab stops.
+    expect(sheet()).not.toBeNull();
+    const kebabs = [...sheet()!.querySelectorAll<HTMLButtonElement>('button[aria-haspopup="menu"]')];
+    expect(kebabs.length).toBe(4);
+    for (const kebab of kebabs) expect(kebab.tabIndex).toBe(0);
   });
 
   it("closes on Escape and returns focus to the chip", async () => {
