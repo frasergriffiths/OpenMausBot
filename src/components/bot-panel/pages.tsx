@@ -7,12 +7,10 @@ import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { MEMORY_INDEX, saveMemoryDoc } from "@/lib/memory";
 import { openExternalLink } from "@/lib/app-links";
-import type { Routine } from "@/lib/routines";
 import { shortPath } from "@/lib/short-path";
 import { currentTaskBot, useStore, type Bot } from "@/state/store";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
 import { ServiceIcon } from "../PluginsPanel";
-import { RoutineEditor } from "../RoutinesPage";
 import { useWorkingFolder } from "../bot-settings/AccessSection";
 import { useBotEditor } from "../bot-settings/BotEditorContext";
 import { SkillReviewDialog, useManagedSkills, type ManagedSkill } from "../bot-settings/SkillsSection";
@@ -104,34 +102,17 @@ export function AppsPage({ bot, derived }: PageContext) {
   );
 }
 
+/** Routines are the bot's to create and manage; the panel shows them read-only, with their runs. */
 export function RoutinesPage({ bot, derived }: PageContext) {
   const { state, dispatch } = useStore();
-  const [editing, setEditing] = useState<Routine | "new" | null>(null);
   return (
-    <>
-      <RoutineList
-        routines={derived.botRoutines}
-        runs={state.routineRuns}
-        loading={state.routinesLoadState === "loading" && derived.botRoutines.length === 0}
-        error={state.routinesLoadState === "error"}
-        onOpen={setEditing}
-        onLogs={(routine) => dispatch({ type: "showRoutines", section: "logs", botId: bot.id, routineId: routine.id })}
-        onToggle={(routine) => dispatch({ type: "updateRoutine", routineId: routine.id, patch: { enabled: !routine.enabled } })}
-      />
-      <Card>
-        <LinkRow data-panel-action="new-routine" icon={Plus} onClick={() => setEditing("new")}>{t("botPanel.routines.add")}</LinkRow>
-      </Card>
-      <p className="mx-1 text-[13px] leading-normal text-ink-secondary">{t("botPanel.routines.ask", { name: bot.name })}</p>
-      {editing && (
-        <RoutineEditor
-          key={bot.id}
-          routine={editing === "new" ? undefined : editing}
-          bots={[bot]}
-          lockedBotId={bot.id}
-          onClose={() => setEditing(null)}
-        />
-      )}
-    </>
+    <RoutineList
+      routines={derived.botRoutines}
+      runs={state.routineRuns}
+      loading={state.routinesLoadState === "loading" && derived.botRoutines.length === 0}
+      error={state.routinesLoadState === "error"}
+      onLogs={(routine) => dispatch({ type: "showRoutines", section: "logs", botId: bot.id, routineId: routine.id })}
+    />
   );
 }
 

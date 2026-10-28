@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Loader2, Menu } from "lucide-react";
 import { CLOUD_LINK_SETTINGS, openBot, StoreProvider, useStore } from "@/state/store";
 import { useShowThreads } from "@/lib/thread-preferences";
@@ -19,12 +19,13 @@ import { PHONE_LAYOUT, SIDEBAR_AND_PANEL_FIT, SIDEBAR_INLINE, TWO_SIDE_PANELS_FI
 import { PluginsPanel, preloadConnectedApps } from "@/components/PluginsPanel";
 import {
   ActivityPanel, BotSettingsDialog, ComputerPanel, FilesView, InspectorPanel, KeyboardShortcutsModal, LocalVmWorkspace,
-  preloadScreens, RemoteAgentSettingsPanel, RemoteDesktopPanel, RoomPanel, SettingsModal, TeamMapPage, TriggersPage,
+  preloadScreens, RemoteAgentSettingsPanel, RemoteDesktopPanel, RoomPanel, SettingsModal, TeamMapPage,
 } from "@/components/lazy-screens";
 import { useAdvancedMode } from "@/lib/interface-mode";
 import { useRoomPanelShown } from "@/lib/room-panel";
 import { WorkspaceBackupRecovery } from "@/components/WorkspaceBackupSettings";
 import { NotificationRail, NotificationsPanel } from "@/components/NotificationsPanel";
+import { RoutineRunsPage } from "@/components/RoutineRunsPage";
 import { useNotificationFeed } from "@/lib/notification-preferences";
 import { UpdateBanner } from "@/components/UpdateBanner";
 import { AppNotices } from "@/components/AppNotices";
@@ -126,8 +127,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [localVmWorkspaceBotId, setLocalVmWorkspaceBotId] = useState<string | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
-  const previousViewRef = useRef(state.activeView);
-  const calendarOriginRef = useRef<"chat" | "team-map">("chat");
   const loading = loadingLine({ connected: state.connected, hydrated: state.hydrated === true, developer: import.meta.env.DEV });
   const group = state.groups.find((g) => g.id === state.selectedId);
   const chiefStep = useChiefStepOpen();
@@ -138,7 +137,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   const botPanelOpen = advanced ? (state.settingsOpen || state.computerOpen || state.inspectorOpen || state.activityOpen) : state.settingsOpen;
   const sidePanelOpen = (Boolean(bot) && botPanelOpen) || roomPanelOpen || (notificationFeed && state.notificationsOpen);
   const collapseSidebar = sidePanelOpen && !sidebarAndPanelFit;
-  const calendarFocus = state.activeView === "routines" && state.routinesFocus.view === "calendar";
 
   const noEngines =
     state.connected &&
@@ -209,13 +207,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   }, [state.selectedId, bot?.threadId, group?.threadId, state.activeView, state.pluginsOpen, state.settingsOpen]);
 
   useEffect(() => {
-    if (state.activeView === "routines" && previousViewRef.current !== "routines") {
-      calendarOriginRef.current = previousViewRef.current === "team-map" ? "team-map" : "chat";
-    }
-    previousViewRef.current = state.activeView;
-  }, [state.activeView]);
-
-  useEffect(() => {
     if (
       localVmWorkspaceBotId &&
       (state.activeView !== "chat" || state.selectedId !== localVmWorkspaceBotId)
@@ -235,17 +226,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
     if (advanced) dispatch({ type: "toggleComputer", open: true });
     else dispatch({ type: "toggleSettings", open: true, section: "access", botId });
   };
-
-  const closeCalendar = useCallback(() => {
-    if (calendarOriginRef.current === "team-map") {
-      dispatch({ type: "showTeamMap" });
-      return;
-    }
-    dispatch({ type: "select", id: state.selectedId });
-  }, [dispatch, state.selectedId]);
-  const openCalendarRoom = useCallback((id: string) => {
-    dispatch({ type: "select", id });
-  }, [dispatch]);
 
   const nativeViewOverlayOpen =
     drawerOpen ||
@@ -291,13 +271,13 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
 
   return (
     <div className="flex h-full flex-col">
-      <UpdateBanner sidebarIndicator={!calendarFocus && (sidebarInline || drawerOpen)} />
+      <UpdateBanner sidebarIndicator={sidebarInline || drawerOpen} />
       <CloudAsleepStrip />
       <CloudSendStrip cloudHome={state.config?.cloudHome === true} onPairPhone={() => dispatch(phonePairingSettingsAction())} />
       <HomeLine />
       <AppNotices quiet={paletteOpen || drawerOpen || Boolean(localVmWorkspaceBotId)} viewer={viewer} />
       <div className="relative flex min-h-0 flex-1">
-      {!calendarFocus && <button
+      <button
         type="button"
         ref={menuButtonRef}
         aria-label="Open bot list"
@@ -307,28 +287,28 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       >
         <Menu size={18} className="max-md:hidden" />
         <ChevronLeft size={20} aria-hidden="true" className="hidden max-md:block" />
-      </button>}
-      {drawerOpen && !calendarFocus && (
+      </button>
+      {drawerOpen && (
         <div
           aria-hidden
           onMouseDown={(e) => e.target === e.currentTarget && setDrawerOpen(false)}
           className="absolute inset-0 z-30 bg-black/50 md:hidden"
         />
       )}
-      {!calendarFocus && <Sidebar
+      <Sidebar
         collapseToIcons={collapseSidebar}
         open={drawerOpen}
         onClose={() => {
           setDrawerOpen(false);
           menuButtonRef.current?.focus();
         }}
-      />}
+      />
       {state.activeView === "team-map" ? (
         <TeamMapPage />
       ) : state.activeView === "files" ? (
         <FilesView />
       ) : state.activeView === "routines" ? (
-        <TriggersPage onBack={closeCalendar} onOpenRoom={openCalendarRoom} />
+        <RoutineRunsPage onBack={() => dispatch({ type: "showChat" })} />
       ) : !remoteClient && localVmWorkspaceBotId ? (
         <LocalVmWorkspace
           primaryBotId={localVmWorkspaceBotId}
@@ -387,8 +367,8 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       )}
       {advanced && !remoteClient && state.inspectorOpen && bot && <InspectorPanel key={bot.threadId} bot={bot} />}
       {advanced && !remoteClient && state.activityOpen && bot && <ActivityPanel key={`activity:${bot.id}`} bot={bot} />}
-      {notificationFeed && !calendarFocus && state.notificationsOpen && <NotificationsPanel />}
-      {notificationFeed && !calendarFocus && <NotificationRail />}
+      {notificationFeed && state.notificationsOpen && <NotificationsPanel />}
+      {notificationFeed && <NotificationRail />}
       {state.appSettingsOpen && <SettingsModal />}
       <CloudAddDialog />
       <CloudHowTo />
@@ -404,12 +384,12 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       {/* After the modals: same z-50 tier, so DOM order keeps the palette on top. */}
       <CommandPalette onOpenChange={setPaletteOpen} />
       {/* Blink resolves -webkit-app-region in DOM order, so this no-drag twin after the headers cuts the drawer button back out. */}
-      {!calendarFocus && <span
+      <span
         aria-hidden
         data-drawer-button-no-drag
         style={captionChrome.noDragStyle}
         className="pointer-events-none absolute left-3 top-3 size-[30px] md:hidden"
-      />}
+      />
       </div>
       {/* Last child on purpose: Blink resolves -webkit-app-region in DOM order, so no-drag buttons must follow every drag region. */}
       <WindowCaptionButtons

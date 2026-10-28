@@ -119,7 +119,7 @@ export function openPlaceAction(
   switch (id) {
     case "choose-model": openBotSettings(dispatch, "model", { botId: target.botId }); return true;
     case "open-tools": openBotSettings(dispatch, "access", { botId: target.botId, page: "tools" }); return true;
-    case "change-routine": openBotSettings(dispatch, "routines", { botId: target.botId }); return true;
+    case "change-routine": openBotSettings(dispatch, "overview", { botId: target.botId, page: "routines" }); return true;
     case "sign-in": appSettings("engines"); return true;
     case "manage-computers": appSettings("computer"); return true;
     case "add-boat-key": appSettings("connections"); return true;

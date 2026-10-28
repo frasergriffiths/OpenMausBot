@@ -227,7 +227,7 @@ describe("Settings → Appearance", () => {
 
   it("appearance search finds the tools layout row via toolbar", () => {
     const appearance = SECTIONS.find((entry) => entry.id === "appearance")!;
-    for (const query of ["toolbar", "tools layout", "footer", "routines", "triggers", "team map"]) {
+    for (const query of ["toolbar", "tools layout", "footer", "team map"]) {
       expect(sectionMatches(appearance, query)).toBe(true);
     }
   });

@@ -403,7 +403,7 @@ export function ApprovalCard({
 }) {
   const card = message.card;
   if (!card) return null;
-  if (cardAutomation(card)) return <TriggerCard card={card} threadId={threadId} />;
+  if (cardAutomation(card)) return <TriggerCard card={card} />;
   const applied = card.autoApplied === true && card.answered === "allow" && !card.held
     ? appliedChange(card, bot?.name ?? t("approval.someone"))
     : undefined;

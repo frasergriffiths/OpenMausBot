@@ -153,7 +153,8 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
               </>
             )}
           </div>
-          <div className="flex h-11 shrink-0 items-center px-3 py-1">
+          {/* 8px above the pills and 8px below them: the same step, so the tab row does not look bottom-heavy. */}
+          <div className="flex h-[38px] shrink-0 items-center px-3 pt-2">
             <div role="tablist" aria-label={t("botSettings.simple.tabs")} className={cn(PILL_TABS, "hidden w-full @[270px]:flex")} onKeyDown={onTabKeyDown}>
               {PANEL_TABS.map((id, index) => (
                 <button
@@ -208,7 +209,9 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           "min-h-0 flex-1",
           page === "browser" || page === "data" || page === "files" || page === "computer"
             ? "flex flex-col overflow-hidden p-3"
-            : "overflow-y-auto px-4 pb-6 pt-4",
+            : page === null
+              ? "overflow-y-auto px-4 pb-6 pt-2"
+              : "overflow-y-auto px-4 pb-6 pt-4",
         )}
       >
         {page === null ? (

@@ -44,7 +44,6 @@ describe("OverviewSection", () => {
       overview: { ...sentences, setup: [
         { id: "identity", label: "Identity", done: true, section: "identity" },
         { id: "folder", label: "Choose a working folder", done: false, section: "access" },
-        { id: "schedule", label: "Add a routine", done: false, section: "routines" },
       ] }, prompt: null, onOpen: vi.fn(),
     }));
     expect(markup).toContain("Setup ideas");

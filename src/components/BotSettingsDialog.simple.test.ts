@@ -133,7 +133,6 @@ const { ModelPicker } = await import("./ModelPicker");
 const { ThreadModelsLine } = await import("./ThreadModelsLine");
 const { ModelSection } = await import("./bot-settings/ModelSection");
 const { RoutineList } = await import("./routines/RoutineList");
-const { RoutineEditor } = await import("./RoutinesPage");
 const { SignedInSites } = await import("./SignedInSites");
 const { AvatarImageGenerator } = await import("./AvatarImageGenerator");
 const { AvatarFraming } = await import("./avatar-editing");
@@ -359,7 +358,7 @@ describe("the bot panel in Simple mode", () => {
   it.each([
     ["overview", "profile", undefined], ["identity", "profile", undefined], ["slack", "profile", undefined],
     ["soul", "profile", "settings"], ["skills", "library", "skills"], ["memory", "library", "memory"],
-    ["routines", "profile", "routines"], ["access", "computer", undefined], ["model", "profile", undefined],
+    ["access", "computer", undefined], ["model", "profile", undefined],
     ["permissions", "profile", "settings"], ["voice", "profile", undefined], ["visibility", "profile", undefined],
     ["history", "profile", undefined], ["usage", "profile", undefined],
   ] as const)("lands a deep link to %s on %s › %s", (section, tab, page) => {
@@ -963,20 +962,17 @@ describe("the drill-in pages", () => {
     expect(switches(cannot.html)).toBe(0);
   });
 
-  it("lists routines with switches, adds one locked to this bot, and says to ask in chat; no logs page, no schedules link", () => {
+  it("lists routines read-only: no switch, no new-routine row, no schedules link", () => {
     const morning = routine();
     fixture.derived.botRoutines = [morning];
     const rendered = body("routines");
     const list = ofType(rendered, RoutineList)!;
     expect(list.props.routines).toBe(fixture.derived.botRoutines);
-    (list.props.onToggle as (routine: Routine) => void)(morning);
-    expect(fixture.dispatch).toHaveBeenLastCalledWith({ type: "updateRoutine", routineId: "r1", patch: { enabled: false } });
-    expect(rendered.html).toContain('aria-label="Run Morning brief on its schedule" type="button" role="switch" aria-checked="true"');
-    expect(rendered.html).toContain("Or just ask Scout in chat: “every weekday at 8, send me a summary”.");
+    expect(list.props.onOpen).toBeUndefined();
+    expect(list.props.onToggle).toBeUndefined();
+    expect(has(rendered, "data-panel-action", "new-routine")).toBe(false);
     expect(rendered.html).not.toContain("Open schedules");
-    expect(has(rendered, "data-panel-action", "routine-logs")).toBe(false);
-    click(find(rendered, "data-panel-action", "new-routine"));
-    expect(ofType(body("routines"), RoutineEditor)!.props).toMatchObject({ lockedBotId: "scout", routine: undefined });
+    expect(rendered.html).not.toContain("role=\"switch\"");
   });
 
   it("lists what MEMORY.md remembers, forgets one line through the memory file route, and adds one", async () => {
@@ -1135,7 +1131,7 @@ describe("the bot settings dialog", () => {
     expect(ofType(rendered, BotPanel)).toBeUndefined();
     expect(rendered.html).not.toContain('id="bot-panel"');
     expect(rendered.html).toContain("Search settings");
-    for (const label of ["Overview", "Identity", "Soul", "Skills", "Memory", "Routines", "Access", "Model", "Permissions", "Voice &amp; alerts", "History", "Usage"]) {
+    for (const label of ["Overview", "Identity", "Soul", "Skills", "Memory", "Access", "Model", "Permissions", "Voice &amp; alerts", "History", "Usage"]) {
       expect(rendered.html).toContain(`>${label}</span>`);
     }
     // The accordion keeps the Memory and Access sections, where the memory, upkeep, browser and record-steps switches live.

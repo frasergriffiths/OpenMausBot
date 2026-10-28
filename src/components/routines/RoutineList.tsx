@@ -13,7 +13,8 @@ export function RoutineList({ routines, runs, bots, loading, error, onOpen, onLo
   bots?: Bot[];
   loading?: boolean;
   error?: boolean;
-  onOpen: (routine: Routine) => void;
+  /** Omitted for the read-only list: the title is then plain text, not a button into an editor. */
+  onOpen?: (routine: Routine) => void;
   onLogs: (routine: Routine) => void;
   onToggle?: (routine: Routine) => void;
 }) {
@@ -28,10 +29,17 @@ export function RoutineList({ routines, runs, bots, loading, error, onOpen, onLo
       const switched = onToggle !== undefined && !routineFinished(routine);
       return <article key={routine.id} className="rounded-xl border border-hairline/40 bg-card p-3.5" aria-label={routine.name}>
         <div className="flex items-start gap-2">
-          <button type="button" onClick={() => onOpen(routine)} className="min-w-0 flex-1 text-left hover:text-accent">
-            <span className="block truncate text-[13px] font-semibold text-ink">{routine.name}</span>
-            <span className="mt-1 block text-[12px] leading-relaxed text-ink-secondary">{bot && `${bot.name} · `}{scheduleLabel(routine.schedule)}</span>
-          </button>
+          {onOpen ? (
+            <button type="button" onClick={() => onOpen(routine)} className="min-w-0 flex-1 text-left hover:text-accent">
+              <span className="block truncate text-[13px] font-semibold text-ink">{routine.name}</span>
+              <span className="mt-1 block text-[12px] leading-relaxed text-ink-secondary">{bot && `${bot.name} · `}{scheduleLabel(routine.schedule)}</span>
+            </button>
+          ) : (
+            <div className="min-w-0 flex-1">
+              <span className="block truncate text-[13px] font-semibold text-ink">{routine.name}</span>
+              <span className="mt-1 block text-[12px] leading-relaxed text-ink-secondary">{bot && `${bot.name} · `}{scheduleLabel(routine.schedule)}</span>
+            </div>
+          )}
           {switched
             ? <Switch checked={routine.enabled} aria-label={t("routines.toggle", { name: routine.name })} onClick={() => onToggle(routine)} />
             : <span className={cn("shrink-0 rounded-full bg-inset px-2 py-0.5 text-[10px]", routine.enabled && routine.nextRunAt != null ? "text-accent" : "text-ink-secondary")}>{routineScheduleState(routine)}</span>}

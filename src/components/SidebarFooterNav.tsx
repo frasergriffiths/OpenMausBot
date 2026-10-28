@@ -1,12 +1,10 @@
-import { FolderOpen, Puzzle, UsersRound, Zap } from "lucide-react";
+import { FolderOpen, Puzzle, UsersRound } from "lucide-react";
 import type { ReactNode } from "react";
 
-import { useAppTriggers } from "@/lib/app-triggers";
 import { cn } from "@/lib/cn";
 import { useCloudFilesReady } from "@/lib/cloud-files";
 import { t } from "@/lib/i18n";
 import { useAdvancedMode } from "@/lib/interface-mode";
-import { isRoutineProblemRun } from "@/lib/routines";
 import { useSidebarToolsLayout, type SidebarDensity } from "@/lib/sidebar-preferences";
 import { useStore } from "@/state/store";
 
@@ -84,13 +82,6 @@ export function SidebarAppsButton() {
   );
 }
 
-/** An unseen failed run, or an app trigger in trouble. */
-export function useAutomationsNeedYou(): boolean {
-  const { state } = useStore();
-  const appTriggers = useAppTriggers();
-  return state.routineRuns.some((run) => isRoutineProblemRun(run) && !run.seenAt) || appTriggers.triggers.some((trigger) => trigger.enabled && trigger.problem);
-}
-
 export function SidebarBottomButtons() {
   return (
     <div data-sidebar-bottom-buttons="" className="flex shrink-0 items-center gap-0.5">
@@ -118,17 +109,6 @@ export function SidebarFooterNav({
   const toolbar = advanced && !iconsOnly && toolsLayout === "toolbar";
   const iconSize = iconsOnly && !rail ? 20 : 18;
   const tone = (active: boolean) => (active ? "text-accent" : "text-ink-secondary");
-  const automationsNeedYou = useAutomationsNeedYou();
-  const automationsRow = <NavRow
-    id="automations"
-    label={t("sidebar.nav.automations")}
-    tourId="nav-automations"
-    iconsOnly={iconsOnly || toolbar}
-    active={state.activeView === "routines"}
-    attention={automationsNeedYou}
-    icon={(active) => <Zap size={iconSize} className={tone(active)} />}
-    onClick={() => dispatch({ type: "showRoutines", view: "list" })}
-  />;
   const filesRow = useCloudFilesReady() && <NavRow
     id="files"
     label={t("sidebar.nav.files")}
@@ -153,7 +133,6 @@ export function SidebarFooterNav({
 
   const rows = (
     <>
-      {automationsRow}
       {appsRow}
       {(advanced || iconsOnly) && (
         <NavRow
@@ -178,7 +157,6 @@ export function SidebarFooterNav({
       <SidebarSectionHeader
         name={t("sidebar.tools")}
         collapsed={collapsed}
-        alert={collapsed && automationsNeedYou}
         onToggle={onToggleCollapsed}
         reorderable={false}
         dragging={false}

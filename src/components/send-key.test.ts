@@ -144,7 +144,8 @@ describe.each(SEND_KEYS)("in %s mode", (mode) => {
   it("editing a sent message submits on the same key", () => {
     render(createElement(ChatView, { bot: { ...bot, messages: [{ id: "ask", role: "user", kind: "text", at: 1, text: "Try the new model" }] } }));
     flushSync(() => host.querySelector<HTMLButtonElement>('[data-mid="ask"] button[aria-haspopup="menu"]')!.click());
-    const edit = [...host.querySelectorAll<HTMLButtonElement>('[data-mid="ask"] [role=menuitem]')].find((item) => (item.textContent ?? "").startsWith("Edit"))!;
+    // The message menu is portaled to <body>, outside the row.
+    const edit = [...document.querySelectorAll<HTMLButtonElement>('[role=menuitem]')].find((item) => (item.textContent ?? "").startsWith("Edit"))!;
     flushSync(() => edit.click());
     const editor = () => host.querySelector<HTMLTextAreaElement>("textarea:not([aria-label])")!;
     expect(editor().value).toBe("Try the new model");
@@ -224,7 +225,7 @@ describe("the send key in hints", () => {
     render(createElement(Composer, { bot: { ...bot, busy: true, tasks: [{ ...bot.tasks![0]!, busy: true }] } }));
     expect(textarea().placeholder).toBe("Pepper is working — Ctrl+Enter sends this into the running turn");
     render(createElement(Composer, { group: { ...room, busyBotId: "bot" }, members: [{ ...bot, modelSelection: { instanceId: "none", model: "x" } }] }));
-    expect(textarea().placeholder).toBe("Pepper is working — Ctrl+Enter queues your message");
+    expect(textarea().placeholder).toBe("Pepper is working — this engine can’t take steering, so Ctrl+Enter queues it");
   });
 
   it("names the key in Japanese hints too", () => {

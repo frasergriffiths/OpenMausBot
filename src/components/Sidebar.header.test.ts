@@ -260,15 +260,13 @@ describe("sidebar glass head and foot", () => {
       const search = at('aria-label="Search bots and messages"');
       const list = at('class="glass-scroller ');
       const foot = at('data-glass-bar="bottom"');
-      const automations = at('data-sidebar-nav="automations"');
       const places = at('data-sidebar-nav="team-map"');
       expect(head).toBeLessThan(topRow);
       expect(topRow).toBeLessThan(search);
       expect(search).toBeLessThan(list);
       expect(list).toBeLessThan(foot);
-      expect(foot).toBeLessThan(automations);
-      expect(automations).toBeLessThan(places);
-      expect(html.match(/data-sidebar-nav="automations"/g)).toHaveLength(1);
+      expect(foot).toBeLessThan(places);
+      expect(html).not.toContain('data-sidebar-nav="automations"');
       expect(html.match(/data-glass-frame=""/g)).toHaveLength(1);
       expect(at("data-glass-frame")).toBeLessThan(head);
     },
@@ -291,12 +289,11 @@ describe("sidebar foot in Simple mode", () => {
     expect(foot.match(/data-app-face="/g)).toHaveLength(3);
   });
 
-  it("keeps one Automations row in the foot and no Routines row in Advanced mode, and still one Apps", () => {
+  it("keeps no Automations or Routines row in Advanced mode, and still one Apps", () => {
     fixture.advanced = true;
     const html = render();
     expect(html).not.toContain('data-sidebar-nav="routines"');
-    expect(html.match(/data-sidebar-nav="automations"/g)).toHaveLength(1);
-    expect(html.indexOf('data-sidebar-nav="automations"')).toBeGreaterThan(html.indexOf('data-glass-bar="bottom"'));
+    expect(html).not.toContain('data-sidebar-nav="automations"');
     expect(html.match(/data-sidebar-nav="apps"/g)).toHaveLength(1);
   });
 });

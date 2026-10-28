@@ -83,7 +83,6 @@ vi.mock("./LinuxLocalControl", () => ({ LinuxLocalControl: () => null }));
 vi.mock("./MacLocalControl", () => ({ MacLocalControl: () => null }));
 vi.mock("./CloudBackendPicker", () => ({ CloudBackendPicker: () => null }));
 vi.mock("./LocalComputerAutoWarning", () => ({ LocalComputerAutoWarning: () => null }));
-vi.mock("./bot-settings/RoutinesSection", () => ({ RoutinesSection: () => null }));
 vi.mock("@/state/store", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/state/store")>(),
   api: (...args: unknown[]) => fixture.api(...args),
@@ -214,16 +213,10 @@ describe("Computer panel tabs", () => {
   it("keeps the Advanced tabs unchanged", () => {
     fixture.advanced = true;
     fixture.android = true;
-    expect(tabs(render(makeBot()))).toEqual(["Screen", "Routines", "Android", "Browser", "Data"]);
+    expect(tabs(render(makeBot()))).toEqual(["Screen", "Android", "Browser", "Data"]);
     fixture.config = {};
     fixture.android = false;
-    expect(tabs(render(makeBot()))).toEqual(["Screen", "Routines", "Browser", "Data"]);
-  });
-
-  it("reads a Routines view stored by Advanced as the Computer tab in Simple", () => {
-    fixture.view.current = "routines";
-    const rendered = render(makeBot());
-    expect(rendered.nodes.find((node) => node.props["data-testid"] === "where-works")).toBeDefined();
+    expect(tabs(render(makeBot()))).toEqual(["Screen", "Browser", "Data"]);
   });
 
   it("lists the files this chat changed in the Files tab", () => {
@@ -528,12 +521,11 @@ describe("A chat pinned to a place", () => {
 describe("Technical controls", () => {
   const cloud = () => makeBot({ computer: "cloud" });
 
-  it("hides the gear, backend picker and Routines card in Simple and keeps them in Advanced", () => {
+  it("hides the gear and backend picker in Simple and keeps them in Advanced", () => {
     const simple = render(cloud());
     expect(simple.nodes.some((node) => node.props.title === "Bot settings")).toBe(false);
     expect(simple.nodes.some((node) => node.type === CloudBackendPicker)).toBe(false);
     expect(simple.html).not.toContain("Works on");
-    expect(simple.buttons.some((node) => text(node.props.children).startsWith("Routines"))).toBe(false);
 
     fixture.advanced = true;
     fixture.values = [];
@@ -541,7 +533,6 @@ describe("Technical controls", () => {
     expect(advanced.nodes.some((node) => node.props.title === "Bot settings")).toBe(true);
     expect(advanced.nodes.some((node) => node.type === CloudBackendPicker)).toBe(true);
     expect(advanced.html).toContain("Works on");
-    expect(advanced.buttons.some((node) => text(node.props.children).startsWith("Routines"))).toBe(true);
   });
 
   it("hides the VM settings link in Simple", () => {
