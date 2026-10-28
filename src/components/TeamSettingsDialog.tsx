@@ -118,7 +118,7 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
             </p>
             <TeamSettingsRows rows={results} />
             <div className="mt-4 flex justify-end">
-              <button type="button" onClick={onClose} className="rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white">{t("teamSettings.done")}</button>
+              <button type="button" onClick={onClose} className="inline-flex h-8 items-center rounded-lg bg-accent px-4 text-[13px] font-medium text-accent-ink">{t("teamSettings.done")}</button>
             </div>
           </>
         ) : (
@@ -169,9 +169,9 @@ export function TeamSettingsDialog({ team, onClose }: { team: string; onClose: (
             )}
             <div className="mt-4 flex items-center justify-end gap-2">
               {running && <span role="status" className="mr-auto text-[12px] text-ink-secondary">{t("teamSettings.progress", { done: progress, count: plan.length })}</span>}
-              <button type="button" disabled={running} onClick={close} className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
+              <button type="button" disabled={running} onClick={close} className="inline-flex h-8 items-center rounded-lg px-3 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
               <button type="button" disabled={running || !applying} onClick={apply}
-                className="rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white disabled:opacity-40">
+                className="inline-flex h-8 items-center rounded-lg bg-accent px-4 text-[13px] font-medium text-accent-ink disabled:opacity-40">
                 {t(applying === 1 ? "teamSettings.applyOne" : "teamSettings.applyMany", { count: applying })}
               </button>
             </div>

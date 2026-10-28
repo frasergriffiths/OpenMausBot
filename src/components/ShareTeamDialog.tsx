@@ -237,7 +237,6 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
     <div className="ui-scrim fixed inset-0 z-[60] flex items-center justify-center p-4" onMouseDown={(event) => {
       if (event.target === event.currentTarget && !saving) onClose();
     }}>
-      <div aria-hidden="true" className="glass-scrim pointer-events-none absolute inset-0" />
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="share-team-title" tabIndex={-1}
         className="menu-surface relative flex max-h-[90vh] w-full max-w-[620px] flex-col overflow-hidden p-5 text-ink outline-none"
         onKeyDown={(event) => {
@@ -314,12 +313,12 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
         {error && <p role="alert" className="mb-2 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</p>}
         <footer className="mt-4 flex justify-end gap-2 border-t border-hairline/35 pt-4">
           {saved ? (
-            <button type="button" onClick={onClose} className="flex h-9 items-center rounded-full bg-accent px-4 text-[13px] font-medium text-white">{t("teamShare.done")}</button>
+            <button type="button" onClick={onClose} className="flex h-8 items-center rounded-full bg-accent px-4 text-[13px] font-medium text-accent-ink">{t("teamShare.done")}</button>
           ) : (
             <>
-              <button type="button" disabled={saving} onClick={onClose} className="flex h-9 items-center rounded-full px-3.5 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
+              <button type="button" disabled={saving} onClick={onClose} className="flex h-8 items-center rounded-full px-3.5 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
               <button type="button" disabled={saving || !preview || !name.trim()} onClick={() => void save()}
-                className="flex h-9 items-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium text-white disabled:opacity-40">
+                className="flex h-8 items-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium text-accent-ink disabled:opacity-40">
                 {saving && <Loader2 size={14} className="animate-spin" />}
                 {saving ? t("teamShare.saving") : t("teamShare.save")}
               </button>

@@ -235,12 +235,12 @@ export function SharePresetDialog({ onClose }: { onClose: () => void }) {
         {error && <p role="alert" className="mb-2 rounded-lg bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</p>}
         <footer className="mt-4 flex justify-end gap-2 border-t border-hairline/35 pt-4">
           {saved ? (
-            <button onClick={onClose} className="rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white">{t("teamShare.done")}</button>
+            <button onClick={onClose} className="inline-flex h-8 items-center rounded-lg bg-accent px-4 text-[13px] font-medium text-accent-ink">{t("teamShare.done")}</button>
           ) : (
             <>
-              <button disabled={saving} onClick={onClose} className="rounded-lg px-3 py-2 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
+              <button disabled={saving} onClick={onClose} className="inline-flex h-8 items-center rounded-lg px-3 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
               <button disabled={saving || !preview} onClick={() => void save()}
-                className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-[13px] font-medium text-white disabled:opacity-40">
+                className="inline-flex h-8 items-center gap-2 rounded-lg bg-accent px-4 text-[13px] font-medium text-accent-ink disabled:opacity-40">
                 {saving && <Loader2 size={14} className="animate-spin" />}
                 {saving ? t("teamShare.saving") : t("teamShare.save")}
               </button>
