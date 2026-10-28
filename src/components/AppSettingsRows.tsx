@@ -212,15 +212,15 @@ export function BusySendRow({ simple = false }: { simple?: boolean }) {
       title={t("settings.simple.busySend")}
       subtitle={simple ? t("settings.simple.busySendHint") : t("settings.simple.busySendHint")}
     >
-      <div className="w-[210px]">
+      <div className="w-[180px]">
         <Segmented<BusySendMode>
           attr="data-busy-send"
           label={t("settings.simple.busySend")}
           value={mode}
           onChange={setBusySendMode}
           options={[
-            { value: "queue", label: t("composer.send.queue") },
-            { value: "steer", label: t("composer.send.steer") },
+            { value: "queue", label: t("settings.simple.busySendQueue") },
+            { value: "steer", label: t("settings.simple.busySendSteer") },
           ]}
         />
       </div>
