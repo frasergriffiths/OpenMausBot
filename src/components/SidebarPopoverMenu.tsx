@@ -167,7 +167,7 @@ function MenuRows({
           {item.technical && (
             <details className="mx-2 mb-1 rounded-lg bg-inset px-2.5 py-2">
               <summary className="flex w-fit cursor-pointer list-none items-center gap-1 text-[12px] leading-4 text-ink-secondary hover:text-ink [&::-webkit-details-marker]:hidden">
-                {t("computer.mac.permission.technicalDetails")}
+                {t("sidebar.update.failureDetails")}
               </summary>
               <p className="mt-1.5 max-h-24 overflow-y-auto break-words text-[12px] leading-5 text-ink-secondary">{item.technical}</p>
             </details>

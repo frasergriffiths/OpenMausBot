@@ -40,6 +40,11 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
   const lastPermissions = useRef(permissionsKey);
   const relaunchAvailable = typeof window !== "undefined" && typeof window.ogb?.relaunch === "function";
 
+  // The card no longer shows the driver's raw reason; keep it in the app log for support.
+  useEffect(() => {
+    if (reason) console.warn("[mac-permissions] Local computer control is unavailable:", reason);
+  }, [reason]);
+
   useEffect(() => {
     if (permissionsKey === lastPermissions.current) return;
     lastPermissions.current = permissionsKey;
@@ -205,15 +210,6 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
             </button>
           </div>
         </div>
-        {reason && (
-          <details className="group mt-3 border-t border-hairline/30 pt-2.5">
-            <summary className="flex w-fit cursor-pointer list-none items-center gap-1 rounded-md py-0.5 text-[12px] leading-4 text-ink-secondary hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [&::-webkit-details-marker]:hidden">
-              <ChevronRight size={14} className="transition-transform group-open:rotate-90" aria-hidden="true" />
-              {t("computer.mac.permission.technicalDetails")}
-            </summary>
-            <p className="mt-2 max-h-24 overflow-y-auto break-words rounded-lg bg-inset px-3 py-2 text-[12px] leading-5 text-ink-secondary">{reason}</p>
-          </details>
-        )}
       </section>
     </Card>
   );

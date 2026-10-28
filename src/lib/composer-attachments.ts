@@ -1,4 +1,3 @@
-import { isCitationAttachment, serializeCitation, type CitationAttachment } from "./citations.ts";
 export { dataContextFor, type DataContext, type DataViewContext } from "../../shared/data-context.ts";
 
 export type PasteAttachment = {
@@ -28,12 +27,11 @@ export type ImageAttachment = {
   uploading?: boolean;
 };
 
-export type Attachment = PasteAttachment | FileAttachment | ImageAttachment | CitationAttachment;
+export type Attachment = PasteAttachment | FileAttachment | ImageAttachment;
 
 export function isAttachment(value: unknown): value is Attachment {
   if (!value || typeof value !== "object") return false;
   const attachment = value as Record<string, unknown>;
-  if (attachment.kind === "citation") return isCitationAttachment(value);
   if (typeof attachment.id !== "string" || !validSize(attachment.size)) return false;
   if (attachment.kind === "paste") {
     return (
@@ -394,9 +392,7 @@ export function formatSize(bytes: number): string {
 export function composeMessage(text: string, attachments: Attachment[]): string {
   const parts = [text.trim()];
   attachments.forEach((a, i) => {
-    if (a.kind === "citation") {
-      parts.push(serializeCitation(a));
-    } else if (a.kind === "paste") {
+    if (a.kind === "paste") {
       parts.push(`<pasted-text index="${i + 1}">\n${a.text}\n</pasted-text>`);
     } else if (a.kind === "image") {
       parts.push(`<attached-image path="${escapeAttribute(a.path)}" name="${escapeAttribute(a.name)}" />`);

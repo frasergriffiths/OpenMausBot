@@ -3,12 +3,12 @@ import { CornerDownRight, Pencil, Trash2 } from "lucide-react";
 import type { SteerQueueReason } from "../../shared/wire";
 import { t } from "@/lib/i18n";
 import { replySnippet } from "@/lib/replies";
-import { splitTranscriptCitations } from "@/lib/citations";
+import { hasLegacyCitation } from "@/lib/citation-legacy";
 
 const ATTACHMENT_TAG = /<attached-(?:image|file)\s/;
 
 function queuedMessageLabel(text: string): string {
-  return splitTranscriptCitations(text).citations.length || ATTACHMENT_TAG.test(text) ? replySnippet(text, 500) : text;
+  return hasLegacyCitation(text) || ATTACHMENT_TAG.test(text) ? replySnippet(text, 500) : text;
 }
 
 export function composerCanSteerQueuedMessages(

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import { escapeCancelsReply, replyAuthor, replySnippet } from "./replies";
-import { citationAttachment, createCitationTextSelector, serializeCitation } from "./citations";
 import type { Message } from "@/state/store";
 
 const base: Message = { id: "m1", at: 1, role: "bot", kind: "text", text: "hello" };
@@ -20,13 +19,8 @@ describe("reply display", () => {
     expect(replySnippet("123456", 5)).toBe("1234…");
   });
 
-  it("uses readable citation content without leaking metadata", () => {
-    const citation = citationAttachment(
-      { ownerType: "bot", ownerId: "b1", threadId: "t1", messageId: "m1" },
-      createCitationTextSelector("quoted text", 0, 11)!,
-      "why?",
-    );
-    const snippet = replySnippet(serializeCitation(citation));
+  it("uses an old citation's readable quote without leaking its metadata", () => {
+    const snippet = replySnippet("<!--omb-citation-v1:abc-->\n> Quoted message:\n> quoted text\n\nComment:\nwhy?");
     expect(snippet).toContain("quoted text");
     expect(snippet).toContain("why?");
     expect(snippet).not.toContain("omb-citation");

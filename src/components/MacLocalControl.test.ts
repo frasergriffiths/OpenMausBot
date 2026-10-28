@@ -25,7 +25,6 @@ const ALWAYS_VISIBLE = [
   "computer.mac.permission.accessibilityName",
   "computer.mac.permission.granted",
   "computer.mac.permission.notGranted",
-  "computer.mac.permission.technicalDetails",
   "computer.mac.permission.retry",
   "computer.mac.permission.relaunch",
 ] as const;
@@ -47,7 +46,7 @@ describe("Mac local computer permission card", () => {
     expect(markup).toContain("Not granted");
     expect(markup).toContain("Open Accessibility Settings");
     expect(markup).toContain("Relaunch OpenMausBot");
-    expect(markup).toContain("Technical details");
+    expect(markup).not.toContain("Technical details");
     expect(markup).toContain("Retry");
   });
 
@@ -65,13 +64,11 @@ describe("Mac local computer permission card", () => {
     expect(markup).not.toContain("rounded-full border-current");
   });
 
-  it("puts the raw driver reason behind one closed technical-details disclosure", () => {
+  it("keeps the raw driver reason out of the card", () => {
+    fixture.localComputer = { available: false, message: "Accessibility required; grant access in System Settings" } as DesktopCapabilities["localComputer"];
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
-    expect(markup).toContain("<details");
-    expect(markup).toContain("<summary");
-    expect(markup).toContain("group-open:rotate-90");
-    expect(markup).toContain("bg-inset");
-    expect(markup).toContain("Accessibility required; grant access in System Settings");
+    expect(markup).not.toContain("<details");
+    expect(markup).not.toContain("Accessibility required; grant access in System Settings");
   });
 
   it("renders both permission rows when both are missing, Screen Recording first", () => {

@@ -35,7 +35,7 @@ import { MentionTextarea } from "./MentionTextarea";
 import { ComposerAttachments, pathForFile } from "./ComposerAttachments";
 import { PointedChips } from "./app/PointedChips"; import { SetupRequestChip, setupRequestPlaceholder } from "./SetupOffer";
 import { takePointedChips } from "@/lib/pointed-chips";
-import { splitTranscriptCitations, type CitationAttachment } from "@/lib/citations";
+import { withoutCitationMarkers } from "@/lib/citation-legacy";
 import { PlaceChip, usePlaceMenuItem } from "./PlaceChip";
 import { ApprovalModeSelector } from "./ApprovalModeSelector";
 import { approvalModeFor } from "../../shared/approval-mode";
@@ -459,15 +459,14 @@ export function Composer({
     if (!queued) return;
     const targetDraftId = draftId;
     const onCancelled = () => {
-      const cited = splitTranscriptCitations(queued.text);
-      if (cited.display) prependComposerDraft(targetDraftId, cited.display);
-      appendDraftAttachments(targetDraftId, cited.citations);
+      const readable = withoutCitationMarkers(queued.text);
+      if (readable) prependComposerDraft(targetDraftId, readable);
       if (targetDraftId !== draftIdRef.current) return;
       requestAnimationFrame(() => {
         const input = inputRef.current;
         if (!input) return;
         input.focus();
-        input.setSelectionRange(cited.display.length, cited.display.length);
+        input.setSelectionRange(readable.length, readable.length);
       });
     };
     if (group) dispatch({ type: "cancelGroupQueued", groupId: group.id, threadId, queueId, onCancelled });
@@ -787,7 +786,6 @@ export function Composer({
           items={attachments}
           onAdd={addAttachments}
           onRemove={removeAttachment}
-          onChangeCitation={(citation: CitationAttachment) => editAttachments((current) => current.map((attachment) => attachment.id === citation.id ? citation : attachment))}
           onDisplayInChatBox={displayPasteInChatBox}
           allowImages={engineSupportsImages}
           notice={attachmentNotice}

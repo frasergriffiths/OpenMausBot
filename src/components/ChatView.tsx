@@ -96,7 +96,6 @@ import { ELEVATED_FLOAT, ELEVATED_HOVER } from "./elevated";
 import { ModelPicker } from "./ModelPicker";
 import { ChatHeaderMenu, ChatMoreMenu } from "./ChatMoreMenu"; import { CHAT_THREAD_PANEL_ID, ThreadTabs, threadTabId, threadTabsShown } from "./ThreadTabs"; import { TeamPrivateFirstLine, TeamPrivateHeader, TeamSharedHeader } from "./TeamPrivateChatsLine";
 import { useChatFindRequests } from "@/lib/chat-find";
-import { CitationSelectionToolbar, SentCitations } from "./CitationUI";
 import { SpeakButton } from "./SpeakButton";
 import { CallOverlay } from "./CallView";
 import { LiveCallBar } from "./LiveCallBar";
@@ -120,12 +119,11 @@ import { useTranscriptViewport } from "@/hooks/use-transcript-viewport";
 import { useUnreadDivider } from "@/hooks/use-unread-divider";
 import { NewMessagesDivider } from "./NewMessagesDivider";
 import { unreadMessageIds } from "@/lib/unread-divider";
-import { appendComposerDraft, appendDraftAttachments, useReplyDraft } from "@/lib/drafts";
+import { appendComposerDraft, useReplyDraft } from "@/lib/drafts";
 import { dayLabel, localDay, transcriptLookups, type TranscriptLookups } from "@/lib/transcript-derivations";
-import { splitTranscriptCitations, type CitationAttachment } from "@/lib/citations";
 import { EmptyChat } from "./ChatEmptyState";
 import { PinnedBanner } from "./ChatPinnedBanner";
-import { highlightCitationSource } from "@/lib/citations-dom";
+import { withoutCitationMarkers } from "@/lib/citation-legacy";
 import { useCanWriteIn, useReactor } from "@/lib/cloud-guest";
 import { formattedReplyWidth, isFormattedReply, splitReplyBlocks } from "@/lib/formatted-reply";
 import { otherSpeaker } from "@/lib/own-profile";
@@ -353,7 +351,7 @@ const Bubble = memo(function Bubble({
   replyTarget?: Message;
   onReply: (message: Message) => void;
 }) {
-  const { botId, threadId, botName, voiceId, tts, localVoice, busy, bots, mentionPeers, mentionPerson, focus, dispatch, onBranch, bubbleStyle, conversational, simple, canReact, openedAt, speakerViewer } = useChatRows();
+  const { botId, threadId, botName, voiceId, tts, localVoice, busy, bots, mentionPeers, mentionPerson, focus, dispatch, bubbleStyle, conversational, simple, canReact, openedAt, speakerViewer } = useChatRows();
   const remoteClient = window.ogb?.remoteClient?.active === true;
   const peer = peerLine(message) ?? peerRequest(message, botId);
   const user = message.role === "user" && !peer;
@@ -403,10 +401,11 @@ const Bubble = memo(function Bubble({
   const tabled = Boolean(blocks?.some((block) => block.kind === "table"));
   const formatted = !simple && !user && !split && isFormattedReply(text);
   const webhookView = user ? webhookMessageView(text) : null;
-  const cited = user && !webhookView ? splitTranscriptCitations(text) : null;
-  const attachments = user && !webhookView ? splitTranscriptAttachments(cited?.display ?? text) : null;
-  const visibleText = webhookView?.task ?? attachments?.display ?? text;
-  const hasAttachments = Boolean(cited?.citations.length || (attachments && (attachments.images.length || attachments.files.length)));
+  // Citations are gone; a message written before that keeps its quote as plain text once the marker is stripped.
+  const readableText = user && !webhookView ? withoutCitationMarkers(text) : text;
+  const attachments = user && !webhookView ? splitTranscriptAttachments(readableText) : null;
+  const visibleText = webhookView?.task ?? attachments?.display ?? readableText;
+  const hasAttachments = Boolean(attachments && (attachments.images.length || attachments.files.length));
   const attachmentsOnly = !webhookView && !replyTarget && !visibleText.trim() &&
     (user ? hasAttachments : generatedPaths.length + linkedFiles.length > 0);
   const collapsible =
@@ -514,22 +513,10 @@ const Bubble = memo(function Bubble({
               {visibleText && (
                 <div
                   className={cn("chat-text", collapsible && "max-h-40 overflow-hidden [mask-image:linear-gradient(to_bottom,black_60%,transparent)]")}
-                  data-citation-source={message.id}
-                  data-citation-owner-type="bot"
-                  data-citation-owner={botId}
-                  data-citation-thread={threadId}
                 >
                   <ThreadRefText text={visibleText} peers={mentionPeers} />
                 </div>
               )}
-              {cited && <SentCitations
-                citations={cited.citations}
-                onNavigate={async (citation: CitationAttachment) => {
-                  if (citation.source.ownerType !== "bot" || !onBranch(citation.source.messageId)) return false;
-                  dispatch({ type: "focusMessage", threadId, messageId: citation.source.messageId });
-                  return highlightCitationSource(citation);
-                }}
-              />}
               {message.steered && (
                 <div className="mt-1 text-[11px] text-ink-tertiary" title={t("chat.sentMidTurnHint")}>
                   {t("chat.sentMidTurn")}
@@ -559,15 +546,15 @@ const Bubble = memo(function Bubble({
               )}
               {!group && <AttachmentGallery images={generatedPaths} files={linkedFiles} message={{ threadId, messageId: message.id }} className={text ? undefined : "mb-0"} eager={eagerAttachments} />}
               {split ? (
-                <ConversationalReply simple={simple} join={join} segments={reply.segments} firstNew={reply.firstNew} citation={{ messageId: message.id, botId, threadId }}
+                <ConversationalReply simple={simple} join={join} segments={reply.segments} firstNew={reply.firstNew}
                   renderSegment={(segment) => <ChatMarkdown text={segment} mentionPeers={mentionPeers} mentionPerson={mentionPerson} message={{ threadId, messageId: message.id }} delivered={group?.delivered} />} />
               ) : tabled && blocks ? (
-                <ReplyBlocks blocks={blocks} join={join} tray={botActions} citation={{ messageId: message.id, ownerType: "bot", ownerId: botId, threadId }}
+                <ReplyBlocks blocks={blocks} join={join} tray={botActions}
                   render={(block) => <ChatMarkdown text={block} mentionPeers={mentionPeers} mentionPerson={mentionPerson} message={{ threadId, messageId: message.id }} delivered={group?.delivered} />} />
               ) : viewRaw && text ? (
-                <div data-citation-source={message.id} data-citation-owner-type="bot" data-citation-owner={botId} data-citation-thread={threadId}><RawMarkdownView text={text} /></div>
+                <div><RawMarkdownView text={text} /></div>
               ) : text ? (
-                <div data-citation-source={message.id} data-citation-owner-type="bot" data-citation-owner={botId} data-citation-thread={threadId}><ChatMarkdown text={text} mentionPeers={mentionPeers} mentionPerson={mentionPerson} message={{ threadId, messageId: message.id }} delivered={group?.delivered} /></div>
+                <div><ChatMarkdown text={text} mentionPeers={mentionPeers} mentionPerson={mentionPerson} message={{ threadId, messageId: message.id }} delivered={group?.delivered} /></div>
               ) : null}
               {group && <AttachmentGallery images={group.images} files={group.files} message={{ threadId, messageId: message.id }} eager={eagerAttachments} beneath />}
             </MessageBoundary>
@@ -928,7 +915,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
   const speakerViewer = state.config?.team && reactor !== "user" ? reactor : null;
   const rows = useMemo<ChatRows>(
     () => ({ botId: bot.id, threadId: bot.threadId, botName: bot.name, voiceId: bot.voice, tts, localVoice, busy, liveTools, hasMore, bots, mentionPeers, mentionPerson: { profileName: state.config?.profile?.name }, focus, showToolCalls, locale, dispatch, onBranch, bubbleStyle, conversational: isConversational(bot.replyStyle), simple: !advanced, canReact: canWrite !== false, openedAt, speakerViewer }),
-    [bot.id, bot.threadId, bot.name, bot.voice, tts, localVoice, busy, liveTools, hasMore, bots, mentionPeers, state.config?.profile?.name, focus, showToolCalls, locale, dispatch, onBranch, bubbleStyle, bot.replyStyle, advanced, canWrite, openedAt, speakerViewer],
+    [bot.id, bot.threadId, bot.name, bot.voice, tts, localVoice, busy, liveTools, hasMore, bots, mentionPeers, state.config?.profile?.name, focus, showToolCalls, locale, dispatch, bubbleStyle, bot.replyStyle, advanced, canWrite, openedAt, speakerViewer],
   );
   const currentTask = bot.tasks?.find((task) => task.threadId === bot.threadId), place = effectivePlace(bot, currentTask), team = state.config?.team, privateChat = Boolean(team) && currentTask?.private === true, sharedChat = Boolean(team) && !privateChat;
 
@@ -949,9 +936,8 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
   }, [messages]);
   const lastTypedMessageHasAttachments = useMemo(() => {
     if (!lastTypedMessage?.text) return false;
-    const cited = splitTranscriptCitations(lastTypedMessage.text);
-    const attached = splitTranscriptAttachments(cited.display);
-    return cited.citations.length > 0 || attached.images.length > 0 || attached.files.length > 0;
+    const attached = splitTranscriptAttachments(withoutCitationMarkers(lastTypedMessage.text));
+    return attached.images.length > 0 || attached.files.length > 0;
   }, [lastTypedMessage]);
 
   const lastMessage = lastNonReceipt(messages);
@@ -1315,13 +1301,6 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
         onEditLast={lastTypedMessage && !lastTypedMessageHasAttachments && !bot.busy && !lastTypedMessage.id.startsWith("optimistic-")
           ? () => setEditingId(lastTypedMessage.id)
           : undefined}
-      />
-      )}
-      {canWrite !== false && (
-      <CitationSelectionToolbar
-        key={`${bot.id}:${bot.threadId}`}
-        viewportRef={scrollRef}
-        onAdd={(citation) => appendDraftAttachments(`bot:${citation.source.ownerId}:${citation.source.threadId}`, [citation])}
       />
       )}
       </div>

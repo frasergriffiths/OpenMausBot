@@ -46,7 +46,6 @@ import { CancelledTurnRow } from "./CancelledTurnRow";
 import { isCancelledTranscriptRow } from "../../shared/client-cancel";
 import { roomRetryRequest } from "@/lib/room-retry";
 import { botEngine, failedTurnCause } from "@/lib/failed-turn";
-import { CitationSelectionToolbar, SentCitations } from "./CitationUI";
 import { Composer } from "./Composer";
 import { ChatErrorBanner, ChatNotice } from "./ChatErrorBanner";
 import { RoomContextWarnings } from "./ContextWarning";
@@ -82,9 +81,8 @@ import { useTranscriptViewport } from "@/hooks/use-transcript-viewport";
 import { useUnreadDivider } from "@/hooks/use-unread-divider";
 import { unreadMessageIds } from "@/lib/unread-divider";
 import { NewMessagesDivider } from "./NewMessagesDivider";
-import { appendDraftAttachments, useReplyDraft } from "@/lib/drafts";
-import { citationPreviewText, splitTranscriptCitations, type CitationAttachment } from "@/lib/citations";
-import { highlightCitationSource } from "@/lib/citations-dom";
+import { useReplyDraft } from "@/lib/drafts";
+import { withoutCitationMarkers } from "@/lib/citation-legacy";
 import { latestFailure, latestReply, type TranscriptSnapshot } from "@/lib/transcript-announcer";
 import { pendingApprovals } from "./PendingApproval";
 import { DataResultChip } from "./DataResultChip"; import { PublishedPageCard } from "./PublishedPageCard";
@@ -161,9 +159,10 @@ function RoomTextMessage({
   const reactor = useReactor();
   const speaker = otherSpeaker(m, state.config?.team && reactor !== "user" ? reactor : null);
   const rawText = user ? (m.text ?? "") : stripLeakedSystemHarnessMessages(m.text ?? "");
-  const cited = user && m.text ? splitTranscriptCitations(m.text) : null;
-  const attachments = user && m.text ? splitTranscriptAttachments(cited?.display ?? m.text) : null;
-  const display = attachments?.display ?? rawText;
+  // A message sent before citations were removed keeps its quote as plain text once the marker is stripped.
+  const readable = user && m.text ? withoutCitationMarkers(m.text) : m.text ?? "";
+  const attachments = user && m.text ? splitTranscriptAttachments(readable) : null;
+  const display = attachments?.display ?? (user ? readable : rawText);
   const [expanded, setExpanded] = useState(false);
   const [viewRaw, setViewRaw] = useState(false);
   const speech = useSpeech();
@@ -246,21 +245,9 @@ function RoomTextMessage({
               {attachments && <AttachmentGallery images={attachments.images} files={attachments.files} message={{ threadId: group.threadId, messageId: m.id }} eager={eager} className={!attachments.display ? "mb-0" : undefined} />}
               <div
                 className={cn(collapsible && "max-h-40 overflow-hidden [mask-image:linear-gradient(to_bottom,black_60%,transparent)]")}
-                data-citation-source={m.id}
-                data-citation-owner-type="group"
-                data-citation-owner={group.id}
-                data-citation-thread={group.threadId}
               >
                 <ThreadRefText text={display} peers={peers} everyone={!group.dm} />
               </div>
-              {cited && <SentCitations
-                citations={cited.citations}
-                onNavigate={async (citation: CitationAttachment) => {
-                  if (citation.source.ownerType !== "group" || !group.messages.some((candidate) => candidate.id === citation.source.messageId)) return false;
-                  dispatch({ type: "focusMessage", threadId: group.threadId, messageId: citation.source.messageId });
-                  return highlightCitationSource(citation);
-                }}
-              />}
               {m.via === "api" && (
                 <div className="mt-1 text-[11px] text-ink-secondary">Sent through the API, not typed here</div>
               )}
@@ -286,12 +273,12 @@ function RoomTextMessage({
               )}
               {!botText.trim() && <MessageAttachmentGallery text={botText} attachments={m.attachments} message={{ threadId: group.threadId, messageId: m.id }} className={m.text ? undefined : "mb-0"} eager={eager} />}
               {viewRaw && botText ? (
-                <div data-citation-source={m.id} data-citation-owner-type="group" data-citation-owner={group.id} data-citation-thread={group.threadId}><RawMarkdownView text={botText} /></div>
+                <div><RawMarkdownView text={botText} /></div>
               ) : tabled && blocks ? (
-                <ReplyBlocks blocks={blocks} tray={botActions} citation={{ messageId: m.id, ownerType: "group", ownerId: group.id, threadId: group.threadId }}
+                <ReplyBlocks blocks={blocks} tray={botActions}
                   render={(block) => <ChatMarkdown text={block} mentionPeers={peers} everyone={!group.dm} mentionPerson={{ profileName: state.config?.profile?.name }} message={{ threadId: group.threadId, messageId: m.id }} delivered={replyGroup?.delivered} />} />
               ) : botText ? (
-                <div data-citation-source={m.id} data-citation-owner-type="group" data-citation-owner={group.id} data-citation-thread={group.threadId}><ChatMarkdown text={botText} mentionPeers={peers} everyone={!group.dm} mentionPerson={{ profileName: state.config?.profile?.name }} message={{ threadId: group.threadId, messageId: m.id }} delivered={replyGroup?.delivered} /></div>
+                <div><ChatMarkdown text={botText} mentionPeers={peers} everyone={!group.dm} mentionPerson={{ profileName: state.config?.profile?.name }} message={{ threadId: group.threadId, messageId: m.id }} delivered={replyGroup?.delivered} /></div>
               ) : null}
               {replyGroup && <AttachmentGallery images={replyGroup.images} files={replyGroup.files} message={{ threadId: group.threadId, messageId: m.id }} eager={eager} beneath />}
             </MessageBoundary>
@@ -1059,7 +1046,7 @@ export function GroupView({ group }: { group: Group }) {
 
       {(() => {
         const pinned = group.messages.find((m) => m.id === group.pinnedMessageId && m.kind === "text");
-        const text = pinned ? citationPreviewText(pinned.text ?? "").replace(/\s+/g, " ").trim() : "";
+        const text = pinned ? withoutCitationMarkers(pinned.text ?? "").replace(/\s+/g, " ").trim() : "";
         if (!pinned || !text) return null;
         const sender = pinned.role === "user" ? t("chat.you") : (pinned.from?.name ?? t("room.aBot"));
         return (
@@ -1212,11 +1199,6 @@ export function GroupView({ group }: { group: Group }) {
         onClearReply={clearReply}
         onConsumeReply={consumeReply}
         onRestoreReply={restoreReply}
-      />
-      <CitationSelectionToolbar
-        key={`${group.id}:${group.threadId}`}
-        viewportRef={scrollRef}
-        onAdd={(citation) => appendDraftAttachments(`group:${citation.source.ownerId}:${citation.source.threadId}`, [citation])}
       />
       </div>
       </GlassScrollFrame>

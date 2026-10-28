@@ -2723,10 +2723,6 @@ button:disabled.bg-danger {
   }
 }
 
-::highlight(omb-citation-source) {
-  background-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
-}
-
 /* Wide-gamut displays. The sRGB values above stay the fallback.
    On Display P3 the same hue is a little more chromatic, with lightness
    held, so the skin reads less dull without moving the neutrals. */

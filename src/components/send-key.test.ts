@@ -24,10 +24,6 @@ vi.mock("./DesktopCapabilities", async (importOriginal) => ({
 vi.mock("@/lib/analytics", () => ({ track: vi.fn() }));
 vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => true, setAdvancedMode: vi.fn() }));
 vi.mock("@/lib/cloud-guest", () => ({ useCanWriteIn: () => null, useReactor: () => "user" }));
-vi.mock("./CitationUI", async (importOriginal) => ({
-  ...await importOriginal<typeof import("./CitationUI")>(),
-  CitationSelectionToolbar: () => createElement("span"),
-}));
 vi.mock("./ModelPicker", () => ({ ModelPicker: (_props: ComponentProps<typeof ModelPicker>) => createElement("span") }));
 vi.mock("./ApprovalModeSelector", () => ({ ApprovalModeSelector: (_props: ComponentProps<typeof ApprovalModeSelector>) => createElement("span") }));
 vi.mock("@/components/Avatar", async (importOriginal) => ({
@@ -40,7 +36,6 @@ vi.mock("@/components/onboarding/view-transition", () => ({ withViewTransition: 
 
 const { Composer } = await import("./Composer");
 const { ChatView } = await import("./ChatView");
-const { CitationBadge } = await import("./CitationUI");
 const { CloudIntent } = await import("./CloudIntent");
 const { GuidedTour } = await import("./onboarding/GuidedTour");
 const { setSendKey } = await import("@/lib/send-key");
@@ -151,20 +146,6 @@ describe.each(SEND_KEYS)("in %s mode", (mode) => {
     expect(editor().value).toBe("Try the new model");
     expectSendKey(mode, editor, () => sends().length);
     expect(sends()).toEqual([expect.objectContaining({ type: "editMessage", messageId: "ask", text: "Try the new model" })]);
-  });
-
-  it("a citation's comment saves on the same key", () => {
-    const onChange = vi.fn();
-    const citation = { kind: "citation", version: 1, id: "c1", quote: "the quote", comment: "why", size: 12,
-      source: { ownerType: "bot", ownerId: "bot", threadId: "selected", messageId: "m1", start: 0, end: 9, prefix: "", suffix: "" } } as const;
-    render(createElement(CitationBadge, { citation, onChange }));
-    flushSync(() => host.querySelector<HTMLButtonElement>("button")!.click());
-    const editButton = [...document.querySelectorAll("button")].find((button) => button.textContent === "Edit comment")!;
-    flushSync(() => editButton.click());
-    const comment = () => document.querySelector<HTMLTextAreaElement>('textarea[aria-label="Comment on selected text"]')!;
-    expectSendKey(mode, comment, () => onChange.mock.calls.length);
-    expect(onChange).toHaveBeenCalledOnce();
-    expect(onChange.mock.calls[0]![0]).toMatchObject({ id: "c1", comment: "why" });
   });
 
   it("the Cloud's first job starts on the same key", () => {

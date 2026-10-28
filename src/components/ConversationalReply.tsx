@@ -24,10 +24,9 @@ export function useThreadOpenedAt(threadId: string): number {
   return opened.current.at;
 }
 
-export function ConversationalReply({ segments, firstNew, citation, renderSegment, simple = false, join }: {
+export function ConversationalReply({ segments, firstNew, renderSegment, simple = false, join }: {
   segments: readonly string[];
   firstNew: number;
-  citation: { messageId: string; botId: string; threadId: string };
   renderSegment: (segment: string) => ReactNode;
   /** Simple mode: each part is a full bot bubble, joined to its neighbours as one group. */
   simple?: boolean;
@@ -35,7 +34,7 @@ export function ConversationalReply({ segments, firstNew, citation, renderSegmen
   join?: BubbleJoin;
 }) {
   return (
-    <div data-conversational-reply className="flex w-full flex-col items-start gap-1" data-citation-source={citation.messageId} data-citation-owner-type="bot" data-citation-owner={citation.botId} data-citation-thread={citation.threadId}>
+    <div data-conversational-reply className="flex w-full flex-col items-start gap-1">
       {segments.map((segment, index) => (
         <div
           key={index}

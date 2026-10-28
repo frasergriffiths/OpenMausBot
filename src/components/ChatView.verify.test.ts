@@ -6,7 +6,6 @@ import { t } from "@/lib/i18n";
 import { askText, runSteps, skillPrompt } from "@/lib/verify-steps";
 import { SAVE_RUN_AS_SKILL_LINE } from "../../shared/learn-request";
 import type { VerifyCard } from "./VerifyCard";
-import { citationAttachment, createCitationTextSelector, serializeCitation } from "@/lib/citations";
 
 const fixture = vi.hoisted(() => {
   vi.stubGlobal("window", {});
@@ -98,16 +97,11 @@ describe("The run card in the chat pane", () => {
     expect(fixture.verify).toBeNull();
   });
 
-  it("renders a sent citation as a badge and keeps raw metadata out of edit actions", () => {
-    const citation = citationAttachment(
-      { ownerType: "bot", ownerId: bot.id, threadId: bot.threadId, messageId: "source" },
-      createCitationTextSelector("source quote", 0, 12)!,
-      "note",
-    );
-    const markup = render([asked("cited", serializeCitation(citation))]);
-    expect(markup).toContain("Open citation: source quote");
+  it("renders an old citation as plain quoted text with no badge or metadata", () => {
+    const markup = render([asked("cited", "<!--omb-citation-v1:abc-->\n> Quoted message:\n> source quote")]);
+    expect(markup).toContain("source quote");
     expect(markup).not.toContain("omb-citation-v1");
-    expect(markup).not.toContain(`aria-label="${t("chat.editMessage")}"`);
+    expect(markup).not.toContain("Open citation");
   });
 
   it("appears once the bot runs a control CLI, with the run as a checklist and its verified steps tagged", () => {

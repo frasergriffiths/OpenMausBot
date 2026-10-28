@@ -34,10 +34,6 @@ vi.mock("./SidebarPopoverMenu", async (importOriginal) => ({
   SidebarPopoverMenu: (props: { renderTrigger: (state: { open: boolean }) => unknown }) => props.renderTrigger({ open: false }),
 }));
 vi.mock("@/lib/cloud-guest", () => ({ useCanWriteIn: () => null, useReactor: () => "user" }));
-vi.mock("./CitationUI", async (importOriginal) => ({
-  ...await importOriginal<typeof import("./CitationUI")>(),
-  CitationSelectionToolbar: () => createElement("span"),
-}));
 vi.mock("./ModelPicker", () => ({ ModelPicker: (_props: ComponentProps<typeof ModelPicker>) => createElement("span") }));
 vi.mock("./ApprovalModeSelector", () => ({ ApprovalModeSelector: (_props: ComponentProps<typeof ApprovalModeSelector>) => createElement("span") }));
 

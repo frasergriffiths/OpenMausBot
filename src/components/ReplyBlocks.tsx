@@ -7,10 +7,9 @@ import { joinedCorners, SIMPLE_BOT_BUBBLE, SIMPLE_BUBBLE_MAX, type BubbleJoin } 
 /** Simple mode's reply with tables: the prose in bubbles and each table in its own card at the message's full width, so
  * every column shows. The first and last prose bubbles take the row's join corners; a table breaks the join. The hover
  * tray sits beside the first block. */
-export function ReplyBlocks({ blocks, join, citation, tray, render }: {
+export function ReplyBlocks({ blocks, join, tray, render }: {
   blocks: readonly ReplyBlock[];
   join?: BubbleJoin;
-  citation: { messageId: string; ownerType: "bot" | "group"; ownerId: string; threadId: string };
   tray?: ReactNode;
   render: (text: string) => ReactNode;
 }) {
@@ -19,10 +18,6 @@ export function ReplyBlocks({ blocks, join, citation, tray, render }: {
     <div
       data-reply-blocks
       className="flex w-full flex-col items-start gap-1"
-      data-citation-source={citation.messageId}
-      data-citation-owner-type={citation.ownerType}
-      data-citation-owner={citation.ownerId}
-      data-citation-thread={citation.threadId}
     >
       {blocks.map((block, index) => {
         const body = block.kind === "table"

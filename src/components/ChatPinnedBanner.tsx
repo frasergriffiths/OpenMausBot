@@ -2,7 +2,7 @@ import { Pin, X } from "lucide-react";
 import type { Bot, Message } from "@/state/store";
 import { t } from "@/lib/i18n";
 import { peerLine } from "@/lib/peer-message";
-import { citationPreviewText } from "@/lib/citations";
+import { withoutCitationMarkers } from "@/lib/citation-legacy";
 
 /** The chat's pinned message above the transcript: who said it, a one-line preview that jumps to it, and Unpin. */
 export function PinnedBanner({
@@ -23,7 +23,7 @@ export function PinnedBanner({
   const pinnedPeer = peerLine(pinned);
   const sender =
     pinned.role === "user" ? (pinnedPeer?.name ?? t("chat.you")) : (pinned.from?.name ?? bot.name);
-  const text = citationPreviewText(pinnedPeer?.body ?? pinned.text ?? "").replace(/\s+/g, " ").trim();
+  const text = withoutCitationMarkers(pinnedPeer?.body ?? pinned.text ?? "").replace(/\s+/g, " ").trim();
   if (!text) return null;
   return (
     <div className="w-full px-5">

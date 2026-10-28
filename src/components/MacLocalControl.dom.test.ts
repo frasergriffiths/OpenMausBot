@@ -152,4 +152,13 @@ describe("the Mac permission card actions", () => {
     expect(alerts[0]!.textContent).toContain("boom");
     expect(button("Open System Settings")!.disabled).toBe(false);
   });
+
+  it("logs the raw driver reason the card no longer shows", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    fixture.localComputer = { available: false, message: "Embedded host failed: Accessibility and Screen Recording required" } as DesktopCapabilities["localComputer"];
+    await mount();
+    expect(warn).toHaveBeenCalledWith("[mac-permissions] Local computer control is unavailable:", "Embedded host failed: Accessibility and Screen Recording required");
+    expect(container.textContent).not.toContain("Embedded host failed");
+    warn.mockRestore();
+  });
 });

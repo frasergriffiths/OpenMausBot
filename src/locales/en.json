@@ -4202,7 +4202,7 @@
   "computer.phase.localUnavailable": "Local computer control isn't ready.",
   "computer.mac.permission.requiredOne": "{permission} is required for OpenMausBot to use this computer. Grant it in System Settings → Privacy & Security, then relaunch OpenMausBot.",
   "computer.mac.permission.requiredBoth": "Screen Recording and Accessibility are required for OpenMausBot to use this computer. Grant them in System Settings → Privacy & Security, then relaunch OpenMausBot.",
-  "computer.mac.permission.generic": "Local computer control is not ready. OpenMausBot needs Accessibility and Screen Recording to use this Mac. Check Technical details or System Settings, then click Retry.",
+  "computer.mac.permission.generic": "Local computer control is not ready. OpenMausBot needs Accessibility and Screen Recording to use this Mac. Open System Settings, then click Retry.",
   "computer.mac.permission.screenSettings": "Open Screen Recording Settings",
   "computer.mac.permission.accessibilitySettings": "Open Accessibility Settings",
   "computer.mac.permission.relaunch": "Relaunch OpenMausBot",
@@ -4219,7 +4219,6 @@
   "computer.mac.permission.settingsHint": "Grant access in System Settings, then come back — this card updates by itself.",
   "computer.mac.permission.relaunchHint": "Already granted it? Relaunch OpenMausBot.",
   "computer.mac.permission.openSettings": "Open System Settings",
-  "computer.mac.permission.technicalDetails": "Technical details",
   "computer.phase.vmUnavailable": "The private desktop isn't available for this bot",
   "computer.phase.error": "Couldn't reach the bot's screen",
   "computer.resizeAria": "Resize panel",
@@ -6647,5 +6646,6 @@
   "composer.placeholder.steerUnavailable": "{name} is working — this engine can’t take steering, so {key} queues it",
   "composer.send.steerUnavailable": "Queue for {name} — this engine can’t steer",
   "common.back": "Back",
-  "settings.group.keys": "Keys"
+  "settings.group.keys": "Keys",
+  "sidebar.update.failureDetails": "Update details"
 }

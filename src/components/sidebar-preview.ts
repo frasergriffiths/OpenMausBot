@@ -6,7 +6,7 @@ import { isReceipt } from "@/lib/receipts";
 import { activityPreview, botEngine, failedTurnCause, STATUS_MARKER } from "@/lib/failed-turn";
 import { t } from "@/lib/i18n";
 import { sidebarConnectorPreview, sidebarGoalRunPreview } from "@/lib/sidebar-layout";
-import { citationPreviewText } from "@/lib/citations";
+import { withoutCitationMarkers } from "@/lib/citation-legacy";
 import { plainPreviewText } from "@/lib/plain-preview";
 import { isClientCancellation, isStoppedTurnName } from "../../shared/client-cancel";
 import { roomWorkingPreview } from "@/lib/room-threads";
@@ -55,7 +55,7 @@ export function lastLine(bot: Bot, visible: Message[], instances: InstanceInfo[]
   const peer = peerLine(last);
   if (peer) return `${peer.name}: ${plainPreviewText(peer.body)}`;
   if (last.role !== "user" && isClientCancellation(last.text ?? "")) return t("chat.turnStopped");
-  return plainPreviewText(citationPreviewText(last.text ?? ""));
+  return plainPreviewText(withoutCitationMarkers(last.text ?? ""));
 }
 
 const RUN_PREVIEW = {
@@ -86,7 +86,7 @@ export function groupPreview(group: Group, bots: Bot[], instances: InstanceInfo[
       : last.kind === "connector" && last.connector
         ? sidebarConnectorPreview(last.connector, t)
         : (last.text ?? "");
-  const readable = plainPreviewText(citationPreviewText(text));
+  const readable = plainPreviewText(withoutCitationMarkers(text));
   if (last.role === "user") return t("sidebar.preview.you", { text: readable });
   return last.from ? `${last.from.name}: ${readable}` : readable;
 }
