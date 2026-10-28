@@ -22,7 +22,7 @@ const TONE_CLASS: Record<ChipTone, string> = {
   warn: "bg-warning/15 text-warning",
 };
 
-export function ActivityPanel({ bot }: { bot: Bot }) {
+export function ActivityPanel({ bot, embedded = false }: { bot: Bot; embedded?: boolean }) {
   const { dispatch } = useStore();
   const { padClass, dragProps } = useCaptionChrome();
   const [rows, setRows] = useState<ActivityRow[] | null>(null);
@@ -93,6 +93,28 @@ export function ActivityPanel({ bot }: { bot: Bot }) {
     }
   };
 
+  const content = (
+    <div className={embedded ? "min-h-0 flex-1 overflow-y-auto" : "min-h-0 flex-1 overflow-y-auto"}>
+        {error && <div className="px-4 py-3 text-[13px] text-danger">{t("activity.panel.error", { message: error })}</div>}
+        {rows && rows.length === 0 && !error && (
+          <div className="px-4 py-6 text-[13px] text-ink-secondary">
+            {t("activity.panel.empty", { name: bot.name })}
+          </div>
+        )}
+        {!rows && !error && <div className="px-4 py-6 text-[13px] text-ink-secondary">{t("activity.panel.loading")}</div>}
+        {days.map((day) => (
+          <section key={day.key}>
+            <h3 className="sticky top-0 bg-panel px-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide text-ink-secondary uppercase">
+              {day.label}
+            </h3>
+            {day.rows.map((row) => (
+              <ActivityLine key={`${row.threadId}:${row.at}:${row.tool}:${row.requestId ?? ""}`} row={row} current={row.threadId === bot.threadId} onJump={() => jump(row)} />
+            ))}
+          </section>
+        ))}
+    </div>
+  );
+  if (embedded) return <div data-activity-body="" className="flex min-h-0 flex-1 flex-col">{content}</div>;
   return (
     <aside aria-label={t("activity.panel.aria", { name: bot.name })} className="animate-panel-in flex h-full w-[400px] max-w-full shrink-0 flex-col border-l border-hairline/40 bg-panel max-md:absolute max-md:inset-y-0 max-md:right-0 max-md:z-30">
       <div {...dragProps} className={cn("flex items-center justify-between px-4 py-3", padClass)}>
@@ -118,30 +140,10 @@ export function ActivityPanel({ bot }: { bot: Bot }) {
           </button>
         </span>
       </div>
-
       <p className="border-b border-hairline/40 px-4 pb-3 text-[12px] text-ink-secondary">
         {t("activity.panel.subtitle", { name: bot.name })}
       </p>
-
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        {error && <div className="px-4 py-3 text-[13px] text-danger">{t("activity.panel.error", { message: error })}</div>}
-        {rows && rows.length === 0 && !error && (
-          <div className="px-4 py-6 text-[13px] text-ink-secondary">
-            {t("activity.panel.empty", { name: bot.name })}
-          </div>
-        )}
-        {!rows && !error && <div className="px-4 py-6 text-[13px] text-ink-secondary">{t("activity.panel.loading")}</div>}
-        {days.map((day) => (
-          <section key={day.key}>
-            <h3 className="sticky top-0 bg-panel px-4 pt-3 pb-1 text-[11px] font-semibold tracking-wide text-ink-secondary uppercase">
-              {day.label}
-            </h3>
-            {day.rows.map((row) => (
-              <ActivityLine key={`${row.threadId}:${row.at}:${row.tool}:${row.requestId ?? ""}`} row={row} current={row.threadId === bot.threadId} onJump={() => jump(row)} />
-            ))}
-          </section>
-        ))}
-      </div>
+      {content}
     </aside>
   );
 }

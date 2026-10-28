@@ -2449,5 +2449,12 @@
   "computer.mac.permission.title": "इस कंप्यूटर पर नियंत्रण की अनुमति दें",
   "computer.mac.permission.driverDetail": "ड्राइवर विवरण",
   "computer.mac.permission.relaunch": "OpenMausBot फिर से शुरू करें",
-  "permissions.openSystemSettings": "सिस्टम सेटिंग्स खोलें"
+  "permissions.openSystemSettings": "सिस्टम सेटिंग्स खोलें",
+  "botPanel.tab.profile": "प्रोफ़ाइल",
+  "botPanel.tab.library": "लाइब्रेरी",
+  "botPanel.tab.computer": "कंप्यूटर",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "थ्रेड्स",
+  "botPanel.page.browser": "ब्राउज़र",
+  "botPanel.library.data": "डेटा"
 }

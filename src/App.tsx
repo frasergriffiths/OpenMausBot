@@ -136,7 +136,8 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   const notificationFeed = useNotificationFeed() && !remoteClient;
   const advanced = useAdvancedMode();
   const roomPanelOpen = useRoomPanelShown({ group, state, simple: !advanced && !remoteClient });
-  const sidePanelOpen = (Boolean(bot) && (state.settingsOpen || state.computerOpen || state.inspectorOpen || state.activityOpen)) || roomPanelOpen || (notificationFeed && state.notificationsOpen);
+  const botPanelOpen = advanced ? (state.settingsOpen || state.computerOpen || state.inspectorOpen || state.activityOpen) : state.settingsOpen;
+  const sidePanelOpen = (Boolean(bot) && botPanelOpen) || roomPanelOpen || (notificationFeed && state.notificationsOpen);
   const collapseSidebar = sidePanelOpen && !sidebarAndPanelFit;
   const calendarFocus = state.activeView === "routines" && state.routinesFocus.view === "calendar";
 
@@ -232,7 +233,8 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   const openComputerFromWorkspace = (botId: string) => {
     setLocalVmWorkspaceBotId(null);
     dispatch({ type: "select", id: botId });
-    dispatch({ type: "toggleComputer", open: true });
+    if (advanced) dispatch({ type: "toggleComputer", open: true });
+    else dispatch({ type: "toggleSettings", open: true, section: "access", botId });
   };
 
   const closeCalendar = useCallback(() => {
@@ -366,9 +368,9 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       {state.settingsOpen && bot && (
         remoteClient
           ? <RemoteAgentSettingsPanel bot={bot} overlay={state.computerOpen && !twoSidePanelsFit} />
-          : <BotSettingsDialog key={`settings:${bot.id}`} bot={bot} overlay={(state.inspectorOpen || state.computerOpen || (notificationFeed && state.notificationsOpen)) && !twoSidePanelsFit} />
+          : <BotSettingsDialog key={`settings:${bot.id}`} bot={bot} overlay={advanced && (state.inspectorOpen || state.computerOpen || (notificationFeed && state.notificationsOpen)) && !twoSidePanelsFit} />
       )}
-      {state.computerOpen && bot && (
+      {advanced && state.computerOpen && bot && (
         remoteClient ? (
           <RemoteDesktopPanel key={`computer:${bot.id}`} bot={bot} />
         ) : (
@@ -382,8 +384,8 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       {roomPanelOpen && group && (
         <RoomPanel key={`room:${group.id}`} group={group} overlay={notificationFeed && state.notificationsOpen && !twoSidePanelsFit} />
       )}
-      {!remoteClient && state.inspectorOpen && bot && <InspectorPanel key={bot.threadId} bot={bot} />}
-      {!remoteClient && state.activityOpen && bot && <ActivityPanel key={`activity:${bot.id}`} bot={bot} />}
+      {advanced && !remoteClient && state.inspectorOpen && bot && <InspectorPanel key={bot.threadId} bot={bot} />}
+      {advanced && !remoteClient && state.activityOpen && bot && <ActivityPanel key={`activity:${bot.id}`} bot={bot} />}
       {notificationFeed && !calendarFocus && state.notificationsOpen && <NotificationsPanel />}
       {notificationFeed && !calendarFocus && <NotificationRail />}
       {state.appSettingsOpen && <SettingsModal />}

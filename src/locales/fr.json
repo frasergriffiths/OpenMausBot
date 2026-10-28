@@ -2449,5 +2449,12 @@
   "computer.mac.permission.title": "Autoriser le contrôle de cet ordinateur",
   "computer.mac.permission.driverDetail": "Détails du pilote",
   "computer.mac.permission.relaunch": "Relancer OpenMausBot",
-  "permissions.openSystemSettings": "Ouvrir les Réglages Système"
+  "permissions.openSystemSettings": "Ouvrir les Réglages Système",
+  "botPanel.tab.profile": "Profil",
+  "botPanel.tab.library": "Bibliothèque",
+  "botPanel.tab.computer": "Ordinateur",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Fils",
+  "botPanel.page.browser": "Navigateur",
+  "botPanel.library.data": "Données"
 }

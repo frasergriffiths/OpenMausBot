@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { AppWindow, AudioLines, ChevronRight, FileText, ShieldCheck, Tag } from "lucide-react";
+import { AppWindow, AudioLines, ChevronRight, FileText, MessageSquare, ShieldCheck, Tag } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { CALL_MODES, effectiveCallMode, setCallMode, useCallMode, type CallMode } from "@/lib/call-mode";
+import { setBusySendMode, useBusySendMode, type BusySendMode } from "@/lib/busy-send";
 import { callCapabilityHelp } from "@/lib/call-capability";
 import { firstSentence } from "@/lib/soul";
 import { currentTaskBot, useStore, type Bot } from "@/state/store";
@@ -41,6 +42,7 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
   const apps = useBotApps(bot);
   const approval = useThreadApproval(currentTaskBot(bot));
   const storedCallMode = useCallMode();
+  const busySend = useBusySendMode();
   const [jobDraft, setJobDraft] = useState<string | null>(null);
   const { patch, approvalMode, engine } = derived;
   const name = bot.name;
@@ -139,6 +141,27 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
               </span>
             </div>
           )}
+        </ColRow>
+      </Card>
+
+      <Card anchor="busy-send">
+        <ColRow data-panel-row="busy-send">
+          <div className="flex items-center gap-2.5">
+            <RowIcon icon={MessageSquare} />
+            <RowText title={t("settings.simple.busySend")} hint={t("settings.simple.busySendHint")} />
+          </div>
+          <div className="pl-[38px]">
+            <Segmented<BusySendMode>
+              attr="data-busy-send"
+              label={t("settings.simple.busySend")}
+              value={busySend}
+              onChange={setBusySendMode}
+              options={[
+                { value: "queue", label: t("settings.simple.busySendQueue") },
+                { value: "steer", label: t("settings.simple.busySendSteer") },
+              ]}
+            />
+          </div>
         </ColRow>
       </Card>
 

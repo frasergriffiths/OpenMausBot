@@ -4913,5 +4913,12 @@
   "computer.problem.localNeedsApp": "Bir botun bu bilgisayarı kullanmasına yalnızca buradaki OpenMausBot uygulaması izin verebilir. Kullanmak için uygulamayı burada açın.",
   "computer.problem.localWindows": "Botlar şu anda bu PC'yi kullanamıyor. OpenMausBot'u yeniden başlatın; işe yaramazsa Ayarlar → Tanılama'yı açın.",
   "computer.problem.localMac": "Botlar bu Mac'i henüz kullanamaz. Sistem Ayarları → Gizlilik ve Güvenlik'te Ekran Kaydı ve Erişilebilirlik altında OpenMausBot'a izin verildiğini kontrol edin, sonra yeniden başlatın.",
-  "templates.invalidJson": "Bu yedek veya ekip dosyası geçerli bir JSON değil."
+  "templates.invalidJson": "Bu yedek veya ekip dosyası geçerli bir JSON değil.",
+  "botPanel.tab.profile": "Profil",
+  "botPanel.tab.library": "Kitaplık",
+  "botPanel.tab.computer": "Bilgisayar",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Konular",
+  "botPanel.page.browser": "Tarayıcı",
+  "botPanel.library.data": "Veriler"
 }

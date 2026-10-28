@@ -4913,5 +4913,12 @@
   "computer.problem.localNeedsApp": "Chỉ ứng dụng OpenMausBot trên máy tính này mới cho bot dùng nó được. Hãy mở ứng dụng ở đây để dùng.",
   "computer.problem.localWindows": "Hiện bot không dùng được PC này. Hãy khởi động lại OpenMausBot, nếu vẫn không được thì mở Cài đặt → Chẩn đoán.",
   "computer.problem.localMac": "Bot chưa dùng được máy Mac này. Hãy kiểm tra OpenMausBot đã được cho phép ở Ghi màn hình và Trợ năng trong Cài đặt hệ thống → Quyền riêng tư & Bảo mật, rồi khởi động lại.",
-  "templates.invalidJson": "Tệp sao lưu hoặc tệp nhóm này không phải JSON hợp lệ."
+  "templates.invalidJson": "Tệp sao lưu hoặc tệp nhóm này không phải JSON hợp lệ.",
+  "botPanel.tab.profile": "Hồ sơ",
+  "botPanel.tab.library": "Thư viện",
+  "botPanel.tab.computer": "Máy tính",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Chuỗi",
+  "botPanel.page.browser": "Trình duyệt",
+  "botPanel.library.data": "Dữ liệu"
 }

@@ -6635,5 +6635,10 @@
   "settings.simple.busySend": "When a bot is working",
   "settings.simple.busySendHint": "Queue waits for the current turn. Steer adds your message to the turn already running.",
   "settings.simple.busySendQueue": "Queue",
-  "settings.simple.busySendSteer": "Steer"
+  "settings.simple.busySendSteer": "Steer",
+  "botPanel.tab.profile": "Profile",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "Threads",
+  "botPanel.page.browser": "Browser",
+  "botPanel.library.data": "Data"
 }

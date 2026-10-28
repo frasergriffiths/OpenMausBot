@@ -60,8 +60,8 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
       key: "computer",
       label: t("chat.computer"),
       icon: <Monitor size={16} />,
-      active: state.computerOpen,
-      onSelect: () => dispatch({ type: "toggleComputer" }),
+      active: advanced ? state.computerOpen : state.settingsOpen && state.botSettingsSection === "access",
+      onSelect: () => advanced ? dispatch({ type: "toggleComputer" }) : dispatch({ type: "toggleSettings", open: true, section: "access", botId: bot.id }),
     },
   ] : [];
   const items: SidebarMenuItem[] = [
@@ -121,23 +121,23 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
       icon: <Gauge size={16} />,
       separatorBefore: true,
       trailing: <span title={usage.detail} data-testid="usage-chip" className={cn("tabular-nums text-[12px]", usage.tone === "danger" ? "text-danger" : usage.tone === "warning" ? "text-warning" : "text-ink-secondary")}>{usage.short}</span>,
-      onSelect: () => advanced ? openBotSettings(dispatch, "usage") : dispatch({ type: "toggleAppSettings", open: true, section: "usage" }),
+      onSelect: () => openBotSettings(dispatch, "usage"),
     } satisfies SidebarMenuItem] : []),
     ...(remoteClient ? [] : [{
       key: "activity",
       label: t("activity.panel.title"),
       icon: <ListChecks size={16} />,
-      active: state.activityOpen,
+      active: advanced ? state.activityOpen : state.settingsOpen && state.botSettingsSection === "usage",
       separatorBefore: !usage,
-      onSelect: () => dispatch({ type: "toggleActivity" }),
+      onSelect: () => advanced ? dispatch({ type: "toggleActivity" }) : openBotSettings(dispatch, "usage", { page: "activity" }),
     } satisfies SidebarMenuItem, {
       key: "inspector",
       label: t("chat.inspector"),
       icon: <Bug size={16} />,
-      active: state.inspectorOpen,
+      active: advanced ? state.inspectorOpen : state.settingsOpen && state.botSettingsSection === "usage",
       // Simple mode keeps Activity and Inspector together, as the panel's menu draws them.
       separatorBefore: advanced,
-      onSelect: () => dispatch({ type: "toggleInspector" }),
+      onSelect: () => advanced ? dispatch({ type: "toggleInspector" }) : openBotSettings(dispatch, "usage", { page: "runlog" }),
     } satisfies SidebarMenuItem]),
   ];
   return { items, on: findOpen || state.inspectorOpen || state.activityOpen };

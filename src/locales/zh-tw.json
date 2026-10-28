@@ -4297,5 +4297,12 @@
   "computer.problem.localNeedsApp": "只有這台電腦上的 OpenMausBot 應用程式能讓機器人使用它。請在這裡開啟應用程式來使用。",
   "computer.problem.localWindows": "機器人目前無法使用這台 PC。請重新啟動 OpenMausBot；若仍無法解決，請開啟「設定 → 診斷」。",
   "computer.problem.localMac": "機器人目前還無法使用這台 Mac。請到「系統設定 → 隱私權與安全性」確認 OpenMausBot 已在「螢幕錄製」和「輔助使用」中獲得允許，然後重新啟動它。",
-  "templates.invalidJson": "此備份或團隊檔案不是有效的 JSON。"
+  "templates.invalidJson": "此備份或團隊檔案不是有效的 JSON。",
+  "botPanel.tab.profile": "個人資料",
+  "botPanel.tab.library": "資料庫",
+  "botPanel.tab.computer": "電腦",
+  "botPanel.page.runLog": "Run log",
+  "botPanel.page.threads": "對話",
+  "botPanel.page.browser": "瀏覽器",
+  "botPanel.library.data": "資料"
 }

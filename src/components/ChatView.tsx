@@ -1050,7 +1050,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
             <div data-chathead-pill className={cn(CHATHEAD_PILL, "pr-1")}>
               <button
                 type="button"
-                onClick={() => dispatch({ type: "toggleSettings", open: true })}
+                onClick={() => dispatch({ type: "toggleSettings", open: true, section: "overview" })}
                 className="flex shrink-0 items-center justify-center rounded-full"
                 title={t("chat.openProfile")}
                 aria-label={t("chat.openProfileAria", { name: bot.name })}
@@ -1075,7 +1075,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
                     dispatch({ type: "updateBot", botId: bot.id, patch: { name } });
                   }
                 }}
-                onActivate={() => dispatch({ type: "toggleSettings", open: true })}
+                onActivate={() => dispatch({ type: "toggleSettings", open: true, section: "overview" })}
                 showEditButton
                 className="truncate text-[14px] font-semibold text-ink"
                 editButtonClassName="size-6 rounded-full"
@@ -1087,7 +1087,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
             <button
               type="button"
               data-chathead-pill data-tour="bot-pill"
-              onClick={() => dispatch({ type: "toggleSettings", open: true })}
+              onClick={() => dispatch({ type: "toggleSettings", open: true, section: "overview" })}
               title={t("chat.openProfile")}
               aria-label={t("chat.openProfileAria", { name: bot.name })}
               className={cn("group flex h-9 min-w-0 items-center gap-2.5 rounded-full py-0.5 pl-2 pr-3.5 text-ink", ELEVATED_FLOAT, ELEVATED_HOVER)}
@@ -1138,11 +1138,11 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
           <LiveCallChip currentBotId={bot.id} onOpen={(botId, threadId) => openThread(dispatch, { botId, threadId }, state, showThreads)} />
           {!phoneMenu && <button
             data-tour="computer"
-            onClick={(event) => { if (!state.computerOpen) rememberComputerPanelOpen({ botId: bot.id, opener: event.currentTarget, tabs: event.detail === 0 }); dispatch({ type: "toggleComputer" }); }}
+            onClick={(event) => { if (advanced) { if (!state.computerOpen) rememberComputerPanelOpen({ botId: bot.id, opener: event.currentTarget, tabs: event.detail === 0 }); dispatch({ type: "toggleComputer" }); } else dispatch({ type: "toggleSettings", open: true, section: "access", botId: bot.id }); }}
             className={cn(
               "relative",
               simpleHead ? "flex size-8 items-center justify-center rounded-full transition-colors hover:bg-ink/[0.06]" : "rounded-md p-1.5 hover:bg-raised",
-              state.computerOpen ? "text-accent" : "text-ink-secondary hover:text-ink",
+              (advanced ? state.computerOpen : state.settingsOpen && state.botSettingsSection === "access") ? "text-accent" : "text-ink-secondary hover:text-ink",
             )}
             title={t("chat.computer")} aria-label={busy && place === "browser" ? `${t("chat.computer")}, ${t("place.live")}` : t("chat.computer")}
           >
