@@ -451,6 +451,19 @@ export function TeamLibraryPanel({
   const normalizedSearch = search.trim().toLowerCase();
   const visibleTeams = (catalog?.teams ?? []).filter((entry) => !normalizedSearch || catalogMatches(entry, normalizedSearch));
   const visibleShareTeams = shareableTeams.filter((team) => !normalizedSearch || (team.name || t("teamLibrary.general")).toLowerCase().includes(normalizedSearch));
+
+  const searchField = (
+    <label className="flex h-9 min-w-0 items-center gap-2.5 rounded-full bg-control/70 px-3.5 focus-within:ring-1 focus-within:ring-accent">
+      <Search size={15} className="shrink-0 text-ink-secondary" />
+      <input
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        placeholder={t("templates.search")}
+        aria-label={t("templates.search")}
+        className="min-w-0 flex-1 bg-transparent text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none"
+      />
+    </label>
+  );
   const tabs: Array<{ key: TeamTab; label: string }> = [
     ...(orgListing?.organization ? [{ key: "org" as const, label: t("orgLibrary.tab", { name: orgListing.organization.name }) }] : []),
     { key: "explore", label: t("templates.explore") },
@@ -515,17 +528,6 @@ export function TeamLibraryPanel({
                 </h2>
               </div>
               <div className="flex shrink-0 items-center gap-1">
-                {!pending && (
-                  <button
-                    type="button"
-                    onClick={() => void openExternal(catalog?.repositoryUrl ?? COMMUNITY_TEAMS_REPOSITORY)}
-                    className="flex size-8 items-center justify-center rounded-full text-ink-secondary hover:bg-raised hover:text-ink"
-                    title={t("templates.openRepository")}
-                    aria-label={t("templates.openRepository")}
-                  >
-                    <Github size={16} />
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={onClose}
@@ -542,18 +544,6 @@ export function TeamLibraryPanel({
 
           {!pending && !finishing && (
             <>
-              {(tab === "explore" || tab === "org" || tab === "share") && (
-                <label className="flex h-9 min-w-0 items-center gap-2.5 rounded-full bg-control/70 px-3.5 focus-within:ring-1 focus-within:ring-accent">
-                  <Search size={15} className="shrink-0 text-ink-secondary" />
-                  <input
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder={t("templates.search")}
-                    aria-label={t("templates.search")}
-                    className="min-w-0 flex-1 bg-transparent text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none"
-                  />
-                </label>
-              )}
               <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("templates.source")}>
                 {tabs.map((entry) => (
                   <button
@@ -599,7 +589,7 @@ export function TeamLibraryPanel({
                     onClick={() => void addOrgPackage(pendingOrg)}
                     disabled={importing}
                     aria-label={t("orgLibrary.addAria", { name: pendingOrg.name })}
-                    className="flex h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-60"
+                    className="flex h-8 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-accent-ink hover:bg-accent/90 disabled:opacity-60"
                   >
                     {importing && <Loader2 size={14} className="animate-spin" />}
                     {importing ? t("orgLibrary.adding") : t("orgLibrary.add")}
@@ -614,7 +604,7 @@ export function TeamLibraryPanel({
                   type="button"
                   onClick={() => void importTeam()}
                   disabled={importing}
-                  className="flex h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-60"
+                  className="flex h-8 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-accent-ink hover:bg-accent/90 disabled:opacity-60"
                 >
                   {importing && <Loader2 size={14} className="animate-spin" />}
                   {importing
@@ -629,6 +619,9 @@ export function TeamLibraryPanel({
             {error && <div role="alert" className="mb-3 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</div>}
 
             {tab === "org" && orgListing?.organization && (
+              <div className="mb-4">{searchField}</div>
+            )}
+            {tab === "org" && orgListing?.organization && (
               <OrgLibraryTab
                 listing={orgListing as OrgLibraryListing & { organization: { id: string; name: string } }}
                 busy={orgBusy}
@@ -642,6 +635,7 @@ export function TeamLibraryPanel({
 
             {tab === "explore" && (
               <div data-templates-grid className="@container flex flex-col gap-7 pt-1">
+                {searchField}
                 <ReadyBotGallery search={search} onDialog={setNestedDialog} onAdded={onClose} />
                 <section aria-labelledby="community-templates-title">
                   <div className="mb-1.5 flex min-h-7 items-center justify-between gap-3 px-2">
@@ -699,6 +693,17 @@ export function TeamLibraryPanel({
                     </div>
                   )}
                 </section>
+                <div className="px-2">
+                  <button
+                    type="button"
+                    onClick={() => void openExternal(catalog?.repositoryUrl ?? COMMUNITY_TEAMS_REPOSITORY)}
+                    title={t("templates.openRepository")}
+                    aria-label={t("templates.openRepository")}
+                    className="inline-flex items-center gap-1.5 text-[13px] font-medium leading-5 text-accent-text hover:underline"
+                  >
+                    <ExternalLink size={12} aria-hidden="true" /> {t("templates.communityRepo")}
+                  </button>
+                </div>
               </div>
             )}
 
@@ -756,13 +761,13 @@ export function TeamLibraryPanel({
                         onKeyDown={(event) => event.key === "Enter" && void loadGithubTeam()}
                         placeholder={t("templates.githubPlaceholder")}
                         aria-label={t("templates.githubUrl")}
-                        className="h-9 min-w-0 flex-1 rounded-full bg-control/70 px-3.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
+                        className="ui-field min-w-0 flex-1"
                       />
                       <button
                         type="button"
                         onClick={() => void loadGithubTeam()}
                         disabled={!githubUrl.trim() || githubLoading}
-                        className="inline-flex h-9 shrink-0 items-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-40"
+                        className="inline-flex h-8 shrink-0 items-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-accent-ink hover:bg-accent/90 disabled:opacity-40"
                       >
                         {githubLoading && <Loader2 size={13} className="animate-spin" />}
                         {t("templates.load")}
@@ -776,6 +781,7 @@ export function TeamLibraryPanel({
 
             {tab === "share" && (
               <div>
+                <div className="mb-4">{searchField}</div>
                 <p className="max-w-2xl px-2 text-[13px] leading-[18px] text-ink-secondary">{t("teamLibrary.shareIntro")}</p>
                 {visibleShareTeams.length === 0 ? (
                   <div className="flex min-h-40 flex-col items-center justify-center text-center">
@@ -823,7 +829,7 @@ export function TeamLibraryPanel({
                     onKeyDown={(event) => event.key === "Enter" && scoutTarget && void runScout(scoutTarget)}
                     placeholder="/path/to/your/project"
                     aria-label={t("templates.projectFolder")}
-                    className="h-9 min-w-0 flex-1 rounded-full bg-control/70 px-3.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="ui-field min-w-0 flex-1"
                   />
                   {Boolean(window.ogb?.pickFolder) && (
                     <button
@@ -840,7 +846,7 @@ export function TeamLibraryPanel({
                     type="button"
                     onClick={() => void runScout(scoutTarget)}
                     disabled={!scoutTarget || scouting}
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-40"
+                    className="inline-flex h-8 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-accent-ink hover:bg-accent/90 disabled:opacity-40"
                   >
                     {scouting ? <Loader2 size={14} className="animate-spin" /> : <Compass size={14} />}
                     {scouting ? t("templates.scouting") : t("templates.scout")}
@@ -940,13 +946,13 @@ export function TeamLibraryPanel({
                         value={roomName}
                         onChange={(event) => setRoomName(event.target.value)}
                         aria-label={t("templates.groupChatName")}
-                        className="h-9 min-w-0 flex-1 rounded-full bg-control/70 px-3.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none focus:ring-1 focus:ring-accent"
+                        className="ui-field min-w-0 flex-1"
                       />
                       <button
                         type="button"
                         onClick={() => void createProject()}
                         disabled={creating}
-                        className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-white hover:bg-accent/90 disabled:opacity-60"
+                        className="inline-flex h-8 shrink-0 items-center justify-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium leading-5 text-accent-ink hover:bg-accent/90 disabled:opacity-60"
                       >
                         {creating && <Loader2 size={14} className="animate-spin" />}
                         {creating ? t("templates.creating") : t("templates.createGroupChat")}

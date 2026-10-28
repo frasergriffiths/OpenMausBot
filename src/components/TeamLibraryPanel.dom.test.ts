@@ -91,7 +91,13 @@ describe("the Templates dialog shell", () => {
     const close = byLabel("Close templates")!;
     expect(close.className).toContain("size-8");
     expect(close.className).toContain("rounded-full");
-    expect(byLabel("Open the community templates repository")!.className).toContain("size-8");
+    const search = byLabel("Search templates")!;
+    expect(header.contains(search)).toBe(false);
+    expect(panel.contains(search)).toBe(true);
+    const repo = byLabel("Open the community templates repository")!;
+    expect(header.contains(repo)).toBe(false);
+    expect(repo.closest("[data-templates-grid]")).not.toBeNull();
+    expect(repo.className).toContain("text-[13px]");
   });
 
   it("presents the sources as the Apps filter pills, not a chunky tablist", async () => {
