@@ -83,7 +83,7 @@ describe("UpdateBanner", () => {
 
   it("shows a preparation failure with a recovery action", () => {
     const html = render({ status: "error", message: "Native staging failed" });
-    expect(html).toContain("Update failed");
+    expect(html).toContain("Couldn&#x27;t check for updates");
     expect(html).toContain("Native staging failed");
     expect(html).toContain("Try again");
   });
@@ -136,6 +136,6 @@ describe("UpdateBanner", () => {
     expect(render({ status: "installing", version: "1.2.3" }, undefined, true)).toBe("");
     expect(render({ status: "downloaded", version: "1.2.3", installMode: "restart" }, undefined, false)).toContain("Restart");
     expect(render({ status: "handed-off", version: "1.2.3", installMode: "handoff", command: "sudo apt install ./x.deb" }, undefined, true)).toContain("Finish in a terminal");
-    expect(render({ status: "error", message: "boom" }, undefined, true)).toContain("Update failed");
+    expect(render({ status: "error", message: "boom" }, undefined, true)).toContain("Couldn&#x27;t check for updates");
   });
 });
