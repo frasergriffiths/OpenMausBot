@@ -179,7 +179,7 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, color, o
           onFocus={() => onFocus(task.threadId)}
           onDoubleClick={startRename}
           className={cn(
-            "flex h-7 max-w-[14rem] min-w-0 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] leading-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
+            "flex h-8 max-w-[14rem] min-w-0 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] leading-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
             active ? "bg-raised font-medium text-ink" : "text-ink-secondary hover:bg-raised/60 hover:text-ink",
           )}
         >
@@ -367,10 +367,10 @@ export function ThreadTabs({ bot, dispatch, onMeasuredWidthChange }: {
   };
   const focusable = threads.some((task) => task.threadId === focusId) ? focusId : active;
 
-  const edgeClass = "flex size-6 shrink-0 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60 disabled:pointer-events-none disabled:opacity-30";
+  const edgeClass = "flex size-7 shrink-0 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-raised hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60 disabled:pointer-events-none disabled:opacity-30";
 
   return (
-    <div data-chathead-tabs className="flex min-w-0 items-center rounded-full bg-composer px-0.5 ring-[0.5px] ring-hairline/60 @max-[30rem]/chathead:hidden">
+    <div data-chathead-tabs className="flex min-w-0 items-center gap-0.5 @max-[30rem]/chathead:hidden">
       {edges.overflow && (
         <button
           type="button"

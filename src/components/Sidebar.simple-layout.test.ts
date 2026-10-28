@@ -51,7 +51,7 @@ import { SidebarResizeHandle } from "./SidebarResizeHandle";
 import { SidebarTileGrid } from "./SidebarTiles";
 import { GlassBar, GlassScrollFrame, GlassScroller } from "./GlassScrollFrame";
 import { SidebarSectionHeader } from "./SidebarSectionHeader";
-import { SidebarEdgeToggle, SidebarSearchPill, SidebarSearchToggle } from "./SidebarSimpleTop";
+import { SidebarEdgeToggle, SidebarSearchPill } from "./SidebarSimpleTop";
 import { SidebarRailSeparator, SimpleRailFooter } from "./SidebarSimpleRail";
 
 const bot = (id: string, extra: Partial<Bot> = {}): Bot => ({
@@ -228,22 +228,14 @@ describe("Simple-mode sidebar layout", () => {
     expect(headers(tree).find((header) => header.props.name === "Work")!.props.collapsed).toBe(true);
   });
 
-  it("keeps the search pill visible, focuses it from the round button, and clears the filter on close", () => {
-    const toggle = () => render().tree.find((node) => node.type === SidebarSearchToggle)!.props as Parameters<typeof SidebarSearchToggle>[0];
+  it("keeps the search field on screen with no toggle, and clears the filter", () => {
     const pill = () => render().tree.find((node) => node.type === SidebarSearchPill)?.props as Parameters<typeof SidebarSearchPill>[0] | undefined;
     expect(pill()).toBeDefined();
-    expect(toggle().open).toBe(true);
-    const focus = vi.fn();
-    const previous = globalThis.document;
-    vi.stubGlobal("document", { querySelector: () => ({ focus }) });
-    toggle().onToggle();
-    expect(focus).toHaveBeenCalled();
-    vi.stubGlobal("document", previous);
-    expect(pill()).toBeDefined();
+    expect(render().tree.some((node) => node.props["data-sidebar-search-toggle"] !== undefined)).toBe(false);
     pill()!.onQuery("bea");
     expect(pill()!.query).toBe("bea");
     expect(listedBots(render().tree)).toEqual(["bea"]);
-    pill()!.onClose();
+    pill()!.onClear();
     expect(pill()).toBeDefined();
     expect(pill()!.query).toBe("");
     expect(listedBots(render().tree)).toEqual(["atlas", "bea", "dodo"]);
@@ -289,7 +281,7 @@ describe("Simple-mode sidebar layout", () => {
     expect(listedBots(tree)).toEqual(["atlas", "bea", "dodo"]);
     expect(headers(tree)).toEqual([]);
     expect(tree.filter((node) => node.type === SidebarRailSeparator)).toHaveLength(2);
-    expect(tree.some((node) => node.type === SidebarSearchToggle)).toBe(false);
+    expect(tree.some((node) => node.props["data-sidebar-search-toggle"] !== undefined)).toBe(false);
     expect((tree.find((node) => node.type === SidebarEdgeToggle)!.props as Parameters<typeof SidebarEdgeToggle>[0]).collapsed).toBe(true);
     expect(tree.some((node) => node.props["data-sidebar-top-buttons"] !== undefined)).toBe(false);
   });

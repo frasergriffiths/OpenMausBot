@@ -55,7 +55,7 @@ describe("Mac local computer permission card", () => {
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
     expect(markup).toContain('data-mac-permission-card=""');
     expect(markup).toContain("bg-card");
-    expect(markup).toContain("mb-2.5 flex text-accent-text");
+    expect(markup).toContain("size-8 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent-text");
     expect(markup).not.toContain("bg-accent/10");
     expect(markup).not.toContain("border-warning/25");
     expect(markup).not.toContain("bg-warning/10 p-4");
@@ -79,7 +79,8 @@ describe("Mac local computer permission card", () => {
     expect(markup.match(/Not granted/g)?.length).toBe(2);
     expect(markup.indexOf("Screen Recording")).toBeLessThan(markup.indexOf("Accessibility"));
     expect(markup).toContain("Open Screen Recording Settings");
-    expect(markup).not.toContain("Open Accessibility Settings");
+    expect(markup).toContain("Open Accessibility Settings");
+    expect(markup).toContain("Open System Settings");
   });
 
   it("does not diagnose a permission when the reason names none", () => {

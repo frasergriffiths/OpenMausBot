@@ -1523,6 +1523,7 @@
   "sidebar.search": "Search",
   "sidebar.searchAria": "Search bots and messages",
   "sidebar.searchClose": "Close search",
+  "sidebar.searchClear": "Clear search",
   "sidebar.noMatch": "Nothing matches “{query}”",
   "sidebar.preview.waiting": "Waiting for you…",
   "sidebar.preview.waitingOnTeammate": "Waiting on a teammate…",

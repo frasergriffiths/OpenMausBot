@@ -30,12 +30,14 @@ const ACTS_LABEL: Record<ApprovalMode, () => string> = {
   custom: () => t("botPanel.acts.custom"),
 };
 
-export function SettingsPage({ bot, derived, onOpen, editingInstructions = false, onEditInstructions }: {
+export function SettingsPage({ bot, derived, onOpen, editingInstructions = false, onEditInstructions, embedded = false }: {
   bot: Bot;
   derived: Derived;
   onOpen?: (page: SimplePageId) => void;
   editingInstructions?: boolean;
   onEditInstructions?: (open: boolean) => void;
+  /** Under another card in the Details tab, so its first card keeps the same step down the page. */
+  embedded?: boolean;
 }) {
   const { dispatch } = useStore();
   const { capabilities, ready } = useDesktopCapabilities();
@@ -80,7 +82,7 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
   const enabledApps = apps.apps.filter((app) => app.scope !== null).map((app) => app.label);
 
   return (
-    <div data-panel-settings>
+    <div data-panel-settings className={embedded ? "mt-4" : undefined}>
       <Card anchor="instructions">
         {soulOpen ? (
           <ColRow data-panel-row="soul">

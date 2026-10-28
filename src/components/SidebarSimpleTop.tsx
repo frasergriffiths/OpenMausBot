@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
-import { useEffect, useState, type CSSProperties, type Ref, type RefObject } from "react";
+import { useEffect, useState, type CSSProperties, type RefObject } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/cn";
@@ -75,53 +75,39 @@ export function SidebarEdgeToggle({ collapsed, onToggle, style, anchorRef, shown
   return pinned ? createPortal(button, document.body) : button;
 }
 
-export function SidebarSearchToggle({ open, onToggle, ref }: { open: boolean; onToggle: () => void; ref?: Ref<HTMLButtonElement> }) {
-  return (
-    <button
-      ref={ref}
-      type="button"
-      data-sidebar-search-toggle
-      onClick={onToggle}
-      aria-label={t("sidebar.searchAria")}
-      aria-expanded={open}
-      title={t("sidebar.searchAria")}
-      className={SIMPLE_TOP_BUTTON}
-    >
-      <Search size={18} strokeWidth={1.5} aria-hidden="true" />
-    </button>
-  );
-}
-
 export const SIMPLE_SEARCH_SHELL = "flex h-8 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1.5 text-ink-secondary focus-within:ring-1 focus-within:ring-accent";
 export const SIMPLE_SEARCH_INPUT = "min-w-0 flex-1 bg-transparent text-[13px] leading-[18px] text-ink placeholder:text-ink-tertiary focus:outline-none";
 
-export function SidebarSearchPill({ query, onQuery, onClose }: { query: string; onQuery: (query: string) => void; onClose: () => void }) {
+/** Simple mode's search field, always on screen: no toggle to open it and no close to put it away. The clear button
+ *  appears only once there is something to clear. */
+export function SidebarSearchPill({ query, onQuery, onClear }: { query: string; onQuery: (query: string) => void; onClear: () => void }) {
   return (
     <div data-sidebar-search-pill className="px-3 pb-2 pt-0.5">
       <div className={cn("flex h-8 items-center gap-2 rounded-[var(--radius-lg)] pl-2.5 pr-1 text-ink-secondary focus-within:ring-focus", ELEVATED_CONTROL)}>
         <Search size={15} aria-hidden="true" className="shrink-0" />
         <input
-          autoFocus
           value={query}
           onChange={(event) => onQuery(event.target.value)}
           onKeyDown={(event) => {
             if (event.key !== "Escape") return;
             event.preventDefault();
-            onClose();
+            onClear();
           }}
           placeholder={t("sidebar.searchAria")}
           aria-label={t("sidebar.searchAria")}
           className={SIMPLE_SEARCH_INPUT}
         />
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t("sidebar.searchClose")}
-          title={t("sidebar.searchClose")}
-          className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-tertiary hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
-        >
-          <X size={14} aria-hidden="true" />
-        </button>
+        {query !== "" && (
+          <button
+            type="button"
+            onClick={onClear}
+            aria-label={t("sidebar.searchClear")}
+            title={t("sidebar.searchClear")}
+            className="flex size-6 shrink-0 items-center justify-center rounded-full text-ink-tertiary hover:bg-raised hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+          >
+            <X size={14} aria-hidden="true" />
+          </button>
+        )}
       </div>
     </div>
   );

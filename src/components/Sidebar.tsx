@@ -9,7 +9,7 @@ import { useTurnLive } from "@/state/turn-status";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 
 import { BotAvatar } from "./Avatar";
-import { BotEngineMark, BotModelBadge, BotModelMark, botTooltip } from "./BotModelBadge";
+import { BotModelBadge, BotModelMark, botTooltip } from "./BotModelBadge";
 import { SidebarSimpleRowActions } from "./SidebarSimpleRowActions";
 import { sectionLabel } from "./sidebar-section-label"; import { SidebarBotRole } from "./BotRole";
 import { MAUS_COLORS, mascotInk, spinnerColor, stateForBot } from "@/lib/mascot";
@@ -99,7 +99,7 @@ import { showWhoReportsToWhom, TeamMenuItems } from "./SidebarTeamMenu";
 import { departmentOwner, useTeamPeople } from "@/state/team-people";
 export { TeamMenuItems };
 import { SidebarResizeHandle, useSidebarWidth } from "./SidebarResizeHandle";
-import { PHONE_TOP_BUTTON, SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_ROW_FOCUS, SIMPLE_TOP_BUTTON, SidebarEdgeToggle, SidebarSearchPill, SidebarSearchToggle } from "./SidebarSimpleTop";
+import { PHONE_TOP_BUTTON, SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_ROW_FOCUS, SIMPLE_TOP_BUTTON, SidebarEdgeToggle, SidebarSearchPill } from "./SidebarSimpleTop";
 import { isSidebarToggle } from "@/lib/keyboard-shortcuts";
 import { SidebarRailSeparator, SimpleRailFooter } from "./SidebarSimpleRail";
 import { useShowThreads } from "@/lib/thread-preferences";
@@ -747,7 +747,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
     iconOnly
       ? railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5"
       : density === "compact"
-        ? cn(showThreads ? "gap-1.5 py-1" : "gap-2.5 py-1.5", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-9")
+        ? cn(showThreads ? "gap-1.5 py-1" : "gap-2.5 py-1.5", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-2")
         : simpleRow ? "gap-2 rounded-[10px] py-2 pl-2 pr-2 md:h-[54px] md:py-0"
         : cn(showThreads ? "gap-2 py-2" : "gap-3 py-2", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2.5 pr-9"),
     !iconOnly && "max-md:rounded-2xl max-md:py-2.5",
@@ -845,7 +845,6 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
             </span>
           )}
           {!simpleList && density === "compact" && <BotModelMark bot={bot} instances={instances} />}
-          {simpleList && density === "compact" && <BotEngineMark bot={bot} instances={instances} className="self-center" />}
           {(expanded || (quiet && !statusLine)) && unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
           {!renaming && <span className="flex shrink-0 self-center"><OwnerFace bot={bot} /></span>}
           {simpleRow && (unread || waiting) && <RowDot waiting={waiting} inline />}
@@ -875,7 +874,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
         </div>}
         {simpleRow && <RowStatusText working={working} unread={unread} />}
       </div>
-      {simpleRow && <SidebarSimpleRowActions bot={bot} instances={instances} menuOpen={menuOpen} onMenu={onMenu} />}
+      {simpleList && !showThreads && <SidebarSimpleRowActions bot={bot} instances={instances} menuOpen={menuOpen} onMenu={onMenu} />}
     </>
   );
   const onContextMenu = (event: React.MouseEvent) => {
@@ -935,7 +934,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
           className="pointer-events-none absolute right-[3.75rem] top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:hidden touch:pointer-events-auto touch:opacity-70"><Plus size={14} /></button>}
         {showThreads && <button type="button" aria-label={t("folder.newNamed", { name: bot.name })} title={t("folder.new")} onClick={() => { setThreadsOpen(true); setCreatingProject(true); }}
           className="pointer-events-none absolute right-8 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:hidden touch:pointer-events-auto touch:opacity-70"><FolderPlus size={14} /></button>}
-        {!simpleRow && <button type="button" data-bot-actions={bot.id} aria-label={t("sidebar.bot.actions", { name: bot.name })} title={t("sidebar.bot.actions", { name: bot.name })} aria-haspopup="menu" aria-expanded={menuOpen} onClick={(event) => { const rect = event.currentTarget.getBoundingClientRect(); onMenu({ botId: bot.id, x: rect.left, y: rect.bottom }); }}
+        {(advanced || showThreads) && <button type="button" data-bot-actions={bot.id} aria-label={t("sidebar.bot.actions", { name: bot.name })} title={t("sidebar.bot.actions", { name: bot.name })} aria-haspopup="menu" aria-expanded={menuOpen} onClick={(event) => { const rect = event.currentTarget.getBoundingClientRect(); onMenu({ botId: bot.id, x: rect.left, y: rect.bottom }); }}
           className={cn("absolute right-1 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary hover:bg-raised hover:text-ink aria-expanded:pointer-events-auto aria-expanded:opacity-100",
             selected ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70")}><MoreHorizontal size={15} /></button>}
       </>}
@@ -1048,10 +1047,8 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const rail = !advanced && density === "icons";
   const sidePanelOpen = state.computerOpen || state.inspectorOpen;
   const sizing = useSidebarWidth({ simple: !advanced, density, sidePanelOpen, sidebarRef });
-  const [searchOpen, setSearchOpen] = useState(false);
-  const searchShown = simpleDesk || searchOpen || query !== "";
-  const searchToggleRef = useRef<HTMLButtonElement>(null);
-  const closeSearch = () => { setSearchOpen(false); setQuery(""); searchToggleRef.current?.focus(); };
+  /** Simple mode keeps the field on screen; the toggle and the close button are gone. */
+  const clearSearch = () => setQuery("");
   const [lastExpandedDensity, setLastExpandedDensity] = useState<Exclude<SidebarDensity, "icons">>(
     () => density === "icons" ? "comfortable" : density,
   );
@@ -1276,8 +1273,11 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const botRow = (bot: Bot): BotRowProps => ({ ...botRowProps(state, dispatch, bot, { density, quiet: quietRows, query: q, onMenu: setMenu, renameRequest: renameRequest?.botId === bot.id ? renameRequest.nonce : 0 }), menuOpen: menu?.botId === bot.id });
   const railSearch = () => {
     if (collapseToIcons) return openCommandPalette();
-    setSearchOpen(true);
     toggleCollapsed();
+    // The field is always mounted once the sidebar is wide; put the caret in it after the rail has expanded.
+    if (typeof requestAnimationFrame === "function") {
+      requestAnimationFrame(() => document.querySelector<HTMLInputElement>("[data-sidebar-search-pill] input")?.focus());
+    }
   };
   const plusItem = advanced ? "flex w-full items-center gap-3 px-3.5 py-2 text-left text-[14px] text-ink hover:bg-menu-hover" : cn(SIMPLE_MENU_ITEM, "text-ink hover:bg-menu-hover");
   const plusControl = (
@@ -1437,7 +1437,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           className={cn("relative flex shrink-0 items-center", density === "icons" ? "flex-col gap-1" : simpleDesk ? "gap-2" : simple ? "gap-1 pl-0.5" : "ml-0.5 gap-0.5")}
           style={windowNoDragStyle}
         >
-          {simpleDesk && <SidebarSearchToggle ref={searchToggleRef} open={searchShown} onToggle={() => { if (simpleDesk) { document.querySelector<HTMLInputElement>("[data-sidebar-search-pill] input")?.focus(); } else { setSearchOpen(true); } }} />}
           {!collapseToIcons && !phone && (advanced || density === "icons") && <button
             type="button"
             onClick={toggleCollapsed}
@@ -1513,7 +1512,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
 
       {density === "icons" && !rail && <DesktopWorkspaceSwitcher compact cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} />}
       <OrganizationIdentity compact={density === "icons"} />
-      {phone ? null : simple ? searchShown && <SidebarSearchPill query={query} onQuery={setQuery} onClose={closeSearch} /> : <div className={cn("pt-1 pb-3", density === "icons" ? "hidden" : "px-3")}>
+      {phone ? null : simple ? <SidebarSearchPill query={query} onQuery={setQuery} onClear={clearSearch} /> : <div className={cn("pt-1 pb-3", density === "icons" ? "hidden" : "px-3")}>
         <div className="flex items-center gap-2 rounded-md border border-hairline/40 bg-inset/40 px-2.5 py-1.5 focus-within:border-focus">
           <Search size={14} className="text-ink-secondary" />
           <input
@@ -1707,7 +1706,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
               </div>
             );
           })}
-          <MovedBotRows bots={state.bots} /><SearchResults query={query} onLanded={() => { setQuery(""); setSearchOpen(false); }} />
+          <MovedBotRows bots={state.bots} /><SearchResults query={query} onLanded={() => setQuery("")} />
           {showPinnedCircleThreads && (
             <PinnedCircleThreadSection
               bots={pinnedBots}
