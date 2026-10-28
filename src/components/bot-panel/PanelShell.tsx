@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Settings, X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
+import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "@/components/pill-tabs";
 import { t } from "@/lib/i18n";
 import type { Bot, BotSettingsSection } from "@/state/store";
 import { ChatShareMenu } from "@/components/ChatMoreMenu";
@@ -136,9 +137,9 @@ export function BotPanel({ bot, derived, headerClassName, linkedSection, onClose
             <div
               role="tablist"
               aria-label={t("botSettings.simple.tabs")}
-              className="sticky top-0 z-[1] -mx-4 mt-[15px] flex justify-center bg-app px-4 pb-2.5 pt-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-3 after:bg-linear-to-b after:from-app after:to-transparent"
+              className="sticky top-0 z-[1] -mx-4 mt-[15px] flex justify-center bg-app px-4 pb-4 pt-1 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-2 after:bg-linear-to-b after:from-app after:to-transparent"
             >
-              <div className="flex items-center gap-0.5 rounded-full bg-ink/[0.05] p-[3px]">
+              <div className={cn(PILL_TABS, "w-full")}>
                 {PANEL_TABS.map((id) => (
                   <button
                     key={id}
@@ -147,10 +148,7 @@ export function BotPanel({ bot, derived, headerClassName, linkedSection, onClose
                     aria-selected={tab === id}
                     data-panel-tab={id}
                     onClick={() => openTab(id)}
-                    className={cn(
-                      "h-7 min-w-0 shrink truncate rounded-full px-3 text-[13px] leading-[18px] transition-colors",
-                      tab === id ? "bg-menu text-ink shadow-[0_1px_2px_rgb(0_0_0/0.08)]" : "text-ink-secondary hover:text-ink",
-                    )}
+                    className={cn(PILL_TAB, "flex-auto", tab === id ? PILL_TAB_ON : PILL_TAB_OFF)}
                   >
                     {t(TAB_LABEL[id])}
                   </button>

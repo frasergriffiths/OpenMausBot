@@ -4,6 +4,7 @@ import { Check, ChevronLeft, ChevronRight, Trash2, type LucideIcon } from "lucid
 import { cn } from "@/lib/cn";
 import { useAdvancedMode } from "@/lib/interface-mode";
 import { MAUS_COLORS, type MausColor } from "@/lib/mascot";
+import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "../pill-tabs";
 import { ELEVATED_CONTROL, ELEVATED_HOVER } from "../elevated";
 import { Switch } from "../SettingsPrimitives";
 
@@ -204,7 +205,7 @@ export function Segmented<V extends string>({ options, value, onChange, label, a
   attr: string;
 }) {
   return (
-    <div role="group" aria-label={label} className="flex w-full rounded-full bg-ink/[0.05] p-[3px]">
+    <div role="group" aria-label={label} className={cn(PILL_TABS, "w-full")}>
       {options.map((option) => (
         <button
           key={option.value}
@@ -214,10 +215,7 @@ export function Segmented<V extends string>({ options, value, onChange, label, a
           disabled={option.disabled}
           title={option.tooltip}
           onClick={() => onChange(option.value)}
-          className={cn(
-            "min-w-0 flex-auto truncate whitespace-nowrap rounded-full px-1.5 py-1.5 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-            value === option.value ? "bg-ink/[0.14] text-ink" : "text-ink-secondary enabled:hover:text-ink",
-          )}
+          className={cn(PILL_TAB, "flex-auto", value === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
         >
           {option.label}
         </button>

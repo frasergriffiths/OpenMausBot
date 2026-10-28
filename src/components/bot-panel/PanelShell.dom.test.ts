@@ -172,7 +172,7 @@ describe("the panel's tabs", () => {
     expect(tab()).toBe("details");
     const strip = host.querySelector('[role="tablist"]')!.className.split(" ");
     expect(strip).toEqual(expect.arrayContaining(["sticky", "top-0", "bg-app", "justify-center"]));
-    expect(host.querySelector('[role="tab"]')!.className.split(" ")).toEqual(expect.arrayContaining(["h-7", "px-3", "text-[13px]", "bg-menu"]));
+    expect(host.querySelector('[role="tab"]')!.className.split(" ")).toEqual(expect.arrayContaining(["py-1.5", "px-3", "text-[13px]", "bg-ink/[0.14]"]));
     for (const id of ["library", "computer", "details"]) {
       click(host.querySelector(`[data-panel-tab="${id}"]`));
       expect(tab()).toBe(id);

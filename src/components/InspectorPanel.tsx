@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bug, ChevronDown, ChevronRight, RefreshCw, X } from "lucide-react";
 import { useStore, visibleMessages, type Bot } from "@/state/store";
 import { cn } from "@/lib/cn";
+import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "./pill-tabs";
 import { useCaptionChrome } from "@/components/DesktopCapabilities";
 import { formatTime, toRows, type InspectorEntry, type InspectorPage, type InspectorRow } from "@/lib/inspector";
 import { listenLiveFrames } from "@/lib/live-events";
@@ -159,7 +160,7 @@ export function InspectorPanel({ bot }: { bot: Bot }) {
       </div>
 
       <div className="flex items-center gap-2 border-b border-hairline/40 px-4 pb-3">
-        <div role="tablist" aria-label={t("inspector.views")} className="flex rounded-lg bg-inset p-0.5" onKeyDown={(event) => {
+        <div role="tablist" aria-label={t("inspector.views")} className={PILL_TABS} onKeyDown={(event) => {
           const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
           const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
           const next = event.key === "ArrowRight" ? (current + 1) % tabs.length
@@ -180,10 +181,7 @@ export function InspectorPanel({ bot }: { bot: Bot }) {
               aria-controls={`inspector-panel-${l}`}
               tabIndex={lens === l ? 0 : -1}
               onClick={() => setLens(l)}
-              className={cn(
-                "rounded-md px-2.5 py-1 text-[12px] font-medium capitalize",
-                lens === l ? "bg-raised text-ink" : "text-ink-secondary hover:text-ink",
-              )}
+              className={cn(PILL_TAB, "capitalize", lens === l ? PILL_TAB_ON : PILL_TAB_OFF)}
             >
               {l === "run" ? t("inspector.run.title") : l}
             </button>
