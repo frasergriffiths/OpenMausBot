@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { t } from "@/lib/i18n";
 import { waitForLocalVmReady } from "@/lib/local-vm-readiness";
 import type { LocaleKey } from "@/locales";
@@ -18,6 +18,7 @@ import {
 import { Card, CommandLine } from "./SettingsPrimitives";
 import { MacLocalControl } from "./MacLocalControl";
 import { Select } from "./Select";
+import { PILL_TABS, PILL_TAB, PILL_TAB_ON, PILL_TAB_OFF } from "./pill-tabs";
 import { cn } from "@/lib/cn";
 import { useStore } from "@/state/store";
 import { VpsComputersCard } from "./VpsComputersCard";
@@ -806,6 +807,7 @@ export function LocalComputerSection() {
   const [cloudRefreshKey, setCloudRefreshKey] = useState(0);
   const cloudInventoryRef = useRef<CloudComputerInventoryInstance[]>([]);
   const cloudOverridesRef = useRef<CloudPostActionOverrides>({});
+  const isolationTabs = useRef<Array<HTMLButtonElement | null>>([]);
   const [vpsInventory, setVpsInventory] = useState<VpsComputerInventoryInstance[]>([]);
   const [vpsConfigured, setVpsConfigured] = useState<boolean | null>(null);
   const [vpsAliases, setVpsAliases] = useState<string[]>([]);
@@ -1205,6 +1207,23 @@ export function LocalComputerSection() {
   const perBotRuntimeUnsupported = perBot && status?.runtime === "container";
   const headerReady = perBot ? Boolean(status?.daemonUp && status?.image && !perBotRuntimeUnsupported) : ready;
 
+  const isolationModes = ["shared", "per-bot"] as const;
+  const isolationTabStop = status?.mode === "per-bot" ? "per-bot" : "shared";
+  const onIsolationKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    if (!status || policyPending) return;
+    const current = isolationModes.findIndex((mode) => mode === status.mode);
+    const from = current < 0 ? 0 : current;
+    const next = event.key === "ArrowRight" ? (from + 1) % isolationModes.length
+      : event.key === "ArrowLeft" ? (from + isolationModes.length - 1) % isolationModes.length
+        : event.key === "Home" ? 0 : isolationModes.length - 1;
+    const mode = isolationModes[next]!;
+    isolationTabs.current[next]?.focus({ preventScroll: true });
+    if (mode === status.mode) return;
+    void savePolicy(mode, status.max_instances ?? 2);
+  };
+
   return (
     <>
       <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">{announcement}</p>
@@ -1291,18 +1310,18 @@ export function LocalComputerSection() {
         title={t("vm.isolation.title")}
         subtitle={t("vm.isolation.subtitle")}
       >
-        <div className="flex overflow-hidden rounded-lg border border-hairline/40">
-          {(["shared", "per-bot"] as const).map((mode, index) => (
+        <div role="tablist" aria-label={t("vm.isolation.title")} className={cn(PILL_TABS, "w-full")} onKeyDown={onIsolationKeyDown}>
+          {isolationModes.map((mode, index) => (
             <button
               key={mode}
+              ref={(node) => { isolationTabs.current[index] = node; }}
               type="button"
+              role="tab"
+              aria-selected={status?.mode === mode}
+              tabIndex={isolationTabStop === mode ? 0 : -1}
               disabled={!status || policyPending}
               onClick={() => void savePolicy(mode, status?.max_instances ?? 2)}
-              className={cn(
-                "flex-1 px-3 py-2 text-[13px] disabled:opacity-50",
-                index > 0 && "border-l border-hairline/40",
-                status?.mode === mode ? "bg-control text-ink" : "text-ink-secondary hover:text-ink",
-              )}
+              className={cn(PILL_TAB, "flex-auto", status?.mode === mode ? PILL_TAB_ON : PILL_TAB_OFF)}
             >
               {mode === "shared" ? t("vm.isolation.shared") : t("vm.isolation.perBot")}
             </button>

@@ -54,6 +54,20 @@ const ownedCloudComputer: CloudComputerInventoryInstance = {
   inUse: false,
 };
 
+describe("isolation control", () => {
+  it("uses the shared pill-tab recipe, not a bordered segmented row", () => {
+    const markup = renderToStaticMarkup(createElement(LocalComputerSection));
+    const start = markup.indexOf('role="tablist"');
+    const tabs = markup.slice(start, markup.indexOf("</div>", start));
+    expect(tabs).toContain("rounded-full bg-ink/[0.05]");
+    expect(tabs).not.toContain("border-hairline");
+    expect(tabs.match(/role="tab"/g)).toHaveLength(2);
+    expect(tabs).toContain('aria-selected="false"');
+    expect(tabs).toContain('tabindex="0"');
+    expect(tabs).toContain('tabindex="-1"');
+  });
+});
+
 afterEach(() => setLocale("en"));
 
 describe("computer inventory request wiring", () => {
