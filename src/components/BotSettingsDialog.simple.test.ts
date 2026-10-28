@@ -311,6 +311,20 @@ describe("the bot panel in Simple mode", () => {
     expect(panel(bot).html).toContain(">Signed-in sites<");
   });
 
+  it("keeps one header layout and the close button in the same fixed slot on the root and a page", () => {
+    const bot = makeBot();
+    const root = panel(makeBot()).html;
+    (ofType(panel(bot), DetailsTab)!.props.onOpen as (page: string) => void)("routines");
+    const page = panel(bot).html;
+    for (const html of [root, page]) {
+      expect(html).toContain('data-panel-header="" class="flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3"');
+      expect(html).toContain('data-panel-leading="" class="flex w-[34px]');
+      expect(html).toContain('data-panel-close="" class="flex w-[34px] shrink-0 justify-end"');
+    }
+    expect(root).toContain("data-panel-avatar");
+    expect(page).toContain('data-panel-back="true"');
+  });
+
   it("goes back on Escape from a page, then closes the panel on a root tab", () => {
     const bot = makeBot();
     (ofType(panel(bot), DetailsTab)!.props.onOpen as (page: string) => void)("routines");

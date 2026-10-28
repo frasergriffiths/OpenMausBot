@@ -40,7 +40,6 @@ function text(value: ReactNode): string {
 let bridge: ManagedDesktopBridge;
 let push: (state: ManagedDesktopState) => void;
 let unsubscribe = vi.fn<() => void>();
-const onOpenSettings = vi.fn();
 const onConnected = vi.fn();
 
 function render() {
@@ -48,7 +47,7 @@ function render() {
   fixture.effects = [];
   let tree: ReactNode = null;
   function Capture() {
-    tree = OrganisationRow({ bridge, onOpenSettings, onConnected });
+    tree = OrganisationRow({ bridge, onConnected });
     return tree;
   }
   const html = renderToStaticMarkup(createElement(Capture));
@@ -87,7 +86,6 @@ beforeEach(() => {
   fixture.effects = [];
   unsubscribe = vi.fn();
   push = () => {};
-  onOpenSettings.mockReset();
   onConnected.mockReset();
   bridge = {
     settingsOpened: vi.fn().mockResolvedValue(true),
@@ -155,13 +153,6 @@ describe("organisation sign-in row in the welcome flow", () => {
     expect(render().html).toContain("Using OpenMausBot at work?");
   });
 
-  it("sends another Admin address to Settings instead of asking here", async () => {
-    await mount();
-    button("Other Admin address")!.props.onClick!();
-    expect(onOpenSettings).toHaveBeenCalledOnce();
-    expect(bridge.begin).not.toHaveBeenCalled();
-  });
-
   it("says when the organisation has approved no models yet", async () => {
     await mount({ ...connected, providers: [] });
     const html = render().html;
@@ -170,14 +161,12 @@ describe("organisation sign-in row in the welcome flow", () => {
     expect(onConnected).not.toHaveBeenCalled();
   });
 
-  it("points any other state to Settings with no sign-in button", async () => {
+  it("shows a reauthorization state without a sign-in button", async () => {
     await mount({ ...connected, status: "reauth-required", message: "Fixture reason" });
     const html = render().html;
     expect(html).toContain("Fixture Company");
     expect(html).toContain("Fixture reason");
     expect(button("Sign in")).toBeUndefined();
-    button("Organization settings")!.props.onClick!();
-    expect(onOpenSettings).toHaveBeenCalledOnce();
   });
 
   it("shows product copy for a failed action, never the IPC error", async () => {

@@ -128,7 +128,6 @@ export function ConnectAi({ hosted = false, tested }: { hosted?: boolean; tested
           {organisation && (
             <OrganisationRow
               bridge={organisation}
-              onOpenSettings={() => dispatch({ type: "toggleAppSettings", open: true, section: "organization" })}
               onConnected={() => void refresh()}
             />
           )}

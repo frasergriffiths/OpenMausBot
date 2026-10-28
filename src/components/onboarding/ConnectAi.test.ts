@@ -7,7 +7,7 @@ import { setLocale } from "@/lib/i18n";
 import type { InstanceInfo } from "@/state/store";
 
 const f = vi.hoisted(() => ({
-  instances: [] as InstanceInfo[], dispatch: vi.fn(), row: null as null | { bridge: unknown; onOpenSettings: () => void },
+  instances: [] as InstanceInfo[], dispatch: vi.fn(), row: null as null | { bridge: unknown },
   check: (): Promise<object> => Promise.resolve({ ok: true }), checks: [] as string[], fail: false,
 }));
 vi.mock("@/state/store", () => ({
@@ -221,8 +221,6 @@ describe("connecting an AI on the first screen", () => {
     expect(f.row).toBeNull();
     await show();
     expect(f.row?.bridge).toBe(bridge);
-    f.row!.onOpenSettings();
-    expect(f.dispatch).toHaveBeenCalledWith({ type: "toggleAppSettings", open: true, section: "organization" });
     delete window.ogb;
   });
 

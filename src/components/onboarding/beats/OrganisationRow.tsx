@@ -6,15 +6,11 @@ import { t } from "@/lib/i18n";
 import { companyModelCount, DEFAULT_ADMIN_ORIGIN } from "@/lib/onboarding";
 import { staggerIndex } from "./shared";
 
-const linkClass = "w-fit text-[12px] text-ink-secondary underline-offset-2 transition-colors hover:text-ink hover:underline";
-
 export function OrganisationRow({
   bridge,
-  onOpenSettings,
   onConnected,
 }: {
   bridge: ManagedDesktopBridge;
-  onOpenSettings: () => void;
   onConnected?: () => void;
 }) {
   const [connection, setConnection] = useState<ManagedDesktopState | null>(null);
@@ -90,9 +86,6 @@ export function OrganisationRow({
           <span className="font-medium text-ink">{t("onboarding.org.title", { app: brand().name })}</span>{" "}
           {t("onboarding.org.body")}
         </p>
-        <button type="button" onClick={onOpenSettings} className={linkClass}>
-          {t("onboarding.org.otherAddress")}
-        </button>
       </>
     );
     action = (
@@ -143,9 +136,6 @@ export function OrganisationRow({
     body = (
       <>
         {name && <p className="truncate text-[13px] font-medium text-ink">{name}</p>}
-        <button type="button" onClick={onOpenSettings} className={linkClass}>
-          {t("onboarding.org.manage")}
-        </button>
       </>
     );
   }

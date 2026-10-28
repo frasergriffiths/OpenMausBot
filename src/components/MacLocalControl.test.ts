@@ -55,7 +55,9 @@ describe("Mac local computer permission card", () => {
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
     expect(markup).toContain('data-mac-permission-card=""');
     expect(markup).toContain("bg-card");
-    expect(markup).toContain("size-8 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent-text");
+    expect(markup).toContain("lucide-shield text-accent-text");
+    expect(markup.indexOf("lucide-shield")).toBeLessThan(markup.indexOf("Allow control of this computer"));
+    expect(markup).not.toContain("bg-accent/12");
     expect(markup).not.toContain("bg-accent/10");
     expect(markup).not.toContain("border-warning/25");
     expect(markup).not.toContain("bg-warning/10 p-4");

@@ -15,7 +15,6 @@ import { PeopleSection } from "./PeopleSection";
 import { ActivitySection } from "./ActivitySection";
 import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
-import { OrganizationSettings } from "./OrganizationSettings";
 import { CloudPlanRow, CloudPlanFootnote, useCloudPlan } from "./ProIntroduction";
 import { CloudUsageDetails, CloudUsageSummaryView, useCloudUsageSettings } from "./CloudUsageMeter";
 import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "./SettingsPrimitives";
@@ -29,7 +28,7 @@ import { useServerUpdateItem } from "./SidebarProfileMenu";
 import { AdvancedModeRow, BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, LanguageRow, ReplayTourRow, SendKeyRow, UpdatesRow } from "./AppSettingsRows";
 import { ThemeRow } from "./ThemeRow";
 
-export type SimpleDisclosureId = "ai-more" | "ai-keys" | "computer-elsewhere" | "billing-limits";
+export type SimpleDisclosureId = "ai-more" | "computer-elsewhere" | "billing-limits";
 
 export type Disclose = (id: SimpleDisclosureId) => { id: SimpleDisclosureId; open: boolean; onToggle: () => void };
 
@@ -82,7 +81,6 @@ export function SimpleGeneralPage({ has, peopleOpen, onLooks }: { has: Has; peop
         </SettingsGroup>
       )}
       {has("import") && <SettingsGroup label={t("settings.section.import")} block="import"><ImportSettings /></SettingsGroup>}
-      {has("organization") && <SettingsGroup label={t("settings.section.organization")} block="organization"><OrganizationSettings /></SettingsGroup>}
       {has("activity") && <SettingsGroup label={t("settings.section.activity")} block="activity"><ActivitySection /></SettingsGroup>}
       <div data-settings-block="advanced-mode" className="scroll-mt-4">
         <SettingsRows><AdvancedModeRow simple /></SettingsRows>
@@ -100,17 +98,17 @@ export function SimpleLooksPage({ onBack }: { onBack: () => void }) {
   );
 }
 
-export function SimpleAiPage({ has, disclose, connections }: { has: Has; disclose: Disclose; connections: ReactNode }) {
+export function SimpleAiPage({ has, disclose }: { has: Has; disclose: Disclose }) {
   return (
     <>
       {has("engines") && <div data-settings-block="engines" className="flex scroll-mt-4 flex-col gap-7"><EnginesSettings simple more={disclose("ai-more")} /></div>}
-      {has("connections") && (
-        <SettingsDisclosureRow title={t("settings.simple.ai.keys")} block="connections" {...disclose("ai-keys")}>
-          {connections}
-        </SettingsDisclosureRow>
-      )}
     </>
   );
+}
+
+export function SimpleKeysPage({ has, connections }: { has: Has; connections: ReactNode }) {
+  if (!has("connections")) return null;
+  return <div data-settings-block="connections" className="scroll-mt-4">{connections}</div>;
 }
 
 export type RemoteAccessCards = Record<"client" | "domain" | "pairing" | "companion", ReactNode>;
