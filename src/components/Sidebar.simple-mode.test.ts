@@ -144,7 +144,7 @@ describe("bot-first sidebar", () => {
     expect(renderToStaticMarkup(createElement(BotListItem, rowProps(density)))).not.toContain('data-testid="bot-role"');
   });
 
-  it("puts the three-dots button then the engine's faded mark at the end of the name line, with the unread dot before them", () => {
+  it("puts one trailing cluster of three dots then the engine mark after the text block, with the unread dot still in the name line", () => {
     fixture.showThreads = false;
     fixture.state = { ...fixture.state, instances: [{ instanceId: "fake", driverKind: "claudeAgent", displayName: "Claude" }] as unknown as AppState["instances"] };
     const candidate = { ...bot, tasks: [], projects: [], unread: true, messages: [{ id: "m", role: "bot", kind: "text", text: "Done.", at: 1 }] } as Bot;
@@ -153,9 +153,13 @@ describe("bot-first sidebar", () => {
     const markup = renderToStaticMarkup(createElement(Capture));
     const title = markup.slice(markup.indexOf('data-sidebar-bot-title=""'), markup.indexOf(">Done.<"));
     expect(title).toContain('<span data-testid="unread-dot" title="Unread" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent self-center"></span>');
-    expect(title.indexOf('data-testid="unread-dot"')).toBeLessThan(title.indexOf('data-bot-actions="atlas"'));
-    expect(title.indexOf('data-bot-actions="atlas"')).toBeLessThan(title.indexOf('data-testid="model-badge"'));
-    expect(title).toContain('data-provider-mark="brand"');
+    expect(title).not.toContain('data-bot-actions="atlas"');
+    expect(title).not.toContain('data-testid="model-badge"');
+
+    const cluster = markup.slice(markup.indexOf('data-bot-actions="atlas"'));
+    expect(cluster.indexOf('data-bot-actions="atlas"')).toBeLessThan(cluster.indexOf('data-testid="model-badge"'));
+    expect(markup).toContain('class="ms-auto flex shrink-0 items-center gap-1 self-center"');
+    expect(markup).toContain('data-provider-mark="brand"');
     expect(markup).not.toContain('data-row-dot=""');
     expect(markup.match(/data-provider-mark=/g)).toHaveLength(1);
     expect(markup).toContain('class="flex items-baseline justify-between gap-2"');

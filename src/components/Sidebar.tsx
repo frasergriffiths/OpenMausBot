@@ -860,27 +860,6 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
           {(expanded || (quiet && !statusLine)) && unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
           {!renaming && <span className="flex shrink-0 self-center"><OwnerFace bot={bot} /></span>}
           {simpleRow && (unread || waiting) && <RowDot waiting={waiting} inline />}
-          {simpleRow && (
-            // [⋯][provider mark] in the row's flow: the engine mark stays last and the dots keep their own hit area.
-            <button
-              type="button"
-              data-bot-actions={bot.id}
-              aria-label={t("sidebar.bot.actions", { name: bot.name })}
-              title={t("sidebar.bot.actions", { name: bot.name })}
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              onClick={(event) => {
-                event.stopPropagation();
-                const rect = event.currentTarget.getBoundingClientRect();
-                onMenu({ botId: bot.id, x: rect.left, y: rect.bottom });
-              }}
-              onKeyDown={(event) => event.stopPropagation()}
-              className="pointer-events-none flex size-7 shrink-0 items-center justify-center rounded-md text-ink-secondary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 aria-expanded:pointer-events-auto aria-expanded:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70"
-            >
-              <MoreHorizontal size={15} />
-            </button>
-          )}
-          {simpleRow && <BotEngineMark bot={bot} instances={instances} className="ms-auto self-center" />}
         </div>
         {(!expanded || deleting) && (!quiet || statusLine) && <div className="flex items-center justify-between gap-2">
           {deleting ? (
@@ -907,6 +886,30 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
         </div>}
         {simpleRow && <RowStatusText working={working} unread={unread} />}
       </div>
+      {simpleRow && (
+        // [⋯][provider mark] as one cluster after the text block, centred on the row. The dots keep their slot
+        // at rest, so the mark never moves; aria-expanded keeps them up while their menu is open.
+        <span className="ms-auto flex shrink-0 items-center gap-1 self-center">
+          <button
+            type="button"
+            data-bot-actions={bot.id}
+            aria-label={t("sidebar.bot.actions", { name: bot.name })}
+            title={t("sidebar.bot.actions", { name: bot.name })}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            onClick={(event) => {
+              event.stopPropagation();
+              const rect = event.currentTarget.getBoundingClientRect();
+              onMenu({ botId: bot.id, x: rect.left, y: rect.bottom });
+            }}
+            onKeyDown={(event) => event.stopPropagation()}
+            className="pointer-events-none flex size-7 shrink-0 items-center justify-center rounded-md text-ink-secondary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 aria-expanded:pointer-events-auto aria-expanded:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70"
+          >
+            <MoreHorizontal size={15} />
+          </button>
+          <BotEngineMark bot={bot} instances={instances} />
+        </span>
+      )}
     </>
   );
   const onContextMenu = (event: React.MouseEvent) => {
