@@ -27,5 +27,5 @@ it.each([false, true])("retains error attention when no separate update button i
   fixture.update = { status: "error", message: "Fixture update failed" };
   const html = renderToStaticMarkup(createElement<{ iconOnly: boolean }>(SidebarProfileMenu, { iconOnly }));
   expect(html).toContain("bg-danger");
-  if (!iconOnly) expect(html).toContain('aria-label="Fixture update failed"');
+  if (!iconOnly) { expect(html).toContain("Couldn&#x27;t check for updates"); expect(html).not.toContain("Fixture update failed"); }
 });

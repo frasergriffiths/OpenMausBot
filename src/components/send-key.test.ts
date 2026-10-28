@@ -5,6 +5,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Bot, Group, InstanceInfo } from "@/state/store";
 import { SEND_KEYS, type SendKey } from "@/lib/send-key";
+import { setBusySendMode } from "@/lib/busy-send";
 import type { ApprovalModeSelector } from "./ApprovalModeSelector";
 import type { ModelPicker } from "./ModelPicker";
 
@@ -219,6 +220,7 @@ describe("the send key in hints", () => {
     expect(host.querySelector('button[aria-label="Send message"]')?.getAttribute("title")).toBe("Send (Ctrl+Enter)");
 
     type(textarea(), "");
+    setBusySendMode("steer");
     render(createElement(Composer, { bot: { ...bot, busy: true, tasks: [{ ...bot.tasks![0]!, busy: true }] } }));
     expect(textarea().placeholder).toBe("Pepper is working — Ctrl+Enter sends this into the running turn");
     render(createElement(Composer, { group: { ...room, busyBotId: "bot" }, members: [{ ...bot, modelSelection: { instanceId: "none", model: "x" } }] }));
@@ -228,12 +230,14 @@ describe("the send key in hints", () => {
   it("names the key in Japanese hints too", () => {
     fixture.instances = [{ instanceId: "test", driverKind: "codex", displayName: "Test", capabilities: { queueing: true } } as unknown as InstanceInfo];
     setSendKey("mod-enter");
+    setBusySendMode("steer");
     setLocale("ja");
     try {
       render(createElement(Composer, { bot: { ...bot, busy: true, tasks: [{ ...bot.tasks![0]!, busy: true }] } }));
       expect(textarea().placeholder).toBe("Pepper が作業中です — Ctrl+Enter で実行中のターンに送ります");
     } finally {
       setLocale("en");
+      setBusySendMode("queue");
     }
   });
 
