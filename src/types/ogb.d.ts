@@ -280,8 +280,8 @@ const __APP_VERSION__: string;
       permStatus(): Promise<{ mic: string; pageMic?: "allowed" | "refused" }>;
       /** Triggers the macOS microphone prompt; resolves true when granted. */
       permRequestMic(): Promise<boolean>;
-      /** Opens System Settings on a privacy pane: mic|screen|speech|accessibility. */
-      permOpenSettings(pane: "mic" | "screen" | "speech" | "accessibility"): Promise<void>;
+      /** Opens System Settings on a privacy pane: mic|screen|speech|accessibility, or the Privacy & Security root. */
+      permOpenSettings(pane: "mic" | "screen" | "speech" | "accessibility" | "privacy"): Promise<void>;
       /** Relaunch the local desktop app through its normal shutdown cleanup. */
       relaunch?(): Promise<boolean>;
       /** Copies an engine install command and opens a blank terminal. False

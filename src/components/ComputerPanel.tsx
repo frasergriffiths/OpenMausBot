@@ -1679,7 +1679,7 @@ export function ComputerPanel({
         {phase !== "team-boat" && (bot.computer !== undefined || computerStatusCurrent) && <>
           <LocalScreenPreview />
           <LinuxLocalControl />
-          <MacLocalControl />
+          <div className="mt-4"><MacLocalControl /></div>
         </>}
 
         {advanced ? <>

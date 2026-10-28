@@ -14,60 +14,99 @@ vi.mock("./DesktopCapabilities", () => ({
   useDesktopCapabilities: () => ({ capabilities: { host: { platform: "darwin" }, localComputer: fixture.localComputer }, ready: true }),
 }));
 
-const { MacLocalControl } = await import("./MacLocalControl");
-const { MacCuaRecoveryActions } = await import("./MacCuaRecoveryActions");
+const { MacLocalControl, MacCuaPermissionCard } = await import("./MacLocalControl");
 
 afterAll(() => vi.unstubAllGlobals());
 afterEach(() => setLocale("en"));
 
-describe("Mac local computer status", () => {
-  it("shows the recorded Accessibility failure and its matching recovery actions", () => {
+const ALWAYS_VISIBLE = [
+  "computer.mac.permission.title",
+  "computer.mac.permission.screenName",
+  "computer.mac.permission.accessibilityName",
+  "computer.mac.permission.granted",
+  "computer.mac.permission.notGranted",
+  "computer.mac.permission.technicalDetails",
+  "computer.mac.permission.retry",
+  "computer.mac.permission.relaunch",
+] as const;
+
+const VISIBLE_KEYS = [
+  ...ALWAYS_VISIBLE,
+  "computer.mac.permission.openSettings",
+  "computer.mac.permission.waiting",
+  "computer.mac.permission.settingsHint",
+  "computer.mac.permission.relaunchHint",
+] as const;
+
+describe("Mac local computer permission card", () => {
+  it("shows the missing pane and the granted one side by side", () => {
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
     expect(markup).toContain("Accessibility is required for OpenMausBot");
-    expect(markup).toContain("Open System Settings");
+    expect(markup).toContain("Screen Recording");
+    expect(markup).toContain("Granted");
+    expect(markup).toContain("Not granted");
+    expect(markup).toContain("Open Accessibility Settings");
     expect(markup).toContain("Relaunch OpenMausBot");
-    expect(markup).toContain("Driver detail");
+    expect(markup).toContain("Technical details");
     expect(markup).toContain("Retry");
   });
 
-  it("uses the app card surface and carries the warning in the badge, never a red hover", () => {
+  it("uses the app card surface and accent, never a warning or danger wash", () => {
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
     expect(markup).toContain('data-mac-permission-card=""');
-    expect(markup).toContain("border-hairline/40 bg-card");
+    expect(markup).toContain("bg-card");
+    expect(markup).toContain("bg-accent/10 text-accent-text");
     expect(markup).not.toContain("border-warning/25");
     expect(markup).not.toContain("bg-warning/10 p-4");
     expect(markup).not.toContain("hover:bg-danger");
-    expect(markup).toContain("bg-warning/10");
+    expect(markup).not.toContain("rounded-full border-current");
   });
 
-  it("keeps the driver reason behind the styled disclosure, unedited", () => {
+  it("puts the raw driver reason behind one closed technical-details disclosure", () => {
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
     expect(markup).toContain("<details");
     expect(markup).toContain("<summary");
     expect(markup).toContain("group-open:rotate-90");
+    expect(markup).toContain("bg-inset");
     expect(markup).toContain("Accessibility required; grant access in System Settings");
   });
 
-  it("renders the same action row inside the card and at the chat call site", () => {
-    const card = renderToStaticMarkup(createElement(MacLocalControl));
-    const actions = renderToStaticMarkup(createElement(MacCuaRecoveryActions, {
-      reason: "Accessibility required; grant access in System Settings",
-    }));
-    const row = (html: string) => html.slice(html.indexOf('data-mac-cua-actions=""'), html.indexOf("</div>", html.indexOf('data-mac-cua-actions=""')) + 6);
-    expect(row(card)).toBe(row(actions));
+  it("renders both permission rows when both are missing, Screen Recording first", () => {
+    fixture.localComputer = { available: false, message: "Screen Recording and Accessibility required" } as DesktopCapabilities["localComputer"];
+    const markup = renderToStaticMarkup(createElement(MacLocalControl));
+    expect(markup).toContain("Screen Recording and Accessibility are required");
+    expect(markup.match(/Not granted/g)?.length).toBe(2);
+    expect(markup.indexOf("Screen Recording")).toBeLessThan(markup.indexOf("Accessibility"));
+    expect(markup).toContain("Open Screen Recording Settings");
+    expect(markup).not.toContain("Open Accessibility Settings");
   });
 
-  it("has every card string translated in every shipped locale", () => {
+  it("does not diagnose a permission when the reason names none", () => {
+    fixture.localComputer = { available: false, status: "unavailable" } as DesktopCapabilities["localComputer"];
+    const markup = renderToStaticMarkup(createElement(MacLocalControl));
+    expect(markup).toContain("Local computer control is not ready");
+    expect(markup).not.toContain("Not granted");
+    expect(markup).toContain("Open System Settings");
+    expect(markup).not.toContain("Relaunch OpenMausBot");
+  });
+
+  it("renders the chat mount identically without a red bubble", () => {
+    fixture.localComputer = { available: false, message: "Accessibility required; grant access in System Settings" } as DesktopCapabilities["localComputer"];
+    const card = renderToStaticMarkup(createElement(MacCuaPermissionCard, { reason: "Accessibility required; grant access in System Settings" }));
+    const row = (html: string) => html.slice(html.indexOf('data-mac-cua-actions=""'), html.indexOf("</div>", html.indexOf('data-mac-cua-actions=""')) + 6);
+    expect(row(card)).toBe(row(renderToStaticMarkup(createElement(MacLocalControl))));
+    expect(card).not.toContain("border-danger/30 bg-danger/10");
+  });
+
+  it("has every visible key translated in all 15 packs, with no English fallback", () => {
     for (const [code, pack] of Object.entries(locales)) {
-      for (const key of [
-        "computer.mac.permission.allowControl",
-        "computer.mac.permission.openSystemSettings",
-        "computer.mac.permission.retry",
-        "computer.mac.permission.driverDetail",
-        "computer.mac.permission.relaunch",
-      ] as const) {
+      for (const key of VISIBLE_KEYS) {
         expect(pack[key], `${code} ${key}`).toBeTruthy();
+        if (code !== "en") expect(pack[key], `${code} ${key}`).not.toBe(locales.en![key]);
       }
+    }
+    for (const key of ["computer.mac.permission.requiredOne", "computer.mac.permission.requiredBoth", "computer.mac.permission.screenSettings", "computer.mac.permission.accessibilitySettings"] as const) {
+      for (const [code, pack] of Object.entries(locales)) expect(pack[key], `${code} ${key}`).toBeTruthy();
     }
   });
 
@@ -75,26 +114,10 @@ describe("Mac local computer status", () => {
     setLocale("ja");
     const pack = locales.ja!;
     const markup = renderToStaticMarkup(createElement(MacLocalControl));
-    for (const key of [
-      "computer.mac.permission.allowControl",
-      "computer.mac.permission.openSystemSettings",
-      "computer.mac.permission.relaunch",
-      "computer.mac.permission.retry",
-      "computer.mac.permission.driverDetail",
-    ] as const) {
-      expect(markup).toContain(pack[key]!);
-    }
+    for (const key of ALWAYS_VISIBLE) expect(markup).toContain(pack[key]!);
     expect(markup).not.toContain("Allow control of this computer");
     expect(markup).not.toContain("Open System Settings");
-  });
-
-  it("does not turn a missing reason into a claimed permission diagnosis", () => {
-    fixture.localComputer = { available: false, status: "unavailable" } as DesktopCapabilities["localComputer"];
-    const markup = renderToStaticMarkup(createElement(MacLocalControl));
-    expect(markup).toContain("Local computer control is not ready");
-    expect(markup).not.toContain("Accessibility is required");
-    expect(markup).toContain("Open System Settings");
-    expect(markup).not.toContain("<details");
+    expect(markup).not.toContain("Not granted");
   });
 
   it("does not offer host repair actions to a remote renderer", () => {

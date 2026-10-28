@@ -554,18 +554,17 @@ describe("thread control placement", () => {
       message: "OpenMausBot can't use this computer yet — embedded host failed: Screen Recording required. Relaunch OpenMausBot after granting any missing macOS permission.",
     }));
     expect(screen).toContain('data-mac-cua-actions=""');
-    expect(screen).toContain("Open System Settings");
+    expect(screen).toContain("Open Screen Recording Settings");
     expect(screen).toContain("Relaunch OpenMausBot");
     expect(screen).toContain("Retry");
-    expect(screen).not.toContain("Open Screen Recording Settings");
     expect(screen).not.toContain("Open Accessibility Settings");
+    expect(screen).not.toContain(">Open System Settings<");
     fixture.localMessage = "Accessibility required";
     const accessibility = renderToStaticMarkup(createElement(ErrorRow, {
       message: "OpenMausBot can't use this computer yet — Accessibility required",
     }));
-    expect(accessibility).toContain("Open System Settings");
+    expect(accessibility).toContain("Open Accessibility Settings");
     expect(accessibility).not.toContain("Open Screen Recording Settings");
-    expect(accessibility).not.toContain("Open Accessibility Settings");
     expect(renderToStaticMarkup(createElement(ErrorRow, { message: "Network timeout" }))).not.toContain('data-mac-cua-actions=""');
     fixture.localReasonCode = "remote-server";
     expect(renderToStaticMarkup(createElement(ErrorRow, { message: "OpenMausBot can't use this computer yet — Screen Recording required" }))).not.toContain('data-mac-cua-actions=""');
