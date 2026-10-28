@@ -2428,5 +2428,11 @@
   "place.view.vm.short": "Séparé de votre écran",
   "place.view.browserOff.short": "Désactivé",
   "place.view.browserOff.line": "Le navigateur du bot est désactivé : il ne peut pas ouvrir de pages web.",
-  "templates.invalidJson": "Ce fichier de sauvegarde ou d’équipe n’est pas un JSON valide."
+  "templates.invalidJson": "Ce fichier de sauvegarde ou d’équipe n’est pas un JSON valide.",
+  "computer.mac.permission.allowControl": "Autoriser le contrôle de cet ordinateur",
+  "computer.mac.permission.openSystemSettings": "Ouvrir les Réglages Système",
+  "computer.mac.permission.retry": "Réessayer",
+  "computer.mac.permission.driverDetail": "Détails du pilote",
+  "computer.mac.permission.relaunch": "Relancer OpenMausBot",
+  "permissions.openSystemSettings": "Ouvrir les Réglages Système"
 }

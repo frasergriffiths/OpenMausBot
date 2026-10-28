@@ -2428,5 +2428,11 @@
   "place.view.vm.short": "आपकी स्क्रीन से अलग",
   "place.view.browserOff.short": "बंद है",
   "place.view.browserOff.line": "बॉट का अपना ब्राउज़र बंद है, इसलिए वह वेब पेज नहीं खोल सकता।",
-  "templates.invalidJson": "यह बैकअप या टीम फ़ाइल मान्य JSON नहीं है।"
+  "templates.invalidJson": "यह बैकअप या टीम फ़ाइल मान्य JSON नहीं है।",
+  "computer.mac.permission.allowControl": "इस कंप्यूटर पर नियंत्रण की अनुमति दें",
+  "computer.mac.permission.openSystemSettings": "सिस्टम सेटिंग्स खोलें",
+  "computer.mac.permission.retry": "पुनः प्रयास करें",
+  "computer.mac.permission.driverDetail": "ड्राइवर विवरण",
+  "computer.mac.permission.relaunch": "OpenMausBot फिर से शुरू करें",
+  "permissions.openSystemSettings": "सिस्टम सेटिंग्स खोलें"
 }

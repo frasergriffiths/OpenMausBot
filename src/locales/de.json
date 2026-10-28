@@ -2446,5 +2446,11 @@
   "place.view.vm.short": "Getrennt von deinem Bildschirm",
   "place.view.browserOff.short": "Ausgeschaltet",
   "place.view.browserOff.line": "Der eigene Browser des Bots ist ausgeschaltet, daher kann er keine Webseiten öffnen.",
-  "templates.invalidJson": "Diese Sicherungs- oder Teamdatei ist kein gültiges JSON."
+  "templates.invalidJson": "Diese Sicherungs- oder Teamdatei ist kein gültiges JSON.",
+  "computer.mac.permission.allowControl": "Steuerung dieses Computers erlauben",
+  "computer.mac.permission.openSystemSettings": "Systemeinstellungen öffnen",
+  "computer.mac.permission.retry": "Wiederholen",
+  "computer.mac.permission.driverDetail": "Treiberdetails",
+  "computer.mac.permission.relaunch": "OpenMausBot neu starten",
+  "permissions.openSystemSettings": "Systemeinstellungen öffnen"
 }

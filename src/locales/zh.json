@@ -3271,5 +3271,11 @@
   "place.view.vm.short": "与你的屏幕分开",
   "place.view.browserOff.short": "已关闭",
   "place.view.browserOff.line": "机器人自己的浏览器已关闭，因此无法打开网页。",
-  "templates.invalidJson": "此备份或团队文件不是有效的 JSON。"
+  "templates.invalidJson": "此备份或团队文件不是有效的 JSON。",
+  "computer.mac.permission.allowControl": "允许控制此电脑",
+  "computer.mac.permission.openSystemSettings": "打开系统设置",
+  "computer.mac.permission.retry": "重试",
+  "computer.mac.permission.driverDetail": "驱动程序详细信息",
+  "computer.mac.permission.relaunch": "重新启动 OpenMausBot",
+  "permissions.openSystemSettings": "打开系统设置"
 }

@@ -2873,5 +2873,11 @@
   "place.view.vm.short": "Окремо від вашого екрана",
   "place.view.browserOff.short": "Вимкнено",
   "place.view.browserOff.line": "Власний браузер бота вимкнено, тож він не може відкривати вебсторінки.",
-  "templates.invalidJson": "Цей файл резервної копії або команди не є коректним JSON."
+  "templates.invalidJson": "Цей файл резервної копії або команди не є коректним JSON.",
+  "computer.mac.permission.allowControl": "Дозволити керування цим комп’ютером",
+  "computer.mac.permission.openSystemSettings": "Відкрити Системні налаштування",
+  "computer.mac.permission.retry": "Повторити",
+  "computer.mac.permission.driverDetail": "Відомості про драйвер",
+  "computer.mac.permission.relaunch": "Перезапустити OpenMausBot",
+  "permissions.openSystemSettings": "Відкрити Системні налаштування"
 }
