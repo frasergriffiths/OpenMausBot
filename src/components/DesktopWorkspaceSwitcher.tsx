@@ -247,7 +247,7 @@ function WorkspaceMenu({ open, anchor, saved, switching, onPick, onForget, onCon
 
 export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill = false, rail = false, cloudHome = false, owner = null, howTo = false, onMenuClosed, onConnectServer, onAddCloud }: {
   compact?: boolean; inline?: boolean; pill?: boolean; rail?: boolean; cloudHome?: boolean; owner?: string | null; howTo?: boolean; onMenuClosed?: () => void;
-  /** Opens Settings → Servers, as the native menu's "Connect to a server…" did. */
+  /** Opens Settings → Computer, where the remote computers live. */
   onConnectServer?: () => void;
   /** Starts the Add a Cloud flow, when this build offers one. */
   onAddCloud?: () => void;

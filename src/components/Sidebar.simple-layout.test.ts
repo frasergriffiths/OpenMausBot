@@ -53,6 +53,7 @@ import { GlassBar, GlassScrollFrame, GlassScroller } from "./GlassScrollFrame";
 import { SidebarSectionHeader } from "./SidebarSectionHeader";
 import { SidebarEdgeToggle, SidebarSearchPill } from "./SidebarSimpleTop";
 import { SidebarRailSeparator, SimpleRailFooter } from "./SidebarSimpleRail";
+import { DesktopWorkspaceSwitcher } from "./DesktopWorkspaceSwitcher";
 
 const bot = (id: string, extra: Partial<Bot> = {}): Bot => ({
   id, threadId: `${id}-thread`, name: id, title: "", description: "", notifications: true,
@@ -103,6 +104,17 @@ beforeEach(() => {
 afterEach(() => {
   setSidebarDensity("comfortable");
   vi.unstubAllGlobals();
+});
+
+describe("the computer switcher's Connect row", () => {
+  it("opens Settings on the Computer tab, not the Servers page", () => {
+    const { tree } = render();
+    const switcher = tree.find((node) => node.type === DesktopWorkspaceSwitcher) as ReactElement<{ onConnectServer?: () => void }> | undefined;
+    expect(switcher?.props.onConnectServer).toBeTypeOf("function");
+    fixture.dispatch.mockClear();
+    switcher!.props.onConnectServer!();
+    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "toggleAppSettings", open: true, section: "computer" });
+  });
 });
 
 describe("Simple-mode sidebar layout", () => {

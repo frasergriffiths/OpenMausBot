@@ -1426,13 +1426,13 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
         </div>}
         {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center pl-1">
           <div data-sidebar-top-switcher className="flex min-w-0 items-center">
-            <DesktopWorkspaceSwitcher inline pill cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "desktopWorkspaces" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />
+            <DesktopWorkspaceSwitcher inline pill cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "computer" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />
           </div>
         </div> : (
           <div data-sidebar-top-slot className={cn("@container/sidebar-top flex min-w-0 flex-1 items-center", simple && "justify-end")}>
             {!simple && <div data-sidebar-top-spacer className="min-w-0 flex-1 @min-[96px]/sidebar-top:min-w-6" />}
             <div data-sidebar-top-switcher className={simple ? "flex min-w-0 items-center" : "flex min-w-0 max-w-[140px] items-center"}>
-              <DesktopWorkspaceSwitcher inline pill={simple} cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "desktopWorkspaces" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />
+              <DesktopWorkspaceSwitcher inline pill={simple} cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "computer" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />
             </div>
           </div>
         ))}
@@ -1514,7 +1514,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
         </div>}
       </div>
 
-      {density === "icons" && !rail && <DesktopWorkspaceSwitcher compact cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "desktopWorkspaces" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />}
+      {density === "icons" && !rail && <DesktopWorkspaceSwitcher compact cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "computer" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />}
       <OrganizationIdentity compact={density === "icons"} />
       {phone ? null : simple ? <SidebarSearchPill query={query} onQuery={setQuery} onClear={clearSearch} /> : <div className={cn("pt-1 pb-3", density === "icons" ? "hidden" : "px-3")}>
         <div className="flex items-center gap-2 rounded-md border border-hairline/40 bg-inset/40 px-2.5 py-1.5 focus-within:border-focus">
