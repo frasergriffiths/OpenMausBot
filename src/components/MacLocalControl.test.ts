@@ -45,7 +45,7 @@ describe("Mac local computer permission card", () => {
     expect(markup).toContain("Granted");
     expect(markup).toContain("Not granted");
     expect(markup).toContain("Open Accessibility Settings");
-    expect(markup).toContain("Relaunch OpenMausBot");
+    expect(markup).toContain("Retry");
     expect(markup).not.toContain("Technical details");
     expect(markup).toContain("Retry");
   });
@@ -93,7 +93,7 @@ describe("Mac local computer permission card", () => {
 
   it("renders the chat mount identically without a red bubble", () => {
     fixture.localComputer = { available: false, message: "Accessibility required; grant access in System Settings" } as DesktopCapabilities["localComputer"];
-    const card = renderToStaticMarkup(createElement(MacCuaPermissionCard, { reason: "Accessibility required; grant access in System Settings" }));
+    const card = renderToStaticMarkup(createElement(MacCuaPermissionCard, { permissions: ["accessibility"], logReason: "Accessibility required; grant access in System Settings" }));
     const row = (html: string) => html.slice(html.indexOf('data-mac-cua-actions=""'), html.indexOf("</div>", html.indexOf('data-mac-cua-actions=""')) + 6);
     expect(row(card)).toBe(row(renderToStaticMarkup(createElement(MacLocalControl))));
     expect(card).not.toContain("border-danger/30 bg-danger/10");

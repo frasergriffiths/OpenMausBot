@@ -66,19 +66,16 @@ afterEach(async () => {
 });
 
 describe("the Mac permission card actions", () => {
-  it("offers one primary pane, secondary relaunch and a text retry", async () => {
+  it("offers one filled action and a quiet Retry", async () => {
     await mount();
     const primary = button("Open System Settings")!;
-    const secondary = button("Relaunch OpenMausBot")!;
     const retry = button("Retry")!;
-    expect(primary.className).toContain("h-9");
-    expect(secondary.className).toContain("min-h-8");
-    for (const control of [primary, secondary]) {
-      expect(control.className).not.toContain("danger");
-      expect(control.className).not.toContain("rounded-full");
-    }
+    expect(primary.className).toContain("h-8");
+    expect(primary.className).toContain("max-w-[18rem]");
+    expect(primary.className).not.toContain("danger");
+    expect(primary.className).not.toContain("rounded-full");
     expect(primary.className).toContain("bg-accent");
-    expect(secondary.className).toContain("bg-control");
+    expect(button("Relaunch OpenMausBot")).toBeUndefined();
     // The row's name carries the status the label would otherwise hide from a screen reader.
     expect(row("Screen Recording")!.getAttribute("aria-label")).toBe("Screen Recording, Not granted. Open Screen Recording Settings");
     expect(retry.className).toContain("text-[13px]");
@@ -105,7 +102,6 @@ describe("the Mac permission card actions", () => {
     expect(fixture.retry).toHaveBeenCalledTimes(1);
     expect(container.textContent).toContain("Already granted it? Relaunch OpenMausBot.");
     expect(button("Relaunch OpenMausBot")!.className).toContain("bg-accent");
-    expect(button("Open Screen Recording Settings")!.className).toContain("bg-control");
 
     await act(async () => {
       window.dispatchEvent(new Event("focus"));
@@ -128,13 +124,15 @@ describe("the Mac permission card actions", () => {
     await mount();
     expect(container.textContent).toContain("Local computer control is not ready");
     expect(container.textContent).not.toContain("Not granted");
-    expect(button("Relaunch OpenMausBot")).toBeUndefined();
     await act(async () => button("Open System Settings")!.click());
     expect(fixture.permOpenSettings.mock.calls).toEqual([["privacy"]]);
   });
 
-  it("relaunches and retries from their own buttons", async () => {
+  it("relaunches from the filled slot once a grant is pending, and retries from the quiet button", async () => {
     await mount();
+    await act(async () => button("Open System Settings")!.click());
+    await act(async () => { window.dispatchEvent(new Event("focus")); });
+    await flush();
     await act(async () => button("Relaunch OpenMausBot")!.click());
     expect(fixture.relaunch).toHaveBeenCalledTimes(1);
     await act(async () => button("Retry")!.click());

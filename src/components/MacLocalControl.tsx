@@ -21,15 +21,14 @@ const PANE_SETTINGS = {
 
 // Explicit controls, not .ui-button: Simple Settings rewrites every .ui-button into an ink pill, and this card
 // must look the same in the computer panel, in Settings and in the chat transcript.
-const PRIMARY = "inline-flex h-9 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-medium text-accent-ink hover:brightness-110 disabled:opacity-50";
-// The secondary sits beside Retry in a panel as narrow as 320px: its label wraps instead of pushing the pair out.
-const SECONDARY = "inline-flex min-h-8 min-w-0 flex-1 items-center justify-center gap-1.5 whitespace-normal rounded-lg bg-control px-3 py-1.5 text-center text-[13px] font-medium leading-4 text-ink hover:bg-raised-hover disabled:opacity-50";
-const TERTIARY = "shrink-0 rounded-md px-2 py-1 text-[13px] font-medium text-ink-secondary hover:bg-ink/[0.04] hover:text-ink disabled:opacity-50";
+// One filled action at the panel's only button height; 288 cap keeps it from becoming a slab in Settings and chat.
+const PRIMARY = "inline-flex h-8 w-full max-w-[18rem] items-center justify-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium leading-[18px] text-accent-ink hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";
+const TERTIARY = "shrink-0 rounded-md px-2 py-1.5 text-[13px] font-medium text-ink-secondary hover:bg-ink/[0.04] hover:text-ink disabled:cursor-not-allowed disabled:opacity-50";
 
 /** The permission card's one look. `MacLocalControl` mounts it in the panel and Settings; ChatView mounts it
  * directly in a failed turn so a setup step is not painted as a crash. */
-export function MacCuaPermissionCard({ reason }: { reason: string }) {
-  const permissions = missingMacCuaPermissions(reason);
+export function MacCuaPermissionCard({ permissions, logReason }: { permissions: MacCuaPermission[]; logReason?: string }) {
+
   const permissionsKey = permissions.join(",");
   const known = permissions.length > 0;
   const [pending, setPending] = useState(false);
@@ -40,10 +39,10 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
   const lastPermissions = useRef(permissionsKey);
   const relaunchAvailable = typeof window !== "undefined" && typeof window.ogb?.relaunch === "function";
 
-  // The card no longer shows the driver's raw reason; keep it in the app log for support.
+  // The card never receives the driver's raw reason; it goes to the app log for support instead.
   useEffect(() => {
-    if (reason) console.warn("[mac-permissions] Local computer control is unavailable:", reason);
-  }, [reason]);
+    if (logReason) console.warn("[mac-permissions] Local computer control is unavailable:", logReason);
+  }, [logReason]);
 
   useEffect(() => {
     if (permissionsKey === lastPermissions.current) return;
@@ -189,24 +188,14 @@ export function MacCuaPermissionCard({ reason }: { reason: string }) {
             <span className="min-w-0 break-words">{error}</span>
           </p>
         )}
-        <div data-mac-cua-actions="" className="mt-3.5">
+        <div data-mac-cua-actions="" className="mt-3">
           <button type="button" onClick={primaryAction} disabled={pending} className={PRIMARY}>
-            {pending && <Loader2 size={13} className="animate-spin" aria-hidden="true" />}
+            {pending && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {primaryLabel}
           </button>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            {!primaryIsRelaunch && known && relaunchAvailable && (
-              <button type="button" onClick={() => void relaunch()} disabled={pending} className={SECONDARY}>
-                {t("computer.mac.permission.relaunch")}
-              </button>
-            )}
-            {primaryIsRelaunch && missingPane && (
-              <button type="button" onClick={() => void openSettings(missingPane)} disabled={pending} className={SECONDARY}>
-                {t(PANE_SETTINGS[missingPane])}
-              </button>
-            )}
-            <button type="button" onClick={() => void retry()} disabled={pending} className={cn(TERTIARY, "ml-auto")}>
-              {t("computer.mac.permission.retry")}
+          <div className="mt-1 flex justify-end">
+            <button type="button" onClick={() => void retry()} disabled={pending} className={TERTIARY}>
+              {pending ? t("common.checking") : t("computer.mac.permission.retry")}
             </button>
           </div>
         </div>
@@ -221,5 +210,6 @@ export function MacLocalControl() {
       capabilities.host.platform !== "darwin" ||
       capabilities.localComputer.reasonCode === "remote-server" ||
       capabilities.localComputer.available) return null;
-  return <MacCuaPermissionCard reason={capabilities.localComputer.message ?? ""} />;
+  const message = capabilities.localComputer.message ?? "";
+  return <MacCuaPermissionCard permissions={missingMacCuaPermissions(message)} logReason={message} />;
 }
