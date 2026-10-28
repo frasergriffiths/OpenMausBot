@@ -546,28 +546,29 @@ describe("thread control placement", () => {
     }
   });
 
-  it("offers the matching macOS Settings and relaunch actions only for a named CUA permission failure", () => {
+  it("offers one shared macOS recovery row only for a named CUA permission failure", () => {
     fixture.platform = "darwin";
     fixture.localMessage = "Screen Recording required";
     window.ogb = { platform: "darwin", permOpenSettings: vi.fn(), relaunch: vi.fn() } as unknown as NonNullable<Window["ogb"]>;
     const screen = renderToStaticMarkup(createElement(ErrorRow, {
       message: "OpenMausBot can't use this computer yet — embedded host failed: Screen Recording required. Relaunch OpenMausBot after granting any missing macOS permission.",
     }));
-    expect(screen).toContain("Open Screen Recording Settings");
+    expect(screen).toContain('data-mac-cua-actions=""');
+    expect(screen).toContain("Open System Settings");
     expect(screen).toContain("Relaunch OpenMausBot");
+    expect(screen).toContain("Retry");
+    expect(screen).not.toContain("Open Screen Recording Settings");
     expect(screen).not.toContain("Open Accessibility Settings");
     fixture.localMessage = "Accessibility required";
     const accessibility = renderToStaticMarkup(createElement(ErrorRow, {
       message: "OpenMausBot can't use this computer yet — Accessibility required",
     }));
-    expect(accessibility).toContain("Open Accessibility Settings");
+    expect(accessibility).toContain("Open System Settings");
     expect(accessibility).not.toContain("Open Screen Recording Settings");
-    expect(renderToStaticMarkup(createElement(ErrorRow, {
-      message: "OpenMausBot can't use this computer yet — Screen Recording required",
-    }))).not.toContain("Open Screen Recording Settings");
-    expect(renderToStaticMarkup(createElement(ErrorRow, { message: "Network timeout" }))).not.toContain("Open Screen Recording Settings");
+    expect(accessibility).not.toContain("Open Accessibility Settings");
+    expect(renderToStaticMarkup(createElement(ErrorRow, { message: "Network timeout" }))).not.toContain('data-mac-cua-actions=""');
     fixture.localReasonCode = "remote-server";
-    expect(renderToStaticMarkup(createElement(ErrorRow, { message: "OpenMausBot can't use this computer yet — Screen Recording required" }))).not.toContain("Open Screen Recording Settings");
+    expect(renderToStaticMarkup(createElement(ErrorRow, { message: "OpenMausBot can't use this computer yet — Screen Recording required" }))).not.toContain('data-mac-cua-actions=""');
     fixture.localReasonCode = "cua-driver-unavailable";
     fixture.platform = "other";
     fixture.localMessage = "";
