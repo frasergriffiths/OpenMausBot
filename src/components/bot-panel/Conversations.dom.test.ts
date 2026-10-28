@@ -230,7 +230,7 @@ describe("a bot's conversations in its panel", () => {
     click(row("launch").querySelector('[aria-label="Actions for Translate the launch post"]'));
     const menu = document.querySelector('[data-thread-overlay][aria-label="Actions for Translate the launch post"]')!;
     const items = [...menu.querySelectorAll("button")].map((button) => button.textContent);
-    expect(items).toEqual(expect.arrayContaining(["Copy link", "Rename thread", "Pin", "Delete thread"]));
+    expect(items).toEqual(expect.arrayContaining(["Copy link", "Rename thread", "Pin", "Delete"]));
     expect(items).not.toContain("Archive");
     click([...menu.querySelectorAll("button")].find((button) => button.textContent === "Pin")!);
     expect(fixture.dispatch.mock.calls).toEqual([[{ type: "updateTask", botId: "research", threadId: "launch", patch: { pinned: true } }]]);
