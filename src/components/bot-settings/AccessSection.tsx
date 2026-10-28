@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { browserUnavailableReason } from "@/lib/feature-flags";
-import { ChevronDown, ChevronRight, FolderOpen, Plus } from "lucide-react";
+import { FolderOpen, Plus } from "lucide-react";
 
 import { api, useStore, type Bot } from "@/state/store";
 import { useBotEditor } from "./BotEditorContext";
@@ -29,6 +29,7 @@ import {
 import { inputCls } from "./field";
 import type { ConnectorScope, ConnectorScopes } from "../../../shared/connector-scopes";
 import type { useBotSettingsDerived } from "./useBotSettingsDerived";
+import { Chevron } from "../chevron";
 
 /**
  * Claude keeps sessions per project folder, so the server pins each task's folder on its first turn. PATCHed directly,
@@ -336,7 +337,7 @@ function ConnectorToolsGrants({
                 }}
                 className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-control/60"
               >
-                {open ? <ChevronDown size={14} className="shrink-0 text-ink-secondary" /> : <ChevronRight size={14} className="shrink-0 text-ink-secondary" />}
+                <Chevron kind="disclosure" open={open} size="row" />
                 <span className="min-w-0 flex-1 truncate font-mono text-[13px] text-ink">{slug}</span>
                 <span className="shrink-0 text-[12px] text-ink-secondary">
                   {!access.editable

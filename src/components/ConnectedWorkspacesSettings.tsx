@@ -7,6 +7,7 @@ import { CloudTile } from "./cloud-buy/parts";
 import { cloudColor } from "@/lib/cloud-look";
 import { useStore } from "@/state/store";
 import { sharedComputersEnabled } from "@/lib/feature-flags";
+import { Chevron } from "./chevron";
 
 type SavedWorkspaces = Awaited<ReturnType<NonNullable<NonNullable<Window["ogb"]>["environments"]>["state"]>>;
 
@@ -176,7 +177,7 @@ export function ConnectedWorkspacesSettings() {
             className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent/50" />
         </label>
         <p className="text-[12px] leading-relaxed text-ink-secondary">Paste a pairing link from your server’s Settings → Remote access, or enter its address and sign in there. Your desktop stays connected afterward.</p>
-        <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer">Need a pairing code?</summary>
+        <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />Need a pairing code?</summary>
           <p className="mt-2">Run this on the server and copy the link it prints:</p>
           <code className="mt-1 block select-all break-words rounded-md bg-inset px-2 py-2 text-ink">npx openmausbot pair --label "My desktop"</code>
         </details>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, KeyRound, Loader2, RefreshCw, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, KeyRound, Loader2, RefreshCw, X } from "lucide-react";
 import { useStore, currentTaskBot, type AppState, type Bot, type InstanceInfo, type ModelSelection } from "@/state/store";
 import type { EffortLevel } from "../../shared/wire";
 import type { ModelVariantOption } from "../../shared/runtime-events";
@@ -32,6 +32,7 @@ import { usePickerPane } from "@/lib/model-picker-pane";
 import { threadsOnOwnModel } from "../../shared/thread-model";
 import { ThreadModelsLine } from "./ThreadModelsLine";
 import { Select } from "./Select";
+import { Chevron } from "./chevron";
 
 type ModelOption = InstanceInfo["models"]["options"][number];
 const COMPACT_MODEL_COUNT = 5;
@@ -769,7 +770,7 @@ export function ModelPicker({
         {attention && <span data-model-attention className="absolute -bottom-0.5 -right-0.5 size-1.5 rounded-full bg-warning ring-[1.5px] ring-app" />}
       </span>
       <span className="min-w-0 max-w-[160px] truncate">{modelName(active, selection.model)}</span>
-      <ChevronDown size={12} strokeWidth={2} aria-hidden="true" className="ml-1 shrink-0 text-ink-tertiary group-hover:text-ink-secondary" />
+      <Chevron kind="menu" size="inline" className="ml-1 text-ink-tertiary group-hover:text-ink-secondary" />
     </button>
   );
 
@@ -953,13 +954,13 @@ export function ModelPicker({
                         {!query && !showAll && official.length > compactOfficial.length && (
                           <button type="button" data-menu-row onClick={() => setShowAll(true)} className={cn(MENU_ROW, "text-ink-secondary hover:text-ink")}>
                             <span className="min-w-0 flex-1 truncate">{t("model.showAll", { count: official.length })}</span>
-                            <ChevronDown size={16} strokeWidth={MENU_STROKE} className={MENU_TRAILING} aria-hidden="true" />
+                            <Chevron kind="menu" open={showAll} size="control" className={MENU_TRAILING} />
                           </button>
                         )}
                         {!query && showAll && official.length > COMPACT_MODEL_COUNT && (
                           <button type="button" data-menu-row onClick={() => setShowAll(false)} className={cn(MENU_ROW, "text-ink-secondary hover:text-ink")}>
                             <span className="min-w-0 flex-1 truncate">{t("model.showSuggested")}</span>
-                            <ChevronUp size={16} strokeWidth={MENU_STROKE} className={MENU_TRAILING} aria-hidden="true" />
+                            <Chevron kind="menu" open size="control" className={MENU_TRAILING} />
                           </button>
                         )}
                       </>

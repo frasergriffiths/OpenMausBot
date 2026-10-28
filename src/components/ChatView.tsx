@@ -58,6 +58,7 @@ import { showWorkingDots } from "@/lib/turn-tail";
 import { lastNonReceipt } from "@/lib/receipts";
 import { turnNowPhrases } from "@/lib/live-activity"; import { useTurnLive } from "@/state/turn-status";
 import { friendlyNowPhrases } from "@/lib/friendly-activity";
+import { Chevron } from "./chevron";
 import { ChatMarkdown } from "./ChatMarkdown";
 import { liveToolIds } from "@/lib/tool-liveness";
 import { VoiceNoteBubble, type VoiceNoteAttachment } from "./VoiceNoteBubble";
@@ -213,7 +214,7 @@ export function ErrorRow({
           <AlertTriangle size={15} className="mt-0.5 shrink-0" />
           <span className="min-w-0 break-words">{headline}</span>
         </div>
-        {headline !== message && <details className="mt-2 text-[12px] text-ink-secondary"><summary className="cursor-pointer">{t("chat.error.details")}</summary><p className="mt-1 break-words">{message}</p></details>}
+        {headline !== message && <details className="mt-2 text-[12px] text-ink-secondary"><summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("chat.error.details")}</summary><p className="mt-1 break-words">{message}</p></details>}
         {usageUrl ? (
           <ManageUsageLink href={usageUrl} className="ui-button ui-button-md mt-2 border-transparent bg-ink text-app hover:brightness-110" />
         ) : claudeUpdateInstance ? (
@@ -502,7 +503,7 @@ const Bubble = memo(function Bubble({
               <div className="chat-text px-4 py-3 whitespace-pre-wrap">{webhookView.task}</div>
               {webhookView.payload && (
                 <details className="border-t border-hairline/30 bg-inset/25 px-4 py-2.5 text-[12px] text-ink-secondary">
-                  <summary className="cursor-pointer select-none hover:text-ink">{t("chat.viewPayload")}</summary>
+                  <summary className="cursor-pointer select-none hover:text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("chat.viewPayload")}</summary>
                   <pre className="mt-2 max-h-48 overflow-auto rounded-lg border border-hairline/25 bg-black/25 p-3 font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-ink-secondary">{webhookView.payload}</pre>
                 </details>
               )}

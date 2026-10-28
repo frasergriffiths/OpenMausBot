@@ -37,6 +37,7 @@ import { api, ApiError, useStore, type Bot, type ConfigStatus } from "@/state/st
 import { Switch } from "../SettingsPrimitives";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
 import { inputCls } from "./field";
+import { Chevron } from "../chevron";
 
 const buttonCls = "rounded-lg bg-control px-3 py-1.5 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-50";
 const quietButtonCls = "rounded-md px-2 py-1 text-[13px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50";
@@ -709,7 +710,7 @@ export function MemoryJournalList({
             </div>
             {row.diff && (
               <details className="mt-1">
-                <summary className="cursor-pointer text-[12px] text-ink-secondary">
+                <summary className="cursor-pointer text-[12px] text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />
                   +{row.added} −{row.removed} · {t("memory.showChanged")}
                 </summary>
                 <pre className="mt-1 max-h-[240px] overflow-auto whitespace-pre-wrap rounded-md bg-card p-2 font-mono text-[12px] leading-relaxed text-ink">

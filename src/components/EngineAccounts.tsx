@@ -10,6 +10,7 @@ import { DeviceSignIn, deviceSignInProvider } from "./DeviceSignIn";
 import { ChatGptPlanStatus } from "./ChatGptPlanStatus";
 import { EngineCard, engineReady, providerName, type EngineCardSummary } from "./EngineLibrary";
 import { CommandRow, EngineSetup, EngineUpdateNotice, EngineWarningNotice } from "./EngineSetup";
+import { Chevron } from "./chevron";
 
 /** Providers whose accounts are listed together on one card, each signed in on its own. */
 export type AccountGroup = "claude" | "chatgpt";
@@ -231,7 +232,7 @@ function AccountRow({ group, instance, signingIn, onSignIn, onSignInDone }: {
               <ClaudeSignIn instanceId={instance.instanceId} autoStart onDone={onSignInDone} />
               {instance.claudeAccount?.signInCommand && (
                 <details className="mt-2 text-[12px] text-ink-secondary">
-                  <summary className="cursor-pointer select-none hover:text-ink">{t("engineSetup.preferTerminal")}</summary>
+                  <summary className="cursor-pointer select-none hover:text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("engineSetup.preferTerminal")}</summary>
                   <CommandRow command={instance.claudeAccount.signInCommand} actionLabel={t("engineSetup.openSignIn")} compact />
                 </details>
               )}
@@ -296,7 +297,7 @@ export function AddAccount({ label, endpoint, extra, folder: offerFolder = false
       </label>
       {offerFolder && (
         <details className="text-[12px] text-ink-secondary">
-          <summary className="cursor-pointer select-none hover:text-ink">{t("accounts.folderToggle")}</summary>
+          <summary className="cursor-pointer select-none hover:text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("accounts.folderToggle")}</summary>
           <input value={folder} onChange={(event) => setFolder(event.target.value)} placeholder="~/.claude-work" maxLength={4096} spellCheck={false} disabled={saving}
             aria-label={t("accounts.folderToggle")}
             className="mt-2 w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 font-mono text-[12px] text-ink outline-none focus:border-accent-border disabled:opacity-50" />

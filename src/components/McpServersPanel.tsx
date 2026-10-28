@@ -31,6 +31,7 @@ import { McpServerEditor, type McpServerSubmission } from "./McpServerEditor";
 import { isRemoteMcpListing, type McpServerListing } from "./mcp-draft";
 import { WHOP_MCP_URL, isWhopServer, whopServerName } from "@/lib/whop-integration";
 import { openBotSettings } from "./bot-panel/panel-link";
+import { Chevron } from "./chevron";
 
 export interface ProbeResult {
   ok: boolean;
@@ -406,7 +407,7 @@ export function McpServersPanel({ embedded = false, whopCard = false, hideWhop =
               {renderPasteBack(server)}
             </div>
           : <details>
-              <summary className="cursor-pointer font-medium text-ink">{t("mcp.auth.otherComputer")}</summary>
+              <summary className="cursor-pointer font-medium text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("mcp.auth.otherComputer")}</summary>
               <p className="mt-2 leading-relaxed">{t("mcp.auth.otherComputerHint")}</p>
               {renderPasteBack(server)}
             </details>)}
@@ -441,7 +442,7 @@ export function McpServersPanel({ embedded = false, whopCard = false, hideWhop =
       {failed && <p role="alert" className="mt-1.5 text-[12px] text-danger">{typeof failed === "string" ? failed : t(failed.key, failed.params)}</p>}
       {whopServer && renderSignIn(whopServer)}
       <details className="mt-1 text-[12px] text-ink-secondary">
-        <summary className="cursor-pointer">{t("whop.access")}</summary>
+        <summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("whop.access")}</summary>
         <p className="mt-2 leading-relaxed">{t("whop.notice")}</p>
         <p className="mt-2 leading-relaxed">{t("whop.accessHint")}</p>
         <div className="mt-2 flex flex-wrap gap-2">{(store.bots ?? []).filter((bot) => !bot.hidden).map((bot) => <button key={bot.id} type="button" onClick={() => { dispatch({ type: "togglePlugins", open: false }); openBotSettings(dispatch, "access", { botId: bot.id, page: "mcp" }); }} className="rounded-lg bg-control px-2.5 py-1.5 text-ink hover:bg-raised-hover">{t("whop.botSettings", { name: bot.name })}</button>)}</div>
@@ -578,7 +579,7 @@ export function McpServersPanel({ embedded = false, whopCard = false, hideWhop =
                   {whop && <div className="mt-3 text-[12px] leading-relaxed text-ink-secondary">
                     <p>{t("whop.notice")}</p>
                     <details className="mt-2">
-                      <summary className="cursor-pointer font-medium text-ink">{t("whop.access")}</summary>
+                      <summary className="cursor-pointer font-medium text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("whop.access")}</summary>
                       <p className="mt-2">{t("whop.accessHint")}</p>
                       <div className="mt-2 flex flex-wrap gap-2">{(store.bots ?? []).filter((bot) => !bot.hidden).map((bot) => <button key={bot.id} type="button" onClick={() => { dispatch({ type: "togglePlugins", open: false }); openBotSettings(dispatch, "access", { botId: bot.id, page: "mcp" }); }} className="rounded-lg bg-control px-2.5 py-1.5 text-ink hover:bg-raised-hover">{t("whop.botSettings", { name: bot.name })}</button>)}</div>
                     </details>

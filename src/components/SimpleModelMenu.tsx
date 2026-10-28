@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Check, ChevronDown, ChevronRight, ChevronUp, Download, Loader2, LogIn, RefreshCw, Search, Settings, X } from "lucide-react";
+import { Check, ChevronRight, Download, Loader2, LogIn, RefreshCw, Search, Settings, X } from "lucide-react";
 import type { Bot, InstanceInfo } from "@/state/store";
 import type { EffortLevel } from "../../shared/wire";
 import type { MenuGroup, MenuModelRow, SimpleMenu } from "@/lib/simple-model-menu";
@@ -11,6 +11,7 @@ import { InstanceProviderMark } from "./ProviderIcons";
 import { MENU_GUTTER, MENU_ICON, MENU_LABEL, MENU_LINE, MENU_NOTE, MENU_ROW, MENU_SEPARATOR, MENU_STROKE, MENU_TRAILING, SIMPLE_MENU_META, SIMPLE_MENU_ROW } from "./menu-recipe";
 import { effortLabel } from "./ModelPicker";
 import { Select } from "./Select";
+import { Chevron } from "./chevron";
 
 export type SimpleThinking =
   | { levels: readonly EffortLevel[]; current?: EffortLevel; onPick: (level: EffortLevel) => void; onReset: () => void }
@@ -138,9 +139,7 @@ function GroupBody({ group, props }: { group: MenuGroup; props: SimpleModelMenuP
                 onClick={() => props.onToggle(instance)} className={cn(MENU_ROW, "text-ink-secondary hover:text-ink focus:text-ink")}>
                 <Gutter />
                 <span className="min-w-0 flex-1 truncate">{body.toggle === "less" ? t("model.showSuggested") : t("model.showAll", { count: body.total })}</span>
-                {body.toggle === "less"
-                  ? <ChevronUp size={16} strokeWidth={MENU_STROKE} className={MENU_TRAILING} aria-hidden="true" />
-                  : <ChevronDown size={16} strokeWidth={MENU_STROKE} className={MENU_TRAILING} aria-hidden="true" />}
+                <Chevron kind="menu" open={body.toggle === "less"} size="control" className={MENU_TRAILING} />
               </button>
             </div>
           )}

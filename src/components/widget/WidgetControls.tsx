@@ -1,11 +1,12 @@
 import { createContext, useContext, type Ref } from "react";
-import { Calendar, Check, ChevronsUpDown, LoaderCircle, X } from "lucide-react";
+import { Calendar, Check, LoaderCircle, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import {
   WIDGET_LIMITS, threadActionTarget, widgetNumber, widgetString, widgetTakesOther, type WidgetActionEntry, type WidgetField, type WidgetNode, type WidgetOther, type WidgetValues,
 } from "../../../shared/widget";
 import { isWidgetDot, widgetIcon, widgetIconFilled } from "./widget-icons";
+import { Chevron } from "../chevron";
 
 export interface WidgetForm {
   uid: string;
@@ -187,7 +188,7 @@ export function WidgetSelect({ node, bare }: { node: WidgetNode; bare: boolean }
         {optionsOf(node).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         {field.takesOther && <option value={OTHER_OPTION}>{t("question.other")}</option>}
       </select>
-      <ChevronsUpDown aria-hidden="true" size={14} className={cn("pointer-events-none absolute text-ink-tertiary", bare ? "end-2" : "end-3")} />
+      <Chevron kind="menu" size="row" className={cn("pointer-events-none absolute", bare ? "end-2" : "end-3")} />
     </span>
   );
   if (!field.takesOther) return select;

@@ -54,7 +54,7 @@ export function ChatHeadPill({ bot, avatar, privacy, onToggle }: {
       )}
       {!open && (
         <span aria-hidden="true" data-chathead-chevron className={cn("-ml-2 flex w-0 shrink-0 overflow-hidden opacity-0 transition-[width,margin,opacity] group-hover:ml-0 group-hover:w-2 group-hover:opacity-100 group-focus-visible:ml-0 group-focus-visible:w-2 group-focus-visible:opacity-100", CHEVRON_MOTION)}>
-          <ChevronRight size={12} className={cn("-ml-0.5 shrink-0 -translate-x-1.5 text-ink-tertiary transition-transform group-hover:translate-x-0 group-focus-visible:translate-x-0", CHEVRON_MOTION)} />
+          <ChevronRight size={16} strokeWidth={1.75} className={cn("-ml-0.5 shrink-0 -translate-x-1.5 text-ink-tertiary transition-transform group-hover:translate-x-0 group-focus-visible:translate-x-0", CHEVRON_MOTION)} />
         </span>
       )}
     </button>

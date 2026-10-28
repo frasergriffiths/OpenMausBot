@@ -1,12 +1,13 @@
 import { Children, Fragment, isValidElement, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ComponentProps, type KeyboardEvent as ReactKeyboardEvent, type ReactElement, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useAdvancedMode } from "@/lib/interface-mode";
 import { isTypeaheadKey, typeaheadMatch, typeaheadText } from "@/lib/menu-keys";
 import { usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { MENU_LABEL, MENU_ROW } from "./menu-recipe";
 import { useMenuMotion } from "./MenuMotion";
+import { Chevron } from "./chevron";
 
 const VARIANTS = {
   field: "rounded-lg border border-hairline/40 bg-inset text-ink",
@@ -117,9 +118,9 @@ function NativeSelect({ className, variant = "field", size = "md", ...props }: S
           variant === "ghost" ? "pl-2.5 pr-[18px] text-[13px]" : NATIVE_SIZES[size].trigger,
         )}
       />
-      <ChevronDown
-        size={variant === "ghost" ? 12 : 14}
-        aria-hidden
+      <Chevron
+        kind="menu"
+        size={variant === "ghost" ? "inline" : "row"}
         className={cn(
           "pointer-events-none absolute top-1/2 -translate-y-1/2 text-ink-secondary peer-disabled:opacity-50",
           variant === "ghost" ? "right-1" : NATIVE_SIZES[size].chevron,
@@ -313,14 +314,13 @@ function SimpleSelect({ className, variant = "field", size = "md", value, onChan
         )}
       >
         <span className="min-w-0 truncate">{selected?.label ?? ""}</span>
-        <ChevronDown
-          size={variant === "ghost" ? 12 : 14}
-          strokeWidth={1.75}
-          aria-hidden="true"
+        <Chevron
+          kind="menu"
+          open={open}
+          size={variant === "ghost" ? "inline" : "row"}
           className={cn(
-            "pointer-events-none absolute top-1/2 -translate-y-1/2 text-ink-secondary transition-transform motion-reduce:transition-none rtl:-scale-x-100",
+            "pointer-events-none absolute top-1/2 -translate-y-1/2 text-ink-secondary",
             variant === "ghost" ? "right-1" : SIZES[size].chevron,
-            open && "rotate-180",
           )}
         />
       </button>

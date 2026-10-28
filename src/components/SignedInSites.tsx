@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
+import { Chevron } from "./chevron";
 
 interface SignedInSite { site: string; cookies: number; storage: number }
 interface SignedInSitesAnswer { running: boolean; sites: SignedInSite[] }
@@ -68,7 +69,7 @@ export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, 
   if (bare) return list;
   return (
     <details className="min-w-0" onToggle={(event) => { if (event.currentTarget.open && !busy) void load(); }}>
-      <summary className="cursor-pointer text-[12px] font-medium text-ink-secondary hover:text-ink">{t("settings.sites.title")}</summary>
+      <summary className="cursor-pointer text-[12px] font-medium text-ink-secondary hover:text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("settings.sites.title")}</summary>
       {list}
     </details>
   );

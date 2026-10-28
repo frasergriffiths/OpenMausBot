@@ -7,6 +7,7 @@ import { t } from "@/lib/i18n";
 import { SignedInSites } from "./SignedInSites";
 import { Select } from "./Select";
 import { browserScope } from "@/lib/team-browser";
+import { Chevron } from "./chevron";
 
 /** Security: the server owns session routing and erasure; this UI never handles cookies or partitions. */
 export function BrowserProfilesManager({ bot, onProfileChanged, disabled = false }: {
@@ -186,7 +187,7 @@ export function BrowserProfilesManager({ bot, onProfileChanged, disabled = false
         </div>
       )}
       <details open={!currentBot} className="min-w-0">
-        <summary className="cursor-pointer text-[12px] font-medium text-ink-secondary hover:text-ink">{t("settings.profiles.manage")}</summary>
+        <summary className="cursor-pointer text-[12px] font-medium text-ink-secondary hover:text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("settings.profiles.manage")}</summary>
         <div className="mt-3 flex flex-col gap-3">
           <form className="flex flex-wrap gap-2" onSubmit={(event) => { event.preventDefault(); void create(); }}>
             <label htmlFor={`${fieldId}-new`} className="sr-only">{t("settings.profiles.newName")}</label>

@@ -58,6 +58,7 @@ import {
   type PhonePairingAttemptQueue,
 } from "../lib/phone-setup";
 import type { CompanionAccountState } from "../types/ogb";
+import { Chevron } from "./chevron";
 import {
   companionStateRefreshIsCurrent,
   mutateCompanionBridgeState,
@@ -1127,7 +1128,7 @@ export function PhoneSetupFlowView({ controller }: { controller: PhoneSetupContr
       )}
       {!c.pairingExpired && c.state?.pairing && (
         <details className="mt-4 w-full max-w-[390px] rounded-lg border border-hairline/40 px-3 py-2 text-left">
-          <summary className="cursor-pointer text-[12px] text-ink-secondary">{t("phone.code.trouble")}</summary>
+          <summary className="cursor-pointer text-[12px] text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("phone.code.trouble")}</summary>
           <div className="mt-3 text-[12px] text-ink-secondary">
             {t("phone.code.manual")}
             <div className="mt-1 font-mono text-[22px] tracking-[0.25em] text-ink">{c.state.pairing.code}</div>

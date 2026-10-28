@@ -21,6 +21,7 @@ import { Select } from "./Select";
 import { cn } from "@/lib/cn";
 import { useStore } from "@/state/store";
 import { VpsComputersCard } from "./VpsComputersCard";
+import { Chevron } from "./chevron";
 
 type Action = "pull" | "run" | "start" | "stop" | "remove" | "recreate";
 
@@ -1366,7 +1367,7 @@ export function LocalComputerSection() {
             {status?.daemonUp && (
               <ActionButton action="pull" pending={pending} onClick={() => void act("pull")}>{t("vm.setup.prepare")}</ActionButton>
             )}
-            {c?.pull && <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer">{t("vm.setup.showPull")}</summary><div className="mt-2"><CommandLine command={c.pull} /></div></details>}
+            {c?.pull && <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("vm.setup.showPull")}</summary><div className="mt-2"><CommandLine command={c.pull} /></div></details>}
           </Step>
 
           <Step
@@ -1413,7 +1414,7 @@ export function LocalComputerSection() {
                 <p className="text-[13px] leading-relaxed text-ink-secondary">{t("vm.setup.idleHint")}</p>
               </>
             ) : null}
-            {c?.run && <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer">{t("vm.setup.showCommand")}</summary><div className="mt-2"><CommandLine command={c.run} /></div></details>}
+            {c?.run && <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("vm.setup.showCommand")}</summary><div className="mt-2"><CommandLine command={c.run} /></div></details>}
           </Step>
         </div>
       </Card>

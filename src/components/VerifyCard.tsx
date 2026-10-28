@@ -1,9 +1,10 @@
-import { BookmarkPlus, CheckCircle2, ChevronDown, ChevronUp, Circle, ListChecks, Loader2, X, XCircle } from "lucide-react";
+import { BookmarkPlus, CheckCircle2, Circle, ListChecks, Loader2, X, XCircle } from "lucide-react";
 import { useState } from "react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { runSummary, type RunSkill, type RunStep } from "@/lib/verify-steps";
+import { Chevron } from "./chevron";
 
 function StatusIcon({ status }: { status: RunStep["status"] }) {
   const className = "size-4 shrink-0";
@@ -60,7 +61,7 @@ export function VerifyCard({
           title={toggleLabel}
           className={ICON_BUTTON}
         >
-          {collapsed ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
+          <Chevron kind="disclosure" open={!collapsed} size="row" />
         </button>
         <button type="button" onClick={onDismiss} aria-label={t("chat.verify.dismiss")} title={t("chat.verify.dismiss")} className={ICON_BUTTON}>
           <X size={14} aria-hidden="true" />

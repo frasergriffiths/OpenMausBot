@@ -8,6 +8,7 @@ import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { SECTION_PROVIDER, type KeyResult, type KeyVia } from "@/lib/analytics-allowlist";
 import { keyRemoved, keySaved, keySaveFailure, keyTestResult, savedKeyResult } from "@/lib/product-events";
+import { Chevron } from "./chevron";
 
 export type ConfigSection = "composio" | "box" | "opencodeGo" | "anthropic" | "openai" | "openrouter" | "openaiCompat" | "xai" | "mistral" | "cerebras" | "groq" | "meta" | "treg" | "deepseek";
 export type TestableProvider = "anthropic" | "openai" | "openrouter" | "openaiCompat" | "xai" | "mistral" | "cerebras" | "groq" | "meta" | "treg";
@@ -502,7 +503,7 @@ export function OpenCodeProviderKeys() {
 
   return (
     <details data-opencode-provider-keys className="rounded-lg border border-hairline/40 bg-inset px-3 py-2" open={names.length > 0}>
-      <summary className="cursor-pointer text-[13px] text-ink-secondary">{t("keys.opencode.otherProviders.title")}</summary>
+      <summary className="cursor-pointer text-[13px] text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("keys.opencode.otherProviders.title")}</summary>
       <div className="mt-3 flex flex-col gap-2">
         <p className="text-[12px] leading-relaxed text-ink-secondary">{t("keys.opencode.otherProviders.hint")}</p>
         {names.map((saved) => (

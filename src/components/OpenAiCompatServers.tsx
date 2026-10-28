@@ -5,6 +5,7 @@ import { t } from "@/lib/i18n";
 import { keySaved } from "@/lib/product-events";
 import { addedServers } from "@/lib/openai-compat-endpoints";
 import { ApiKeyRow, OpenAiCompatUrl } from "./ApiKeys";
+import { Chevron } from "./chevron";
 
 export function modelIds(text: string): string[] {
   return [...new Set(text.split(/[,，、\s]+/).map((id) => id.trim()).filter(Boolean))];
@@ -18,7 +19,7 @@ export function OtherOpenAiCompatServers() {
   const added = addedServers(state.instances);
   return (
     <details data-api-keys-other className="rounded-lg border border-hairline/40 bg-inset px-3 py-2" open={Boolean(state.config?.openaiCompat?.configured) || added.length > 0}>
-      <summary className="cursor-pointer text-[13px] text-ink-secondary">{t("keys.other.title")}</summary>
+      <summary className="cursor-pointer text-[13px] text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("keys.other.title")}</summary>
       <div className="mt-3 flex flex-col gap-4">
         <ApiKeyRow section="openaiCompat" testProvider="openaiCompat" />
         <OpenAiCompatUrl />

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { ChevronDown, ChevronRight, Sparkles, X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { formatTokens, hasFiniteCost } from "@/lib/usage";
@@ -9,6 +9,7 @@ import {
 import { useStore, type InstanceInfo } from "@/state/store";
 import type { TraceDetail, TraceNode, TraceRootSummary, TraceTotals } from "../../../shared/usage-trace";
 import { appName, StepIcon, ToolIcon, TurnAvatar, useAppCards } from "./TraceIcon";
+import { Chevron } from "../chevron";
 
 export function modelName(model: string, instances: readonly InstanceInfo[]): string {
   for (const instance of instances) {
@@ -253,7 +254,7 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
                       className="flex size-5 shrink-0 items-center justify-center rounded text-ink-secondary hover:bg-raised hover:text-ink"
                       aria-label={t(row.open ? "trace.collapse" : "trace.expand")}
                     >
-                      {row.open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      <Chevron kind="disclosure" open={row.open} size="row" />
                     </button>
                   ) : <span className="w-5 shrink-0" />}
                   <RowName row={row} models={state.instances} />

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -9,6 +9,7 @@ import { McpResultBudgetField, withResultBudget, type McpMessage } from "./McpRe
 import { McpSecretRows } from "./McpSecretRows";
 import { Select } from "./Select";
 import { draftBody, draftFor, draftFromPaste, emptyDraft, isRemoteMcpListing, soleKey, type McpDraft, type McpServerListing } from "./mcp-draft";
+import { Chevron } from "./chevron";
 
 export interface McpServerSubmission {
   name: string;
@@ -118,7 +119,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
       {(adding || keysOnly) && drafts.length <= 1 && (
         <button type="button" aria-expanded={details} onClick={() => { setDetails(!details); if (!drafts.length) setDrafts([emptyDraft()]); }}
           className="mt-3 inline-flex items-center gap-1 text-[12px] font-medium text-ink-secondary hover:text-ink">
-          {details ? <ChevronDown size={14} /> : <ChevronRight size={14} />} {t("mcp.details")}
+          <Chevron kind="disclosure" open={details} size="row" /> {t("mcp.details")}
         </button>
       )}
       {details && draft && (

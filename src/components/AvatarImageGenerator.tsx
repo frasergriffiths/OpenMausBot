@@ -5,6 +5,7 @@ import { api, useStore, type ConfigStatus } from "@/state/store";
 import { normalizeImageGenerationUrl, type AvatarImageProvider } from "../../shared/image-generation";
 import { Select } from "./Select";
 import { t } from "@/lib/i18n";
+import { Chevron } from "./chevron";
 
 const PROVIDERS = {
   openai: { label: "OpenAI", keyLabel: "OpenAI image API key", credential: "openaiImageApiKey" },
@@ -242,7 +243,7 @@ export function AvatarImageGenerator({
 
       {configured ? (
         <details key={provider} className="mt-3 rounded-lg border border-hairline/40 px-3 py-2">
-          <summary className="cursor-pointer text-[12px] text-ink-secondary">{t("botIdentity.ai.connectionSettings")}</summary>
+          <summary className="cursor-pointer text-[12px] text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("botIdentity.ai.connectionSettings")}</summary>
           <div className="mt-3">{connectionForm}</div>
         </details>
       ) : <div className="mt-3">{connectionForm}</div>}

@@ -115,7 +115,7 @@ describe("Settings rail groups", () => {
   it("shows every desktop page under its labelled group", () => {
     vi.stubGlobal("window", { ogb: { environments: {}, organization: {}, cloudAccount: {} } });
     const html = render();
-    for (const label of ["You", "AI", "Keys &amp; connectors", "Devices", "Account"]) expect(html).toContain(`>${label}</div>`);
+    for (const label of ["You", "AI", "Keys", "Devices", "Account"]) expect(html).toContain(`>${label}</div>`);
     expect(html).toContain("glass-surface");
     expect(rail(html)).toEqual({
       you: ["general", "appearance", "companion"],

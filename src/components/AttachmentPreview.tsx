@@ -632,7 +632,7 @@ export function AttachmentPreviewDialog({
                 aria-label={t("attach.previous")}
                 className="absolute left-2 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white sm:left-4"
               >
-                <ChevronLeft size={21} />
+                <ChevronLeft size={16} strokeWidth={1.75} />
               </button>
               <button
                 type="button"
@@ -640,7 +640,7 @@ export function AttachmentPreviewDialog({
                 aria-label={t("attach.next")}
                 className="absolute right-2 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/55 text-white/80 backdrop-blur-sm hover:bg-black/75 hover:text-white sm:right-4"
               >
-                <ChevronRight size={21} />
+                <ChevronRight size={16} strokeWidth={1.75} />
               </button>
             </>
           )}

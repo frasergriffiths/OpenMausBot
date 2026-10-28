@@ -7,6 +7,7 @@ import { copyText } from "@/lib/copy-text";
 import { DEVICE_SIGN_IN_COPY, DeviceSignIn, deviceSignInProvider } from "./DeviceSignIn";
 import { ClaudeSignIn } from "./ClaudeSignIn";
 import { RefreshEngines } from "./EngineLibrary";
+import { Chevron } from "./chevron";
 
 type Platform = "darwin" | "win32" | "linux";
 
@@ -203,7 +204,7 @@ function ServerEngineInstall({ instance, mode, command, quiet = false }: { insta
       {error && <p role="alert" className="whitespace-pre-wrap text-[12px] leading-relaxed text-danger">{error}</p>}
       {command && (
         <details className="rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
-          <summary className="cursor-pointer select-none">{t("engineSetup.preferTerminal")}</summary>
+          <summary className="cursor-pointer select-none flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("engineSetup.preferTerminal")}</summary>
           <CommandRow command={command} actionLabel={t(mode === "update" ? "engineSetup.openUpdate" : "engineSetup.openInstall")} compact allowTerminal={state.config?.cloudHome !== true} />
         </details>
       )}
@@ -366,7 +367,7 @@ function ManagedEngineSetup({ instance, signInOnly }: { instance: InstanceInfo; 
             {busy === "check" ? t("common.checking") : t("engineSetup.finishedSignIn")}
           </button>
           <details className="rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
-            <summary className="cursor-pointer select-none">{t("engineSetup.otherComputer")}</summary>
+            <summary className="cursor-pointer select-none flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("engineSetup.otherComputer")}</summary>
             <p className="mt-2 leading-relaxed">{t("engineSetup.otherComputerHint")}</p>
             <input
               value={callbackUrl}
@@ -554,7 +555,7 @@ export function EngineSetup({
 
       {instance.snapshot.state === "unavailable" && instance.snapshot.reason && (quiet ? (
         <details data-engine-setup-reason className="mt-2 text-[12px] leading-4 text-ink-tertiary">
-          <summary className="cursor-pointer select-none hover:text-ink-secondary">{t("engineSetup.details")}</summary>
+          <summary className="cursor-pointer select-none hover:text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("engineSetup.details")}</summary>
           <p className="mt-1 whitespace-pre-wrap">{instance.snapshot.reason}</p>
         </details>
       ) : (
@@ -568,7 +569,7 @@ export function EngineSetup({
           <DeviceSignIn key={instance.instanceId} instanceId={instance.instanceId} browserPkce={browserSignIn} provider={provider} />
           {deviceSignIn && provider === "grok" && signInCommand && serverTerminal(cloudHome) && (
             <details className="mt-2 rounded-lg border border-hairline/50 bg-app px-2.5 py-2 text-[12px] text-ink-secondary">
-              <summary className="cursor-pointer select-none">{t("engineSetup.preferTerminal")}</summary>
+              <summary className="cursor-pointer select-none flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("engineSetup.preferTerminal")}</summary>
               <CommandRow command={signInCommand} actionLabel={t("engineSetup.openSignIn")} compact />
             </details>
           )}

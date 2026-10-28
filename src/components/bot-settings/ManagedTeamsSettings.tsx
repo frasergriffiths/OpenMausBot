@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { t } from "@/lib/i18n";
+import { Chevron } from "../chevron";
 
 export function ManagedTeamsSettings({
   name, ownTeam, teams, allowed, onSave,
@@ -15,7 +16,7 @@ export function ManagedTeamsSettings({
   const changed = JSON.stringify([...selected].sort()) !== JSON.stringify([...allowed].sort());
   return (
     <details className="mt-3 border-t border-hairline/40 pt-3">
-      <summary className="cursor-pointer text-[13px] font-medium text-ink">{t("botAccess.teams.title")}</summary>
+      <summary className="cursor-pointer text-[13px] font-medium text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("botAccess.teams.title")}</summary>
       <p className="mt-2 text-[13px] leading-relaxed text-ink-secondary">
         {t("botAccess.teams.description", { name })}
       </p>

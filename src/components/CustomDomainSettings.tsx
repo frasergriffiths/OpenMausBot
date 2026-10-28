@@ -3,6 +3,7 @@ import { Check, ExternalLink, Globe, Loader2 } from "lucide-react";
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
 import { Card, CommandLine } from "./SettingsPrimitives";
+import { Chevron } from "./chevron";
 
 export interface CustomDomainStatus {
   publicUrl: string | null;
@@ -73,7 +74,7 @@ export function customDomainProxyExample(status: Pick<CustomDomainStatus, "appPo
 export function CustomDomainGuide({ status }: { status: CustomDomainStatus }) {
   return (
     <details className="rounded-lg border border-hairline/50 bg-inset px-3 py-2.5 text-[12px] text-ink-secondary">
-      <summary className="cursor-pointer font-medium text-ink">{t("settings.domain.guide")}</summary>
+      <summary className="cursor-pointer font-medium text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("settings.domain.guide")}</summary>
       <ol className="mt-3 list-decimal space-y-3 pl-4 leading-relaxed">
         <li>{t("settings.domain.dns")}</li>
         <li>

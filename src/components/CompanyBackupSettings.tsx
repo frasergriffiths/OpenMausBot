@@ -5,6 +5,7 @@ import { activeLocale, t } from "@/lib/i18n";
 import { collectWorkspaceClientState, WORKSPACE_RESTORE_MARKER } from "@/lib/workspace-backup-client";
 import { Card, Switch } from "./SettingsPrimitives";
 import { WorkspaceBackupRestartNotice, WorkspaceBackupSummaryView } from "./WorkspaceBackupSettings";
+import { Chevron } from "./chevron";
 
 type BackupBridge = NonNullable<NonNullable<Window["ogb"]>["companyBackups"]>;
 type BackupList = Awaited<ReturnType<BackupBridge["list"]>>;
@@ -280,7 +281,7 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
         {(dialog.kind === "restore" || dialog.kind === "delete") && <div className="text-[13px] text-ink-secondary"><p>{dateLabel(dialog.entry)} · {bytes(dialog.entry.sizeBytes)}</p><code className="break-all text-[11px]">{dialog.entry.id}</code></div>}
         {(dialog.kind === "create" || dialog.kind === "schedule") && <form className="flex flex-col gap-3" onSubmit={(event) => { event.preventDefault(); if (dialog.kind === "schedule") void configureSchedule(true); else create(); }}>
           <p className="text-[13px] text-ink">{t(dialog.kind === "schedule" ? "companyBackup.scheduleWarning" : "companyBackup.managedUploadWarning", { organization: connection.organization?.name ?? "", email: connection.email ?? "" })}</p>
-          {dialog.kind === "schedule" ? <details className="text-[13px] text-ink-secondary"><summary className="cursor-pointer text-ink">{t("companyBackup.included")}</summary><p className="mt-2">{t("backup.excluded")}</p><p className="mt-2">{t("companyBackup.managedPrivacy")}</p></details> : <><p className="text-[13px] text-ink-secondary">{t("backup.excluded")}</p><p className="text-[13px] text-ink-secondary">{t("companyBackup.managedPrivacy")}</p></>}
+          {dialog.kind === "schedule" ? <details className="text-[13px] text-ink-secondary"><summary className="cursor-pointer text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("companyBackup.included")}</summary><p className="mt-2">{t("backup.excluded")}</p><p className="mt-2">{t("companyBackup.managedPrivacy")}</p></details> : <><p className="text-[13px] text-ink-secondary">{t("backup.excluded")}</p><p className="text-[13px] text-ink-secondary">{t("companyBackup.managedPrivacy")}</p></>}
           <p className="text-[13px] text-ink-secondary">{t("companyBackup.managedEncryption")}</p>
           {dialog.kind === "schedule" && <label className="flex items-start gap-2 text-[13px]"><input className="mt-1 accent-accent" type="checkbox" required disabled={disabled} checked={confirmation === "BACK UP THIS WORKSPACE DAILY"} onChange={event => setConfirmation(event.target.checked ? "BACK UP THIS WORKSPACE DAILY" : "")} /><span>{t("companyBackup.scheduleConsent")}</span></label>}
           <button type="submit" className="ui-button" disabled={disabled || (dialog.kind === "schedule" && confirmation !== "BACK UP THIS WORKSPACE DAILY")}>{t(dialog.kind === "schedule" ? "companyBackup.enableSchedule" : "companyBackup.create")}</button>

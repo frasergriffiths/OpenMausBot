@@ -2,7 +2,7 @@
 // authorization.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fromMarkdown } from "mdast-util-from-markdown";
-import { ChevronDown, ChevronUp, Download, Film, LoaderCircle, Music, Play, X } from "lucide-react";
+import { Download, Film, LoaderCircle, Music, Play, X } from "lucide-react";
 import { attachmentBasename, FILE_MAX_BYTES, type TranscriptFileAttachment, type TranscriptImageAttachment } from "@/lib/composer-attachments";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -18,6 +18,7 @@ import {
   type MessageAttachmentContext,
   type PreviewImage,
 } from "./AttachmentPreview";
+import { Chevron } from "./chevron";
 
 export interface GalleryFile extends TranscriptFileAttachment {
   linked?: boolean;
@@ -438,7 +439,7 @@ export function AttachmentGallery({ images = [], files = [], message, eager = fa
       )}
       {items.length > limit && (
         <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded} className="flex min-h-8 items-center gap-1 rounded-lg px-1 py-1 text-[11px] text-ink-secondary transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60">
-          {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          <Chevron kind="menu" open={expanded} size="inline" />
           {expanded ? t("attach.showLess") : t("attach.showMore", { count: items.length - limit })}
         </button>
       )}

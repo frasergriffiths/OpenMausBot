@@ -7,6 +7,7 @@ import type { Message } from "@/state/store";
 import { traceRootId } from "../../shared/usage-trace";
 import { EXCERPT_SUMMARY_HEADER } from "../../shared/wire";
 import { TraceDialog } from "./usage/TraceView";
+import { Chevron } from "./chevron";
 
 export function DigestChip({ message }: { message: Message }) {
   const [tracing, setTracing] = useState(false);
@@ -42,7 +43,7 @@ export function CompactionChip({ message }: { message: Message }) {
   const excerpts = message.compaction.summary.startsWith(EXCERPT_SUMMARY_HEADER);
   return (
     <details className="max-w-[600px] rounded-xl border border-hairline/40 bg-panel px-3 py-2 text-[12px] text-ink-secondary" data-testid="compaction-chip">
-      <summary className="cursor-pointer font-medium">{t(excerpts ? "chat.compactionExcerptTitle" : "chat.compactionTitle")}</summary>
+      <summary className="cursor-pointer font-medium flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t(excerpts ? "chat.compactionExcerptTitle" : "chat.compactionTitle")}</summary>
       <p className="mt-2">{t(excerpts ? "chat.compactionExcerptHint" : "chat.compactionHint")}</p>
       <p className="mt-2 whitespace-pre-wrap break-words">{message.compaction.summary}</p>
     </details>

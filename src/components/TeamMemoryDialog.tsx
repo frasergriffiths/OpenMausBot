@@ -8,6 +8,7 @@ import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { cn } from "@/lib/cn";
 import { Select } from "./Select";
+import { Chevron } from "./chevron";
 
 type Kind = "person" | "place" | "decision" | "term";
 
@@ -245,7 +246,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
                         <span className="block px-1 text-[11px] text-ink-secondary">
                           {entry.source.botName || t("teamMemory.you")} · {new Date(entry.updatedAt).toLocaleDateString()} · {loadedIds.includes(entry.id) ? t("teamMemory.loaded") : t("teamMemory.searchable")}
                         </span>
-                        {!!entry.history?.length && <details className="mt-1 text-[11px] text-ink-secondary"><summary>{t("teamMemory.history")}</summary>{entry.history.map((version, index) => <div key={index} className="mt-1">{new Date(version.at).toLocaleDateString()}: {version.name} — {version.detail} <button disabled={busyId !== null} onClick={() => editDetail(entry, version.detail, version.name)} className="underline">{t("teamMemory.restore")}</button></div>)}</details>}
+                        {!!entry.history?.length && <details className="mt-1 text-[11px] text-ink-secondary"><summary className="flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("teamMemory.history")}</summary>{entry.history.map((version, index) => <div key={index} className="mt-1">{new Date(version.at).toLocaleDateString()}: {version.name} — {version.detail} <button disabled={busyId !== null} onClick={() => editDetail(entry, version.detail, version.name)} className="underline">{t("teamMemory.restore")}</button></div>)}</details>}
                       </span>
                       <button aria-label={t(entry.pinned ? "teamMemory.unpin" : "teamMemory.pin", { name: entry.name })} aria-pressed={entry.pinned ?? false} disabled={busyId !== null} className="p-1 text-ink-secondary hover:text-accent" onClick={() => void run(entry.id, () => api(`/api/team-memory/${entry.id}?${query}`, { method: "PATCH", body: JSON.stringify({ pinned: !entry.pinned, expectedRevision: entry.revision }) }))}><Pin size={13} /></button>
                       <button

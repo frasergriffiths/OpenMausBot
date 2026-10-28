@@ -54,6 +54,7 @@ import { useAdvancedMode } from "@/lib/interface-mode";
 import { Select } from "./Select";
 import { BrowserProfilesRow, ColorUserBubblesRow, AdvancedModeRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, RunCardRow, SendKeyRow, ShowThreadsRow, SidebarDensityRow, ToolCallsRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
 import { SIMPLE_ADVANCED_ONLY, SimpleAiPage, SimpleBillingPage, SimpleComputerPage, SimpleGeneralPage, SimpleKeysPage, SimpleLooksPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId } from "./SettingsSimplePages";
+import { Chevron } from "./chevron";
 
 // labelKey, not a label: t() reads the active pack when called, so a label resolved at module scope would freeze the
 // boot language.
@@ -396,7 +397,7 @@ export function SettingsModal() {
               )}
               <OpenCodeProviderKeys />
               <details className="rounded-lg border border-hairline/40 bg-inset px-3 py-2">
-                <summary className="cursor-pointer text-[13px] text-ink-secondary">{t("settings.connections.selfHost")}</summary>
+                <summary className="cursor-pointer text-[13px] text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("settings.connections.selfHost")}</summary>
                 <div className="mt-3">
                   <ApiKeyRow section="composio" />
                 </div>

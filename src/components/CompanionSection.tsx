@@ -27,6 +27,7 @@ import { Card, Switch } from "./SettingsPrimitives";
 import { SIMPLE_ROW_FOCUS } from "./SidebarSimpleTop";
 import { brand } from "../lib/brand";
 import { useStore } from "@/state/store";
+import { Chevron } from "./chevron";
 
 export {
   companionAccountActionError,
@@ -217,7 +218,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
       </div>
 
       <details className="rounded-xl border border-hairline/40 bg-card">
-        <summary className="cursor-pointer px-4 py-3.5 text-[13px] font-medium text-ink">
+        <summary className="cursor-pointer px-4 py-3.5 text-[13px] font-medium text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />
           {t("remote.advanced")}
         </summary>
         <div className="flex flex-col gap-4 border-t border-hairline/30 px-4 py-4">

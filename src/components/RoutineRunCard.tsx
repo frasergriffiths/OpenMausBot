@@ -7,6 +7,7 @@ import { useShowThreads } from "@/lib/thread-preferences";
 import { liveCardKind } from "../../shared/live-approval";
 import type { AutomationLine, RoutineRunCardData } from "../../shared/routine-run";
 import { formatTime, openNotificationTarget, useStore, type Message } from "@/state/store";
+import { Chevron } from "./chevron";
 
 const DETAIL_LIMIT = 280;
 
@@ -98,7 +99,7 @@ export function RoutineRunCard({
           </time>
           {detail && <p className="mt-1.5 text-[13px] leading-relaxed text-ink-secondary">{detail}</p>}
           {run.status === "completed" && run.summary && run.summary.length > DETAIL_LIMIT && <details className="mt-2 text-[12px] text-ink-secondary">
-            <summary className="cursor-pointer font-medium text-ink-secondary hover:text-ink">{t("routines.results.showReport")}</summary>
+            <summary className="cursor-pointer font-medium text-ink-secondary hover:text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("routines.results.showReport")}</summary>
             <p className="mt-2 whitespace-pre-wrap leading-relaxed">{run.summary}</p>
           </details>}
         </div>

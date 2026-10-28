@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Bug, ChevronDown, ChevronRight, RefreshCw, X } from "lucide-react";
+import { Bug, RefreshCw, X } from "lucide-react";
 import { useStore, visibleMessages, type Bot } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "./pill-tabs";
@@ -10,6 +10,7 @@ import type { RuntimeEvent } from "../../shared/runtime-events";
 import { RunLog } from "./RunLog";
 import { timelineEvents } from "@/lib/taskTimeline";
 import { t } from "@/lib/i18n";
+import { Chevron } from "./chevron";
 
 type Lens = "run" | "events" | "raw";
 
@@ -224,7 +225,7 @@ function Row({ row, open, onToggle }: { row: InspectorRow; open: boolean; onTogg
       )}
     >
       <button onClick={onToggle} className="flex w-full items-start gap-2 px-3 py-1.5 text-left hover:bg-raised/60">
-        <span className="mt-[1px] shrink-0 text-ink-secondary">{open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}</span>
+        <span className="mt-[1px] shrink-0 text-ink-secondary"><Chevron kind="disclosure" open={open} size="inline" /></span>
         <span className="shrink-0 tabular-nums text-ink-secondary">{formatTime(row.at)}</span>
         <span
           className={cn(
