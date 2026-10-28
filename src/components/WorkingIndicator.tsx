@@ -18,15 +18,15 @@ export function WorkingDots({ size = 4, className }: { size?: number; className?
   );
 }
 
-export function WorkingTimer({ since, className }: { since: number; className?: string }) {
+export function WorkingTimer({ since, className, format = formatElapsed }: { since: number; className?: string; format?: (elapsedMs: number) => string }) {
   const node = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const tick = () => {
-      if (node.current) node.current.textContent = formatElapsed(Date.now() - since);
+      if (node.current) node.current.textContent = format(Date.now() - since);
     };
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [since]);
+  }, [since, format]);
   return <span ref={node} className={cn("tabular-nums", className)} />;
 }

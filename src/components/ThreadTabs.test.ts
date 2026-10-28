@@ -98,7 +98,7 @@ describe("a bot's threads in the chat header", () => {
     render(bot({ color: "blue" }));
     const pricing = tab("pricing");
     const spinner = pricing.querySelector("svg.animate-spin")!;
-    expect(spinner.getAttribute("style")).toContain("color");
+    expect(spinner.classList.contains("animate-spin")).toBe(true);
     expect(spinner.classList.contains("text-success")).toBe(false);
     expect(pricing.className).toContain("leading-4");
     expect(pricing.className).not.toContain("leading-none");
@@ -106,6 +106,10 @@ describe("a bot's threads in the chat header", () => {
     expect(timer).not.toBeNull();
     expect(timer.textContent).not.toBe("");
     expect(timer.textContent).toMatch(/\d+s|\d+m/);
+    expect(timer.className).toContain("text-[12px]");
+    expect(timer.className).toContain("text-ink-secondary");
+    expect(timer.parentElement!.className).toContain("min-w-[2.75rem]");
+    expect(timer.parentElement!.className).toContain("@max-[10rem]:hidden");
   });
 
   it("shows a running turn and an unread reply from the tab itself", () => {
@@ -117,6 +121,12 @@ describe("a bot's threads in the chat header", () => {
     expect(tab("who").textContent).not.toContain("Unread");
     render(bot({ tasks: [task("who", "Who am I?", 1), task("triage", "Triage the inbox", 2, { activity: "waiting-on-you" })] }));
     expect(tab("triage").textContent).toContain("Waiting");
+  });
+
+  it("caps the elapsed slot at 1h+ so the tab never grows past the hour", () => {
+    render(bot({ threadId: "pricing", tasks: [task("pricing", "Long run", 1, { busy: true, activity: "working", turnStartedAt: now - 3_700_000 })] }));
+    expect(tab("pricing").textContent).toContain("1h+");
+    expect(tab("pricing").textContent).not.toContain("61m");
   });
 
   it("shows a turn waiting on the person instead of the spinner its busy flag would raise", () => {

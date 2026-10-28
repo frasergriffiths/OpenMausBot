@@ -8,10 +8,11 @@ import { cn } from "@/lib/cn";
 import { copyText } from "@/lib/copy-text";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 import { t } from "@/lib/i18n";
-import { MAUS_COLORS } from "@/lib/mascot";
+import { spinnerColor } from "@/lib/mascot";
 import { reducedMotion } from "@/lib/onboarding";
 import { nextRename } from "@/lib/rename";
 import { localizedTaskTitle } from "@/lib/task-title";
+import { formatElapsed } from "@/lib/working-time";
 import { threadRefUrl } from "@/lib/thread-refs";
 import { currentTaskBot, openBotThread, useStore, type Action, type Bot, type Task } from "@/state/store";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -25,6 +26,9 @@ type TabTask = Task & { queued?: boolean };
 type ThreadActions = ReturnType<typeof threadRowActions>;
 
 const displayTitle = (task: TabTask) => localizedTaskTitle(task.title || t("task.newShort"));
+
+/** The tab has one fixed-width slot: minutes and seconds clip at the hour, never grow the tab. */
+const tabElapsed = (ms: number) => (ms >= 3_600_000 ? "1h+" : formatElapsed(ms));
 
 /** The transcript panel the strip controls. */
 export const CHAT_THREAD_PANEL_ID = "chat-thread-panel";
@@ -175,14 +179,14 @@ function ThreadTab({ task, ownerId, active, tabbable, folders, actions, color, o
           onFocus={() => onFocus(task.threadId)}
           onDoubleClick={startRename}
           className={cn(
-            "flex h-7 max-w-[12rem] min-w-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] leading-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
+            "@container flex h-7 max-w-[12rem] min-w-0 items-center gap-1.5 rounded-full px-2.5 text-[12px] leading-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60",
             active ? "bg-raised font-medium text-ink" : "text-ink-secondary hover:bg-raised/60 hover:text-ink",
           )}
         >
           {running && <Loader2 size={12} aria-hidden="true" className="shrink-0 animate-spin" style={{ color }} />}
           {running && task.turnStartedAt ? (
-            <span className="shrink-0">
-              <WorkingTimer since={task.turnStartedAt} className="text-[11px] tabular-nums text-ink-tertiary" />
+            <span className="shrink-0 min-w-[2.75rem] text-right @max-[10rem]:hidden">
+              <WorkingTimer since={task.turnStartedAt} format={tabElapsed} className="text-[12px] tabular-nums text-ink-secondary" />
             </span>
           ) : null}
           {waitingOnYou && <Clock size={12} aria-hidden="true" className="shrink-0 text-accent" />}
@@ -401,7 +405,7 @@ export function ThreadTabs({ bot, dispatch, onMeasuredWidthChange }: {
             tabbable={task.threadId === focusable}
             folders={bot.projects}
             actions={actions}
-            color={MAUS_COLORS[bot.color]}
+            color={spinnerColor(bot.color)}
             onOpen={open}
             onFocus={setFocusId}
             register={register}

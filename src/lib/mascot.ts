@@ -63,6 +63,15 @@ export const MAUS_COLORS = {
   chrome: "#B3BAC4",
 } satisfies Record<MausColor, string>;
 
+/** Status spinners mix the mascot hue toward the skin's ink, so the 12px mark clears 3:1 on the active tab
+ *  without changing the true hue used by avatars, dots and the mascot itself. 65/35 is the lowest hue share that
+ *  clears 3:1 for every colour in every skin; see spinner-color.test.ts. */
+export const SPINNER_HUE_PERCENT = 65;
+
+export function spinnerColor(color: MausColor): string {
+  return `color-mix(in oklab, ${MAUS_COLORS[color]} ${SPINNER_HUE_PERCENT}%, var(--color-ink))`;
+}
+
 export const MAUS_COLOR_LABEL = {
   green: "mascotColor.green", blue: "mascotColor.blue", red: "mascotColor.red", orange: "mascotColor.orange",
   purple: "mascotColor.purple", cyan: "mascotColor.cyan", pink: "mascotColor.pink", yellow: "mascotColor.yellow",
