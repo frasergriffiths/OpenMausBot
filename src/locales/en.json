@@ -2688,8 +2688,6 @@
   "onboarding.tour.tools": "The Tools menu. Connected apps, Automations, and the team map all live behind it. Let's open it.",
   "onboarding.tour.apps": "Connected apps. Gmail, Slack, GitHub, Notion, and hundreds more. Let's have a look.",
   "onboarding.tour.apps-panel": "The marketplace. Sign in to an app once and every bot can use it as a tool. We'll close this and move on.",
-  "onboarding.tour.automations": "Automations. Bots that run on a schedule, or when a webhook calls. Let's open it.",
-  "onboarding.tour.automations-page": "A calendar. Drop a bot on a time and it runs by itself; the result lands in its chat. Next takes you back to the chat.",
   "onboarding.tour.done": "That's the tour, and you're back in the chat. Your phone, the terminal, and everything else is in Settings. Replay this any time from Settings → General.",
   "onboarding.card.custom": "Type your own answer",
   "onboarding.card.dismiss": "Dismiss question",
@@ -6641,12 +6639,13 @@
   "botPanel.page.browser": "Browser",
   "botPanel.library.data": "Data",
   "sidebar.switchServerAddCloud": "Add a Cloud…",
-  "sidebar.switchServerConnect": "Connect to a server…",
+  "sidebar.switchServerConnect": "Connect to another computer…",
   "sidebar.switchServerForget": "Forget “{name}”…",
-  "composer.placeholder.steerUnavailable": "{name} is working — this engine can’t take steering, so {key} queues it",
-  "composer.send.steerUnavailable": "Queue for {name} — this engine can’t steer",
+  "composer.placeholder.steerUnavailable": "{name} is working — this AI can’t take steering, so {key} queues it",
+  "composer.send.steerUnavailable": "Queue for {name} — this AI can’t steer",
   "common.back": "Back",
   "settings.group.keys": "Keys",
   "sidebar.update.failureDetails": "Update details",
-  "thread.switcher.empty": "No threads yet"
+  "thread.switcher.empty": "No threads yet",
+  "settings.companyModels.title": "Company models"
 }

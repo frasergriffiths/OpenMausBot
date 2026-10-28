@@ -2040,8 +2040,6 @@
   "onboarding.tour.tools": "Menu Công cụ. Ứng dụng đã kết nối, Tự động hóa và sơ đồ team đều nằm ở đây. Hãy cùng mở nó.",
   "onboarding.tour.apps": "Ứng dụng đã kết nối. Gmail, Slack, GitHub, Notion và hàng trăm ứng dụng khác. Hãy cùng xem thử.",
   "onboarding.tour.apps-panel": "Marketplace. Đăng nhập vào một ứng dụng một lần và mọi bot đều có thể sử dụng ứng dụng đó như một công cụ. Chúng ta sẽ đóng phần này và tiếp tục.",
-  "onboarding.tour.automations": "Tự động hóa. Các bot chạy theo lịch trình hoặc khi webhook gọi đến. Hãy cùng mở nó.",
-  "onboarding.tour.automations-page": "Giao diện lịch. Kéo thả bot vào một khung giờ và bot sẽ tự chạy; kết quả sẽ gửi về đoạn chat. Bấm Tiếp theo để quay lại cuộc trò chuyện.",
   "onboarding.tour.done": "Phần hướng dẫn đã xong và bạn đã quay lại đoạn chat. Điện thoại, terminal và mọi thứ khác đều có trong Cài đặt. Bạn có thể xem lại hướng dẫn này bất kỳ lúc nào từ Cài đặt → Chung.",
   "onboarding.card.custom": "Nhập câu trả lời của riêng bạn",
   "onboarding.card.dismiss": "Bỏ qua câu hỏi",

@@ -2535,8 +2535,6 @@
   "onboarding.tour.tools": "「ツール」メニューです。接続済みアプリ、自動化、チームマップがここにあります。開いてみましょう。",
   "onboarding.tour.apps": "接続済みアプリです。Gmail、Slack、GitHub、Notion など、数百のアプリに対応しています。見てみましょう。",
   "onboarding.tour.apps-panel": "マーケットプレイスです。アプリに一度サインインすれば、すべてのボットがツールとして使えます。閉じて先に進みましょう。",
-  "onboarding.tour.automations": "自動化です。ボットがスケジュールどおりに、または webhook で呼ばれたときに動きます。開いてみましょう。",
-  "onboarding.tour.automations-page": "カレンダーです。時間の枠にボットを置くと自動で動き、結果はそのボットのチャットに届きます。「次へ」でチャットに戻ります。",
   "onboarding.tour.done": "ツアーはここまでです。チャットに戻りました。スマートフォン、ターミナルなどの機能は設定にあります。設定 → 一般からいつでももう一度見られます。",
   "onboarding.card.custom": "自分の回答を入力",
   "onboarding.card.dismiss": "質問を閉じる",

@@ -2395,8 +2395,6 @@
   "onboarding.tour.tools": "O menu Ferramentas. Apps conectados, Automações e o mapa da equipe ficam todos nele. Vamos abrir.",
   "onboarding.tour.apps": "Apps conectados. Gmail, Slack, GitHub, Notion e centenas de outros. Vamos dar uma olhada.",
   "onboarding.tour.apps-panel": "O marketplace. Entre em um app uma vez e todos os bots podem usá-lo como ferramenta. Vamos fechar isto e seguir.",
-  "onboarding.tour.automations": "Automações. Bots que rodam em um agendamento ou quando um webhook chama. Vamos abrir.",
-  "onboarding.tour.automations-page": "Um calendário. Coloque um bot em um horário e ele roda sozinho; o resultado chega no chat dele. “Próximo” leva você de volta ao chat.",
   "onboarding.tour.done": "Esse foi o tour, e você está de volta ao chat. Seu celular, o terminal e todo o resto ficam em Configurações. Reveja quando quiser em Configurações → Geral.",
   "onboarding.card.custom": "Digitar sua própria resposta",
   "onboarding.card.dismiss": "Dispensar a pergunta",

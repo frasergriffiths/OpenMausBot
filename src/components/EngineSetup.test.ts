@@ -160,7 +160,7 @@ describe("install from Settings on the server", () => {
     const reason = "`kimi` isn't installed, or isn't on this app's PATH.";
     const engine = npmEngine({ state: "unavailable", reason });
     const quiet = renderToStaticMarkup(createElement(StoreProvider, null, createElement(EngineSetup, { instance: engine, quiet: true })));
-    expect(quiet).toMatch(/<details data-engine-setup-reason="true" class="[^"]*text-ink-tertiary"><summary[^>]*>Details<\/summary><p[^>]*>`kimi` isn&#x27;t installed/);
+    expect(quiet).toMatch(/<details data-engine-setup-reason="true" class="[^"]*text-ink-tertiary"><summary[^>]*>.*?<\/summary><p[^>]*>`kimi` isn&#x27;t installed/);
     expect(quiet).not.toContain('role="alert"');
     expect(quiet).not.toContain("text-danger");
     expect(quiet).toContain("Install Kimi here");

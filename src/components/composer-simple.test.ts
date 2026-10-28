@@ -34,7 +34,7 @@ describe("the busy composer and the Steer preference", () => {
 
   it("says the engine cannot steer when Steer is chosen but unsupported, instead of a plain queue line", () => {
     expect(composerPlaceholder({ ...base, busySend: "steer", canSteer: false }))
-      .toBe("Otto is working — this engine can’t take steering, so Enter queues it");
+      .toBe("Otto is working — this AI can’t take steering, so Enter queues it");
     expect(composerPlaceholder({ ...base, busySend: "queue", canSteer: false }))
       .toBe("Otto is working — sends when this turn finishes");
   });
@@ -43,7 +43,7 @@ describe("the busy composer and the Steer preference", () => {
     expect(sendLabels({ simple: false, busySend: "steer", busy: true, canSteer: true, name: "Otto", sendLabel: "Enter" }))
       .toEqual({ label: "Send into the running turn", title: "Send into the running turn" });
     expect(sendLabels({ simple: false, busySend: "steer", busy: true, canSteer: false, name: "Otto", sendLabel: "Enter" }))
-      .toEqual({ label: "Queue for Otto — this engine can’t steer", title: "Queue for Otto — this engine can’t steer" });
+      .toEqual({ label: "Queue for Otto — this AI can’t steer", title: "Queue for Otto — this AI can’t steer" });
     expect(sendLabels({ simple: false, busySend: "queue", busy: true, canSteer: false, name: "Otto", sendLabel: "Enter" }))
       .toEqual({ label: "Queue message", title: "Sends when the current turn finishes" });
   });

@@ -2478,8 +2478,6 @@
   "onboarding.tour.tools": "Menu Narzędzia. Połączone aplikacje, automatyzacje i mapa zespołu są za nim. Otwórzmy je.",
   "onboarding.tour.apps": "Połączone aplikacje. Gmail, Slack, GitHub, Notion i setki innych. Zobaczmy.",
   "onboarding.tour.apps-panel": "Sklep z aplikacjami. Zaloguj się raz do aplikacji, a każdy bot może jej używać jako narzędzia. Zamkniemy to i przejdziemy dalej.",
-  "onboarding.tour.automations": "Automatyzacje. Boty uruchamiane według harmonogramu lub gdy wywoła je webhook. Otwórzmy.",
-  "onboarding.tour.automations-page": "Kalendarz. Upuść bota na godzinę, a uruchomi się sam; wynik trafi do jego czatu. Dalej przeniesie cię z powrotem do czatu.",
   "onboarding.tour.done": "To koniec samouczka, a ty wracasz do czatu. Telefon, terminal i wszystko inne znajdziesz w Ustawieniach. Odtwórz go w dowolnym momencie w Ustawienia → Ogólne.",
   "onboarding.card.custom": "Wpisz własną odpowiedź",
   "onboarding.card.dismiss": "Odrzuć pytanie",

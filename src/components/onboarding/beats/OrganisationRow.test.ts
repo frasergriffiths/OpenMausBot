@@ -60,9 +60,9 @@ const button = (label: string) => render().nodes.find((node) => node.type === "b
 async function mount(state: ManagedDesktopState = { status: "signed-out" }) {
   vi.mocked(bridge.state).mockResolvedValueOnce(state);
   render();
-  const cleanup = fixture.effects[0]!();
+  const cleanups = fixture.effects.map((effect) => effect());
   await flush();
-  return cleanup;
+  return () => cleanups.forEach((cleanup) => cleanup?.());
 }
 
 const connecting: ManagedDesktopState = {
@@ -114,9 +114,9 @@ describe("organisation sign-in row in the welcome flow", () => {
     const html = render().html;
     expect(html).toContain("Using OpenMausBot at work?");
     expect(html).toContain("Sign in with your organization.");
-    expect(html).toContain("Other Admin address");
+    expect(html).not.toContain("Other Admin address");
     expect(bridge.begin).not.toHaveBeenCalled();
-    expect(bridge.settingsOpened).not.toHaveBeenCalled();
+    expect(bridge.settingsOpened).toHaveBeenCalledOnce();
     expect(fetch).not.toHaveBeenCalled();
   });
 

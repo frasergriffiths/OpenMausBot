@@ -54,6 +54,12 @@ export function OrganisationRow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bridge]);
 
+  // Showing the row is the acknowledgement the Settings page used to give, so the restart intent clears once.
+  useEffect(() => {
+    void Promise.resolve(bridge.settingsOpened?.()).catch(() => {});
+  }, [bridge]);
+
+
   const perform = async (action: () => Promise<ManagedDesktopState>) => {
     if (pending.current) return;
     pending.current = true;

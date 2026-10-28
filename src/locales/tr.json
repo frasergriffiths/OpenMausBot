@@ -2040,8 +2040,6 @@
   "onboarding.tour.tools": "Araçlar menüsü. Bağlı uygulamalar, Otomasyonlar ve ekip haritası burada yer alır. Hadi açalım.",
   "onboarding.tour.apps": "Bağlı uygulamalar. Gmail, Slack, GitHub, Notion ve yüzlercesi. Hadi göz atalım.",
   "onboarding.tour.apps-panel": "Pazaryeri. Bir uygulamaya bir kez giriş yapın, her bot onu bir araç olarak kullanabilsin. Bunu kapatıp devam edelim.",
-  "onboarding.tour.automations": "Otomasyonlar. Belirli bir zamanlamaya göre veya bir webhook çağrıldığında çalışan botlar. Hadi açalım.",
-  "onboarding.tour.automations-page": "Bir takvim. Bir botu bir zamana bırakın ve kendi kendine çalışsın; sonuç sohbetine gelir. İleri sizi sohbete geri götürür.",
   "onboarding.tour.done": "Tur bitti ve sohbete geri döndünüz. Telefonunuz, terminal ve diğer her şey Ayarlar'dadır. Bunu istediğiniz zaman Ayarlar → Genel bölümünden yeniden oynatabilirsiniz.",
   "onboarding.card.custom": "Kendi cevabınızı yazın",
   "onboarding.card.dismiss": "Soruyu kapat",

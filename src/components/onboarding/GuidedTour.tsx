@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { readAdvancedMode, useAdvancedMode } from "@/lib/interface-mode";
+import { useAdvancedMode } from "@/lib/interface-mode";
 import { ANCHOR_EFFECTS, currentStep, stepNumber, TOUR_STEPS, withTourFinished, type TourEffect, type TourStep } from "@/lib/guided-tour";
 import { t } from "@/lib/i18n";
 import type { MausState } from "@/lib/mascot";
@@ -17,8 +17,6 @@ const MASCOT: Record<TourStep["id"], MausState> = {
   "tour.tools": "curious",
   "tour.apps": "happy",
   "tour.apps-panel": "proud",
-  "tour.automations": "happy",
-  "tour.automations-page": "drowsy",
   "tour.done": "celebrate",
 };
 
@@ -81,9 +79,6 @@ export function GuidedTour() {
           return;
         case "closeApps":
           dispatch({ type: "togglePlugins", open: false });
-          return;
-        case "openAutomations":
-          if (!press("nav-automations") && readAdvancedMode()) dispatch({ type: "showRoutines" });
           return;
         case "backToChat":
           dispatch({ type: "showChat" });
@@ -167,7 +162,7 @@ export function GuidedTour() {
   }, [active, step, advance, run]);
 
   useEffect(() => {
-    if (!active || !step?.anchor || step.id === "tour.apps-panel" || step.id === "tour.automations-page" || step.id === "tour.done") return;
+    if (!active || !step?.anchor || step.id === "tour.apps-panel" || step.id === "tour.done") return;
     const onClick = (event: MouseEvent) => {
       const target = event.target as Element | null;
       if (target?.closest(`[data-tour="${step.anchor}"]`)) advance(true);

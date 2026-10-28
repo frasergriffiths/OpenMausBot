@@ -108,13 +108,13 @@ describe("the Simple computer switcher", () => {
     expect(sheet()).toBeNull();
   });
 
-  it("restores the server actions: Add a Cloud, Connect to a server, and Forget for a saved remote", async () => {
+  it("restores the computer actions: Add a Cloud, Connect to another computer, and Forget for a saved remote", async () => {
     const onConnectServer = vi.fn();
     const onAddCloud = vi.fn();
     await mount({ activeId: "mini", props: { onConnectServer, onAddCloud } });
     await act(async () => trigger().click());
     const actions = [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].map((row) => row.textContent);
-    expect(actions).toEqual(["Add a Cloud…", "Connect to a server…", "Forget “Mac mini”…"]);
+    expect(actions).toEqual(["Add a Cloud…", "Connect to another computer…", "Forget “Mac mini”…"]);
     expect(document.querySelectorAll('[role="separator"]')).toHaveLength(1);
 
     await act(async () => document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')[1]!.click());

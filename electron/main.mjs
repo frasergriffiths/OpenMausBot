@@ -29,7 +29,7 @@ import { createServerSupervisor } from "./server-supervisor.mjs";
 import { serverChildLaunch } from "./server-child-launch.mjs";
 import { packageUrlFromCommandLine, packageUrlFromDeepLink } from "./package-link.mjs";
 import { chatLinkFrom, chatLinkFromCommandLine } from "./chat-link.mjs";
-import { createOrganizationEntry, isOrganizationDeepLink, takeOrganizationDeepLink, organizationRestartIntent, withOrganizationRestartIntent, withoutOrganizationRestartIntent } from "./organization-entry.mjs";
+import { createOrganizationEntry, organizationRestartIntent, withOrganizationRestartIntent, withoutOrganizationRestartIntent } from "./organization-entry.mjs";
 import { windowBackground, windowChromeOptions } from "./window-chrome.mjs";
 import { createAllWindowsClosedQuit } from "./window-all-closed.mjs";
 import { createStartupScreen } from "./startup-screen.mjs";
@@ -134,7 +134,6 @@ let desktopViewerOwner = null;
 let desktopViewerContextId = null;
 let desktopWorkspaceManager = null;
 let desktopWorkspaceOwner = null;
-let pendingOrganizationEntry = takeOrganizationDeepLink(process.argv);
 const cloudEntry = createCloudEntry({
   reveal: () => { if (!desktopTray?.show()) activateExistingWindow(BrowserWindow.getAllWindows()); },
   open: async () => {
@@ -144,9 +143,8 @@ const cloudEntry = createCloudEntry({
   },
 });
 cloudEntry.fromLaunch(process.argv);
-let pendingPackageInstallUrl = pendingOrganizationEntry ? null : packageUrlFromCommandLine(process.argv);
-let pendingChatLink = pendingOrganizationEntry ? null : chatLinkFromCommandLine(process.argv);
-let organizationEntryReady = false;
+let pendingPackageInstallUrl = packageUrlFromCommandLine(process.argv);
+let pendingChatLink = chatLinkFromCommandLine(process.argv);
 let mainWindow = null;
 const serverUnavailableWindows = new WeakSet();
 let unreadCount = 0;
@@ -290,15 +288,11 @@ function queueChatLink(rawLink) {
 }
 
 app.on("open-url", (event, url) => {
-  if (!queueOrganizationEntry(url) && !cloudEntry.fromUrl(url) && !queuePackageInstall(url) && !queueChatLink(url)) return;
+  if (!cloudEntry.fromUrl(url) && !queuePackageInstall(url) && !queueChatLink(url)) return;
   event.preventDefault();
 });
 
 app.on("second-instance", (_event, commandLine) => {
-  if (takeOrganizationDeepLink(commandLine)) {
-    queueOrganizationEntry("openmausbot://organization");
-    return;
-  }
   if (cloudEntry.fromArgs(commandLine)) return;
   const packageUrl = packageUrlFromCommandLine(commandLine);
   if (packageUrl) pendingPackageInstallUrl = packageUrl;
@@ -1601,7 +1595,6 @@ function refreshApplicationMenu() {
       onSwitch: (id) => void workspaceMenuAction(() => switchEnvironment(id)),
       onAddFromClipboard: () => void addServerFromClipboard(),
       onConnect: () => void workspaceMenuAction(openWorkspaceSettings),
-      onOrganizationSignIn: () => queueOrganizationEntry("openmausbot://organization"),
       onForget: (id) => void workspaceMenuAction(() => forgetEnvironment(id)),
       onOpenSettings: () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send("app:open-settings"); },
       openAtLogin: loginItem.available() ? { checked: loginItem.chosen(), onToggle: on => { loginItem.choose(on); refreshApplicationMenu(); } } : null,
@@ -1810,31 +1803,11 @@ const organizationEntry = createOrganizationEntry({
     if (!app.isPackaged) throw new Error("Organization sign-in requires the installed desktop app.");
     if (!serverReady) throw new Error("This installation is unavailable. Restart the app and try organization sign-in again.");
     if (desktopRemoteAccess || activeRemote(environmentsState)) throw new Error("Choose this computer before signing in with your organization.");
-    const win = mainWindow && !mainWindow.isDestroyed() ? mainWindow : createWindow({ deferNavigation: true });
-    if (!win.webContents.isLoadingMainFrame() && senderIsLocal({ sender: win.webContents })) {
-      win.webContents.send("app:open-settings", "organization");
-    } else {
-      await win.loadURL(`${rendererOrigin()}/?desktop-settings=organization`);
-    }
+    // Organization sign-in lives in onboarding only: land on the app's home, where the welcome row is.
+    await showHome();
   },
   relaunch: relaunchAfterDesktopRemoteChange,
 });
-
-function queueOrganizationEntry(link) {
-  if (!isOrganizationDeepLink(link)) return false;
-  pendingOrganizationEntry = true;
-  if (!desktopTray?.show()) activateExistingWindow(BrowserWindow.getAllWindows());
-  void deliverOrganizationEntry();
-  return true;
-}
-
-async function deliverOrganizationEntry() {
-  if (!organizationEntryReady || !pendingOrganizationEntry) return false;
-  pendingOrganizationEntry = false;
-  let delivered = false;
-  await workspaceMenuAction(async () => { delivered = await organizationEntry.request(); });
-  return delivered;
-}
 
 async function openCloudEntry() {
   if (!app.isPackaged) throw new Error("MausBot Cloud requires the installed desktop app.");
@@ -3165,11 +3138,9 @@ app.whenReady().then(async () => {
   });
   let restoredOrganizationEntry = false;
   await workspaceMenuAction(async () => { restoredOrganizationEntry = await organizationEntry.restore(); });
-  organizationEntryReady = true;
   // A cold-start action owns its first navigation; a default load started first would be aborted by it.
-  const deliveredOrganizationEntry = await deliverOrganizationEntry();
   const deliveredCloudEntry = await cloudEntry.ready();
-  if (!hiddenStart && !restoredOrganizationEntry && !deliveredOrganizationEntry && !deliveredCloudEntry) await showHome();
+  if (!hiddenStart && !restoredOrganizationEntry && !deliveredCloudEntry) await showHome();
   // Reconcile incomplete setup and resume interrupted sign-out only once the local app is usable.
   if (hostedAccount) void hostedAccount.restore().catch(() => {});
   // Registering from an unreadable store would mint a second installation identity.

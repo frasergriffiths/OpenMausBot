@@ -9,8 +9,6 @@ export type TourStepId =
   | "tour.tools"
   | "tour.apps"
   | "tour.apps-panel"
-  | "tour.automations"
-  | "tour.automations-page"
   | "tour.done";
 
 export type TourEffect =
@@ -19,11 +17,10 @@ export type TourEffect =
   | "openTools"
   | "openApps"
   | "closeApps"
-  | "openAutomations"
   | "backToChat";
 
 /** Effects the anchor's own click already performs, so a click instead of Next must not repeat them. */
-export const ANCHOR_EFFECTS: ReadonlySet<TourEffect> = new Set<TourEffect>(["openComputer", "openTools", "openApps", "openAutomations"]);
+export const ANCHOR_EFFECTS: ReadonlySet<TourEffect> = new Set<TourEffect>(["openComputer", "openTools", "openApps"]);
 
 export interface TourStep {
   id: TourStepId;
@@ -45,8 +42,6 @@ export const TOUR_STEPS: TourStep[] = [
   { id: "tour.tools", anchor: "tools", skipIfMissing: true, placement: "right", onExit: "openTools" },
   { id: "tour.apps", anchor: "nav-apps", skipIfMissing: true, placement: "right", onEnter: "openTools", onExit: "openApps" },
   { id: "tour.apps-panel", anchor: "apps-panel", placement: "below", onEnter: "openApps", onExit: "closeApps" },
-  { id: "tour.automations", anchor: "nav-automations", skipIfMissing: true, placement: "right", onEnter: "openTools", onExit: "openAutomations" },
-  { id: "tour.automations-page", anchor: "automations-page", skipIfMissing: true, placement: "below", onEnter: "openAutomations", onExit: "backToChat" },
   { id: "tour.done", anchor: "composer", placement: "above" },
 ];
 

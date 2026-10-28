@@ -36,8 +36,6 @@ describe("guided tour", () => {
   it("goes through the Tools menu rather than straight to the pages", () => {
     expect(step("tour.tools").onExit).toBe("openTools");
     expect(step("tour.apps").onExit).toBe("openApps");
-    expect(step("tour.automations").onEnter).toBe("openTools");
-    expect(step("tour.automations").onExit).toBe("openAutomations");
     for (const s of TOUR_STEPS.filter((x) => x.anchor?.startsWith("nav-"))) expect(s.skipIfMissing).toBe(true);
   });
 
@@ -46,14 +44,12 @@ describe("guided tour", () => {
     expect(step("tour.computer-browser").fallbackAnchor).toBe("computer-tabs");
     expect(step("tour.apps").onEnter).toBe("openTools");
     expect(step("tour.apps-panel").onEnter).toBe("openApps");
-    expect(step("tour.automations-page").onEnter).toBe("openAutomations");
   });
 
   it("closes everything it opened and returns to the chat", () => {
     expect(step("tour.computer").onExit).toBe("openComputer");
     expect(step("tour.computer-browser").onExit).toBe("closeComputer");
     expect(step("tour.apps-panel").onExit).toBe("closeApps");
-    expect(step("tour.automations-page").onExit).toBe("backToChat");
   });
 
   it("knows which effects the control's own click performs", () => {
@@ -73,7 +69,7 @@ describe("guided tour", () => {
     const simple = tourSteps(false);
     expect(simple.map((s) => s.id)).toEqual(TOUR_STEPS.map((s) => s.id));
     expect(simple.map((s) => s.anchor)).toEqual([
-      "composer", "bot-pill", "bot-pill", "computer-browser", "tools", "nav-apps", "apps-panel", "nav-automations", "automations-page", "composer",
+      "composer", "bot-pill", "bot-pill", "computer-browser", "tools", "nav-apps", "apps-panel", "composer",
     ]);
     // Simple's header renders neither "model" nor "computer"; a step that needs them would wait forever.
     for (const s of simple) expect(["model", "computer"]).not.toContain(s.anchor);
