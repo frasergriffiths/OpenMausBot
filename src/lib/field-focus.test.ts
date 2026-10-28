@@ -53,7 +53,9 @@ describe("text field focus", () => {
   it("leaves a field that reports an error in its error colour while focused", () => {
     const selectors = [...unlayered(css).matchAll(/([^{}]+)\{[^}]*border-color:\s*var\(--color-focus\)[^}]*\}/g)].map((match) => match[1].trim());
     expect(selectors.length).toBeGreaterThan(0);
-    for (const selector of selectors) expect(selector).toContain(':not([aria-invalid="true"])');
+    for (const selector of selectors) expect(
+      selector.includes(':not([aria-invalid="true"])') || selector.includes(':not(:has([aria-invalid="true"]))'),
+    ).toBe(true);
   });
 
   it("gives every text field the same halo ring, except the composer and the model search", () => {
@@ -66,6 +68,12 @@ describe("text field focus", () => {
   it("gives every text field one radius from the skin's control scale", () => {
     const rules = [...unlayered(css).matchAll(/([^{}]+)\{([^}]*border-radius:\s*var\(--radius-lg[^}]*)\}/g)].map((match) => match[1]!.trim());
     expect(rules.some((selector) => selector.includes(":is(input") && selector.includes("textarea"))).toBe(true);
+  });
+
+  it("draws focus around a composed field, never inside it", () => {
+    const cssText = unlayered(css);
+    expect(cssText).toMatch(/:is\(\.ui-field\):focus-within/);
+    expect(cssText).toMatch(/:is\(\.ui-field, \[data-field-shell\]\) :is\(input, textarea, select\):focus-visible\s*\{[^}]*box-shadow:\s*none/);
   });
 
   it("scopes the field recipe to Simple so Advanced keeps its own chrome", () => {

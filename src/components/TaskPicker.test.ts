@@ -5,8 +5,16 @@ import {
   TASK_PICKER_DISMISS_MS,
   filterTasks,
   groupThreadTasks,
+  taskPickerChevronClass,
   taskPickerPointerIntent,
 } from "./TaskPicker";
+
+describe("the title-bar thread switcher chevron", () => {
+  it("stays visible in Simple and hides below the chathead breakpoint in Advanced", () => {
+    expect(taskPickerChevronClass(false)).toBe("shrink-0");
+    expect(taskPickerChevronClass(true)).toContain("@max-4xl/chathead:hidden");
+  });
+});
 
 describe("taskPickerPointerIntent", () => {
   it("treats a single click as switch, not rename", () => {

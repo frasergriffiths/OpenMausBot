@@ -234,6 +234,8 @@ type ThreadRowProps = {
    * has worked. */
   panel?: boolean;
   preview?: string;
+  /** Advanced keeps its own 1px accent ring, exactly as the sidebar row does. */
+  advanced?: boolean;
 };
 
 const sameFields = <T extends object>(a: T, b: T): boolean => {
@@ -244,7 +246,8 @@ const sameFields = <T extends object>(a: T, b: T): boolean => {
 const sameThreadRow = ({ task: previousTask, ...previous }: ThreadRowProps, { task, ...next }: ThreadRowProps): boolean =>
   sameFields(previousTask, task) && sameFields(previous, next);
 
-export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, current, compact, folders, onSelect, onRename, onRegenerateTitle, onDelete, onMove, onArchive, onPin, onSnooze, onLink, onRefreshPermissions, activityLabel, now, selectMode = false, checked = false, onToggleSelect, panel = false, preview }: ThreadRowProps) {
+export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, current, compact, folders, onSelect, onRename, onRegenerateTitle, onDelete, onMove, onArchive, onPin, onSnooze, onLink, onRefreshPermissions, activityLabel, now, selectMode = false, checked = false, onToggleSelect, panel = false, preview, advanced = false }: ThreadRowProps) {
+  const rowFocus = advanced ? "outline-none focus-visible:ring-1 focus-visible:ring-accent/60" : SIMPLE_ROW_FOCUS;
   const [menu, setMenu] = useState<{ left: number; top: number } | null>(null);
   const menuMotion = useHeldMenuMotion(menu);
   const [renaming, setRenaming] = useState(false);
@@ -324,7 +327,7 @@ export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, 
         {...(selectMode ? { role: "checkbox", "aria-checked": checked, "aria-disabled": !tickable, "aria-label": t("task.bulk.rowCheck", { title: displayTitle }) } : {})}
         onClick={choose} onDoubleClick={selectMode ? undefined : startRename} onContextMenu={contextMenu}
         onKeyDown={(event) => { if (opensRowMenuFromKey(event.key, event.shiftKey, selectMode)) { event.preventDefault(); const rect = event.currentTarget.getBoundingClientRect(); openMenu(rect.left, rect.bottom); } }}
-        className={cn("flex min-w-0 flex-1 items-center gap-2 rounded-md pl-6 pr-1 text-left text-[13px] font-medium", SIMPLE_ROW_FOCUS, compact ? "min-h-7 py-1" : "min-h-8 py-1.5", current ? "font-semibold text-ink" : "text-ink-secondary hover:text-ink", panel && "rounded-[10px] py-2 pl-3 text-[14px]", selectMode && "pl-1.5", selectMode && !tickable && "cursor-not-allowed opacity-60")}>
+        className={cn("flex min-w-0 flex-1 items-center gap-2 rounded-md pl-6 pr-1 text-left text-[13px] font-medium", rowFocus, compact ? "min-h-7 py-1" : "min-h-8 py-1.5", current ? "font-semibold text-ink" : "text-ink-secondary hover:text-ink", panel && "rounded-[10px] py-2 pl-3 text-[14px]", selectMode && "pl-1.5", selectMode && !tickable && "cursor-not-allowed opacity-60")}>
         {selectMode && <span aria-hidden="true" title={tickable ? undefined : t("task.bulk.running")}
           className={cn("flex size-3.5 shrink-0 items-center justify-center rounded-[3px] border", checked ? "border-accent bg-accent text-white" : "border-ink-tertiary", !tickable && "opacity-50")}>
           {checked && <Check size={10} strokeWidth={3} />}
@@ -338,7 +341,7 @@ export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, 
         </span> : heading}
       </button>}
       {task.link && <a href={task.link} target="_blank" rel="noreferrer" dir="ltr" title={task.link} aria-label={t("task.openLink", { link: threadLinkLabel(task.link) ?? task.link })}
-        className={cn("shrink-0 rounded px-1 font-mono text-[11px] text-ink-secondary hover:bg-raised hover:text-ink [unicode-bidi:isolate]", SIMPLE_ROW_FOCUS)}>{threadLinkLabel(task.link) ?? t("task.link")}</a>}
+        className={cn("shrink-0 rounded px-1 font-mono text-[11px] text-ink-secondary hover:bg-raised hover:text-ink [unicode-bidi:isolate]", rowFocus)}>{threadLinkLabel(task.link) ?? t("task.link")}</a>}
       {!renaming && <span className={cn("flex shrink-0 items-center gap-2 px-1", panel && "pt-2.5")} onClick={choose} onContextMenu={contextMenu}>
         {updatedLabel && <time dateTime={new Date(updatedAt).toISOString()} className="shrink-0 tabular-nums text-[11px] text-ink-secondary">{updatedLabel}</time>}
         {task.pinned === true && <Pin size={11} className="shrink-0 text-ink-secondary" aria-label={t("sidebar.bot.pin")} />}

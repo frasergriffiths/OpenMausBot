@@ -3,7 +3,7 @@ import { useAdvancedMode } from "@/lib/interface-mode";
 import { PHONE_LAYOUT, useMediaQuery } from "@/lib/use-media-query";
 import { ThreadLinkContext } from "@/components/ThreadLinkMenu";
 import { useShowThreads, useShowThreadsChoice } from "@/lib/thread-preferences";
-import { AlertTriangle, ChevronLeft, ChevronRight, Copy, Monitor, Plus, RefreshCw, Reply, Square, Webhook } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, Copy, Monitor, RefreshCw, Reply, Square, Webhook } from "lucide-react";
 import { WorkingDots } from "@/components/WorkingIndicator";
 import { ACTION_ICON, CopyButton, MESSAGE_ROW, MessageActions, messageActionClass, ReplyAction, type MessageMenuItem } from "@/components/MessageActions";
 import { copyText } from "@/lib/copy-text";
@@ -32,10 +32,10 @@ import {
   openBot,
 } from "@/state/store";
 import { EngineSetup } from "./EngineSetup";
+import { ChatNewThreadButton } from "./ChatNewThreadButton"; import { ChatPermissionNotice } from "./ChatPermissionNotice";
 import { CHATGPT_USAGE_URL, ManageUsageLink } from "./ChatGptPlanStatus";
 import { CODEX_USAGE_URL, codexUsageLimitReached } from "../../shared/codex-usage-limit";
 import { ClaudeUpdatePrompt } from "./ClaudeUpdatePrompt";
-import { MacCuaPermissionCard } from "./MacLocalControl";
 import { macCuaPermissionMessage, missingMacCuaPermissions } from "@/lib/mac-cua-permissions";
 import { failedTurnCause, signedOutEngine } from "@/lib/failed-turn";
 import { plainErrorLine } from "@/lib/plain-error";
@@ -207,15 +207,7 @@ export function ErrorRow({
     : null;
   const headline = plainHeadline ?? message;
   const usageUrl = action ? null : message.includes("subscription_sharing_usage_limit_exceeded") ? CHATGPT_USAGE_URL : codexUsageLimitReached(message) ? CODEX_USAGE_URL : null;
-  if (macCuaReason) {
-    return (
-      <div className="flex justify-start">
-        <div className="w-fit max-w-[min(var(--chat-bubble-max),var(--chat-bubble-pct))]">
-          <MacCuaPermissionCard reason={capabilities.localComputer.message ?? message} />
-        </div>
-      </div>
-    );
-  }
+  if (macCuaReason) return <ChatPermissionNotice reason={capabilities.localComputer.message ?? message} />;
   return (
     <div className="flex justify-start">
       <div className="w-fit max-w-[min(var(--chat-bubble-max),var(--chat-bubble-pct))] rounded-xl border border-danger/30 bg-danger/10 px-3.5 py-2.5 text-[14px] text-danger">
@@ -1140,16 +1132,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
           )}
           <ThreadContextWarning bot={bot} messages={messages} />
           <EngineLimitNotice engine={bot.modelSelection?.instanceId} />
-          {!advanced && <button
-            type="button"
-            data-chathead-new-thread
-            onClick={() => dispatch({ type: "newTask", botId: bot.id })}
-            title={t("botPanel.conversations.new")}
-            aria-label={t("botPanel.conversations.new")}
-            className="flex size-8 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink"
-          >
-            <Plus size={18} />
-          </button>}
+          {!advanced && <ChatNewThreadButton onNew={() => dispatch({ type: "newTask", botId: bot.id })} />}
           {/* The model and the bot's computer stay in view in both modes; Simple mode moves only ⋯ into the bot panel. */}
           {!remoteClient && !phone && <ModelPicker key={bot.threadId} bot={bot} threadId={bot.threadId} />}
           <LiveCallChip currentBotId={bot.id} onOpen={(botId, threadId) => openThread(dispatch, { botId, threadId }, state, showThreads)} />

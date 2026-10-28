@@ -11,9 +11,15 @@ import { formatTaskTokens, headlineTokens, usageDetail } from "@/lib/usage";
 import { nextRename } from "@/lib/rename";
 import { FolderIcon, NewThreadButton } from "./BotProjects";
 import { useShowThreads } from "@/lib/thread-preferences";
+import { useAdvancedMode } from "@/lib/interface-mode";
 import { attentionJumpAction, attentionOwnerName, AttentionThreadRows, crossBotAttentionThreads, threadsWhenTreeHidden, type AttentionThread } from "./SidebarBotActivity";
 import { formatUpdatedAt, orderedThreadList, threadByline, threadRecency, threadUpdatedLabel, useRelativeNow } from "./SidebarThreadRow";
 import { Select } from "./Select";
+
+/** Advanced keeps the old hidden chevron below the chathead breakpoint; Simple shows it so the switch is named. */
+export function taskPickerChevronClass(advanced: boolean): string {
+  return cn("shrink-0", advanced && "@max-4xl/chathead:hidden");
+}
 
 export const TASK_PICKER_DISMISS_MS = 500;
 
@@ -101,6 +107,7 @@ function ConversationTaskPicker({
   attention?: AttentionThread[];
   onAttentionJump?: (entry: AttentionThread) => void;
 }) {
+  const advanced = useAdvancedMode();
   const [open, setOpen] = useState(false);
   const motion = useMenuMotion(open);
   const [renaming, setRenaming] = useState<string | null>(null);
@@ -241,7 +248,7 @@ function ConversationTaskPicker({
             className="size-1.5 shrink-0 animate-pulse rounded-full bg-accent"
           />
         )}
-        <ChevronDown size={12} className="shrink-0" />
+        <ChevronDown size={12} className={taskPickerChevronClass(advanced)} />
       </button>
 
       {motion.shown && (

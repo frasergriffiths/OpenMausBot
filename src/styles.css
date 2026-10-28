@@ -1655,6 +1655,19 @@ body {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus) 28%, transparent);
 }
 
+/* A composed field draws one indicator around its wrapper, never a second one inside the pill or the field box. */
+:root[data-interface="simple"] :is(.ui-field):focus-within:not(:has([aria-invalid="true"])) {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus) 28%, transparent);
+}
+
+/* Inside a composed wrapper the wrapper owns the indicator; the inner input stays quiet. The broad field
+   rule above is deliberately high-specificity, so this one states the reset outright. */
+:root[data-interface="simple"] :is(.ui-field, [data-field-shell]) :is(input, textarea, select):focus-visible {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
 /* One field radius: every text field takes the skin's control radius, so a
    dialog, a settings row and a sidebar filter agree. */
 :root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea):not([data-menu-search], [data-tour="composer"] textarea) {

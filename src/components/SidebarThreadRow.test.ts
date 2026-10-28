@@ -550,6 +550,17 @@ const moreMenuButton = (tree: RowNode) => {
   return found;
 };
 
+describe("row focus", () => {
+  it("uses the Simple outline in Simple and the old accent ring in Advanced", () => {
+    const task = { threadId: "t1", title: "Fix the login" };
+    const simple = renderToStaticMarkup(renderRow(task, "scout") as never);
+    expect(simple).toContain("focus-visible:outline-2");
+    const advanced = renderToStaticMarkup(renderRow(task, "scout", true, { advanced: true }) as never);
+    expect(advanced).toContain("focus-visible:ring-1 focus-visible:ring-accent/60");
+    expect(advanced).not.toContain("focus-visible:outline-2");
+  });
+});
+
 describe("Copy link", () => {
   it("writes the exact canonical link for the row's owner to the clipboard", () => {
     const writeText = vi.fn(() => Promise.resolve());

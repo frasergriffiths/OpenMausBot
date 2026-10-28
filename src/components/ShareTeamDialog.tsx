@@ -313,12 +313,12 @@ export function ShareTeamDialog({ team, onClose }: { team: string; onClose: () =
         {error && <p role="alert" className="mb-2 rounded-xl bg-danger/10 px-3 py-2 text-[12px] text-danger">{error}</p>}
         <footer className="mt-4 flex justify-end gap-2 border-t border-hairline/35 pt-4">
           {saved ? (
-            <button type="button" onClick={onClose} className="flex h-8 items-center rounded-full bg-accent px-4 text-[13px] font-medium text-accent-ink">{t("teamShare.done")}</button>
+            <button type="button" onClick={onClose} className="flex h-8 items-center rounded-lg bg-accent px-4 text-[13px] font-medium text-accent-ink">{t("teamShare.done")}</button>
           ) : (
             <>
               <button type="button" disabled={saving} onClick={onClose} className="flex h-8 items-center rounded-full px-3.5 text-[13px] text-ink-secondary hover:bg-raised">{t("common.cancel")}</button>
               <button type="button" disabled={saving || !preview || !name.trim()} onClick={() => void save()}
-                className="flex h-8 items-center gap-2 rounded-full bg-accent px-4 text-[13px] font-medium text-accent-ink disabled:opacity-40">
+                className="flex h-8 items-center gap-2 rounded-lg bg-accent px-4 text-[13px] font-medium text-accent-ink disabled:opacity-40">
                 {saving && <Loader2 size={14} className="animate-spin" />}
                 {saving ? t("teamShare.saving") : t("teamShare.save")}
               </button>

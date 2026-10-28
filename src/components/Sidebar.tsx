@@ -9,7 +9,9 @@ import { useTurnLive } from "@/state/turn-status";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 
 import { BotAvatar } from "./Avatar";
-import { BotEngineMark, BotModelBadge, BotModelMark, botTooltip } from "./BotModelBadge"; import { SidebarBotRole } from "./BotRole";
+import { BotEngineMark, BotModelBadge, BotModelMark, botTooltip } from "./BotModelBadge";
+import { SidebarSimpleRowActions } from "./SidebarSimpleRowActions";
+import { sectionLabel } from "./sidebar-section-label"; import { SidebarBotRole } from "./BotRole";
 import { stateForBot } from "@/lib/mascot";
 import { cn } from "@/lib/cn";
 import { searchMatchesThreads, useSearchDisclosure } from "@/lib/search-disclosure";
@@ -18,7 +20,6 @@ import { lastNonReceipt } from "@/lib/receipts";
 import { botPreview, groupPreview } from "./sidebar-preview";
 import { activeLocale, t } from "@/lib/i18n";
 import { copyText } from "@/lib/copy-text";
-import type { LocaleKey } from "@/locales";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { BulkSelectFilters, ThreadListFooter, deleteThreadsInBulk, useBulkSelect } from "./BulkSelectBar";
  
@@ -76,7 +77,6 @@ import {
   sameSectionOrder,
   sidebarLayoutInteractive,
   sidebarSectionCollapsed,
-  sidebarSectionLabel,
   simpleSidebarSections,
   userSectionId,
   userSectionName,
@@ -130,18 +130,6 @@ export { ArchivedBotRow, ArchivedBotsPanel, archivedDeleteAllCopy, botConfirmCop
 
 /** Coupled to electron/window-chrome.mjs: trafficLightPosition.y = 16 and 14px-tall buttons. */
 export const MAC_TRAFFIC_LIGHT_CENTER_Y = 23;
-
-const SECTION_LABEL_KEYS: Record<string, LocaleKey> = {
-  [PINNED_SECTION_ID]: "sidebar.section.pinned",
-  [CHANNELS_SECTION_ID]: "sidebar.section.channels",
-  [BOT_CHATS_SECTION_ID]: "sidebar.section.botChats",
-  [BOTS_SECTION_ID]: "sidebar.section.bots",
-};
-
-function sectionLabel(id: string): string {
-  const key = SECTION_LABEL_KEYS[id];
-  return key ? t(key) : sidebarSectionLabel(id);
-}
 
 export interface MenuState {
   botId: string;
@@ -239,7 +227,7 @@ export function GroupListItem({
       onClick={() => { setThreadsOpen(true); dispatch({ type: "newGroupTask", groupId: group.id }); }}
       className="pointer-events-none absolute right-1 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink disabled:opacity-40 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70 touch:disabled:opacity-40"><Plus size={14} /></button>}
     </div>
-    {expanded && <GroupThreadList group={group} selected={selected} density={density} query={group.name.toLowerCase().includes(query.toLowerCase()) ? "" : query} />}
+    {expanded && <GroupThreadList group={group} selected={selected} density={density} advanced={advanced} query={group.name.toLowerCase().includes(query.toLowerCase()) ? "" : query} />}
     </>
   );
 }
@@ -886,30 +874,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
         </div>}
         {simpleRow && <RowStatusText working={working} unread={unread} />}
       </div>
-      {simpleRow && (
-        // [⋯][provider mark] as one cluster after the text block, centred on the row. The dots keep their slot
-        // at rest, so the mark never moves; aria-expanded keeps them up while their menu is open.
-        <span className="ms-auto flex shrink-0 items-center gap-1 self-center">
-          <button
-            type="button"
-            data-bot-actions={bot.id}
-            aria-label={t("sidebar.bot.actions", { name: bot.name })}
-            title={t("sidebar.bot.actions", { name: bot.name })}
-            aria-haspopup="menu"
-            aria-expanded={menuOpen}
-            onClick={(event) => {
-              event.stopPropagation();
-              const rect = event.currentTarget.getBoundingClientRect();
-              onMenu({ botId: bot.id, x: rect.left, y: rect.bottom });
-            }}
-            onKeyDown={(event) => event.stopPropagation()}
-            className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-md text-ink-secondary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 aria-expanded:pointer-events-auto aria-expanded:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70"
-          >
-            <MoreHorizontal size={15} />
-          </button>
-          <BotEngineMark bot={bot} instances={instances} />
-        </span>
-      )}
+      {simpleRow && <SidebarSimpleRowActions bot={bot} instances={instances} menuOpen={menuOpen} onMenu={onMenu} />}
     </>
   );
   const onContextMenu = (event: React.MouseEvent) => {

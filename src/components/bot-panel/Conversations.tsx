@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, Search, SquarePen } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 import { activeLocale, t } from "@/lib/i18n";
+import { useAdvancedMode } from "@/lib/interface-mode";
 import { SIDEBAR_INLINE, useMediaQuery } from "@/lib/use-media-query";
 import { api, currentTaskBot, openBotThread, useStore, visibleMessages, type Bot, type Message } from "@/state/store";
 import { lastLine } from "../sidebar-preview";
@@ -53,6 +54,7 @@ export function forgetConversationLines(): void {
 }
 
 export function BotConversations({ bot }: { bot: Bot }) {
+  const advanced = useAdvancedMode();
   const { state, dispatch } = useStore();
   const now = useRelativeNow();
   const phone = !useMediaQuery(SIDEBAR_INLINE, true);
@@ -160,6 +162,7 @@ export function BotConversations({ bot }: { bot: Bot }) {
               preview={preview(task.threadId)}
               task={task}
               ownerId={bot.id}
+              advanced={advanced}
               current={task.threadId === bot.threadId}
               folders={bot.projects}
               now={stampClock(threadRecency(task), now)}
