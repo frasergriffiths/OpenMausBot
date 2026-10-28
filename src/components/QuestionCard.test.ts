@@ -159,7 +159,7 @@ describe("QuestionCard", () => {
       const markup = render(message({ questionRequest: { version: 1, questions: [question] } }));
       expect(markup).not.toContain("divide-y");
       expect(markup).toContain('class="-mx-2 flex flex-col"');
-      expect(markup).toMatch(/aria-keyshortcuts="A" class="flex min-h-10[^"]*rounded-\[10px\]/);
+      expect(markup).toMatch(/aria-keyshortcuts="A" class="flex min-h-10[^"]*rounded-xl/);
       expect(markup).toMatch(/size-6[^"]*rounded-\[7px\][^"]*">A</);
       expect(markup).toMatch(/text-\[14px\] leading-5[^"]* text-ink">Chip race</);
       expect(markup).toMatch(/text-\[16px\] font-semibold leading-\[22px\] text-ink-secondary"><bdi dir="auto">Which article\?</);

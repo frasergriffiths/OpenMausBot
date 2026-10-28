@@ -1157,8 +1157,8 @@ export function ComputerPanel({
     && liveTask.surface !== profileBot.computer ? liveTask.surface : undefined;
 
   const tabClass = (active: boolean) => cn(
-    "flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-[13px] transition-colors @max-[28rem]/paneltabs:[&>svg]:hidden @max-[22rem]/paneltabs:px-2",
-    active ? "bg-raised text-ink shadow-sm" : "text-ink-secondary hover:text-ink",
+    "flex h-8 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[13px] transition-colors @max-[28rem]/paneltabs:[&>svg]:hidden @max-[22rem]/paneltabs:px-2",
+    active ? "bg-raised text-ink" : "text-ink-secondary hover:text-ink",
   );
 
   const chooseTab = (view: ComputerPanelView) => {
@@ -1270,7 +1270,7 @@ export function ComputerPanel({
           {signInHelp?.place === "browser" && <div className="-mt-1 mb-3">{signInBanner()}</div>}
           <BrowserPanel bot={bot} signIn={signInRequest} page={pageRequest} />
           {errorText && (
-            <div role="alert" className="mt-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">
+            <div role="alert" className="mt-2 rounded-xl bg-danger/10 px-3 py-2 text-[13px] text-danger">
               {errorText}
             </div>
           )}
@@ -1285,7 +1285,7 @@ export function ComputerPanel({
               {browserCanTurnOn ? t("computer.browserOff.body", { name: bot.name }) : browserUnavailableReason(state.config)}
             </p>
             {errorText && (
-              <div role="alert" className="w-full rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">
+              <div role="alert" className="w-full rounded-xl bg-danger/10 px-3 py-2 text-[13px] text-danger">
                 {errorText}
               </div>
             )}
@@ -1517,7 +1517,7 @@ export function ComputerPanel({
         </div>
 
         {errorText && !cloudRefused && (
-          <div className="mt-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">
+          <div role="alert" className="mt-2 rounded-xl bg-danger/10 px-3 py-2 text-[13px] text-danger">
             {errorText}
           </div>
         )}

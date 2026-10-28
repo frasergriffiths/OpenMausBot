@@ -241,7 +241,7 @@ function ConversationTaskPicker({
             className="size-1.5 shrink-0 animate-pulse rounded-full bg-accent"
           />
         )}
-        <ChevronDown size={12} className="shrink-0 @max-4xl/chathead:hidden" />
+        <ChevronDown size={12} className="shrink-0" />
       </button>
 
       {motion.shown && (
@@ -390,7 +390,7 @@ function ConversationTaskPicker({
                     disabled={Boolean(task.busy) || busy && active}
                     aria-label={t("task.deleteAria")}
                     title={t("task.deleteTitle")}
-                    className="rounded p-1 text-ink-secondary opacity-0 hover:bg-raised hover:text-danger focus-visible:opacity-100 group-hover:opacity-100 disabled:opacity-20 touch:opacity-70 touch:disabled:opacity-20"
+                    className="rounded p-1 text-ink-secondary opacity-0 hover:bg-raised hover:text-danger focus-visible:opacity-100 group-hover:opacity-100 disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-ink-secondary touch:opacity-70 touch:disabled:opacity-20"
                   >
                     <Trash2 size={13} />
                   </button>

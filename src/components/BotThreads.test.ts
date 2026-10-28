@@ -75,7 +75,7 @@ describe("sidebar bot threads", () => {
     expect(markup).toContain('aria-label="New thread in Research"');
     expect(markup).not.toContain('aria-label="Choose folder for new thread"');
     const folderToggle = markup.match(/<button[^>]*aria-label="Collapse Research threads"[^>]*>/)?.[0];
-    expect(folderToggle).toContain("focus-visible:ring-1");
+    expect(folderToggle).toContain("focus-visible:outline-2");
     expect(folderToggle).not.toContain("hover:bg-");
     expect(markup.indexOf('aria-label="Collapse Research threads"')).toBeLessThan(markup.indexOf('data-sidebar-folder-label="research"'));
     expect(markup).toContain("Threads");

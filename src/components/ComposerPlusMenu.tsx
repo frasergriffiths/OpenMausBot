@@ -321,7 +321,7 @@ function ComposerMenu({ items, renderTrigger }: { items: SidebarMenuItem[]; rend
                 close(false);
                 item.onSelect();
               }}
-              className="flex h-[34px] w-full items-center gap-2 rounded-[9px] px-3 text-start text-[15px] text-ink transition-colors hover:bg-menu-hover focus-visible:bg-menu-hover focus-visible:outline-none disabled:opacity-50"
+              className="flex h-[34px] w-full items-center gap-2 rounded-lg px-3 text-start text-[15px] text-ink transition-colors hover:bg-menu-hover focus-visible:bg-menu-hover focus-visible:outline-none disabled:opacity-50"
             >
               <span className={cn("flex size-3.5 shrink-0 items-center justify-center [&_svg]:size-3.5 [&_svg]:stroke-[1.5]", item.active ? "text-accent" : "text-ink-secondary")} aria-hidden="true">{item.icon}</span>
               <span className="min-w-0 flex-1 truncate">{item.label}</span>

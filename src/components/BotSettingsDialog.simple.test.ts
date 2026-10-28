@@ -570,7 +570,7 @@ describe("the avatar editor", () => {
     expect(segment(withImage, "data-avatar-crop").value).toBe("circle");
     segment(withImage, "data-avatar-crop").onChange("square");
     expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "square" });
-    click(find(withImage, "aria-label", "Remove custom avatar image"));
+    click(find(withImage, "aria-label", "Remove picture"));
     expect(patch).toHaveBeenLastCalledWith({ avatarUrl: null, avatarCrop: "mascot", avatarZoom: AVATAR_ZOOM_MIN, avatarFocusX: AVATAR_FOCUS_CENTER, avatarFocusY: AVATAR_FOCUS_CENTER });
   });
 

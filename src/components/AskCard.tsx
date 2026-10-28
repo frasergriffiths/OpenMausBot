@@ -132,7 +132,7 @@ export const ASK_FIELD =
   "h-7 rounded-full border border-hairline/60 bg-inset px-3 text-[13px] leading-5 text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-60";
 
 /** Simple mode's lettered choice: a full-width 40px row with a 24px key-cap and a 14px label. */
-export const ASK_CHOICE_ROW = "flex min-h-10 w-full items-center gap-[11px] rounded-[10px] px-2 py-2 text-start transition-colors focus-visible:bg-ink/[0.06] focus-visible:outline-none disabled:cursor-default";
+export const ASK_CHOICE_ROW = "flex min-h-10 w-full items-center gap-[11px] rounded-xl px-2 py-2 text-start transition-colors focus-visible:bg-ink/[0.06] focus-visible:outline-none disabled:cursor-default";
 export const ASK_CHOICE_LABEL = "min-w-0 flex-1 break-words text-[14px] leading-5 [unicode-bidi:plaintext]";
 export const ASK_CHOICE_LIST = "-mx-2 flex flex-col";
 
@@ -153,7 +153,7 @@ export function AskChoiceLetter({ letter, picked = false, quiet = false }: { let
 /** Simple mode's last choice: "Something else", typed in place, on the same row as the lettered ones. */
 export function AskSomethingElse({ children }: { children: ReactNode }) {
   return (
-    <label data-ask-something-else className="flex min-h-10 w-full cursor-text items-center gap-[11px] rounded-[10px] px-2 py-2 transition-colors focus-within:bg-ink/[0.06] hover:bg-ink/[0.04]">
+    <label data-ask-something-else className="flex min-h-10 w-full cursor-text items-center gap-[11px] rounded-xl px-2 py-2 transition-colors focus-within:bg-ink/[0.06] hover:bg-ink/[0.04]">
       <span aria-hidden="true" className="flex size-6 shrink-0 items-center justify-center rounded-[7px] bg-ink/[0.06] text-ink-secondary">
         <Pencil size={12} />
       </span>

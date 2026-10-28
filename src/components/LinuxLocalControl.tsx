@@ -63,7 +63,7 @@ export function LinuxLocalControl() {
         </div>
         <span
           className={cn(
-            "shrink-0 rounded-full px-2 py-1 text-[10px] font-medium",
+            "shrink-0 rounded-full px-2 py-1 text-[11px] font-medium",
             ready
               ? "bg-success/10 text-success"
               : waylandSafetyBlocked

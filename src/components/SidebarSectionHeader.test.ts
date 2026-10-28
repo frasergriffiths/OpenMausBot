@@ -121,7 +121,7 @@ describe("SidebarSectionHeader as a Simple-mode line", () => {
 
   it("shows how many rows the section holds at rest, crossfading to the chevron on hover or focus", () => {
     const html = renderToStaticMarkup(line({ count: 3 }));
-    expect(html).toMatch(/class="h-\[30px\]|group\/section flex h-\[30px\] items-center gap-1\.5 rounded-\[6px\] px-2 pb-1\.5 pt-2 hover:bg-raised\/50/);
+    expect(html).toMatch(/class="h-\[30px\]|group\/section flex h-\[30px\] items-center gap-1\.5 rounded-lg px-2 pb-1\.5 pt-2 hover:bg-raised\/50/);
     expect(html).toMatch(/<span class="text-\[12px\] tabular-nums leading-4 text-ink-secondary transition-opacity group-hover\/section:opacity-0 group-focus-within\/section:opacity-0 touch:opacity-0">3<\/span>/);
   });
 

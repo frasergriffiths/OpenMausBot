@@ -85,7 +85,7 @@ export function SidebarSectionHeader({
         draggable={reorderable || undefined}
         onDragStart={reorderable ? onDragStart : undefined}
         onDragEnd={reorderable ? onDragEnd : undefined}
-        className={cn("group/section flex h-[30px] items-center gap-1.5 rounded-[6px] px-2 pb-1.5 pt-2 hover:bg-raised/50", reorderable && "cursor-grab", dragging && "opacity-40")}
+        className={cn("group/section flex h-[30px] items-center gap-1.5 rounded-lg px-2 pb-1.5 pt-2 hover:bg-raised/50", reorderable && "cursor-grab", dragging && "opacity-40")}
       >
         {onToggle ? (
           <button
@@ -118,7 +118,7 @@ export function SidebarSectionHeader({
             aria-haspopup="menu"
             aria-expanded={menuOpen}
             onClick={(event) => onMenu(event.currentTarget)}
-            className="flex h-[18px] w-[22px] shrink-0 items-center justify-center rounded-[5px] text-ink-tertiary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus group-hover/section:opacity-100 group-focus-within/section:opacity-100 aria-expanded:bg-raised aria-expanded:text-ink aria-expanded:opacity-100 touch:opacity-100"
+            className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-tertiary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus group-hover/section:opacity-100 group-focus-within/section:opacity-100 aria-expanded:bg-raised aria-expanded:text-ink aria-expanded:opacity-100 touch:opacity-100"
           >
             <MoreHorizontal size={15} aria-hidden="true" />
           </button>
@@ -190,7 +190,7 @@ function SectionAttention({ attention, label, alert }: { attention?: SidebarSect
       {attention && attention.waiting > 0 && (
         <span
           aria-hidden="true"
-          className="min-w-4 rounded-full bg-warning/15 px-1 text-center text-[9px] font-semibold leading-4 text-warning"
+          className="min-w-4 rounded-full bg-warning/15 px-1 text-center text-[11px] font-semibold leading-4 text-warning"
         >
           {attention.waiting}
         </span>
@@ -198,7 +198,7 @@ function SectionAttention({ attention, label, alert }: { attention?: SidebarSect
       {attention && attention.unread > 0 && (
         <span
           aria-hidden="true"
-          className="min-w-4 rounded-full bg-accent/15 px-1 text-center text-[9px] font-semibold leading-4 text-accent"
+          className="min-w-4 rounded-full bg-accent/15 px-1 text-center text-[11px] font-semibold leading-4 text-accent"
         >
           {attention.unread}
         </span>

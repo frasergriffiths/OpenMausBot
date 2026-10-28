@@ -130,7 +130,7 @@ export function LocalScreenPreview() {
             {t("computer.screen.subtitle")}
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-raised px-2 py-1 text-[10px] font-medium text-ink-secondary">
+        <span className="shrink-0 rounded-full bg-raised px-2 py-1 text-[11px] font-medium text-ink-secondary">
           {t("computer.screen.badge")}
         </span>
       </div>

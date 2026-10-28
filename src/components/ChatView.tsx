@@ -234,7 +234,7 @@ export function ErrorRow({
             <button
               type="button"
               onClick={action.onClick}
-              className="ui-button ui-button-md mt-1.5 rounded-full border-danger/30 bg-transparent text-danger hover:bg-danger/15"
+              className="ui-button ui-button-md mt-1.5 ui-button-primary"
             >
               {action.label}
             </button>
@@ -243,7 +243,7 @@ export function ErrorRow({
           onRetry && (
             <button
               onClick={onRetry}
-              className="ui-button ui-button-md mt-1.5 rounded-full border-danger/30 bg-transparent text-danger hover:bg-danger/15"
+              className="ui-button ui-button-md mt-1.5"
             >
               <RefreshCw size={12} /> {t("chat.retry")}
             </button>
