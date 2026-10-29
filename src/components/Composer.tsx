@@ -61,7 +61,7 @@ import {
   type PasteAttachment,
 } from "@/lib/composer-attachments";
 import { goalCoordinatorForComposer, jevRoomRoutingOn, openTaskWorking, roomRespondersForComposer } from "@/lib/group-routing";
-import { composerPlaceholder, sendLabels, SIMPLE_CONTROL, slotColors } from "./composer-simple";
+import { composerPlaceholder, sendLabels, SIMPLE_CONTROL, slotColors, steerInterruptsTurn } from "./composer-simple";
 import { useBusySendMode } from "@/lib/busy-send";
 import { PendingApprovalActions, PendingApprovalPanel, pendingApprovals } from "./PendingApproval";
 import { CallButton } from "./CallView";
@@ -92,6 +92,9 @@ import {
 import { useSlashSkills } from "@/lib/use-slash-skills";
 
 const SIMPLE_COMPOSER = "bg-composer p-2 ring-[0.5px] ring-ink/10 hover:ring-ink/[0.22] focus-within:ring-ink/[0.22] shadow-[0_2px_8px_-1px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.03),0_0_0_1px_rgb(228_228_228/0.04)] [transition:border-radius_300ms,box-shadow_150ms]";
+
+/** How long a stopped turn may take to settle before the message is queued and the person is told. */
+export const STEER_INTERRUPT_SETTLE_MS = 8_000;
 
 const supportsAgents = (instances: InstanceInfo[], candidate?: Bot) =>
   Boolean(candidate && instances.find((instance) => instance.instanceId === candidate.modelSelection.instanceId)?.capabilities?.agentsMcp);
@@ -157,6 +160,8 @@ export function Composer({
     : bot?.modelSelection.instanceId;
   const canSteer =
     state.instances.find((i) => i.instanceId === steerInstanceId)?.capabilities?.queueing === true;
+  // Rooms keep queueing; a 1:1 chat with Steer chosen stops the turn first when the engine has no mid-turn steering.
+  const steerInterrupts = steerInterruptsTurn({ direct: !group, busy, busySend, canSteer });
   const composerTask = profile?.tasks?.find((task) => task.threadId === threadId);
   // Visible branch only: an approval left on an abandoned branch must not block the composer.
   const approvals = pendingApprovals(group ? group.messages : bot ? visibleMessages(bot) : []);
@@ -433,6 +438,27 @@ export function Composer({
     Boolean(approval),
   );
   const [steering, setSteering] = useState(false);
+  // An engine without mid-turn steering still owes the person their message: the interrupt goes first, the send
+  // follows once the turn has ended. Words sent while that stop settles wait behind it, in order.
+  const pendingSteerSendRef = useRef<{ draftId: string; revision: number; deliver: () => void; next: Array<() => void> } | null>(null);
+  const pendingSteerTimerRef = useRef<number | null>(null);
+  const flushPendingSteerSend = () => {
+    const pending = pendingSteerSendRef.current;
+    if (!pending) return false;
+    pendingSteerSendRef.current = null;
+    if (pendingSteerTimerRef.current !== null) {
+      window.clearTimeout(pendingSteerTimerRef.current);
+      pendingSteerTimerRef.current = null;
+    }
+    pending.deliver();
+    for (const deliver of pending.next) deliver();
+    return true;
+  };
+  useEffect(() => {
+    if (!busy) flushPendingSteerSend();
+  }, [busy]);
+  // Leaving the conversation does not drop words already sent: they go now and queue behind the turn if they must.
+  useEffect(() => () => { flushPendingSteerSend(); }, []);
   const interruptTurn = () => {
     if (group) dispatch({ type: "interruptGroup", groupId: group.id, threadId });
     else if (bot) dispatch({ type: "interrupt", botId: bot.id, threadId });
@@ -561,7 +587,7 @@ export function Composer({
   const stopInSlot = simpleDock && stoppable && !locked && !hasContent && !calling;
   const callShown = !simpleDock || (!hasContent && !stopInSlot);
   const slot = slotColors(bot?.color, Boolean(group));
-  const sendNames = sendLabels({ simple: !advanced, busySend, busy, canSteer, name: busyName, sendLabel });
+  const sendNames = sendLabels({ simple: !advanced, busySend, busy, canSteer, steerInterrupts, name: busyName, sendLabel });
   const retryFailedSend = (failed: FailedComposerSend) => {
     const failedMode = failed.channelMode ?? "chat";
     if (failed.requestText.includes("<attached-image ") && !imageTargetsSupport(failed.requestText, failedMode)) {
@@ -593,6 +619,12 @@ export function Composer({
   };
   const send = () => {
     if (locked || attachmentPending) return;
+    // The second press of a double click has not changed the draft: the first press owns the stop and the send.
+    const pending = pendingSteerSendRef.current;
+    if (steerInterrupts && pending?.draftId === draftId && pending.revision === draftRevision(draftId)) return;
+    // One stop at a time: a second message joins the same stop and starts after the words already waiting.
+    const joinsPendingSend = steerInterrupts && pending !== null && pending.draftId === draftId;
+    const interruptFirst = steerInterrupts && pending === null;
     if (
       attachments.some((attachment) => attachment.kind === "image") &&
       !imageTargetsSupport(effectiveText, effectiveChannelMode)
@@ -633,13 +665,34 @@ export function Composer({
       roomMessageSent(effectiveChannelMode, busy);
     } else if (bot) {
       const points = effectiveChannelMode === "goal" ? null : takePointedChips(threadId);
-      dispatch({
-        type: "send", botId: bot.id, text: body, sendId: sentDraft.sendId, replyToId: replyTo?.id, threadId, dataContext, mode: effectiveChannelMode,
-        ...(points ? { pointed: points.pointed } : {}),
-        onError: () => { autoSteerAfterSendRef.current = false; points?.restore(); restoreDraft(sentDraft); },
-      });
+      const deliver = () => {
+        dispatch({
+          type: "send", botId: bot.id, text: body, sendId: sentDraft.sendId, replyToId: replyTo?.id, threadId, dataContext, mode: effectiveChannelMode,
+          ...(points ? { pointed: points.pointed } : {}),
+          onError: () => { autoSteerAfterSendRef.current = false; points?.restore(); restoreDraft(sentDraft); },
+        });
+        directMessageSent(state.instances, bot.modelSelection?.instanceId, interruptFirst ? false : busy && !canSteer);
+      };
       autoSteerAfterSendRef.current = autoSteer;
-      directMessageSent(state.instances, bot.modelSelection?.instanceId, busy && !canSteer);
+      if (joinsPendingSend) {
+        pending!.revision = sentDraft.revision;
+        pending!.next.push(deliver);
+      } else if (interruptFirst) {
+        pendingSteerSendRef.current = { draftId, revision: sentDraft.revision, deliver, next: [] };
+        pendingSteerTimerRef.current = window.setTimeout(() => {
+          if (!flushPendingSteerSend()) return;
+          dispatch({ type: "notice", notice: { kind: "note", botName: null, text: t("composer.notice.steerQueued") } });
+        }, STEER_INTERRUPT_SETTLE_MS);
+        dispatch({
+          type: "interrupt", botId: bot.id, threadId,
+          onError: () => {
+            if (!flushPendingSteerSend()) return;
+            dispatch({ type: "notice", notice: { kind: "note", botName: null, text: t("composer.notice.steerQueued") } });
+          },
+        });
+      } else {
+        deliver();
+      }
     }
     setText("");
     setAttachments([]);
@@ -961,7 +1014,7 @@ export function Composer({
             aria-busy={bot?.awaitingThreadSnapshot || undefined}
             placeholder={composerPlaceholder({
               simple: !advanced, busySend, locked: setupLocked, approval: Boolean(approval), attaching: attachmentPending, listening: recording,
-              replying: Boolean(replyTo), busy, canSteer, queued: pendingCount > 0, busyName, sendLabel, group, members: members ?? [],
+              replying: Boolean(replyTo), busy, canSteer, steerInterrupts, queued: pendingCount > 0, busyName, sendLabel, group, members: members ?? [],
               jevOn: jevRoomRoutingOn(state.config), goal: channelMode === "goal", botName: bot?.name ?? "",
               setupHint: group ? null : setupRequestPlaceholder(bot, threadId),
             })}
@@ -1015,16 +1068,16 @@ export function Composer({
             disabled={attachmentPending}
             aria-label={sendNames.label}
             title={sendNames.title}
-            style={simpleDock && !(busy && !canSteer) ? { backgroundColor: slot.fill, color: slot.ink } : undefined}
+            style={simpleDock && !(busy && !canSteer && !steerInterrupts) ? { backgroundColor: slot.fill, color: slot.ink } : undefined}
             className={cn(
               "flex shrink-0 items-center justify-center rounded-full",
               simpleDock ? "size-7 animate-[slot-fade-in_120ms_ease-out] disabled:cursor-default disabled:opacity-40" : "size-8 text-white",
-              busy && !canSteer
+              busy && !canSteer && !steerInterrupts
                   ? "bg-raised text-ink-secondary hover:bg-raised-hover"
                   : simpleDock ? "hover:brightness-110" : "bg-accent hover:brightness-110",
             )}
           >
-            {busy && !canSteer ? <Clock size={simpleDock ? 14 : 15} /> : simpleDock ? <ArrowUp size={16} strokeWidth={1.75} absoluteStrokeWidth /> : <ArrowUp size={17} />}
+            {busy && !canSteer && !steerInterrupts ? <Clock size={simpleDock ? 14 : 15} /> : simpleDock ? <ArrowUp size={16} strokeWidth={1.75} absoluteStrokeWidth /> : <ArrowUp size={17} />}
           </button>
           )}
           </div>

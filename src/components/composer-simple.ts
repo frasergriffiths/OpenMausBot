@@ -14,7 +14,18 @@ export function slotColors(color: Bot["color"] | undefined, room: boolean): { fi
   return { fill: tone.background, ink: tone.ink };
 }
 
-export function composerPlaceholder({ simple, busySend, locked, approval, attaching, listening, replying, busy, canSteer, queued, busyName, sendLabel, group, members, jevOn, goal, botName, setupHint }: {
+/** Steer chosen on an engine that cannot take a mid-turn message: in a 1:1 chat the send stops the running turn
+ *  first and starts the message as the next one. Rooms keep queueing, since a room turn belongs to everyone. */
+export function steerInterruptsTurn({ direct, busy, busySend, canSteer }: {
+  direct: boolean;
+  busy: boolean;
+  busySend: BusySendMode;
+  canSteer: boolean;
+}): boolean {
+  return direct && busy && busySend === "steer" && !canSteer;
+}
+
+export function composerPlaceholder({ simple, busySend, locked, approval, attaching, listening, replying, busy, canSteer, steerInterrupts, queued, busyName, sendLabel, group, members, jevOn, goal, botName, setupHint }: {
   simple: boolean;
   busySend: BusySendMode;
   locked: boolean;
@@ -24,6 +35,7 @@ export function composerPlaceholder({ simple, busySend, locked, approval, attach
   replying: boolean;
   busy: boolean;
   canSteer: boolean;
+  steerInterrupts: boolean;
   queued: boolean;
   busyName: string;
   sendLabel: string;
@@ -45,8 +57,8 @@ export function composerPlaceholder({ simple, busySend, locked, approval, attach
       ? t("composer.placeholder.steerQueued", { name: busyName, key: sendLabel })
       : t("composer.placeholder.steer", { name: busyName, key: sendLabel });
   }
-  // Steer is chosen but this engine cannot take a message mid-turn: say so instead of queueing as if nothing was picked.
-  if (busy && busySend === "steer") {
+  // Steer is chosen on an engine with no mid-turn steering: a 1:1 send stops the turn, a room still queues.
+  if (busy && steerInterrupts) {
     return t("composer.placeholder.steerUnavailable", { name: busyName, key: sendLabel });
   }
   if (busy) {
@@ -71,14 +83,14 @@ export function composerPlaceholder({ simple, busySend, locked, approval, attach
 }
 
 /** The round Send button's name: what pressing it does now. Simple mode says it in the bot's terms. */
-export function sendLabels({ simple, busySend, busy, canSteer, name, sendLabel }: { simple: boolean; busySend: BusySendMode; busy: boolean; canSteer: boolean; name: string; sendLabel: string }): { label: string; title: string } {
+export function sendLabels({ simple, busySend, busy, canSteer, steerInterrupts, name, sendLabel }: { simple: boolean; busySend: BusySendMode; busy: boolean; canSteer: boolean; steerInterrupts: boolean; name: string; sendLabel: string }): { label: string; title: string } {
   if (busy && canSteer && busySend === "steer") {
     const steer = simple ? t("composer.send.steerSimple", { name }) : t("composer.send.steer");
     return { label: steer, title: steer };
   }
-  if (busy && busySend === "steer") {
-    const queue = t("composer.send.steerUnavailable", { name });
-    return { label: queue, title: queue };
+  if (busy && steerInterrupts) {
+    const stop = t("composer.send.steerUnavailable");
+    return { label: stop, title: stop };
   }
   if (busy) {
     return simple
