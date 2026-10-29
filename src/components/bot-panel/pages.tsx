@@ -25,7 +25,7 @@ import { ActivityPanel } from "../ActivityPanel";
 import { InspectorPanel } from "../InspectorPanel";
 import { ComputerFilesPane } from "../ComputerFilesPane";
 import { UsageSection } from "../bot-settings/UsageSection";
-import { useOpenComputer, WherePage } from "./ComputerTab";
+import { useOpenComputer } from "./ComputerTab";
 import { memoryNotes, withMemoryNote, withoutMemoryNote } from "./memory-notes";
 import type { SimplePageId } from "./page-registry";
 import { BotSwitch, buttonCls, Card, LinkRow, NoteRow, RadioRow, rowCls, SwitchRow, TextRow, TrashButton } from "./rows";
@@ -449,8 +449,6 @@ export function PageBody({ page, onOpen, editingInstructions, onEditInstructions
   switch (page) {
     case "settings":
       return <SettingsPage {...context} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} />;
-    case "where":
-      return <WherePage {...context} />;
     case "apps":
       return <AppsPage {...context} />;
     case "routines":
