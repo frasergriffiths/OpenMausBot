@@ -104,6 +104,13 @@ mac:
       arch: [arm64, x64]
   icon: build/icon.icns
   category: public.app-category.productivity
+  # A stable local identity, not ad-hoc. Ad-hoc signing gives the app a new
+  # cdhash on every build, so macOS treats each install as a different app and
+  # drops the Screen Recording and Accessibility grants. Signing with a fixed
+  # certificate makes the designated requirement the certificate, not the
+  # build, so the grants survive reinstalls on this Mac. Local builds only:
+  # this certificate is trusted on this machine alone and is not for distribution.
+  identity: "OpenMausBot Local"
   hardenedRuntime: true
   gatekeeperAssess: false
   entitlements: build/entitlements.mac.plist

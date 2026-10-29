@@ -108,9 +108,16 @@ export function beatsFor(options: { hosted?: boolean; allowComputer?: boolean })
   return options.allowComputer ? ["meet", "allowComputer", "chief"] : ["meet", "chief"];
 }
 
-/** Where a reloaded first run opens: the saved screen while it is offered, else the first. */
+/** The screen after `beat` that this run offers, in the canonical order; undefined when the run ends. */
+export function nextBeatAfter(beat: BeatId, beats: readonly BeatId[]): BeatId | undefined {
+  return BEAT_ORDER.slice(BEAT_ORDER.indexOf(beat) + 1).find((id) => beats.includes(id));
+}
+
+/** Where a reloaded first run opens: the saved screen, or the first one offered after it. */
 export function resumeBeat(beats: readonly BeatId[], saved: BeatId | undefined): BeatId {
-  return saved && beats.includes(saved) ? saved : beats[0] ?? "meet";
+  const at = saved ? BEAT_ORDER.indexOf(saved) : -1;
+  if (at < 0) return beats[0] ?? "meet";
+  return BEAT_ORDER.slice(at).find((id) => beats.includes(id)) ?? beats[0] ?? "meet";
 }
 
 export function onboardingCloudOffered(record: OnboardingStatus | undefined): boolean {

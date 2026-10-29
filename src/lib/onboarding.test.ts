@@ -4,6 +4,7 @@ import {
   aiWorks,
   BEAT_ORDER,
   beatsFor,
+  nextBeatAfter,
   cloudSignInDue,
   companyModelCount,
   completionPatch,
@@ -253,6 +254,15 @@ describe("the first run's screens", () => {
     expect(resumeBeat(beatsFor({}), "chief")).toBe("chief");
     expect(resumeBeat(beatsFor({}), undefined)).toBe("meet");
     expect(resumeBeat(beatsFor({ hosted: true }), "chief")).toBe("meet");
+    expect(resumeBeat(beatsFor({}), "allowComputer")).toBe("chief");
+    expect(resumeBeat(beatsFor({ allowComputer: true }), "allowComputer")).toBe("allowComputer");
+  });
+
+  it("walks the canonical order, never backwards through the offered screens", () => {
+    expect(nextBeatAfter("allowComputer", ["meet", "chief"])).toBe("chief");
+    expect(nextBeatAfter("meet", ["meet", "chief"])).toBe("chief");
+    expect(nextBeatAfter("meet", ["meet", "allowComputer", "chief"])).toBe("allowComputer");
+    expect(nextBeatAfter("chief", ["meet", "chief"])).toBeUndefined();
     expect(resumeBeat(beatsFor({}), "engines" as never), "a step from the longer welcome").toBe("meet");
   });
 });

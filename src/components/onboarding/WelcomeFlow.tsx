@@ -4,7 +4,7 @@ import { brandStatus } from "@/lib/brand";
 import { cn } from "@/lib/cn";
 import { chiefStepFits, myDefaultBot, setChiefStepOpen, useViewerEmail } from "@/lib/default-bot";
 import { CLOUD_PRO_UPDATE_NOTICE, dismissNotice } from "@/lib/notices";
-import { beatsFor, cloudBeatPossible, completionPatch, firstRunPatch, markWelcomeFinished, resumeBeat, showWelcome, type BeatId } from "@/lib/onboarding";
+import { beatsFor, cloudBeatPossible, completionPatch, firstRunPatch, markWelcomeFinished, nextBeatAfter, resumeBeat, showWelcome, type BeatId } from "@/lib/onboarding";
 import { clearWelcomeDraft, readWelcomeDraft, saveWelcomeDraft } from "@/lib/welcome-draft";
 import { api, useStore } from "@/state/store";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
@@ -125,7 +125,7 @@ export function WelcomeFlow({
 
   // Each screen fades away before the next comes up; a timer moves on, since a hidden window runs no animation to
   // its end.
-  const nextBeat = beats[beats.indexOf(beat) + 1];
+  const nextBeat = nextBeatAfter(beat, beats);
   const leaving = useRef(false);
   const next = useCallback(() => {
     if (finishing.current || leaving.current) return;
@@ -189,7 +189,7 @@ export function WelcomeFlow({
       {chief ? (
         <ChiefIntro replay={replay} onLeave={fadeScrim} onDone={(botId) => void finish("completed", botId)} />
       ) : beat === "allowComputer" ? (
-        <AllowComputerBeat onNext={next} onSkip={() => void finish("skipped", null)} />
+        <AllowComputerBeat onNext={next} onSkip={next} />
       ) : (
         <MeetScreen hosted={hosted} onNext={next} />
       )}

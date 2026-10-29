@@ -127,7 +127,7 @@ export function MacCuaPermissionCard({ permissions, logReason, showCheckAgain = 
 
   return (
     <Card>
-      <section data-mac-permission-card="" className="px-4 py-4">
+      <section data-mac-permission-card="" className="py-4">
         <div className="min-w-0">
           <Shield size={17} className="text-accent-text" aria-hidden="true" />
           <h3 className="mt-2 text-[15px] font-semibold leading-5 text-ink">{t("computer.mac.permission.title")}</h3>
@@ -187,7 +187,7 @@ export function MacCuaPermissionCard({ permissions, logReason, showCheckAgain = 
             <span className="min-w-0 break-words">{error}</span>
           </p>
         )}
-        <div data-mac-cua-actions="" className="mt-3">
+        <div data-mac-cua-actions="" className="mt-3 flex flex-col items-center">
           <button type="button" onClick={primaryAction} disabled={pending} className={PRIMARY}>
             {pending && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {primaryLabel}
@@ -195,12 +195,12 @@ export function MacCuaPermissionCard({ permissions, logReason, showCheckAgain = 
           {(showCheckAgain || onSkip) && (
             <div className="mt-2 flex items-center justify-center gap-3 text-[13px] leading-[18px]">
               {showCheckAgain && (
-                <button type="button" onClick={() => void retry()} disabled={pending} className="rounded-lg px-2.5 py-1 font-medium text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50">
+                <button type="button" onClick={() => void retry()} disabled={pending} className="rounded-lg px-2.5 py-1.5 font-medium text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50">
                   {t("common.checkAgain")}
                 </button>
               )}
               {onSkip && (
-                <button type="button" onClick={onSkip} className="rounded-lg px-2.5 py-1 text-ink-tertiary hover:bg-control hover:text-ink">
+                <button type="button" onClick={onSkip} className="rounded-lg px-2.5 py-1.5 text-ink-tertiary hover:bg-control hover:text-ink">
                   {t("cloudIntent.skip")}
                 </button>
               )}
