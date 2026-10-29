@@ -21,7 +21,7 @@ describe("rich table rendering", () => {
     expect(html).toContain('scope="col"');
   });
   it("gives a short table its actions without the search box and row count a long one needs", () => {
-    const table = (length: number) => renderToStaticMarkup(createElement(RichTable, { columns: [{ text: "ID" }], rows: Array.from({ length }, (_, i) => [{ text: String(i) }]) }));
+    const table = (length: number) => renderToStaticMarkup(createElement(RichTable, { card: false, columns: [{ text: "ID" }], rows: Array.from({ length }, (_, i) => [{ text: String(i) }]) }));
     const short = table(8);
     expect(short).not.toContain('aria-label="Search all rows…"');
     expect(short).not.toContain("8 of 8 rows");
@@ -76,11 +76,13 @@ describe("Simple mode's table card", () => {
     expect(html).toContain('aria-label="Copy table"');
     expect(html).toContain('aria-label="Download results as CSV"');
     expect(html).toContain('aria-label="Expand table"');
-    expect(html).toMatch(/<button type="button" class="group\/th [^"]*" aria-label="Sort by Sender"[^>]*><span dir="auto">Sender<\/span>/);
+    expect(html).toMatch(/<button type="button" class="group\/th [^"]*" aria-label="Sort by Sender"[^>]*><span dir="auto"[^>]*>Sender<\/span>/);
     expect(html).toContain("border-t-[0.5px] border-ink/[0.07]");
     expect(html).not.toContain("<footer");
     expect(html).not.toContain(`aria-label="${"Search all rows…"}"`);
-    expect(html).toContain('data-fit="true"');
+    expect(html).not.toContain('data-fit="true"');
+    expect(html).toContain("table-fixed");
+    expect(html).toContain('class="truncate"');
   });
 
   it("puts search and the row count inside the card once a table runs past eight rows", () => {

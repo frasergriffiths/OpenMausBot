@@ -1688,6 +1688,21 @@ body {
   background: transparent;
 }
 
+/* The table card's sideways scroll: a 4px bar that stays visible whenever the table is wider than the card, so the
+   card never looks like a hard cut. The fade overlays stop one pixel above it and never cover it. */
+.table-card-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 4px;
+}
+.table-card-scroll::-webkit-scrollbar-thumb {
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--color-scrollbar);
+}
+.table-card-scroll::-webkit-scrollbar-thumb:horizontal { min-width: 40px; }
+.table-card-scroll::-webkit-scrollbar-track { background: transparent; }
+.table-card-scroll::-webkit-scrollbar-corner { background: transparent; }
+
 @keyframes panel-in {
   from { transform: translateX(28px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }

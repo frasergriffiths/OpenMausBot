@@ -1,11 +1,11 @@
-import { useDeferredValue, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ArrowDown, ArrowUp, Check, Copy, Download, Maximize2, Search, WrapText, X } from "lucide-react";
 import { isTableNumber, tableCsv, tableRowOrder, type TableSort } from "@/lib/table-data";
 import { t } from "@/lib/i18n";
 import { copyText } from "@/lib/copy-text";
-import { columnMinimums, fitsColumns } from "@/lib/table-fit";
+import { cardCellText, cardColumnWidths, fitsColumns, fittedColumnWidths } from "@/lib/table-fit";
 import { cn } from "@/lib/cn";
 
 export interface TableCell { text: string; content?: ReactNode; align?: TableAlign; vAlign?: "top" | "middle" | "bottom" }
@@ -139,6 +139,7 @@ export function RichTable({ columns, rows, name = t("table.title"), expanded = f
  * the sort buttons, rows are split by hairlines, and nothing else is drawn. */
 type TableLook = "quiet" | "card";
 
+
 function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, direction, headless = false, look = "quiet" }: RichTableProps & {
   order: number[]; wrap: boolean; large: boolean; sort: TableSort; onSort: (column: number) => void; look?: TableLook;
 }) {
@@ -153,8 +154,9 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
     return () => observer.disconnect();
   }, []);
   const virtual = order.length > 80;
-  const minimums = useMemo(() => columnMinimums(columns.map((column) => column.text), rows.map((row) => row.map((cell) => cell.text))), [columns, rows]);
+  const natural = useMemo(() => cardColumnWidths(columns.map((column) => column.text), rows.map((row) => row.map((cell) => cell.text))), [columns, rows]);
   const [available, setAvailable] = useState<number | null>(null);
+  const [edges, setEdges] = useState({ left: false, right: false, vertical: false });
   useEffect(() => {
     const element = scroll.current;
     if (!element || typeof ResizeObserver === "undefined") return;
@@ -162,15 +164,35 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-  const fit = fitsColumns({ wrap, virtual, minimums, available });
-  const widths = useMemo(() => columns.map((column, index) => column.width ?? Math.min(320, Math.max(140,
-    Math.max(column.text.length, ...rows.slice(0, 100).map((row) => Math.min(40, row[index]?.text.length ?? 0))) * 7 + 40,
-  ))), [columns, rows]);
+  const fit = fitsColumns({ wrap, virtual, widths: natural, available });
+  // Which edges still have content behind them: the fade is a signal, not decoration, so it only shows where a
+  // sideways scroll would move. RTL starts at the right, so the two sides swap.
+  const measureEdges = useCallback(() => {
+    const element = scroll.current;
+    if (!element) return;
+    const max = element.scrollWidth - element.clientWidth;
+    const offset = Math.abs(element.scrollLeft);
+    const atStart = offset <= 1;
+    const atEnd = max <= 1 || offset >= max - 1;
+    const vertical = element.scrollHeight > element.clientHeight + 1;
+    setEdges(direction === "rtl" ? { left: !atEnd, right: !atStart, vertical } : { left: !atStart, right: !atEnd, vertical });
+  }, [direction]);
+  useEffect(() => {
+    measureEdges();
+    const element = scroll.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measureEdges);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [measureEdges, fit, wrap, order, columns, rows, available]);
+  const fitted = useMemo(() => fittedColumnWidths(natural, available ?? 0), [natural, available]);
+  const widths = useMemo(() => columns.map((column, index) => column.width ?? (fit ? fitted[index]! : natural[index]!)), [columns, fit, fitted, natural]);
+  const minWidth = widths.reduce((sum, width) => sum + width, 0);
   const numeric = useMemo(() => columns.map((_, index) => {
     const nonempty = rows.slice(0, 200).map((row) => row[index]?.text.trim() ?? "").filter(Boolean);
     return nonempty.length > 0 && nonempty.every(isTableNumber);
   }), [columns, rows]);
-  const virtualizer = useVirtualizer({ count: order.length, getScrollElement: () => scroll.current, estimateSize: () => 42,
+  const virtualizer = useVirtualizer({ count: order.length, getScrollElement: () => scroll.current, estimateSize: () => card ? 40 : 42,
     getItemKey: (index) => order[index]!, overscan: 6, enabled: virtual, initialRect: { width: 800, height: 400 }, scrollMargin: headingHeight });
   useEffect(() => { if (scroll.current) scroll.current.scrollTop = 0; }, [order]);
   useEffect(() => { virtualizer.measure(); }, [wrap, widths, virtualizer]);
@@ -181,41 +203,52 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
   const sortLabel = (column: TableColumn, index: number) => t("table.sort", { column: column.text || index + 1 });
   const header = (column: TableColumn, index: number) => column.content ?? (column.text || t("table.column", { number: index + 1 }));
   const arrow = (index: number, className?: string) => sort?.column === index && sort.descending ? <ArrowDown size={12} className={className} /> : <ArrowUp size={12} className={cn(className, sort?.column !== index && !card && "opacity-35")} />;
-  return <div ref={scroll} tabIndex={0} role="region" aria-label={name}
-    className={cn("overflow-auto overscroll-x-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60", card && !fit && "[mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)]")}
-    style={{ maxHeight: large ? "65dvh" : virtual || !wrap ? 400 : undefined }} data-fit={fit || undefined}>
-    <table dir={direction} aria-label={name} aria-rowcount={order.length + 1} className={cn("w-full border-separate border-spacing-0 text-[14px]", fit ? "table-auto" : "table-fixed", card && "leading-5")} style={fit ? undefined : { minWidth: widths.reduce((a, b) => a + b, 0) }}>
-      {!fit && <colgroup>{widths.map((width, index) => <col key={index} style={{ width }} />)}</colgroup>}
-      <thead ref={heading} hidden={headless} className="sticky top-0 z-10 bg-composer"><tr aria-rowindex={1}>
-        {columns.map((column, index) => <th key={index} scope="col" aria-sort={sort?.column === index ? sort.descending ? "descending" : "ascending" : "none"}
-          className={card ? "px-4 py-2.5 align-bottom font-semibold" : "h-10 border-b border-hairline/60 px-3 py-2 font-medium"} style={{ textAlign: alignment(column, index) }}>
-          <div className="break-words [overflow-wrap:anywhere]" style={fit ? { minWidth: minimums[index] } : undefined}>
-            {card ? (
-              <button type="button" className="group/th inline-flex max-w-full items-center gap-1 text-start font-semibold [text-align:inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60" aria-label={sortLabel(column, index)} title={sortLabel(column, index)} onClick={() => onSort(index)}>
+  return <div className="relative">
+    {card && <>
+      <div data-table-fade="left" aria-hidden="true" className={cn("pointer-events-none absolute top-0 bottom-1 z-10 w-14 bg-gradient-to-r from-composer to-transparent transition-opacity", direction === "rtl" && edges.vertical ? "left-2" : "left-0", edges.left ? "opacity-100" : "opacity-0")} />
+      <div data-table-fade="right" aria-hidden="true" className={cn("pointer-events-none absolute top-0 bottom-1 z-10 w-14 bg-gradient-to-l from-composer to-transparent transition-opacity", direction === "rtl" || !edges.vertical ? "right-0" : "right-2", edges.right ? "opacity-100" : "opacity-0")} />
+    </>}
+    <div ref={scroll} tabIndex={0} role="region" aria-label={name} onScroll={card ? measureEdges : undefined}
+      className={cn("overflow-auto overscroll-x-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60", card && "table-card-scroll")}
+      style={{ maxHeight: large ? "65dvh" : card ? "min(444px, calc(100dvh - 168px))" : virtual || !wrap ? 400 : undefined }} data-fit={fit || undefined}>
+      <table dir={direction} aria-label={name} aria-rowcount={order.length + 1} className={cn("w-full table-fixed border-separate border-spacing-0 text-[14px]", card && "leading-5")} style={{ minWidth }}>
+        <colgroup>{widths.map((width, index) => <col key={index} style={{ width }} />)}</colgroup>
+        <thead ref={heading} hidden={headless} className="sticky top-0 z-10 bg-composer"><tr aria-rowindex={1}>
+          {columns.map((column, index) => <th key={index} scope="col" aria-sort={sort?.column === index ? sort.descending ? "descending" : "ascending" : "none"}
+            className={card ? "h-10 whitespace-nowrap px-4 py-2.5 align-bottom font-semibold" : "h-10 border-b border-hairline/60 px-3 py-2 font-medium"} style={{ textAlign: alignment(column, index) }}>
+            <div className={cn("min-w-0", card ? "truncate" : "break-words [overflow-wrap:anywhere]")}>
+              {card ? (
+                <button type="button" className="group/th inline-flex min-w-0 max-w-full items-center gap-1 text-start font-semibold [text-align:inherit] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60" aria-label={sortLabel(column, index)} title={sortLabel(column, index)} onClick={() => onSort(index)}>
+                  <span dir="auto" className="truncate">{header(column, index)}</span>
+                  {arrow(index, cn("shrink-0 text-ink-tertiary transition-opacity", sort?.column === index ? "opacity-100" : "opacity-0 group-hover/th:opacity-100 group-focus-within/th:opacity-100 touch:opacity-100"))}
+                </button>
+              ) : <>
                 <span dir="auto">{header(column, index)}</span>
-                {arrow(index, cn("shrink-0 text-ink-tertiary transition-opacity", sort?.column === index ? "opacity-100" : "opacity-0 group-hover/th:opacity-100 group-focus-within/th:opacity-100 touch:opacity-100"))}
-              </button>
-            ) : <>
-              <span dir="auto">{header(column, index)}</span>
-              <button type="button" className="table-action ms-1 inline-flex align-middle" aria-label={sortLabel(column, index)} title={sortLabel(column, index)} onClick={() => onSort(index)}>{arrow(index)}</button>
-            </>}
-          </div>
-        </th>)}
-      </tr></thead>
-      <tbody>
-        {before > 0 && <tr aria-hidden="true"><td colSpan={columns.length} style={{ height: before, padding: 0 }} /></tr>}
-        {items.map((item) => <tr key={item.key} data-index={item.index} ref={virtual ? virtualizer.measureElement : undefined} aria-rowindex={item.index + 2}
-          className={card ? undefined : item.index % 2 ? "bg-ink/[0.03] hover:bg-raised/70" : "hover:bg-raised/70"}>
-          {columns.map((column, index) => {
-            const cell = rows[order[item.index]!]![index];
-            return <td key={index} className={card ? "border-t-[0.5px] border-ink/[0.07] px-4 py-2.5 align-top tabular-nums" : "border-b border-hairline/20 px-3 py-2.5 align-top tabular-nums"} style={{ textAlign: cell?.align ?? alignment(column, index), verticalAlign: cell?.vAlign }}>
-              <div dir="auto" title={!wrap ? cell?.text : undefined} className={wrap ? "whitespace-pre-wrap break-words [overflow-wrap:anywhere]" : "truncate"}>{cell?.content ?? cell?.text}</div>
-            </td>;
-          })}
-        </tr>)}
-        {after > 0 && <tr aria-hidden="true"><td colSpan={columns.length} style={{ height: after, padding: 0 }} /></tr>}
-      </tbody>
-    </table>
-    {order.length === 0 && <p className="p-8 text-center text-sm text-ink-secondary">{t(rows.length ? "table.noResults" : "table.empty")}</p>}
+                <button type="button" className="table-action ms-1 inline-flex align-middle" aria-label={sortLabel(column, index)} title={sortLabel(column, index)} onClick={() => onSort(index)}>{arrow(index)}</button>
+              </>}
+            </div>
+          </th>)}
+        </tr></thead>
+        <tbody>
+          {before > 0 && <tr aria-hidden="true"><td colSpan={columns.length} style={{ height: before, padding: 0 }} /></tr>}
+          {items.map((item) => <tr key={item.key} data-index={item.index} ref={virtual ? virtualizer.measureElement : undefined} aria-rowindex={item.index + 2}
+            className={card ? undefined : item.index % 2 ? "bg-ink/[0.03] hover:bg-raised/70" : "hover:bg-raised/70"}>
+            {columns.map((column, index) => {
+              const cell = rows[order[item.index]!]![index];
+              const display = card ? cardCellText(cell?.text ?? "") : undefined;
+              const shortened = card && display !== cell?.text;
+              return <td key={index} className={card ? "border-t-[0.5px] border-ink/[0.07] px-4 py-[9.5px] align-top tabular-nums" : "border-b border-hairline/20 px-3 py-2.5 align-top tabular-nums"} style={{ textAlign: cell?.align ?? alignment(column, index), verticalAlign: cell?.vAlign }}>
+                <div dir={shortened ? "rtl" : "auto"} title={card || !wrap ? cell?.text : undefined}
+                  className={cn(card ? "truncate" : wrap ? "whitespace-pre-wrap break-words [overflow-wrap:anywhere]" : "truncate")}>
+                  {shortened ? <span dir="ltr">{display}</span> : cell?.content ?? display ?? cell?.text}
+                </div>
+              </td>;
+            })}
+          </tr>)}
+          {after > 0 && <tr aria-hidden="true"><td colSpan={columns.length} style={{ height: after, padding: 0 }} /></tr>}
+        </tbody>
+      </table>
+      {order.length === 0 && <p className="p-8 text-center text-sm text-ink-secondary">{t(rows.length ? "table.noResults" : "table.empty")}</p>}
+    </div>
   </div>;
 }
