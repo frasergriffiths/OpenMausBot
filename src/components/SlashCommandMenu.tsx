@@ -28,10 +28,10 @@ export function SlashCommandMenu({ listRef, motion, commands, highlight, query =
       id="composer-slash-menu"
       role="listbox"
       aria-label={t("composer.commands.aria")}
-      className={cn("popover-surface absolute bottom-full left-2 z-40 mb-2 flex max-h-80 w-[min(22.5rem,calc(100%-1rem))] origin-bottom flex-col overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]", motion.className)}
+      className={cn("popover-surface absolute bottom-full left-2 z-40 mb-2 flex max-h-[min(20rem,50dvh)] w-[min(22.5rem,calc(100%-1rem))] origin-bottom flex-col overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]", motion.className)}
       {...motion.exitProps}
     >
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [mask-image:linear-gradient(to_bottom,black_calc(100%-12px),transparent)]">
+      <div className={cn("min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain", commands.length > 6 && "[mask-image:linear-gradient(to_bottom,black_calc(100%-12px),transparent)]")}>
         {sections.map((section) => (
           <div key={section.id} role="group" aria-labelledby={`composer-slash-${section.id}`}>
             <div

@@ -25,7 +25,9 @@ const render = (list: ComposerSlashCommand[], highlight = 0, query = "") => rend
 describe("the composer's / menu", () => {
   it("draws Commands then Skills, with a live count only on Skills", () => {
     const html = render(commands);
-    expect(html.indexOf("Commands")).toBeLessThan(html.indexOf("Skills"));
+    expect(html).toContain(">Commands<");
+    expect(html).toContain(">Skills<");
+    expect(html.indexOf(">Commands<")).toBeLessThan(html.indexOf(">Skills<"));
     expect(html).toContain(">1<");
     expect(html).toContain("Skills");
     expect(html).toContain("↑↓ move · ↵ pick · Esc close");

@@ -320,8 +320,8 @@ export function Composer({
   const slashSkills = useSlashSkills(group ? undefined : bot?.id, threadId, Boolean(slash) && slash?.start !== dismissedSlashAt);
   const canLearn = skillAuthoringEnabled(state.config) &&
     (group ? (members ?? []).some((member) => supportsAgents(state.instances, member)) : supportsAgents(state.instances, bot));
-  const commandCandidates = useMemo(() => {
-    if (!slash || slash.start === dismissedSlashAt) return [];
+  const commandPool = useMemo(() => {
+    if (!slash || slash.start === dismissedSlashAt) return [] as ComposerSlashCommand[];
     const available: ComposerSlashCommand[] = [];
     if (!group?.dm) available.push({
       kind: "command",
@@ -344,10 +344,13 @@ export function Composer({
       description: t("composer.command.setupDesc"),
     });
     available.push(...skillSlashCommands(slashSkills));
-    return available.filter((command) => slashCommandMatches(command, slash.query));
+    return available;
   }, [slash, dismissedSlashAt, group, bot, canLearn, state.instances, locale, slashSkills]);
-  const commandAvailable = Boolean(slash && slash.start !== dismissedSlashAt &&
-    ((!group?.dm ? 1 : 0) + (canLearn ? 1 : 0) + (!group && supportsAgents(state.instances, bot) ? 1 : 0) + slashSkills.length) > 0);
+  const commandCandidates = useMemo(
+    () => (slash ? commandPool.filter((command) => slashCommandMatches(command, slash.query)) : []),
+    [commandPool, slash],
+  );
+  const commandAvailable = Boolean(slash && slash.start !== dismissedSlashAt && commandPool.length > 0);
   const commandPickerOpen = commandAvailable;
 
   const mention = mentionQueryAt(text, caret); const teammates = useTeammates(); const viewer = useViewerEmail();
@@ -935,6 +938,12 @@ export function Composer({
             </div>
           )}
           <MentionTextarea
+            role={commandPickerOpen ? "combobox" : undefined}
+            aria-haspopup={commandPickerOpen ? "listbox" : undefined}
+            aria-expanded={commandPickerOpen ? true : undefined}
+            aria-autocomplete={commandPickerOpen ? "list" : undefined}
+            aria-controls={commandPickerOpen ? "composer-slash-menu" : undefined}
+            aria-activedescendant={commandPickerOpen && commandCandidates[highlight] ? `composer-slash-option-${highlight}` : undefined}
             wrapperClassName={singleRow || simpleDock ? undefined : "@max-[30rem]/composer:order-first @max-[30rem]/composer:basis-full"}
             inputRef={inputRef}
             peers={[...(group ? members ?? [] : state.bots.filter((member) => member.id !== bot?.id)), ...teammates.peers]}
@@ -956,6 +965,10 @@ export function Composer({
               // An input method's confirming Enter and arrows pick its own candidates, not a mention or command.
               if (imeComposing(e.nativeEvent)) return;
               if (commandPickerOpen) {
+                if (!commandCandidates.length && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Home" || e.key === "End")) {
+                  e.preventDefault();
+                  return;
+                }
                 if (e.key === "Home" || e.key === "End") {
                   e.preventDefault();
                   setHighlight(e.key === "Home" ? 0 : Math.max(0, commandCandidates.length - 1));
