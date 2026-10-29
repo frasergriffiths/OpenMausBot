@@ -2106,7 +2106,6 @@
   "composer.command.goalBotDesc": "Keep this bot working until the goal is complete",
   "composer.command.learnDesc": "Draft a reusable skill from this conversation",
   "composer.command.setupDesc": "Have this bot interview you and set itself up",
-  "composer.command.skillTag": "skill",
   "composer.busy.team": "The team",
   "composer.busy.aBot": "A bot",
   "composer.busy.theBot": "The bot",
@@ -6652,5 +6651,11 @@
   "settings.threadChip.aria": "Conversation switcher style",
   "settings.threadChip.pill": "One pill",
   "settings.threadChip.tabs": "Browser tabs",
-  "task.archivedNone": "No archived threads"
+  "task.archivedNone": "No archived threads",
+  "composer.commands.skills": "Skills",
+  "composer.commands.keys": "↑↓ move · ↵ pick · Esc close",
+  "composer.commands.noMatch": "No commands match “{query}”",
+  "composer.commands.noMatchHint": "Type / to see every command",
+  "composer.commands.resultOne": "1 command",
+  "composer.commands.resultOther": "{count} commands"
 }

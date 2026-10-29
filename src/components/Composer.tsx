@@ -346,7 +346,9 @@ export function Composer({
     available.push(...skillSlashCommands(slashSkills));
     return available.filter((command) => slashCommandMatches(command, slash.query));
   }, [slash, dismissedSlashAt, group, bot, canLearn, state.instances, locale, slashSkills]);
-  const commandPickerOpen = commandCandidates.length > 0;
+  const commandAvailable = Boolean(slash && slash.start !== dismissedSlashAt &&
+    ((!group?.dm ? 1 : 0) + (canLearn ? 1 : 0) + (!group && supportsAgents(state.instances, bot) ? 1 : 0) + slashSkills.length) > 0);
+  const commandPickerOpen = commandAvailable;
 
   const mention = mentionQueryAt(text, caret); const teammates = useTeammates(); const viewer = useViewerEmail();
   const candidates = useMemo(() => {
@@ -816,8 +818,15 @@ export function Composer({
             </button>
           </div>
         ))}
-        <SlashCommandMenu listRef={commandListRef} motion={commandMotion} commands={commandCandidates} highlight={highlight}
+        <SlashCommandMenu listRef={commandListRef} motion={commandMotion} commands={commandCandidates} highlight={highlight} query={slash?.query}
           onPick={pickCommand} onHighlight={setHighlight} />
+        {commandPickerOpen && (
+          <span role="status" className="sr-only">
+            {commandCandidates.length === 0 ? t("composer.commands.noMatch", { query: slash?.query ?? "" })
+              : commandCandidates.length === 1 ? t("composer.commands.resultOne")
+                : t("composer.commands.resultOther", { count: commandCandidates.length })}
+          </span>
+        )}
         <MentionMenu listRef={mentionListRef} motion={mentionMotion} choices={candidates} highlight={highlight}
           everyoneCount={mentionEveryoneCount} onPick={pickMention} onHighlight={setHighlight} />
         {approval && (
@@ -947,6 +956,11 @@ export function Composer({
               // An input method's confirming Enter and arrows pick its own candidates, not a mention or command.
               if (imeComposing(e.nativeEvent)) return;
               if (commandPickerOpen) {
+                if (e.key === "Home" || e.key === "End") {
+                  e.preventDefault();
+                  setHighlight(e.key === "Home" ? 0 : Math.max(0, commandCandidates.length - 1));
+                  return;
+                }
                 if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                   e.preventDefault();
                   const delta = e.key === "ArrowDown" ? 1 : -1;

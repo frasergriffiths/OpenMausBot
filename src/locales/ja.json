@@ -1998,7 +1998,6 @@
   "composer.command.goalBotDesc": "目標を達成するまでこのボットに作業を続けさせます",
   "composer.command.learnDesc": "この会話から再利用できるスキルの下書きを作成",
   "composer.command.setupDesc": "このボットに質問させて、自分で設定させます",
-  "composer.command.skillTag": "スキル",
   "composer.busy.team": "チーム",
   "composer.busy.aBot": "ボット",
   "composer.busy.theBot": "ボット",
@@ -6330,5 +6329,11 @@
   "composer.placeholder.steerUnavailable": "{name} is working — {key} stops this turn and sends this message now",
   "composer.send.steerUnavailable": "Stop this turn and send",
   "composer.notice.steerQueued": "Still working — queued this message instead",
-  "task.archivedNone": "No archived threads"
+  "task.archivedNone": "No archived threads",
+  "composer.commands.skills": "Skills",
+  "composer.commands.keys": "↑↓ move · ↵ pick · Esc close",
+  "composer.commands.noMatch": "No commands match “{query}”",
+  "composer.commands.noMatchHint": "Type / to see every command",
+  "composer.commands.resultOne": "1 command",
+  "composer.commands.resultOther": "{count} commands"
 }
