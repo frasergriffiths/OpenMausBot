@@ -1150,7 +1150,7 @@ export function ComputerPanel({
     <aside
       className={cn(
         embedded
-          ? "relative flex h-full min-h-0 w-full flex-col bg-panel"
+          ? "relative flex h-full min-h-0 w-full flex-col"
           : "animate-panel-in relative flex h-full shrink-0 flex-col border-l border-hairline/40 bg-panel max-md:absolute max-md:inset-0 max-md:z-40 max-md:w-full!",
       )}
       ref={panelRef}
