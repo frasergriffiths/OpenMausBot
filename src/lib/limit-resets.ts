@@ -45,10 +45,19 @@ export function useEngineLimits(): EngineLimit[] {
     listeners.add(listener);
     if (report) setEngines(report.engines);
     void loadLimits();
-    timer ??= setInterval(() => void loadLimits(), POLL_MS);
+    const start = () => { timer ??= setInterval(() => void loadLimits(), POLL_MS); };
+    const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const onVisibility = () => {
+      if (document.visibilityState !== "visible") { stop(); return; }
+      void loadLimits();
+      start();
+    };
+    if (typeof document === "undefined" || document.visibilityState === "visible") start();
+    document?.addEventListener("visibilitychange", onVisibility);
     return () => {
       listeners.delete(listener);
-      if (!listeners.size && timer) { clearInterval(timer); timer = null; }
+      document?.removeEventListener("visibilitychange", onVisibility);
+      if (!listeners.size) stop();
     };
   }, []);
   return engines;
