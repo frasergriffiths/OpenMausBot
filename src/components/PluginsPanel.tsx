@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, ChevronRight, Loader2, RefreshCw, Search, Server, TriangleAlert, X } from "lucide-react";
 import { api, useStore, type Bot, type InstanceInfo } from "@/state/store";
 import { cn } from "@/lib/cn";
+import { Notice } from "./Notice";
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
@@ -627,27 +628,23 @@ export function PluginsPanel() {
             </div>
           )}
           {setupNotice && filter !== "mcp" && (
-            <div
-              className={cn(
-                "mb-3 rounded-xl px-4 py-3 text-[13px]",
-                setupNotice.tone === "warning" ? "bg-warning/10 text-warning" : "bg-control/50 text-ink-secondary",
-              )}
+            <Notice
+              tone="warning"
+              className="mb-3"
+              action={
+                <button
+                  className={cn("font-medium underline underline-offset-2", remoteClient && "hidden")}
+                  onClick={() => {
+                    close();
+                    dispatch({ type: "toggleAppSettings", open: true, section: "connections" });
+                  }}
+                >
+                  {t("connectors.openSettings")}
+                </button>
+              }
             >
-              {t(whopConnected ? "whop.otherAppsSetup" : setupNotice.key)}{" "}
-              <button
-                className={cn(
-                  "font-medium underline underline-offset-2",
-                  setupNotice.tone === "info" && "text-ink",
-                  remoteClient && "hidden",
-                )}
-                onClick={() => {
-                  close();
-                  dispatch({ type: "toggleAppSettings", open: true, section: "connections" });
-                }}
-              >
-                {t("connectors.openSettings")}
-              </button>
-            </div>
+              {t(whopConnected ? "whop.otherAppsSetup" : setupNotice.key)}
+            </Notice>
           )}
           {botsWithoutApps.length > 0 && (
             <div className="mb-3 rounded-xl bg-control/50 px-4 py-3 text-[13px] leading-relaxed text-ink-secondary">
