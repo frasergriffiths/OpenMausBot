@@ -185,6 +185,43 @@ describe("the thread chip in Simple mode", () => {
     expect(menu!.parentElement).toBe(document.body);
   });
 
+  it("gives the delete dialog its own lifetime inside the switcher", async () => {
+    fixture.threadsWanted = true;
+    draw();
+    flushSync(() => chip()!.click());
+    const openDelete = () => {
+      const kebab = sheet()!.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;
+      flushSync(() => kebab.click());
+      const item = [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')]
+        .find((candidate) => candidate.textContent?.trim() === "Delete")!;
+      flushSync(() => item.click());
+    };
+    const dialog = () => document.querySelector<HTMLElement>('[role="alertdialog"]');
+
+    openDelete();
+    expect(dialog()?.textContent).toContain("Delete thread?");
+    // A press inside the dialog is not a press outside the switcher: neither may close.
+    flushSync(() => dialog()!.dispatchEvent(new Event("pointerdown", { bubbles: true })));
+    await settle();
+    expect(dialog()).not.toBeNull();
+    expect(sheet()).not.toBeNull();
+
+    // Escape cancels the dialog only; the switcher stays, and focus lands back on something real.
+    flushSync(() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })));
+    await settle();
+    expect(dialog()).toBeNull();
+    expect(sheet()).not.toBeNull();
+    expect(document.activeElement).not.toBe(document.body);
+
+    // Confirm deletes once and closes both.
+    actions.length = 0;
+    openDelete();
+    flushSync(() => [...dialog()!.querySelectorAll<HTMLButtonElement>("button")].find((candidate) => candidate.textContent?.trim() === "Delete thread")!.click());
+    await settle();
+    expect(actions.filter((action) => action.type === "deleteTask").length).toBe(1);
+    expect(dialog()).toBeNull();
+  });
+
   it("closes the switcher when the chip is pressed a second time, instead of reopening it", async () => {
     fixture.threadsWanted = true;
     draw();

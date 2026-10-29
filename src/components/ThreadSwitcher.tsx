@@ -52,7 +52,8 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
   // The chip that opened it counts as inside: a second press closes it through its own toggle instead of the
   // outside-press dismiss closing it and the click opening it again.
   const inside = useRef({ contains: (target: unknown) => panelRef.current?.contains(target as Node) === true || anchorRef.current?.contains(target as Node) === true });
-  usePopoverDismiss(open, inside, () => onClose(true));
+  // While a delete is being confirmed the dialog owns the screen: outside presses and Escape are the dialog's.
+  usePopoverDismiss(open && !deleting, inside, () => onClose(true));
 
   useLayoutEffect(() => {
     if (!motion.shown) { setPosition(null); return; }
@@ -83,7 +84,7 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
     return () => cancelAnimationFrame(frame);
   }, [open]);
 
-  if (!motion.shown) return null;
+  if (!motion.shown && !deleting) return null;
 
   const current = bot.threadId;
   // Archived threads are their own group, never mixed into the list above it.
@@ -152,7 +153,9 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
     ];
   };
 
-  return createPortal(
+  return (
+    <>
+      {motion.shown && createPortal(
     <div
       ref={panelRef}
       id="thread-switcher"
@@ -204,17 +207,20 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
           </ul>
         )}
       </div>
+    </div>,
+        document.body,
+      )}
       {deleting && (
         <ConfirmDialog
           open
           title={t("task.deleteConfirm")}
           body={t("task.deleteBody", { title: displayTitle(deleting) })}
           confirmLabel={t("task.deleteAria")}
+          returnFocusRef={anchorRef}
           onCancel={() => setDeleting(null)}
           onConfirm={() => { actions.onDelete(deleting); setDeleting(null); onClose(true); }}
         />
       )}
-    </div>,
-    document.body,
+    </>
   );
 }
