@@ -818,17 +818,6 @@ export function Composer({
             </button>
           </div>
         ))}
-        <SlashCommandMenu listRef={commandListRef} motion={commandMotion} commands={commandCandidates} highlight={highlight} query={slash?.query}
-          onPick={pickCommand} onHighlight={setHighlight} />
-        {commandPickerOpen && (
-          <span role="status" className="sr-only">
-            {commandCandidates.length === 0 ? t("composer.commands.noMatch", { query: slash?.query ?? "" })
-              : commandCandidates.length === 1 ? t("composer.commands.resultOne")
-                : t("composer.commands.resultOther", { count: commandCandidates.length })}
-          </span>
-        )}
-        <MentionMenu listRef={mentionListRef} motion={mentionMotion} choices={candidates} highlight={highlight}
-          everyoneCount={mentionEveryoneCount} onPick={pickMention} onHighlight={setHighlight} />
         {approval && (
           <div className="mb-2 overflow-hidden rounded-2xl bg-composer ring-1 ring-composer-ring">
             <PendingApprovalPanel
@@ -876,6 +865,17 @@ export function Composer({
             className={cn("pointer-events-none absolute -left-5 -right-5 bg-app", advanced ? "-bottom-3 top-1/2" : cn("top-0", simpleDock ? "-bottom-4" : "-bottom-3"))}
           />
         <div ref={shellRef} data-tour="composer" data-multiline={multiline ? "" : undefined} className={cn("@container/composer relative z-[1]", singleRow ? "flex items-end gap-2" : simpleDock ? cn(SIMPLE_COMPOSER, multiline ? "rounded-[18px]" : "rounded-[22px]") : "rounded-2xl bg-composer px-2 py-1.5 ring-1 ring-composer-ring")}>
+        <SlashCommandMenu listRef={commandListRef} motion={commandMotion} commands={commandCandidates} highlight={highlight} query={slash?.query}
+          onPick={pickCommand} onHighlight={setHighlight} />
+        {commandPickerOpen && (
+          <span role="status" className="sr-only">
+            {commandCandidates.length === 0 ? t("composer.commands.noMatch", { query: slash?.query ?? "" })
+              : commandCandidates.length === 1 ? t("composer.commands.resultOne")
+                : t("composer.commands.resultOther", { count: commandCandidates.length })}
+          </span>
+        )}
+        <MentionMenu listRef={mentionListRef} motion={mentionMotion} choices={candidates} highlight={highlight}
+          everyoneCount={mentionEveryoneCount} onPick={pickMention} onHighlight={setHighlight} />
         {singleRow && !locked && (
           <div className="flex shrink-0 items-center">
             <PhonePlus
