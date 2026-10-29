@@ -873,7 +873,6 @@ export function Composer({
             </div>
           )}
           <MentionTextarea
-            matchInputStyle={!advanced}
             wrapperClassName={singleRow || simpleDock ? undefined : "@max-[30rem]/composer:order-first @max-[30rem]/composer:basis-full"}
             inputRef={inputRef}
             peers={[...(group ? members ?? [] : state.bots.filter((member) => member.id !== bot?.id)), ...teammates.peers]}
