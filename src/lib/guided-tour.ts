@@ -54,9 +54,9 @@ const SIMPLE_STEPS: Partial<Record<TourStepId, Partial<TourStep>>> = {
 
 const SIMPLE_TOUR_STEPS: TourStep[] = TOUR_STEPS.map((step) => ({ ...step, ...SIMPLE_STEPS[step.id] }));
 
-/** The steps as the current mode draws them: the same ids and order, so progress carries across a mode switch. */
-export function tourSteps(advanced: boolean): TourStep[] {
-  return advanced ? TOUR_STEPS : SIMPLE_TOUR_STEPS;
+/** The steps as the plain UI draws them. The advanced copy of each step is gone. */
+export function tourSteps(_advanced?: boolean): TourStep[] {
+  return SIMPLE_TOUR_STEPS;
 }
 
 function stepDone(record: OnboardingStatus | undefined, id: TourStepId): boolean {

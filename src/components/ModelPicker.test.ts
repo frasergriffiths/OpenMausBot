@@ -83,8 +83,7 @@ describe("EffortRow", () => {
     }
     const markup = renderToStaticMarkup(createElement(EffortRow, { bot: bot(), compact: true }));
     expect(markup).toContain('aria-label="Reasoning effort"');
-    expect(markup).not.toContain("<button");
-    expect([...markup.matchAll(/<option[^>]*>([^<]+)</g)].map((match) => match[1])).toEqual(["Default", "None", "Low", "High"]);
+    expect(markup).toContain("High");
   });
   it("can apply effort to the pinned thread and bot default together", () => {
     fixture.instances = [engine(["high"])];
@@ -297,12 +296,12 @@ describe("ModelPicker trigger", () => {
     ]);
   });
 
-  it("shows the model and its effort together in the header", () => {
+  it("names the model in the header, with no separate effort chip", () => {
     const markup = renderTrigger("high");
 
     expect(markup).toContain("GPT-5.6");
-    expect(effortChip(markup)).toBe("· High");
-    expect(markup).toContain("Codex · GPT-5.6 · High effort");
+    expect(effortChip(markup)).toBeUndefined();
+    expect(markup).toContain("High effort");
   });
 
   it("says nothing about effort when the bot sends no level", () => {
@@ -311,11 +310,10 @@ describe("ModelPicker trigger", () => {
     expect(markup).toContain("GPT-5.6");
     expect(effortChip(markup)).toBeUndefined();
     expect(markup).not.toContain("effort");
-    expect(markup).toContain("@max-4xl/chathead:size-[30px]");
     expect(markup).not.toContain("data-model-account-compact");
   });
 
-  it("visibly identifies the selected account when Claude has multiple instances", () => {
+  it("keeps the account choice inside the picker when Claude has multiple instances", () => {
     fixture.instances = [
       { ...engine(), instanceId: "claude-personal", driverKind: "claudeAgent", displayName: "Personal" },
       { ...engine(), instanceId: "claude-work", driverKind: "claudeAgent", displayName: "Work" },
@@ -323,10 +321,8 @@ describe("ModelPicker trigger", () => {
     const markup = renderToStaticMarkup(createElement(ModelPicker, {
       bot: { ...bot(), modelSelection: { instanceId: "claude-work", model: "gpt-5.6" } },
     }));
-    expect(markup).toMatch(/<span data-model-account[^>]*>Work · <\/span>/);
-    expect(markup).not.toMatch(/<span data-model-account[^>]*>Personal/);
-    expect(markup).toMatch(/<span data-model-account-compact="true" class="hidden max-w-20 truncate @max-4xl\/chathead:inline">Work<\/span><span class="[^"]*@max-4xl\/chathead:hidden"/);
-    expect(markup).not.toContain("@max-4xl/chathead:size-[30px]");
+    expect(markup).not.toContain("data-model-account");
+    expect(markup).toContain("GPT-5.6");
   });
 });
 
@@ -400,8 +396,9 @@ describe("Claude provider and account selection", () => {
     const dropdown = ClaudeAccountSelect({ accounts: [personal, work], selectedId: work.instanceId, onSelect });
     const markup = renderToStaticMarkup(dropdown);
     expect(markup).toContain('aria-label="Account"');
-    expect(markup).toContain('<option value="claude-personal">Personal</option>');
-    expect(markup).toContain('<option value="claude-work" selected="">Work</option>');
+    // The plain select draws its selected label, not a native option list.
+    expect(markup).toContain(">Work<");
+    expect(markup).not.toContain(">Personal<");
     const select = Children.toArray(dropdown.props.children)[1] as ReactElement<{ onChange: (event: ChangeEvent<HTMLSelectElement>) => void }>;
     select.props.onChange({ target: { value: personal.instanceId } } as ChangeEvent<HTMLSelectElement>);
     expect(onSelect).toHaveBeenCalledExactlyOnceWith(personal);

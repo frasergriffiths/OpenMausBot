@@ -59,10 +59,9 @@ describe("guided tour", () => {
     expect(ANCHOR_EFFECTS.has("closeApps")).toBe(false);
   });
 
-  it("keeps Advanced mode's steps exactly as they were", () => {
-    expect(tourSteps(true)).toBe(TOUR_STEPS);
-    expect(step("tour.model")).toEqual({ id: "tour.model", anchor: "model", placement: "below" });
-    expect(step("tour.computer")).toEqual({ id: "tour.computer", anchor: "computer", placement: "below", onExit: "openComputer" });
+  it("draws the plain steps for every caller", () => {
+    expect(tourSteps(true)).toBe(tourSteps(false));
+    expect(tourSteps(true).find((s) => s.id === "tour.model")).toMatchObject({ anchor: "bot-pill", skipIfMissing: true });
   });
 
   it("walks Simple mode through the bot pill where the header's model chip and Computer button were", () => {
@@ -88,8 +87,8 @@ describe("guided tour", () => {
   it("resumes at the same step and number in either mode", () => {
     const record = withDone(["tour.composer"]);
     expect(currentStep(record, false)).toMatchObject({ id: "tour.model", anchor: "bot-pill" });
-    expect(currentStep(record, true)).toMatchObject({ id: "tour.model", anchor: "model" });
-    expect(currentStep(record)).toBe(step("tour.model"));
+    expect(currentStep(record, true)).toMatchObject({ id: "tour.model", anchor: "bot-pill" });
+    expect(currentStep(record)).toBe(tourSteps(false).find((s) => s.id === "tour.model"));
     expect(stepNumber(currentStep(record, false)!)).toEqual(stepNumber(step("tour.model")));
     expect(stepNumber(currentStep(record, false)!).current).toBe(2);
     expect(currentStep(withDone(TOUR_STEPS.map((s) => s.id)), false)).toBeNull();

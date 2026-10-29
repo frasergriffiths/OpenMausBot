@@ -2,7 +2,6 @@ import { Children, Fragment, isValidElement, useCallback, useEffect, useId, useL
 import { createPortal } from "react-dom";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { isTypeaheadKey, typeaheadMatch, typeaheadText } from "@/lib/menu-keys";
 import { usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { MENU_LABEL, MENU_ROW } from "./menu-recipe";
@@ -25,18 +24,6 @@ const SIZES = {
 
 const GHOST_SIZE = "h-7 pl-2.5 pr-6 text-[13px] leading-4";
 
-// Advanced mode keeps the exact native control it had.
-const NATIVE_VARIANTS = {
-  field: "rounded-lg border border-hairline/40 bg-inset text-ink",
-  pill: "h-8 rounded-full border border-hairline/40 bg-raised/60 font-medium text-ink hover:bg-raised",
-  ghost: "h-7 rounded-lg border-[0.5px] [border-color:var(--settings-edge,color-mix(in_srgb,var(--color-ink)_8%,transparent))] bg-transparent text-ink hover:bg-ink/[0.06] [field-sizing:content]",
-  quiet: "rounded-md bg-ink/[0.05] text-ink outline-none hover:bg-ink/[0.08] focus-visible:ring-[1.5px] focus-visible:ring-focus",
-} as const;
-const NATIVE_SIZES = {
-  lg: { trigger: "py-2.5 pl-3 pr-9 text-[15px]", chevron: "right-2" },
-  md: { trigger: "py-2 pl-3 pr-9 text-[13px]", chevron: "right-2" },
-  sm: { trigger: "py-1.5 pl-2.5 pr-8 text-[13px]", chevron: "right-1.5" },
-} as const;
 const EDGE_MARGIN = 8;
 const MENU_GAP = 4;
 
@@ -103,31 +90,7 @@ function nextEnabled(options: OptionEntry[], from: number, step: 1 | -1): number
 }
 
 export function Select(props: SelectProps) {
-  const advanced = useAdvancedMode();
-  return advanced ? <NativeSelect {...props} /> : <SimpleSelect {...props} />;
-}
-
-function NativeSelect({ className, variant = "field", size = "md", ...props }: SelectProps) {
-  return (
-    <div className={cn("relative inline-flex min-w-0", className)}>
-      <select
-        {...props}
-        className={cn(
-          "peer w-full min-w-0 cursor-pointer appearance-none truncate disabled:cursor-default disabled:opacity-50",
-          NATIVE_VARIANTS[variant],
-          variant === "ghost" ? "pl-2.5 pr-[18px] text-[13px]" : NATIVE_SIZES[size].trigger,
-        )}
-      />
-      <Chevron
-        kind="menu"
-        size={variant === "ghost" ? "inline" : "row"}
-        className={cn(
-          "pointer-events-none absolute top-1/2 -translate-y-1/2 text-ink-secondary peer-disabled:opacity-50",
-          variant === "ghost" ? "right-1" : NATIVE_SIZES[size].chevron,
-        )}
-      />
-    </div>
-  );
+  return <SimpleSelect {...props} />;
 }
 
 function SimpleSelect({ className, variant = "field", size = "md", value, onChange, disabled, children, id, name, title, autoFocus, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-describedby": ariaDescribedBy, ...rest }: SelectProps) {

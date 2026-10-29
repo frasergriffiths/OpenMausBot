@@ -840,14 +840,18 @@ describe("the Computer tab", () => {
     expect(at("cloud")).toContain("Right now: Cloud desktop");
   });
 
-  it("keeps signed-in sites inline, opens the browser from its row, and logs out of the browser in one plain action", () => {
+  it("keeps signed-in sites inline, opens the browser from its row, and offers per-site sign-out plus Add login", () => {
     fixture.ownerOrAdmin = true;
     const rendered = computerTab(makeBot());
     click(find(rendered, "data-panel-page", "browser"));
     expect(onOpen).toHaveBeenLastCalledWith("browser");
     for (const page of ["folder", "logins", "android", "sites"]) expect(has(rendered, "data-panel-page", page)).toBe(false);
     const sites = ofType(rendered, SignedInSites)!;
-    expect(sites.props).toMatchObject({ bare: true, signOutStyle: "browser", target: { bot: "scout" }, sharedBy: ["Scout"], disabled: false });
+    expect(sites.props).toMatchObject({ bare: true, target: { bot: "scout" }, sharedBy: ["Scout"], disabled: false });
+    // Since 97c1b793c the tab signs out per site (with "Sign out of all" when there are several) and offers Add login,
+    // rather than one browser-wide sign-out: the test had kept the superseded style.
+    expect(sites.props.signOutStyle).toBeUndefined();
+    expect(has(rendered, "data-panel-action", "add-login")).toBe(true);
     expect(has(rendered, "data-panel-row", "data")).toBe(false);
     (fixture.dispatch as ReturnType<typeof vi.fn>).mockClear();
     click(find(rendered, "data-panel-action", "open-computer"));

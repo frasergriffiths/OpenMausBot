@@ -14,7 +14,6 @@ import { useStore, type Bot, type Group, type Message } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { BotAvatar } from "./Avatar";
 import { CallTargetButton, type CallButtonPlacement } from "./CallView";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { isRoutineApproval, isSkillApproval, pendingApprovals, spokenApprovalPrompt } from "./PendingApproval";
 
@@ -42,12 +41,6 @@ export function GroupCallButton({ group, members, placement, fill, ink }: { grou
       onStart={() => track("group_call_started", { memberCount: members.length })}
     />
   );
-}
-
-/** The room header's call button: in Simple mode the room calls from its composer instead. */
-export function RoomHeaderCallButton({ group, members }: { group: Group; members: Bot[] }) {
-  const advanced = useAdvancedMode();
-  return advanced ? <GroupCallButton group={group} members={members} /> : null;
 }
 
 export function GroupCallOverlay({ group, members }: { group: Group; members: Bot[] }) {

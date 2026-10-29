@@ -911,7 +911,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
   const onBranch = useCallback((messageId: string) => branch.current.some((m) => m.id === messageId), []);
   const colorMine = useColorUserBubbles();
   // Simple mode draws your bubble in one flat tone of the bot's colour.
-  const bubbleStyle = useMemo(() => (colorMine ? userBubbleStyle(bot.color, { flat: !advanced }) : undefined), [colorMine, bot.color, advanced]);
+  const bubbleStyle = useMemo(() => (colorMine ? userBubbleStyle(bot.color, { flat: true }) : undefined), [colorMine, bot.color, advanced]);
   const hasMore = Boolean(bot.hasMore);
   const reactor = useReactor();
   const speakerViewer = state.config?.team && reactor !== "user" ? reactor : null;
@@ -1169,13 +1169,13 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
         ref={scrollRef}
         className="glass-scroller h-full overflow-x-hidden overflow-y-auto overscroll-y-contain px-5 [overflow-anchor:none]"
         // Simple mode's composer sits on plain canvas, so a row scrolled into view stops clear of it.
-        style={advanced ? undefined : { scrollPaddingBottom: composerDock.pad }}
+        style={{ scrollPaddingBottom: composerDock.pad }}
         {...scrollHandlers}
       >
         <div
           ref={transcriptRef}
           // Simple mode spaces groups 16px apart, Advanced 12px.
-          data-simple-rows={advanced ? undefined : ""}
+          data-simple-rows=""
           className="glass-scroller-content chat-column relative flex w-full flex-col gap-3 data-[simple-rows]:gap-4"
           style={{ paddingBottom: composerDock.pad }}
           role="log"

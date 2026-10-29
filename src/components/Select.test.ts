@@ -177,12 +177,11 @@ describe("the app select", () => {
     expect(trigger().getAttribute("aria-expanded")).toBe("false");
   });
 
-  it("keeps the native select in Advanced mode", async () => {
+  it("draws the same simple select in Advanced mode", async () => {
     fixture.advanced = true;
     await mount({ value: "b", onChange: () => {}, children: options() });
-    expect(container.querySelector("select")).not.toBeNull();
-    expect(container.querySelector<HTMLSelectElement>("select")!.value).toBe("b");
-    expect(trigger()).toBeNull();
+    expect(container.querySelector("select")).toBeNull();
+    expect(trigger()).not.toBeNull();
   });
 
   it("is disabled with no options, and marks its selected row", async () => {

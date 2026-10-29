@@ -199,3 +199,22 @@ Stage 1 of the removal. Every non-test `useAdvancedMode` file, and every line th
 - :39 — `advanced &&` — **MERGE**: real behaviour or copy that must survive.
 **`src/lib/place-view.ts`** — hook at 108
 - :109 — `return { server: serverKind(config, platform), plan, role: ownerOrAdmin === false ? "user" : "ad` — **MERGE**: real behaviour or copy that must survive.
+
+## Stage 2 dispositions (release/0.1.143)
+
+Deleted in the stage-2 commit:
+- The advanced-only Inspector and Activity panel routes in `App.tsx`, and the advanced menu branches that toggled them (`ChatMoreMenu.tsx`). The panel components stay: the plain bot panel renders both on its usage page.
+- "Show advanced controls" in the Computer tab, the button that called `setAdvancedMode(true)`.
+- The advanced hover menu (sidebar attention trigger and its popover). The pinned attention rail stays; it is plain.
+- The model chip's advanced parts (account, provider, effort, compact account label); the picker now always draws the plain chip.
+- Inline chat rename on the empty chat; the plain name is shown.
+- The room header's group-call button; the composer's plain group-call button stays.
+- `FirstConversationTour` (advanced-only), the advanced tour copy in `guided-tour.ts` (every caller now gets the plain steps), and `MausBotWelcome`'s advanced styling.
+- The native `Select` branch; every caller now gets the plain select.
+- Pure advanced style branches: task-picker chevron hiding, group top fade, flat vs raised user bubble, composer scroll padding and simple-rows attributes, composer placeholder colour.
+
+Stayed, with the reason:
+- `ComputerPanel` advanced VPS controls, `ModelPicker` full view, `WelcomeBring` team import, `BotSettingsDialog` `simpleView`, ChatView's advanced header subtree, the `VerifyCard` run card and `Feed`/composer mode chips: real functionality (MERGE), not diagnostic or style-only. Their placement is Sage/Nova's settings-merge stage.
+- `ToolActivity`, `ActivityRun`, `failed-turn.ts`, `sidebar-preview.ts` advanced copy/label branches: parameterised text helpers shared with plain code, not surfaces; they return the plain branch already and are safe to collapse with the flag in stage 3.
+- Sidebar layout/density branches, `ChatView` advanced header, `ChatMoreMenu`'s Computer entry: structural branches that choose between real panels; not style-only.
+- The `settings.advancedMode` row, `ADVANCED_MODE_KEY`, `setAdvancedMode` and `src/lib/interface-mode.ts`: stage 3 by instruction.

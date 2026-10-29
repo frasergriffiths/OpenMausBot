@@ -10,9 +10,8 @@ import {
 } from "./TaskPicker";
 
 describe("the title-bar thread switcher chevron", () => {
-  it("stays visible in Simple and hides below the chathead breakpoint in Advanced", () => {
-    expect(taskPickerChevronClass(false)).toBe("shrink-0");
-    expect(taskPickerChevronClass(true)).toContain("@max-4xl/chathead:hidden");
+  it("stays visible below the chathead breakpoint", () => {
+    expect(taskPickerChevronClass()).toBe("shrink-0");
   });
 });
 

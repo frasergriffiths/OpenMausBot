@@ -26,7 +26,6 @@ import { useAdvancedMode } from "@/lib/interface-mode";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 
 import { t } from "@/lib/i18n";
-import { COMPACT_SQUARE } from "@/lib/compact-chip";
 import { useAiSwitch } from "@/lib/ai-switch";
 import { usePickerPane } from "@/lib/model-picker-pane";
 import { threadsOnOwnModel } from "../../shared/thread-model";
@@ -352,8 +351,6 @@ export function ModelPicker({
   const openaiAccounts = pickerInstances.filter((instance) => signInFamily(instance) === "openai");
   const openaiRailInstance = openaiAccounts.find((instance) => instance.instanceId === lastOpenaiIdRef.current)
     ?? openaiAccounts.find((instance) => instance.instanceId === selection.instanceId) ?? openaiAccounts[0];
-  const multipleClaudeAccounts = state.instances.filter(isClaudeAccount).length > 1;
-  const showActiveAccount = (multipleClaudeAccounts && isClaudeAccount(active)) || Boolean(active?.snapshot.chatgptPlan);
   const claudeRailInstance = claudeAccounts.find((instance) => instance.instanceId === lastClaudeIdRef.current)
     ?? claudeAccounts.find((instance) => instance.instanceId === selection.instanceId) ?? claudeAccounts[0];
   const railInstance =
@@ -710,61 +707,26 @@ export function ModelPicker({
     title: `${summary}${followLine}${attentionLine}${busyLine}`,
   };
 
-  const trigger = advanced ? (
-    <button
-      {...triggerProps}
-      className={cn(
-        "group flex items-center gap-1.5 rounded-full border-[0.5px] border-ink/10 py-1 pl-2 pr-2.5 text-[13px] text-ink disabled:cursor-not-allowed",
-        contained
-          ? "hover:bg-ink/[0.06] aria-expanded:bg-ink/[0.08] disabled:opacity-50 disabled:hover:bg-transparent"
-          : cn("bg-composer shadow-(--shadow-float) disabled:text-ink-tertiary disabled:hover:bg-composer", ELEVATED_HOVER),
-        !contained && active && !showActiveAccount && COMPACT_SQUARE,
-      )}
-    >
-      {active && <InstanceProviderMark instance={active} size={14} className="group-disabled:opacity-50" />}
-      {!contained && active && showActiveAccount && (
-        <span data-model-account-compact className="hidden max-w-20 truncate @max-4xl/chathead:inline">{active.displayName}</span>
-      )}
-      <span className={cn("flex min-w-0 items-center gap-1", !contained && active && "@max-4xl/chathead:hidden")}>
-        <span className="max-w-[160px] truncate">
-          {active && showActiveAccount && (
-            <span data-model-account className="text-ink-secondary">{active.displayName} · </span>
-          )}
-          {modelLabel(active, selection.model)}
-          {active && modelProvider(active, selection.model) && (
-            <span className="text-ink-secondary"> · {modelProvider(active, selection.model)}</span>
-          )}
-        </span>
-        {selectedVariantLabel !== undefined ? (
-          <span data-model-variant className="max-w-[120px] truncate text-ink-secondary">· {selectedVariantLabel}</span>
-        ) : selection.effort && (
-          <span data-model-effort className="shrink-0 text-ink-secondary">
-            · {effortLabel(selection.effort)}
-          </span>
-        )}
-      </span>
-      <Chevron kind="menu" open={open} size="row" className={cn("text-ink-secondary", !contained && active && "@max-4xl/chathead:hidden")} />
-    </button>
-  ) : (
-    <button
-      {...triggerProps}
-      className={cn(
-        "group flex items-center rounded-full text-[13px] leading-[18px] text-ink-secondary disabled:cursor-not-allowed disabled:text-ink-tertiary",
-        contained
-          ? "min-w-0 max-w-[58%] transition-colors duration-150 hover:bg-ink/[0.06] hover:text-ink aria-expanded:bg-ink/[0.08] aria-expanded:text-ink disabled:hover:bg-transparent"
-          : cn("shrink-0", ELEVATED_FLOAT, ELEVATED_HOVER, "hover:text-ink aria-expanded:text-ink"),
-        size === "sm" ? "h-7 pl-2 pr-1.5" : "h-8 pl-2.5 pr-2",
-      )}
-    >
-      <span className="relative mr-1.5 flex shrink-0 group-disabled:opacity-50">
-        {active
-          ? <InstanceProviderMark instance={active} size={14} subtle />
-          : <span className="size-3.5 rounded-full bg-ink/[0.08]" aria-hidden="true" />}
-        {attention && <span data-model-attention className="absolute -bottom-0.5 -right-0.5 size-1.5 rounded-full bg-warning ring-[1.5px] ring-app" />}
-      </span>
-      <span className="min-w-0 max-w-[160px] truncate">{modelName(active, selection.model)}</span>
-      <Chevron kind="menu" size="inline" className="ml-1 text-ink-tertiary group-hover:text-ink-secondary" />
-    </button>
+  const trigger = (
+  <button
+    {...triggerProps}
+    className={cn(
+      "group flex items-center rounded-full text-[13px] leading-[18px] text-ink-secondary disabled:cursor-not-allowed disabled:text-ink-tertiary",
+      contained
+        ? "min-w-0 max-w-[58%] transition-colors duration-150 hover:bg-ink/[0.06] hover:text-ink aria-expanded:bg-ink/[0.08] aria-expanded:text-ink disabled:hover:bg-transparent"
+        : cn("shrink-0", ELEVATED_FLOAT, ELEVATED_HOVER, "hover:text-ink aria-expanded:text-ink"),
+      size === "sm" ? "h-7 pl-2 pr-1.5" : "h-8 pl-2.5 pr-2",
+    )}
+  >
+    <span className="relative mr-1.5 flex shrink-0 group-disabled:opacity-50">
+      {active
+        ? <InstanceProviderMark instance={active} size={14} subtle />
+        : <span className="size-3.5 rounded-full bg-ink/[0.08]" aria-hidden="true" />}
+      {attention && <span data-model-attention className="absolute -bottom-0.5 -right-0.5 size-1.5 rounded-full bg-warning ring-[1.5px] ring-app" />}
+    </span>
+    <span className="min-w-0 max-w-[160px] truncate">{modelName(active, selection.model)}</span>
+    <Chevron kind="menu" size="inline" className="ml-1 text-ink-tertiary group-hover:text-ink-secondary" />
+  </button>
   );
 
   const simpleMenu = simpleView ? simpleModelMenu({

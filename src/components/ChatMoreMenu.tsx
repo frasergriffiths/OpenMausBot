@@ -127,17 +127,17 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
       key: "activity",
       label: t("activity.panel.title"),
       icon: <ListChecks size={16} />,
-      active: advanced ? state.activityOpen : state.settingsOpen && state.botSettingsSection === "usage",
+      active: state.settingsOpen && state.botSettingsSection === "usage",
       separatorBefore: !usage,
-      onSelect: () => advanced ? dispatch({ type: "toggleActivity" }) : openBotSettings(dispatch, "usage", { page: "activity" }),
+      onSelect: () => openBotSettings(dispatch, "usage", { page: "activity" }),
     } satisfies SidebarMenuItem, {
       key: "inspector",
       label: t("chat.inspector"),
       icon: <Bug size={16} />,
-      active: advanced ? state.inspectorOpen : state.settingsOpen && state.botSettingsSection === "usage",
-      // Simple mode keeps Activity and Inspector together, as the panel's menu draws them.
-      separatorBefore: advanced,
-      onSelect: () => advanced ? dispatch({ type: "toggleInspector" }) : openBotSettings(dispatch, "usage", { page: "runlog" }),
+      active: state.settingsOpen && state.botSettingsSection === "usage",
+      // Activity and Inspector share the panel's usage page.
+      separatorBefore: false,
+      onSelect: () => openBotSettings(dispatch, "usage", { page: "runlog" }),
     } satisfies SidebarMenuItem]),
   ];
   return { items, on: findOpen || state.inspectorOpen || state.activityOpen };
@@ -145,7 +145,6 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
 
 function RoundChatMoreMenu({ bot, phoneHeader }: { bot: Bot; phoneHeader: boolean }) {
   const { items, on } = useChatMoreItems(bot, phoneHeader);
-  const advanced = useAdvancedMode();
   return (
     <SidebarPopoverMenu
       items={items}
@@ -157,7 +156,7 @@ function RoundChatMoreMenu({ bot, phoneHeader }: { bot: Bot; phoneHeader: boolea
           data-testid="chat-more"
           className={cn(
             "flex size-8 items-center justify-center rounded-full",
-            advanced ? "bg-raised/50 transition-colors hover:bg-raised" : cn(ELEVATED_CONTROL, ELEVATED_HOVER, open && ELEVATED_OPEN),
+            cn(ELEVATED_CONTROL, ELEVATED_HOVER, open && ELEVATED_OPEN),
             "max-md:size-9 max-md:border max-md:border-hairline max-md:bg-card",
             open || on ? "text-accent" : "text-ink",
           )}
@@ -187,13 +186,12 @@ export function ChatShareMenu({ bot, className }: { bot: Bot; className: string 
 
 function ShareMenu({ bot, className }: { bot: Bot; className: string }) {
   const { items } = useChatMoreItems(bot);
-  const advanced = useAdvancedMode();
   return (
     <SidebarPopoverMenu
       items={items.filter((item) => EXPORT_ITEMS.includes(item.key)).map((item) => ({
         ...item, heading: undefined, separatorBefore: false, label: t(item.key === "copy" ? "chat.export.copyConversation" : "chat.export.downloadConversation"),
       }))}
-      compact={!advanced}
+      compact
       ariaLabel={t("chat.export.heading")}
       triggerClassName="rounded-full"
       triggerTitle={t("chat.export.heading")}

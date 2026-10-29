@@ -964,7 +964,7 @@ describe("every capability of the picker stays reachable", () => {
     expect(list(onMissing).current).toMatchObject({ meta: "Setup required", warning: true });
   });
 
-  it("in Advanced mode, from the chip and the full picker", () => {
+  it("from the plain chip and the full picker", () => {
     fixture.advanced = true;
     fixture.instances = [updated, signedOutWork, codex, plan, managed, local];
     const forBot = followed();
@@ -972,7 +972,7 @@ describe("every capability of the picker stays reachable", () => {
     const opened = open(forBot);
     const html = menu(opened.html);
     const checks = {
-      "chip shows account, model and effort": chipHtml.includes("data-model-account") && chipHtml.includes("data-model-effort"),
+      "plain chip, with no advanced account or effort parts": !chipHtml.includes("data-model-account") && !chipHtml.includes("data-model-effort"),
       "use the bot's model, checked while following": opened.nodes.some((node) => node.type === FollowBotModelRow),
       "engine rail with Cloud, API keys and Local, and a way to add keys": html.includes(">Cloud<") && html.includes(">API keys<") && html.includes(">Local<") && html.includes("data-rail-add-api-key"),
       "a managed engine stays on the rail, dimmed": html.includes("Managed by Acme") && html.includes("opacity-40"),
