@@ -1470,7 +1470,6 @@
   "attach.outsideWorkspacePath": "請在執行 OpenMausBot 的電腦上，於此路徑找到這個檔案",
   "attach.revealMissing": "該檔案已不存在",
   "attach.revealFailed": "無法在資料夾中顯示該檔案",
-  "task.renameHint": "點擊可切換 · 按兩下或按右鍵可重新命名",
   "task.newBusy": "請先讓這個回合結束",
   "task.new": "新增對話——從頭開始的全新對話",
   "task.switchWithUsage": "所有對話 · {label}（輸入 {input} · 輸出 {output}）",
@@ -1483,12 +1482,7 @@
   "attention.item": "{title} · {name} · {status}",
   "attention.pin": "釘選",
   "attention.unpin": "取消釘選",
-  "sidebar.pinnedThreads.title": "已釘選的對話",
-  "sidebar.pinnedThreads.item": "{title} · {name}",
   "task.search": "搜尋對話",
-  "task.renameAria": "重新命名對話",
-  "task.renameNamed": "重新命名 {title}",
-  "task.renameTitle": "重新命名這個對話",
   "task.regenerateTitle": "重新產生標題",
   "task.regeneratingTitle": "正在重新產生…",
   "task.deleteAria": "刪除對話",
@@ -4251,5 +4245,7 @@
   "botPanel.tab.profile": "個人資料",
   "botPanel.tab.library": "資料庫",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.browser": "瀏覽器"
+  "botPanel.page.browser": "瀏覽器",
+  "botPanel.tab.computer": "電腦",
+  "settings.sites.logOutBrowser": "登出瀏覽器"
 }

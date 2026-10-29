@@ -16,7 +16,6 @@ import { SkillReviewDialog, useManagedSkills, type ManagedSkill } from "../bot-s
 import { useBotApps, type BotApp } from "../bot-settings/useBotApps";
 import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
 import { RoutineList } from "../routines/RoutineList";
-import { BrowserLogins } from "./browser-logins";
 import { BrowserPanel } from "../BrowserPanel";
 import { ComputerPanel } from "../ComputerPanel";
 import { AndroidDevicePanel, useAndroidUsbDevices } from "../AndroidDevicePanel";
@@ -24,7 +23,6 @@ import { ActivityPanel } from "../ActivityPanel";
 import { InspectorPanel } from "../InspectorPanel";
 import { UsageSection } from "../bot-settings/UsageSection";
 import { ComputerFilesPane } from "../ComputerFilesPane";
-import { useOpenComputer } from "./WhereItWorks";
 import { memoryNotes, withMemoryNote, withoutMemoryNote } from "./memory-notes";
 import type { SimplePageId } from "./page-registry";
 import { BotSwitch, buttonCls, Card, LinkRow, NoteRow, RadioRow, rowCls, SwitchRow, TextRow, TrashButton } from "./rows";
@@ -363,11 +361,6 @@ export function FolderPage({ bot }: PageContext) {
   );
 }
 
-export function BrowserPage({ bot, derived }: PageContext) {
-  const openComputer = useOpenComputer(bot);
-  return <BrowserLogins bot={bot} browserEnabled={derived.browserEnabled} onOpenBrowser={() => openComputer("browser")} />;
-}
-
 export function ActivityPage({ bot }: PageContext) {
   return <ActivityPanel bot={bot} embedded />;
 }
@@ -376,12 +369,10 @@ export function RunLogPage({ bot }: PageContext) {
   return <InspectorPanel bot={bot} embedded />;
 }
 
-export function BrowserLivePage({ bot, derived, onOpen }: PageContext & { onOpen?: (page: SimplePageId) => void }) {
+/** The browser itself: its page, its tabs and its typing. Signed-in sites and signing out live on the Computer tab. */
+export function BrowserLivePage({ bot, derived }: PageContext) {
   if (!derived.browserEnabled) return <Card><NoteRow>{t("botAccess.browser.off")}</NoteRow></Card>;
-  return <>
-    <BrowserLogins bot={bot} browserEnabled onOpenBrowser={() => onOpen?.("browser")} />
-    <BrowserPanel bot={bot} />
-  </>;
+  return <BrowserPanel bot={bot} />;
 }
 
 export function FilesPage({ bot }: PageContext) {

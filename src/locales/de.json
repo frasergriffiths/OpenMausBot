@@ -869,15 +869,11 @@
   "attach.retrySaveAria": "{name} erneut speichern",
   "attach.downloading": "Lade herunter…",
   "attach.downloaded": "Heruntergeladen",
-  "task.renameHint": "Klicken zum Wechseln · Doppelklick oder Rechtsklick zum Umbenennen",
   "task.newBusy": "Lass diesen Zug erst zu Ende gehen",
   "task.new": "Neuer Thread — ein frisches Gespräch",
   "task.switchWithUsage": "Alle Threads · {label} ({input} ein · {output} aus)",
   "task.switch": "Alle Threads",
   "task.search": "Threads suchen",
-  "task.renameAria": "Thread umbenennen",
-  "task.renameNamed": "{title} umbenennen",
-  "task.renameTitle": "Diesen Thread umbenennen",
   "task.deleteAria": "Thread löschen",
   "thread.menu.delete": "Löschen",
   "task.deleteTitle": "Diesen Thread und sein Gespräch löschen",
@@ -2463,5 +2459,7 @@
   "botPanel.tab.profile": "Profil",
   "botPanel.tab.library": "Bibliothek",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.browser": "Browser"
+  "botPanel.page.browser": "Browser",
+  "botPanel.tab.computer": "Computer",
+  "settings.sites.logOutBrowser": "Im Browser abmelden"
 }

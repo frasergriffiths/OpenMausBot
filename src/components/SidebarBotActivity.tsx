@@ -1,10 +1,10 @@
-import { BellDot, CircleAlert, Clock3, Loader2, Pin, PinOff, type LucideIcon } from "lucide-react";
+import { BellDot, CircleAlert, Clock3, Loader2, type LucideIcon } from "lucide-react";
 import type { Dispatch } from "react";
 import type { Action, AppState, Bot, Group, Task } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { roomThreadSpeakerId, roomThreadWorking } from "@/lib/room-threads";
 import { t } from "@/lib/i18n";
-import { isArchived, orderedSidebarThreads, orderedThreadList, threadRecency, threadUpdatedLabel } from "./SidebarThreadRow";
+import { isArchived, orderedSidebarThreads, orderedThreadList } from "./SidebarThreadRow";
 import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { localizedTaskTitle } from "@/lib/task-title";
 
@@ -70,13 +70,6 @@ export function attentionJumpAction(entry: AttentionThread):
     : { type: "switchGroupTask", groupId: entry.groupId, threadId: entry.task.threadId };
 }
 
-export function attentionUnpinAction(entry: AttentionThread):
-  | { type: "updateTask"; botId: string; threadId: string; patch: { pinned: boolean } }
-  | { type: "pinGroupTask"; groupId: string; threadId: string; pinned: boolean; title: string } {
-  if (entry.kind === "bot") return { type: "updateTask", botId: entry.botId, threadId: entry.task.threadId, patch: { pinned: false } };
-  return { type: "pinGroupTask", groupId: entry.groupId, threadId: entry.task.threadId, pinned: false, title: entry.task.title };
-}
-
 /** aria-label replaces the button's contents, so the count must be in the name or a screen reader never hears it. */
 export function attentionTriggerLabel(count: number): string {
   return count > 0 ? t("attention.titleCount", { count }) : t("attention.title");
@@ -119,27 +112,6 @@ export function crossBotAttentionThreads(
       : { kind: "bot", botId: botId!, botName: botName!, task });
 }
 
-export function crossBotPinnedThreads(bots: Bot[], groups: Group[], queued: Record<string, unknown[]>): AttentionThread[] {
-  const flat: FlatAttentionEntry[] = [
-    ...bots
-      .filter((bot) => !bot.hidden)
-      .flatMap((bot): FlatAttentionEntry[] => (bot.tasks ?? [])
-        .filter((task) => task.pinned === true && !task.routineRunId)
-        .map((task) => ({ ...task, queued: Boolean(queued[task.threadId]?.length), botId: bot.id, botName: bot.name }))),
-    ...groups
-      .flatMap((group): FlatAttentionEntry[] => {
-        const activity = new Map(sidebarGroupActivityTasks(group, bots, queued).map((task) => [task.threadId, task]));
-        return (group.tasks ?? [])
-          .filter((task) => task.pinned === true)
-          .map((task) => ({ ...task, ...activity.get(task.threadId), queued: Boolean(queued[task.threadId]?.length), groupId: group.id, groupName: group.name, groupThreadId: group.threadId }));
-      }),
-  ];
-  return orderedThreadList(flat).map(({ botId, botName, groupId, groupName, groupThreadId, ...task }): AttentionThread =>
-    groupId !== undefined
-      ? { kind: "group", groupId, groupName: groupName!, groupThreadId: groupThreadId!, task }
-      : { kind: "bot", botId: botId!, botName: botName!, task });
-}
-
 export function AttentionThreadRows({ entries, onJump }: { entries: AttentionThread[]; onJump: (entry: AttentionThread) => void }) {
   return <>
     {entries.map((entry) => {
@@ -155,36 +127,6 @@ export function AttentionThreadRows({ entries, onJump }: { entries: AttentionThr
           <span className="block truncate text-[11px] text-ink-secondary">{name} · {status}</span>
         </span>
       </button>;
-    })}
-  </>;
-}
-
-export function PinnedThreadRows({ entries, now, onJump, onUnpin }: { entries: AttentionThread[]; now: number; onJump: (entry: AttentionThread) => void; onUnpin: (entry: AttentionThread) => void }) {
-  return <>
-    {entries.map((entry) => {
-      const name = attentionOwnerName(entry);
-      const status = attentionRowStatus(entry.task);
-      const updated = threadUpdatedLabel(threadRecency(entry.task), now);
-      const byline = status.active ? `${name} · ${status.label}` : updated ? `${name} · ${updated}` : name;
-      const label = t("sidebar.pinnedThreads.item", { title: entry.task.title, name: byline });
-      const unpinLabel = t("sidebar.bot.unpin");
-      const key = `${entry.kind}-${entry.kind === "bot" ? entry.botId : entry.groupId}-${entry.task.threadId}`;
-      const Icon = status.active ? status.Icon : Pin;
-      return <div key={key} className="group/pinned flex w-full items-center">
-        <button type="button" aria-label={label} title={label}
-          onClick={() => onJump(entry)}
-          className="flex min-w-0 flex-1 items-center gap-2.5 px-3.5 py-2 text-left text-[13px] text-ink hover:bg-menu-hover">
-          <Icon size={15} aria-hidden="true" className={cn("shrink-0", status.active ? status.colorClass : "text-ink-secondary")} />
-          <span className="min-w-0 flex-1">
-            <span className="block truncate">{entry.task.title}</span>
-            <span className="block truncate text-[11px] text-ink-secondary">{byline}</span>
-          </span>
-        </button>
-        <button type="button" aria-label={unpinLabel} title={unpinLabel} onClick={() => onUnpin(entry)}
-          className="mr-2 flex size-6 shrink-0 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover/pinned:opacity-100 max-md:opacity-70 touch:opacity-70">
-          <PinOff size={13} aria-hidden="true" />
-        </button>
-      </div>;
     })}
   </>;
 }

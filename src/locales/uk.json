@@ -950,7 +950,6 @@
   "attach.retrySaveAria": "Повторити збереження {name}",
   "attach.downloading": "Завантаження…",
   "attach.downloaded": "Завантажено",
-  "task.renameHint": "Клік для переключення · подвійний клік або правий клік для перейменування",
   "task.newBusy": "Дочекайтеся завершення цього запиту",
   "task.new": "Нова гілка — свіжа розмова",
   "task.switchWithUsage": "Усі гілки · {label} ({input} вхід · {output} вихід)",
@@ -958,9 +957,6 @@
   "task.otherActivity": "Інша активність ({count})",
   "task.workingElsewhere": "Працює в інших гілках: {count}",
   "task.search": "Пошук гілок",
-  "task.renameAria": "Перейменувати гілку",
-  "task.renameNamed": "Перейменувати {title}",
-  "task.renameTitle": "Перейменувати цю гілку",
   "task.deleteAria": "Видалити гілку",
   "thread.menu.delete": "Видалити",
   "task.deleteTitle": "Видалити цю гілку та її розмову",
@@ -2888,5 +2884,7 @@
   "botPanel.tab.profile": "Профіль",
   "botPanel.tab.library": "Бібліотека",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.browser": "Браузер"
+  "botPanel.page.browser": "Браузер",
+  "botPanel.tab.computer": "Комп'ютер",
+  "settings.sites.logOutBrowser": "Вийти з браузера"
 }

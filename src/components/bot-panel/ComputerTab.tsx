@@ -2,17 +2,19 @@ import { Globe2, Monitor, Smartphone } from "lucide-react";
 
 import { writeComputerPanelView, type ComputerPanelView } from "@/lib/computer-panel-view";
 import { t } from "@/lib/i18n";
+import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { useAdvancedMode } from "@/lib/interface-mode";
 import { useStore, type Bot } from "@/state/store";
 import { BotAvatar } from "../Avatar";
 import { LinuxLocalControl } from "../LinuxLocalControl";
 import { useAndroidUsbDevices } from "../AndroidDevicePanel";
 import { screenFramePreview } from "../ScreenFrame";
+import { SignedInSites } from "../SignedInSites";
 import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
 import type { SimplePageId } from "./page-registry";
 import { PlaceControl } from "./PlaceControl";
 import { CloudBackendPicker } from "../CloudBackendPicker";
-import { Card, NavRow } from "./rows";
+import { Card, ColRow, NavRow } from "./rows";
 
 type Derived = ReturnType<typeof useBotSettingsDerived>;
 
@@ -25,19 +27,29 @@ export function useOpenComputer(bot: Pick<Bot, "id">) {
   };
 }
 
-/** Where the bot works, as part of its profile: its screen, the place control every surface shares, and the browser and
- *  signed-in sites behind it. There is no separate Computer tab and no second control. */
-export function WhereItWorks({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
+/** The Computer tab: the bot's screen, the one place control, and the browser behind it. Signed-in sites live here
+ *  inline rather than on a view of their own, and the only sign-out is one plain "log out of browser". */
+export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
+  const ownerOrAdmin = useOwnerOrAdmin();
+  const { state } = useStore();
+  const { browserEnabled } = derived;
   const screenOf = t("computer.screenOf", { name: bot.name });
   const android = useAndroidUsbDevices();
   const openComputer = useOpenComputer(bot);
   const advanced = useAdvancedMode();
+  const profileId = bot.browserProfile ?? "";
+  const profile = (state.config?.browserProfiles ?? []).find((candidate) => candidate.id === profileId);
+  const temporary = profileId === "guest";
+  const ownChrome = profile?.browser === "chrome" && state.config?.browserEngine?.myChrome === true;
+  const sharedBy = profileId && !temporary
+    ? state.bots.filter((candidate) => candidate.browserProfile === profileId).map((candidate) => candidate.name)
+    : [bot.name];
 
   const screen = [...bot.messages].reverse().find((message) => message.kind === "screen" && (message.hasImage || message.png));
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
 
   return (
-    <div data-panel-where-section="">
+    <div data-panel-tabpanel="computer" className="[&>*:first-child]:mt-0">
       <LinuxLocalControl />
       <button
         type="button"
@@ -69,7 +81,7 @@ export function WhereItWorks({ bot, derived, onOpen }: { bot: Bot; derived: Deri
       </button>
       <div className="mt-3 text-center text-[13px] text-ink-tertiary">{screenOf}</div>
 
-      <Card label={t("computer.simple.whereWorks", { name: bot.name })} anchor="where">
+      <Card label={t("computer.simple.whereWorks", { name: bot.name })}>
         <div className="p-3">
           <PlaceControl bot={bot} patch={derived.patch} approvalMode={derived.approvalMode} dataAttr="data-panel-where" />
           {bot.computer === "cloud" && (
@@ -90,6 +102,23 @@ export function WhereItWorks({ bot, derived, onOpen }: { bot: Bot; derived: Deri
             value={android.devices.length}
             onClick={() => onOpen("android")}
           />
+        )}
+      </Card>
+
+      <Card anchor="logins" label={t("settings.sites.title")}>
+        {!browserEnabled ? (
+          <ColRow><span className="text-[13px] text-ink-secondary">{t("botSettings.simple.loginsOff", { name: bot.name })}</span></ColRow>
+        ) : temporary ? (
+          <ColRow><span className="text-[13px] text-ink-secondary">{t("settings.profiles.temporaryHint")}</span></ColRow>
+        ) : ownChrome ? (
+          <ColRow><span className="text-[13px] text-ink-secondary">{t("settings.profiles.myChromeHint")}</span></ColRow>
+        ) : (
+          // Security: reading and clearing a browser's sign-ins is the owner's or an admin's; the server refuses anyone else.
+          ownerOrAdmin !== false && (profileId === "" || profile) && (
+            <ColRow>
+              <SignedInSites bare signOutStyle="browser" key={`${bot.id}:${profileId}`} target={{ bot: bot.id }} sharedBy={sharedBy} disabled={Boolean(bot.busy)} />
+            </ColRow>
+          )
         )}
       </Card>
     </div>

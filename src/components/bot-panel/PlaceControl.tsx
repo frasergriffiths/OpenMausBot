@@ -27,6 +27,22 @@ const GAP = 6;
 const placeRows = (menu: HTMLElement | null) =>
   menu ? [...menu.querySelectorAll<HTMLElement>('[role="menuitemradio"]:not(:disabled)')] : [];
 
+/** The place in one read-only line, for a recap: the name and consequence come from the same table the control draws. */
+export function PlaceAnswer({ bot }: { bot: Bot }) {
+  const { capabilities } = useDesktopCapabilities();
+  const platform = capabilities.host?.platform ?? "other";
+  const views = usePlaceViews(bot);
+  const current = (bot.computer ?? "auto") as EffectivePlace;
+  const view = current === "auto" || current === "off" ? undefined : views[current].view;
+  const copy = placeCopy(current, view, platform);
+  return (
+    <span data-place-answer="" className="flex min-w-0 flex-col">
+      <span className="min-w-0 truncate text-[13px] leading-[18px] text-ink">{copy.name}</span>
+      {copy.line && <span className="min-w-0 truncate text-[12px] leading-4 text-ink-secondary">{copy.line}</span>}
+    </span>
+  );
+}
+
 /** One place control, used by the bot profile and the setup card: a two-line trigger and a menu of the places.
  *  The name, state, consequence and needs come from one table, so no surface invents its own vocabulary; the menu is
  *  the shared sheet (popover-surface, --radius-menu, 240px, 30px rows, 16px icons, shadow-lg, pop-in/pop-out) with the

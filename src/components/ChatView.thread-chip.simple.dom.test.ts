@@ -184,4 +184,32 @@ describe("the thread chip in Simple mode", () => {
     expect(sheet()!.contains(menu)).toBe(false);
     expect(menu!.parentElement).toBe(document.body);
   });
+
+  it("closes the switcher when the chip is pressed a second time, instead of reopening it", async () => {
+    fixture.threadsWanted = true;
+    draw();
+    flushSync(() => chip()!.click());
+    expect(sheet()).not.toBeNull();
+    // The real press, in its own event: a pointerdown outside the sheet, then the chip's own click.
+    flushSync(() => chip()!.dispatchEvent(new Event("pointerdown", { bubbles: true })));
+    flushSync(() => chip()!.click());
+    await settle();
+    expect(sheet()).toBeNull();
+    expect(chip()!.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("keeps an archived thread in its own group at the end, not mixed into the open ones", () => {
+    fixture.threadsWanted = true;
+    const archived = { ...tasks[0]!, threadId: "thread-1", title: "Put away", archivedAt: at };
+    state.bots = [{ ...bot, tasks: [archived, ...tasks.slice(1)] }];
+    draw();
+    flushSync(() => chip()!.click());
+    const list = sheet()!;
+    const heading = list.querySelector("[data-thread-switcher-archived]");
+    expect(heading?.textContent).toBe("Archived");
+    const all = rows();
+    expect(all.map((row) => row.getAttribute("data-thread-row"))).toEqual(["thread-2", "thread-3", "thread-4", "thread-1"]);
+    // The archived row comes after the heading, so it is never between two open ones.
+    expect(heading!.compareDocumentPosition(all[3]!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });

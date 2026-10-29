@@ -147,4 +147,16 @@ describe("the Simple computer switcher", () => {
     await flush();
     expect(environments.forget).toHaveBeenCalledWith("mini");
   });
+
+  it("closes on a second press of the same trigger instead of reopening", async () => {
+    await mount();
+    await act(async () => trigger().click());
+    expect(sheet()).not.toBeNull();
+    // The real press: a pointerdown on the trigger, then its own click.
+    await act(async () => trigger().dispatchEvent(new Event("pointerdown", { bubbles: true })));
+    await act(async () => trigger().click());
+    await settle();
+    expect(sheet()).toBeNull();
+    expect(trigger().getAttribute("aria-expanded")).toBe("false");
+  });
 });

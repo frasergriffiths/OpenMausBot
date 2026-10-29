@@ -150,7 +150,10 @@ function WorkspaceMenu({ open, anchor, saved, switching, onPick, onForget, onCon
   const motion = useMenuMotion(open);
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
-  const inside = useRef({ contains: (target: unknown) => ref.current?.contains(target as Node) === true });
+  // The switcher's own trigger counts as inside: pressing it while open reaches its toggle, which closes the menu,
+  // rather than being dismissed as an outside press and reopened by the same click.
+  const inside = useRef({ contains: (target: unknown) => ref.current?.contains(target as Node) === true
+    || (target instanceof Element && Boolean(target.closest("[data-workspace-switcher]"))) });
   usePopoverDismiss(open, inside, onClose);
   useLayoutEffect(() => {
     if (!motion.shown) { setPosition(null); return; }

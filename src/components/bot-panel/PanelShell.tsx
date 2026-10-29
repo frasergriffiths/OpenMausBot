@@ -11,6 +11,7 @@ import { Select } from "@/components/Select";
 import { MAUS_COLORS, mascotInk } from "@/lib/mascot";
 import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
 import { AvatarEditorCard } from "./AvatarEditorCard";
+import { ComputerTab } from "./ComputerTab";
 import { DetailsTab } from "./DetailsTab";
 import { LibraryTab } from "./LibraryTab";
 import { PANEL_TABS, PAGES, TAB_LABEL, type PanelTarget, type SimplePageId } from "./page-registry";
@@ -225,6 +226,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           >
             {tab === "profile" && <DetailsTab bot={bot} derived={derived} onOpen={openPage} editingInstructions={editingInstructions} onEditInstructions={setEditingInstructions} />}
             {tab === "library" && <LibraryTab bot={bot} onOpen={openPage} />}
+            {tab === "computer" && <ComputerTab bot={bot} derived={derived} onOpen={openPage} />}
           </div>
         ) : (
           <div data-panel-page-view={page} className={cn((page === "browser" || page === "files" || page === "computer") && "flex min-h-0 flex-1 flex-col")}>

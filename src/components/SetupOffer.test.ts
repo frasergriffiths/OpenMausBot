@@ -142,11 +142,14 @@ describe("the setup card under a new bot's greeting", () => {
     expect(fixture.api).not.toHaveBeenCalled();
   });
 
-  it("settles once answered: the answers go quiet and the answer shows", () => {
+  it("settles once answered: both answers stay, the job and where it works", () => {
     const picked = { id: "u1", role: "user", kind: "text", at: 2, text: "Watch the news", setupRequest: true } as Message;
     const settled = renderOffer(offered, [offered, picked]);
     expect(settled.html).toContain("Your answer");
     expect(settled.html).toContain("Watch the news");
+    expect(settled.html).toContain("Where Ava works");
+    expect(settled.html).toContain('data-setup-place-answer=""');
+    expect(settled.html).toContain("Automatic");
     expect(settled.choices.every((node) => node.props.disabled === true)).toBe(true);
     expect(settled.close).toBeUndefined();
     expect(settled.card!.props.onKeyDown).toBeUndefined();

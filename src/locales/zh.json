@@ -1115,7 +1115,6 @@
   "attach.retrySaveAria": "重新保存 {name}",
   "attach.downloading": "正在下载…",
   "attach.downloaded": "已下载",
-  "task.renameHint": "点击切换 · 双击或右键重命名",
   "task.newBusy": "先让本轮结束",
   "task.new": "新建对话——从头开始的全新对话",
   "task.switchWithUsage": "全部对话 · {label}（输入 {input} · 输出 {output}）",
@@ -1128,9 +1127,6 @@
   "attention.pin": "钉选",
   "attention.unpin": "取消钉选",
   "task.search": "搜索对话",
-  "task.renameAria": "重命名对话",
-  "task.renameNamed": "重命名 {title}",
-  "task.renameTitle": "重命名此对话",
   "task.deleteAria": "删除对话",
   "thread.menu.delete": "删除",
   "task.deleteTitle": "删除此对话及其聊天记录",
@@ -3257,5 +3253,7 @@
   "botPanel.tab.profile": "个人资料",
   "botPanel.tab.library": "资料库",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.browser": "浏览器"
+  "botPanel.page.browser": "浏览器",
+  "botPanel.tab.computer": "电脑",
+  "settings.sites.logOutBrowser": "退出浏览器登录"
 }

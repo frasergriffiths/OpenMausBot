@@ -66,9 +66,7 @@ describe("project thread grouping", () => {
 });
 
 describe("task picker copy", () => {
-  it("advertises both gestures the row actually handles", () => {
-    expect(t("task.renameHint")).toContain("double-click");
-    expect(t("task.renameHint")).toContain("right-click");
+  it("keeps the switch click, with no rename gesture on the row", () => {
     expect(TASK_PICKER_DISMISS_MS).toBeGreaterThanOrEqual(500);
   });
 

@@ -27,11 +27,9 @@ export async function deleteThreadsInBulk(owner: { botId: string } | { groupId: 
 }
 
 export function bulkDeleteBody(rows: readonly SelectableRow[], selected: Selection, freshConversation: boolean): string {
-  const pinned = rows.filter((row) => selected.has(row.threadId) && row.pinned === true).length;
   const everything = rows.length > 0 && rows.every((row) => selected.has(row.threadId));
   return [
     t("task.bulk.confirmBody"),
-    pinned > 0 ? t("task.bulk.pinnedNote", { count: pinned }) : null,
     freshConversation && everything ? t("task.bulk.freshNote") : null,
   ].filter(Boolean).join(" ");
 }

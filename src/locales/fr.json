@@ -781,15 +781,11 @@
   "attach.retrySaveAria": "Réessayer d'enregistrer {name}",
   "attach.downloading": "Téléchargement…",
   "attach.downloaded": "Téléchargé",
-  "task.renameHint": "Cliquez pour changer · double-clic ou clic droit pour renommer",
   "task.newBusy": "Laissez ce tour se terminer d'abord",
   "task.new": "Nouveau fil — une nouvelle conversation",
   "task.switchWithUsage": "Tous les fils · {label} ({input} en entrée · {output} en sortie)",
   "task.switch": "Tous les fils",
   "task.search": "Rechercher des fils",
-  "task.renameAria": "Renommer le fil",
-  "task.renameNamed": "Renommer {title}",
-  "task.renameTitle": "Renommer ce fil",
   "task.deleteAria": "Supprimer le fil",
   "thread.menu.delete": "Supprimer",
   "task.deleteTitle": "Supprimer ce fil et sa conversation",
@@ -2445,5 +2441,7 @@
   "botPanel.tab.profile": "Profil",
   "botPanel.tab.library": "Bibliothèque",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.browser": "Navigateur"
+  "botPanel.page.browser": "Navigateur",
+  "botPanel.tab.computer": "Ordinateur",
+  "settings.sites.logOutBrowser": "Se déconnecter du navigateur"
 }

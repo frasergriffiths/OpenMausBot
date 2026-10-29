@@ -8,13 +8,15 @@ interface SignedInSite { site: string; cookies: number; storage: number }
 interface SignedInSitesAnswer { running: boolean; sites: SignedInSite[] }
 
 /** Security: the server reads and clears the browser itself, running or not, and keeps the key. */
-export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, bare = false }: {
+export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, bare = false, signOutStyle: signOutMode = "per-site" }: {
   target: { profile: string } | { bot: string };
   /** Which conversation's browser is meant, on a Team Cloud. */
   scope?: Readonly<Record<string, string>>;
   sharedBy: string[];
   disabled?: boolean;
   bare?: boolean;
+  /** "browser" reads the sites and offers one plain "Log out of browser" instead of a button per site. */
+  signOutStyle?: "per-site" | "browser";
 }) {
   const [sites, setSites] = useState<SignedInSite[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -41,6 +43,7 @@ export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, 
 
   const locked = disabled || busy;
   const buttonClass = "flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50";
+  const oneAction = signOutMode === "browser";
   const list = (
       <div className={bare ? "flex min-w-0 flex-col gap-2" : "mt-2 flex flex-col gap-2"} aria-busy={busy}>
         {sharedBy.length > 1 && <p className="text-[11px] leading-relaxed text-ink-secondary">{t("settings.sites.shared", { names: sharedBy.join(", ") })}</p>}
@@ -51,16 +54,18 @@ export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, 
             {sites.map((entry) => (
               <li key={entry.site} className="flex min-w-0 items-center gap-2 py-1.5">
                 <span className="min-w-0 flex-1 truncate text-[13px] text-ink" title={entry.site}>{entry.site}</span>
-                <button type="button" disabled={locked} onClick={() => void signOut(entry.site)} aria-label={t("settings.sites.signOutOf", { site: entry.site })} className={buttonClass}>
-                  <LogOut size={13} />{t("settings.sites.signOut")}
-                </button>
+                {!oneAction && (
+                  <button type="button" disabled={locked} onClick={() => void signOut(entry.site)} aria-label={t("settings.sites.signOutOf", { site: entry.site })} className={buttonClass}>
+                    <LogOut size={13} />{t("settings.sites.signOut")}
+                  </button>
+                )}
               </li>
             ))}
           </ul>
         )}
         {!!sites?.length && (
           <button type="button" disabled={locked} onClick={() => void signOut()} className={`${buttonClass} self-start`}>
-            <LogOut size={13} />{t("settings.sites.signOutAll")}
+            <LogOut size={13} />{oneAction ? t("settings.sites.logOutBrowser") : t("settings.sites.signOutAll")}
           </button>
         )}
         {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}

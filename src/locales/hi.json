@@ -781,15 +781,11 @@
   "attach.retrySaveAria": "{name} फिर से सहेजें",
   "attach.downloading": "डाउनलोड हो रहा है…",
   "attach.downloaded": "डाउनलोड हो गया",
-  "task.renameHint": "बदलने के लिए क्लिक करें · नाम बदलने के लिए डबल-क्लिक या राइट-क्लिक",
   "task.newBusy": "पहले यह बारी पूरी होने दें",
   "task.new": "नया थ्रेड — एक नई बातचीत",
   "task.switchWithUsage": "सभी थ्रेड · {label} ({input} इन · {output} आउट)",
   "task.switch": "सभी थ्रेड",
   "task.search": "थ्रेड खोजें",
-  "task.renameAria": "थ्रेड का नाम बदलें",
-  "task.renameNamed": "{title} का नाम बदलें",
-  "task.renameTitle": "इस थ्रेड का नाम बदलें",
   "task.deleteAria": "थ्रेड हटाएँ",
   "thread.menu.delete": "हटाएँ",
   "task.deleteTitle": "इस थ्रेड और इसकी बातचीत को हटाएँ",
@@ -2445,5 +2441,7 @@
   "botPanel.tab.profile": "प्रोफ़ाइल",
   "botPanel.tab.library": "लाइब्रेरी",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.browser": "ब्राउज़र"
+  "botPanel.page.browser": "ब्राउज़र",
+  "botPanel.tab.computer": "कंप्यूटर",
+  "settings.sites.logOutBrowser": "ब्राउज़र से साइन आउट करें"
 }

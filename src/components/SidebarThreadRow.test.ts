@@ -2,7 +2,7 @@ import { createElement, type ComponentProps, type MemoExoticComponent, type Reac
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setLocale } from "@/lib/i18n";
-import { formatUpdatedAt, nextSnoozeExpiry, orderedSidebarThreads, orderedThreadList, partitionHelperThreads, SidebarThreadRow, stampClock, threadByline, threadOpenerLabel, threadUpdatedLabel, visibleSidebarThreads } from "./SidebarThreadRow";
+import { formatUpdatedAt, nextSnoozeExpiry, orderedSidebarThreads, orderedThreadList, partitionHelperThreads, SidebarThreadRow, splitArchivedThreads, stampClock, threadByline, threadOpenerLabel, threadUpdatedLabel, visibleSidebarThreads } from "./SidebarThreadRow";
 
 type ThreadRowProps = ComponentProps<typeof SidebarThreadRow>;
 
@@ -64,7 +64,7 @@ describe("sidebar thread visibility", () => {
     const render = (busy = false, activity?: "waiting-on-you") => renderToStaticMarkup(createElement(SidebarThreadRow, {
       task: { threadId: "queued", title: "Next job", queued: true, busy, activity },
       ownerId: "scout",
-      current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+      current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
     }));
     expect(render()).toContain("Next job · Queued");
     expect(render(true)).toContain("Next job · Working");
@@ -77,7 +77,7 @@ describe("sidebar thread visibility", () => {
 describe("threads waiting on a teammate", () => {
   const render = (task: ThreadRowProps["task"], props: Partial<ThreadRowProps> = {}) =>
     renderToStaticMarkup(createElement(SidebarThreadRow, {
-      task, ownerId: "scout", current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en", ...props,
+      task, ownerId: "scout", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en", ...props,
     }));
   it("shows the wait as a quiet label over the busy paint, never the work spinner", () => {
     const markup = render({ threadId: "dispatch", title: "Dispatch", waitingForTeammates: true, busy: true, activity: "working" });
@@ -106,7 +106,7 @@ describe("threads waiting on a teammate", () => {
 describe("threads a bot opened", () => {
   const openedBy = { botId: "scout", name: "Scout", at: 5 };
   const render = (task: ThreadRowProps["task"]) => renderToStaticMarkup(createElement(SidebarThreadRow, {
-    task, ownerId: "scout", current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+    task, ownerId: "scout", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
   }));
   it("says who opened the thread in plain words, and nothing for the person's own", () => {
     expect(threadOpenerLabel({ openedBy })).toBe("opened by Scout");
@@ -168,7 +168,7 @@ describe("snoozed threads", () => {
 describe("threads a bot opened", () => {
   const openedBy = { botId: "scout", name: "Scout", at: 5 };
   const render = (task: ThreadRowProps["task"]) => renderToStaticMarkup(createElement(SidebarThreadRow, {
-    task, ownerId: "scout", current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+    task, ownerId: "scout", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
   }));
   it("says who opened the thread in plain words, and nothing for the person's own", () => {
     expect(threadOpenerLabel({ openedBy })).toBe("opened by Scout");
@@ -198,7 +198,7 @@ describe("threads a bot closed", () => {
   const openedBy = { botId: "pm", name: "Parker", at: 5 };
   const closedBy = { botId: "pm", name: "Parker", at: 9 };
   const render = (task: ThreadRowProps["task"], current = false) => renderToStaticMarkup(createElement(SidebarThreadRow, {
-    task, ownerId: "pm", current, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+    task, ownerId: "pm", current, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
   }));
   it("folds closed threads out of the default list without spending the six recent rows on them", () => {
     const helpers = Array.from({ length: 3 }, (_, index) => ({ threadId: `h${index}`, title: `Helper ${index}`, openedBy, closedBy }));
@@ -238,7 +238,7 @@ describe("formatUpdatedAt", () => {
     expect(formatUpdatedAt(Number.NaN)).toBe("");
     const markup = renderToStaticMarkup(createElement(SidebarThreadRow, {
       task: { threadId: "t", title: "Notes", updatedAt: at },
-      ownerId: "b", current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+      ownerId: "b", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
     }));
     expect(markup).toContain(formatUpdatedAt(at));
     expect(markup).toContain(new Date(at).toISOString());
@@ -290,7 +290,7 @@ describe("threadUpdatedLabel", () => {
     const at = Date.now() - 5 * 60_000;
     const markup = renderToStaticMarkup(createElement(SidebarThreadRow, {
       task: { threadId: "t", title: "Notes", updatedAt: at },
-      ownerId: "b", current: false, now: Date.now(), onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+      ownerId: "b", current: false, now: Date.now(), onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
     }));
     expect(markup).toContain("5 min ago");
     expect(markup).toContain(`title="Notes · ${formatUpdatedAt(at)}"`);
@@ -301,7 +301,7 @@ describe("threadUpdatedLabel", () => {
     const at = Date.now() - 5 * 60_000;
     const markup = renderToStaticMarkup(createElement(SidebarThreadRow, {
       task: { threadId: "t", title: "Notes", updatedAt: at },
-      ownerId: "b", current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+      ownerId: "b", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
     }));
     expect(markup).toContain(`>${formatUpdatedAt(at)}<`);
   });
@@ -317,7 +317,7 @@ describe("thread title direction", () => {
   const now = Date.UTC(2026, 8, 25, 12, 0, 0);
   const row = (title: string, openedBy?: { botId: string; name: string; at: number }) => renderToStaticMarkup(createElement(SidebarThreadRow, {
     task: { threadId: "t", title, updatedAt: now - 2 * 3_600_000, ...(openedBy ? { openedBy } : {}) },
-    ownerId: "b", current: false, now, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+    ownerId: "b", current: false, now, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
   }));
   const titleSpan = (markup: string, title: string) => {
     const match = markup.match(new RegExp(`<span dir="auto" class="([^"]*)">${title}</span>`));
@@ -341,6 +341,19 @@ describe("thread title direction", () => {
   });
 });
 
+describe("splitArchivedThreads", () => {
+  it("keeps archived threads in their own group, in the order they came in", () => {
+    const { open, archived } = splitArchivedThreads([
+      { threadId: "a" },
+      { threadId: "b", archivedAt: 0 },
+      { threadId: "c" },
+      { threadId: "d", archivedAt: 12 },
+    ]);
+    expect(open.map((task) => task.threadId)).toEqual(["a", "c"]);
+    expect(archived.map((task) => task.threadId)).toEqual(["b", "d"]);
+  });
+});
+
 describe("orderedThreadList", () => {
   const task = (threadId: string, over: Record<string, unknown> = {}) => ({
     threadId,
@@ -349,15 +362,15 @@ describe("orderedThreadList", () => {
     ...over,
   });
 
-  it("pins first, then newest ordering message, and keeps equal stamps in stored order", () => {
+  it("orders by newest ordering message and keeps equal stamps in stored order", () => {
     const ordered = orderedThreadList([
       task("old", { lastThreadOrderAt: 10 }),
-      task("pinned-old", { pinned: true, lastThreadOrderAt: 5 }),
+      task("older", { lastThreadOrderAt: 5 }),
       task("new", { lastThreadOrderAt: 30 }),
-      task("pinned-new", { pinned: true, lastThreadOrderAt: 20 }),
+      task("middle", { lastThreadOrderAt: 20 }),
       task("tie-b", { lastThreadOrderAt: 10 }),
     ]);
-    expect(ordered.map((item) => item.threadId)).toEqual(["pinned-new", "pinned-old", "new", "old", "tie-b"]);
+    expect(ordered.map((item) => item.threadId)).toEqual(["new", "middle", "old", "tie-b", "older"]);
   });
 
   it("does not let waiting or working outrank a newer idle thread", () => {
@@ -452,9 +465,9 @@ describe("orderedSidebarThreads", () => {
 
 describe("archived threads", () => {
   const render = (task: ThreadRowProps["task"]) => renderToStaticMarkup(createElement(SidebarThreadRow, {
-    task, ownerId: "scout", current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+    task, ownerId: "scout", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
   }));
-  it("keeps the six newest open threads, and does not spend those slots on a pin", () => {
+  it("keeps the six newest open threads", () => {
     const rows = [
       { threadId: "old-open", title: "Old", createdAt: 1, lastThreadOrderAt: 1 },
       { threadId: "newer", title: "Newer", createdAt: 2, lastThreadOrderAt: 50 },
@@ -466,7 +479,7 @@ describe("archived threads", () => {
       { threadId: "pinned-closed", title: "Pinned", createdAt: 8, updatedAt: 2, pinned: true, closedBy: { botId: "b", name: "Scout", at: 2 } },
     ];
     expect(visibleSidebarThreads(rows, "none").map((task) => task.threadId)).toEqual([
-      "pinned-closed", "newer", "mid", "also", "fourth", "fifth", "sixth",
+      "newer", "mid", "also", "fourth", "fifth", "sixth",
     ]);
   });
   it("keeps archived threads out of the default list until the person unarchives them, even when they need the person", () => {
@@ -518,7 +531,7 @@ type RowNode = { $$typeof?: unknown; type?: unknown; props?: RowProps; children?
 const renderRow = (task: RowTask, ownerId: string, fresh = true, extra: Partial<ThreadRowProps> = {}): RowNode => {
   rowHooks.begin(fresh);
   const row = (SidebarThreadRow as MemoExoticComponent<(props: ThreadRowProps) => ReactNode>).type;
-  return row({ task, ownerId, current: false, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en", ...extra }) as RowNode;
+  return row({ task, ownerId, current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en", ...extra }) as RowNode;
 };
 
 const walk = (node: unknown, visit: (element: RowNode) => void): void => {
@@ -630,13 +643,14 @@ describe("Regenerate title", () => {
     (moreMenuButton(tree)!.props!.onClick as (event: unknown) => void)({ currentTarget: { getBoundingClientRect: () => ({ left: 100, bottom: 200 }) } });
   };
 
-  it("is offered next to Rename only when the caller can regenerate titles", () => {
+  it("is offered only when the caller can regenerate titles, with no Rename beside it", () => {
     vi.stubGlobal("window", { innerWidth: 1024, innerHeight: 768 });
     vi.stubGlobal("document", { body: { nodeType: 1 } });
     const task = { threadId: "t1", title: "Fix the login" };
     openMenu(renderRow(task, "scout"));
     const plain = renderRow(task, "scout", false);
-    expect(buttonWithLabel(plain, "Rename thread")).toBeDefined();
+    expect(buttonWithLabel(plain, "Rename thread")).toBeUndefined();
+    expect(buttonWithLabel(plain, "Pin")).toBeUndefined();
     expect(buttonWithLabel(plain, "Regenerate title")).toBeUndefined();
 
     const onRegenerateTitle = vi.fn();
@@ -698,7 +712,7 @@ describe("Thread link", () => {
     const now = Date.UTC(2026, 8, 25, 12, 0, 0);
     const markup = renderToStaticMarkup(createElement(SidebarThreadRow, {
       task: { threadId: "t", title: "Fix", updatedAt: now - 3_600_000, link: "https://github.com/o/r/pull/42" },
-      ownerId: "b", current: false, now, onSelect: vi.fn(), onRename: vi.fn(), onDelete: vi.fn(), locale: "en",
+      ownerId: "b", current: false, now, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
     }));
     expect(markup.indexOf("</button>")).toBeLessThan(markup.indexOf(">#42</a>"));
     expect(markup.indexOf(">#42</a>")).toBeLessThan(markup.indexOf("<time"));
@@ -722,11 +736,11 @@ describe("helper threads a bot opened", () => {
       thread("open-now", { openedBy: opener }),
       thread("approval", { openedBy: opener, activity: "waiting-on-you" }),
       thread("reply", { openedBy: opener, unread: true }),
-      thread("pinned", { openedBy: opener, pinned: true }),
+      thread("quiet", { openedBy: opener }),
     ];
     const { own, helpers } = partitionHelperThreads(tasks, "open-now");
-    expect(own.map((task) => task.threadId)).toEqual(["open-now", "approval", "reply", "pinned"]);
-    expect(helpers).toEqual([]);
+    expect(own.map((task) => task.threadId)).toEqual(["open-now", "approval", "reply"]);
+    expect(helpers.map((task) => task.threadId)).toEqual(["quiet"]);
   });
 
   it("leaves filed, closed, archived and snoozed helper threads where they already go", () => {

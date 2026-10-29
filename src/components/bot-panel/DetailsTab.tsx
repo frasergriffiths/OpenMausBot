@@ -1,14 +1,15 @@
 import { Calendar, Gauge, ListChecks, Sparkles } from "lucide-react";
 
 import { t } from "@/lib/i18n";
+import { setupJobAnswer } from "@/lib/setup-answer";
 import type { Bot } from "@/state/store";
 import { ModelPicker } from "../ModelPicker";
 import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
 import type { SimplePageId } from "./page-registry";
+import { PlaceAnswer } from "./PlaceControl";
 import { SettingsPage } from "./SettingsPage";
 import { TryAsking } from "./TryAsking";
-import { WhereItWorks } from "./WhereItWorks";
-import { Card, NavRow, RowIcon, rowCls, RowText } from "./rows";
+import { Card, ColRow, NavRow, RowIcon, rowCls, RowText } from "./rows";
 
 type Derived = ReturnType<typeof useBotSettingsDerived>;
 
@@ -20,9 +21,21 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
   onEditInstructions?: (open: boolean) => void;
 }) {
   const routinesOn = derived.botRoutines.filter((routine) => routine.enabled).length;
+  const job = setupJobAnswer(bot);
 
   return (
     <div data-panel-tabpanel="profile">
+      {job && (
+        <Card anchor="setup">
+          <ColRow data-panel-row="setup-job">
+            <RowText title={t("botPanel.page.blurb", { name: bot.name })} hint={<span dir="auto" className="line-clamp-3">{job}</span>} />
+          </ColRow>
+          <ColRow data-panel-row="setup-place">
+            <RowText title={t("computer.simple.whereWorks", { name: bot.name })} hint={<PlaceAnswer bot={bot} />} />
+          </ColRow>
+        </Card>
+      )}
+
       <Card anchor="model">
         <div data-panel-row="model" className={rowCls}>
           <ModelPicker
@@ -35,9 +48,6 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
       </Card>
 
       <SettingsPage bot={bot} derived={derived} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} embedded />
-
-      <WhereItWorks bot={bot} derived={derived} onOpen={onOpen} />
-
 
       {derived.botRoutines.length > 0 && (
         <Card label={t("botSettings.simple.routines")} anchor="routines">

@@ -17,7 +17,7 @@ const noop = vi.fn();
 describe("select mode rows", () => {
   const row = (extra: Record<string, unknown>) => renderToStaticMarkup(createElement(SidebarThreadRow, {
     task: { threadId: "a", title: "Old chat", ...extra }, ownerId: "bot", current: false, locale: "en",
-    onSelect: noop, onRename: noop, onDelete: noop, selectMode: true, checked: true, onToggleSelect: noop,
+    onSelect: noop, onDelete: noop, selectMode: true, checked: true, onToggleSelect: noop,
   }));
   it("renders a checkbox row without the actions menu", () => {
     const markup = row({});
@@ -33,7 +33,7 @@ describe("select mode rows", () => {
   it("keeps the normal row outside select mode", () => {
     const markup = renderToStaticMarkup(createElement(SidebarThreadRow, {
       task: { threadId: "a", title: "Old chat" }, ownerId: "bot", current: false, locale: "en",
-      onSelect: noop, onRename: noop, onDelete: noop,
+      onSelect: noop, onDelete: noop,
     }));
     expect(markup).not.toContain('role="checkbox"');
     expect(markup).toContain("Actions for");

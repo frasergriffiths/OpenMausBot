@@ -1,17 +1,16 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { Archive, ArchiveRestore, Check, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Check, MoreHorizontal, Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
-import { nextRename } from "@/lib/rename";
 import { usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 import { currentTaskBot, openBotThread, useStore, type Bot, type Task } from "@/state/store";
 import { useMenuMotion } from "./MenuMotion";
 import { anchoredMenuPosition } from "./SidebarPopoverMenu";
 import { SidebarPopoverMenu, type SidebarMenuItem } from "./SidebarPopoverMenu";
-import { isArchived, isWorking, orderedThreadList, threadRecency, threadRowActions, threadUpdatedLabel } from "./SidebarThreadRow";
+import { isArchived, isWorking, orderedThreadList, splitArchivedThreads, threadRecency, threadRowActions, threadUpdatedLabel } from "./SidebarThreadRow";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { SIMPLE_ROW_FOCUS } from "./SidebarSimpleTop";
 import { displayTitle, chipStatus } from "./ChatThreadBar";
@@ -49,11 +48,10 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
   const panelRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
-  const [renaming, setRenaming] = useState<string | null>(null);
-  const [draft, setDraft] = useState("");
   const [deleting, setDeleting] = useState<RowTask | null>(null);
-  const finishing = useRef(false);
-  const inside = useRef({ contains: (target: unknown) => panelRef.current?.contains(target as Node) === true });
+  // The chip that opened it counts as inside: a second press closes it through its own toggle instead of the
+  // outside-press dismiss closing it and the click opening it again.
+  const inside = useRef({ contains: (target: unknown) => panelRef.current?.contains(target as Node) === true || anchorRef.current?.contains(target as Node) === true });
   usePopoverDismiss(open, inside, () => onClose(true));
 
   useLayoutEffect(() => {
@@ -88,30 +86,61 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
   if (!motion.shown) return null;
 
   const current = bot.threadId;
-  const finishRename = (task: RowTask, save: boolean) => {
-    if (finishing.current) return;
-    finishing.current = true;
-    const next = save ? nextRename(task.title, draft) : null;
-    setRenaming(null);
-    if (next) actions.onRename(task, next);
-    requestAnimationFrame(() => {
-      const row = panelRef.current?.querySelector<HTMLElement>(`[data-thread-row="${task.threadId}"]`);
-      if (row) row.focus();
-      else onClose(true);
-    });
+  // Archived threads are their own group, never mixed into the list above it.
+  const { open: openThreads, archived: archivedThreads } = splitArchivedThreads(threads);
+  const renderRow = (task: RowTask) => {
+    const isCurrent = task.threadId === current;
+    const status = chipStatus(task);
+    const waiting = task.activity === "waiting-on-you";
+    const time = threadUpdatedLabel(threadRecency(task), Date.now());
+    return (
+      <li key={task.threadId}>
+        <div className={cn("group/thread relative flex min-w-0 items-center rounded-md", isCurrent ? "bg-menu-active" : "hover:bg-menu-hover")}>
+          <button
+            type="button"
+            data-thread-row={task.threadId}
+            data-switcher-focus={task.threadId}
+            aria-current={isCurrent ? "true" : undefined}
+            tabIndex={isCurrent ? 0 : -1}
+            onClick={() => { openBotThread(dispatch, bot, task.threadId, false); onClose(true); }}
+            className={cn(
+              "flex h-11 min-w-0 flex-1 items-center gap-1.5 rounded-md pl-2 pr-1 text-left",
+              SIMPLE_ROW_FOCUS,
+            )}
+          >
+            <span className="flex w-2 shrink-0 items-center justify-center" aria-hidden="true">
+              {waiting ? <span className="size-1.5 rounded-full bg-warning" /> : <span className="size-1.5 rounded-full bg-ink-tertiary/50" />}
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span dir="auto" className={cn("truncate text-[13px] leading-[18px] text-ink", isCurrent ? "font-semibold" : "font-medium")}>{displayTitle(task)}</span>
+              <span className="flex min-w-0 items-center gap-1 text-[12px] leading-4">
+                <span className="shrink-0 whitespace-nowrap text-ink-tertiary">{time}</span>
+                <span className="shrink-0 text-ink-tertiary" aria-hidden="true">·</span>
+                <span title={status} className={cn("min-w-0 truncate", waiting ? "text-warning" : isCurrent ? "text-ink-secondary" : "text-ink-tertiary")}>{status}</span>
+              </span>
+            </span>
+            <span className="flex shrink-0 items-center gap-1">
+              {isCurrent && <Check size={12} aria-hidden="true" className="text-accent" />}
+            </span>
+          </button>
+          <div className="mr-0.5 shrink-0">
+            <SidebarPopoverMenu
+              items={rowMenu(task)}
+              compact
+              ariaLabel={t("task.actions", { title: displayTitle(task) })}
+              triggerLabel={t("task.actions", { title: displayTitle(task) })}
+              triggerClassName="flex size-[30px] items-center justify-center rounded-md text-ink-tertiary hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+              renderTrigger={() => <MoreHorizontal size={14} />}
+            />
+          </div>
+        </div>
+      </li>
+    );
   };
-
   const rowMenu = (task: RowTask): SidebarMenuItem[] => {
     const archived = isArchived(task);
     const working = isWorking(task);
     return [
-      { key: "rename", label: t("task.renameAria"), icon: <Pencil size={14} />, onSelect: () => { setDraft(task.title); setRenaming(task.threadId); } },
-      {
-        key: "pin",
-        label: task.pinned === true ? t("sidebar.bot.unpin") : t("sidebar.bot.pin"),
-        icon: task.pinned === true ? <PinOff size={14} /> : <Pin size={14} />,
-        onSelect: () => actions.onPin(task, task.pinned !== true),
-      },
       {
         key: "archive",
         label: archived ? t("task.unarchive") : t("task.archive"),
@@ -165,77 +194,13 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
           <p className="px-2 py-6 text-center text-[12px] leading-4 text-ink-tertiary">{t("thread.switcher.empty")}</p>
         ) : (
           <ul className="flex flex-col gap-0.5">
-            {threads.map((task) => {
-              const isCurrent = task.threadId === current;
-              const status = chipStatus(task);
-              const waiting = task.activity === "waiting-on-you";
-              const time = threadUpdatedLabel(threadRecency(task), Date.now());
-              return (
-                <li key={task.threadId}>
-                  <div className={cn("group/thread relative flex min-w-0 items-center rounded-md", isCurrent ? "bg-menu-active" : "hover:bg-menu-hover")}>
-                    {renaming === task.threadId ? (
-                      <div className="flex h-11 min-w-0 flex-1 items-center gap-1.5 pl-2 pr-1">
-                        <span className="flex w-2 shrink-0" />
-                        <input
-                          autoFocus
-                          value={draft}
-                          maxLength={80}
-                          dir="auto"
-                          aria-label={t("task.renameAria")}
-                          onFocus={(event) => event.currentTarget.select()}
-                          onChange={(event) => setDraft(event.target.value)}
-                          onBlur={() => finishRename(task, true)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" && !event.nativeEvent.isComposing) { event.preventDefault(); finishRename(task, true); }
-                            else if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); finishRename(task, false); }
-                          }}
-                          className="h-7 w-full min-w-0 rounded-md border border-accent/50 bg-inset px-2 text-[13px] leading-4 text-ink outline-none"
-                        />
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        data-thread-row={task.threadId}
-                        data-switcher-focus={task.threadId}
-                        aria-current={isCurrent ? "true" : undefined}
-                        tabIndex={isCurrent ? 0 : -1}
-                        onClick={() => { openBotThread(dispatch, bot, task.threadId, false); onClose(true); }}
-                        className={cn(
-                          "flex h-11 min-w-0 flex-1 items-center gap-1.5 rounded-md pl-2 pr-1 text-left",
-                          SIMPLE_ROW_FOCUS,
-                        )}
-                      >
-                        <span className="flex w-2 shrink-0 items-center justify-center" aria-hidden="true">
-                          {waiting ? <span className="size-1.5 rounded-full bg-warning" /> : <span className="size-1.5 rounded-full bg-ink-tertiary/50" />}
-                        </span>
-                        <span className="flex min-w-0 flex-1 flex-col">
-                          <span dir="auto" className={cn("truncate text-[13px] leading-[18px] text-ink", isCurrent ? "font-semibold" : "font-medium")}>{displayTitle(task)}</span>
-                          <span className="flex min-w-0 items-center gap-1 text-[12px] leading-4">
-                            <span className="shrink-0 whitespace-nowrap text-ink-tertiary">{time}</span>
-                            <span className="shrink-0 text-ink-tertiary" aria-hidden="true">·</span>
-                            <span title={status} className={cn("min-w-0 truncate", waiting ? "text-warning" : isCurrent ? "text-ink-secondary" : "text-ink-tertiary")}>{status}</span>
-                          </span>
-                        </span>
-                        <span className="flex shrink-0 items-center gap-1">
-                          {isCurrent && <Check size={12} aria-hidden="true" className="text-accent" />}
-                          {task.pinned === true && <><Pin size={12} aria-hidden="true" className="text-ink-tertiary" /><span className="sr-only">{t("sidebar.bot.pin")}</span></>}
-                        </span>
-                      </button>
-                    )}
-                    <div className="mr-0.5 shrink-0">
-                      <SidebarPopoverMenu
-                        items={rowMenu(task)}
-                        compact
-                        ariaLabel={t("task.actions", { title: displayTitle(task) })}
-                        triggerLabel={t("task.actions", { title: displayTitle(task) })}
-                        triggerClassName="flex size-[30px] items-center justify-center rounded-md text-ink-tertiary hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
-                        renderTrigger={() => <MoreHorizontal size={14} />}
-                      />
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
+            {openThreads.map(renderRow)}
+            {archivedThreads.length > 0 && (
+              <>
+                <li role="presentation" data-thread-switcher-archived="" className="px-2 pb-1 pt-2 text-[11px] font-medium leading-4 text-ink-tertiary">{t("task.archived")}</li>
+                {archivedThreads.map(renderRow)}
+              </>
+            )}
           </ul>
         )}
       </div>

@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Check, FolderInput, Pencil, Pin, PinOff, Plus, Search, Trash2 } from "lucide-react";
+import { Activity, Check, FolderInput, Plus, Search, Trash2 } from "lucide-react";
 import { useStore, type Bot, type BotProject, type Group, type Task } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { roomThreadsWorkingElsewhere } from "@/lib/room-threads";
@@ -8,7 +8,6 @@ import { t } from "@/lib/i18n";
 import { localizedTaskTitle } from "@/lib/task-title";
 import { COMPACT_BUBBLE } from "@/lib/compact-chip";
 import { formatTaskTokens, headlineTokens, usageDetail } from "@/lib/usage";
-import { nextRename } from "@/lib/rename";
 import { FolderIcon, NewThreadButton } from "./BotProjects";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { useAdvancedMode } from "@/lib/interface-mode";
@@ -86,10 +85,8 @@ function ConversationTaskPicker({
   bot,
   onNew,
   onSwitch,
-  onRename,
   onDelete,
   onMove,
-  onPin,
   attention,
   onAttentionJump,
   workingElsewhere = 0,
@@ -101,22 +98,17 @@ function ConversationTaskPicker({
   bot?: Bot;
   onNew: () => void;
   onSwitch: (threadId: string) => void;
-  onRename: (threadId: string, title: string) => void;
   onDelete: (threadId: string) => void;
   onMove?: (threadId: string, projectId: string | null) => void;
-  onPin?: (threadId: string, pinned: boolean) => void;
   attention?: AttentionThread[];
   onAttentionJump?: (entry: AttentionThread) => void;
 }) {
   const advanced = useAdvancedMode();
   const [open, setOpen] = useState(false);
   const motion = useMenuMotion(open);
-  const [renaming, setRenaming] = useState<string | null>(null);
-  const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const finishingRename = useRef(false);
   const now = useRelativeNow();
 
   const current = tasks.find((t) => t.threadId === threadId);
@@ -130,7 +122,6 @@ function ConversationTaskPicker({
 
   const closeMenu = () => {
     clearDismiss();
-    setRenaming(null);
     setQuery("");
     setOpen(false);
   };
@@ -139,16 +130,8 @@ function ConversationTaskPicker({
     clearDismiss();
     dismissTimer.current = setTimeout(() => {
       dismissTimer.current = null;
-      setRenaming(null);
       setOpen(false);
     }, TASK_PICKER_DISMISS_MS);
-  };
-
-  const startRename = (task: PickerTask) => {
-    clearDismiss();
-    finishingRename.current = false;
-    setDraft(task.title);
-    setRenaming(task.threadId);
   };
 
   useEffect(() => () => {
@@ -161,7 +144,6 @@ function ConversationTaskPicker({
         clearTimeout(dismissTimer.current);
         dismissTimer.current = null;
       }
-      setRenaming(null);
       setQuery("");
       return;
     }
@@ -173,19 +155,16 @@ function ConversationTaskPicker({
           clearTimeout(dismissTimer.current);
           dismissTimer.current = null;
         }
-        setRenaming(null);
         setOpen(false);
       }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
       if (e.target instanceof Element && e.target.closest("[data-thread-overlay]")) return;
-      if (renaming) return;
       if (dismissTimer.current) {
         clearTimeout(dismissTimer.current);
         dismissTimer.current = null;
       }
-      setRenaming(null);
       setOpen(false);
     };
     window.addEventListener("mousedown", onDown);
@@ -194,17 +173,7 @@ function ConversationTaskPicker({
       window.removeEventListener("mousedown", onDown);
       window.removeEventListener("keydown", onKey);
     };
-  }, [open, renaming]);
-
-  const commitRename = (threadId: string, save: boolean) => {
-    // Escape unmounts the input, which fires blur; without this guard blur would save the cancelled draft.
-    if (finishingRename.current) return;
-    finishingRename.current = true;
-    const currentTitle = tasks.find((task) => task.threadId === threadId)?.title ?? "";
-    const title = save ? nextRename(currentTitle, draft) : null;
-    setRenaming(null);
-    if (title) onRename(threadId, title);
-  };
+  }, [open]);
 
   const u = current?.usage;
   const currentLabel = u ? formatTaskTokens(headlineTokens(u)) : null;
@@ -306,83 +275,23 @@ function ConversationTaskPicker({
                   className={cn("group flex items-center gap-2 px-2.5 py-2", active ? "bg-raised/60" : "hover:bg-raised/40")}
                 >
                   <Check size={13} className={cn("shrink-0", active ? "text-accent" : "opacity-0")} />
-                  {renaming === task.threadId ? (
-                    <input
-                      autoFocus
-                      value={draft}
-                      maxLength={80}
-                      aria-label={t("task.renameAria")}
-                      onFocus={(e) => e.currentTarget.select()}
-                      onChange={(e) => setDraft(e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onBlur={() => commitRename(task.threadId, true)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          commitRename(task.threadId, true);
-                        }
-                        if (e.key === "Escape") {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          commitRename(task.threadId, false);
-                        }
-                      }}
-                      className="min-w-0 flex-1 rounded bg-inset px-1.5 py-0.5 text-[13px] text-ink focus:outline-none"
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        if (taskPickerPointerIntent("click", e.detail) !== "select") return;
-                        if (!active) onSwitch(task.threadId);
-                        queueDismiss();
-                      }}
-                      onDoubleClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        startRename(task);
-                      }}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        startRename(task);
-                      }}
-                      className="min-w-0 flex-1 text-left"
-                      title={t("task.renameHint")}
-                    >
-                      <div dir="auto" className="truncate text-[13px] text-ink">{localizedTaskTitle(task.title)}</div>
-                      <div className="text-[11px] text-ink-secondary">
-                        {task.activity === "waiting-on-you" ? `${t("task.waiting")} · ` : task.waitingForTeammates ? `${t("task.waitingOnTeammate")} · ` : task.busy ? `${t("chat.activity.working")} · ` : task.unread ? `${t("task.unread")} · ` : ""}
-                        <TaskUpdatedTime task={task} now={now} />
-                        <TaskUsage usage={task.usage} />
-                        {opener && ` · ${opener}`}
-                      </div>
-                    </button>
-                  )}
-                  {onPin && renaming !== task.threadId && (
-                    <button
-                      type="button"
-                      onClick={() => onPin(task.threadId, task.pinned !== true)}
-                      aria-label={task.pinned === true ? t("sidebar.bot.unpin") : t("sidebar.bot.pin")}
-                      title={task.pinned === true ? t("sidebar.bot.unpin") : t("sidebar.bot.pin")}
-                      className="rounded p-1 text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 touch:opacity-70"
-                    >
-                      {task.pinned === true ? <PinOff size={13} /> : <Pin size={13} />}
-                    </button>
-                  )}
-                  {renaming !== task.threadId && (
-                    <button
-                      type="button"
-                      onClick={() => startRename(task)}
-                      aria-label={t("task.renameNamed", { title: task.title })}
-                      title={t("task.renameTitle")}
-                      className="rounded p-1 text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 touch:opacity-70"
-                    >
-                      <Pencil size={13} />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      if (taskPickerPointerIntent("click", e.detail) !== "select") return;
+                      if (!active) onSwitch(task.threadId);
+                      queueDismiss();
+                    }}
+                    className="min-w-0 flex-1 text-left"
+                  >
+                    <div dir="auto" className="truncate text-[13px] text-ink">{localizedTaskTitle(task.title)}</div>
+                    <div className="text-[11px] text-ink-secondary">
+                      {task.activity === "waiting-on-you" ? `${t("task.waiting")} · ` : task.waitingForTeammates ? `${t("task.waitingOnTeammate")} · ` : task.busy ? `${t("chat.activity.working")} · ` : task.unread ? `${t("task.unread")} · ` : ""}
+                      <TaskUpdatedTime task={task} now={now} />
+                      <TaskUsage usage={task.usage} />
+                      {opener && ` · ${opener}`}
+                    </div>
+                  </button>
                   {bot && onMove && (bot.projects?.length ?? 0) > 0 && <label title={t("folder.move")} className="relative rounded p-1 text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-within:opacity-100 group-hover:opacity-100 touch:opacity-70">
                     <FolderInput size={13} />
                     <select aria-label={t("folder.moveNamed", { title: task.title })} value={bot.projects?.some((project) => project.id === task.projectId) ? task.projectId : ""}
@@ -460,10 +369,8 @@ export function TaskPicker({ bot }: { bot: Bot }) {
       attention={crossBotAttentionThreads(state.bots, state.pendingQueued, bot.id, state.groups)}
       onNew={() => dispatch({ type: "newTask", botId: bot.id })}
       onSwitch={(threadId) => dispatch({ type: "switchTask", botId: bot.id, threadId })}
-      onRename={(threadId, title) => dispatch({ type: "renameTask", botId: bot.id, threadId, title })}
       onDelete={(threadId) => dispatch({ type: "deleteTask", botId: bot.id, threadId })}
       onMove={(threadId, projectId) => dispatch({ type: "updateTask", botId: bot.id, threadId, patch: { projectId } })}
-      onPin={(threadId, pinned) => dispatch({ type: "updateTask", botId: bot.id, threadId, patch: { pinned } })}
       onAttentionJump={(entry) => dispatch(attentionJumpAction(entry))}
     />
   );
@@ -485,12 +392,7 @@ export function GroupTaskPicker({ group }: { group: Group }) {
       workingElsewhere={roomThreadsWorkingElsewhere(group)}
       onNew={() => dispatch({ type: "newGroupTask", groupId: group.id })}
       onSwitch={(threadId) => dispatch({ type: "switchGroupTask", groupId: group.id, threadId })}
-      onRename={(threadId, title) => dispatch({ type: "renameGroupTask", groupId: group.id, threadId, title })}
       onDelete={(threadId) => dispatch({ type: "deleteGroupTask", groupId: group.id, threadId })}
-      onPin={(threadId, pinned) => {
-        const title = group.tasks?.find((task) => task.threadId === threadId)?.title ?? "";
-        dispatch({ type: "pinGroupTask", groupId: group.id, threadId, pinned, title });
-      }}
     />
   );
 }
