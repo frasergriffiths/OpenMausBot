@@ -17,11 +17,11 @@ import {
 } from "@/lib/local-voice";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { PILL_TABS, PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON } from "./pill-tabs";
 import { voiceKeyDraftValue, type VoiceKeyDraft } from "@/lib/voice-key-draft";
 import { VoicePicker, type PickerVoice } from "./VoicePicker";
 import { Select } from "./Select";
 import { Switch } from "./SettingsPrimitives";
+import { RadioRow } from "./bot-panel/rows";
 
 const SAMPLE = "Morning. Overnight the tests went green, and I left two notes for you in the thread.";
 const FISH_MODELS = [
@@ -310,31 +310,27 @@ export function VoiceSettings({
 
       {!workspaceConfigurationLocked && (
         <div className="mt-4">
-          <div className="mb-2 text-[13px] text-ink-secondary">{t("voice.engine")}</div>
-          {/* One capsule track, as the bot panel's segmented rows use: equal cells, never a pill stretched across the
-              row. Two columns in a narrow panel, three from 420px of container width, so five read 3 + 2. */}
-          <div className="@container">
-            <div className={cn(PILL_TABS, "grid grid-cols-2 @[420px]:grid-cols-3")} role="group" aria-label={t("voice.engine")}>
-              {([
-                { value: "elevenlabs", label: t("voice.elevenlabs.label"), available: true },
-                { value: "fish", label: t("voice.fish.label"), available: true },
-                { value: "xai", label: t("voice.grok.label"), available: true },
-                { value: "system", label: t("voice.macBuiltIn"), available: systemVoicesAvailable },
-                { value: "chatterbox", label: t("voice.chatterboxLocal"), available: true },
-              ] as const).map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  aria-pressed={provider === option.value}
-                  disabled={switching || !option.available}
-                  title={option.available ? option.label : `${option.label} — ${t("voice.macOnly")}`}
-                  onClick={() => setProvider(option.value)}
-                  className={cn(PILL_TAB, "min-h-[30px] w-full", provider === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
-                >
-                  <span className="block w-full min-w-0 truncate">{option.label}</span>
-                </button>
-              ))}
-            </div>
+          <div className="mb-1 text-[13px] text-ink-secondary">{t("voice.engine")}</div>
+          {/* One row per service, as the rest of Simple mode's radio lists: names line up with the label above, and a
+              narrow panel keeps every name whole. */}
+          <div role="radiogroup" aria-label={t("voice.engine")} className="flex flex-col divide-y divide-ink/[0.05]">
+            {([
+              { value: "elevenlabs", label: t("voice.elevenlabs.label"), available: true },
+              { value: "fish", label: t("voice.fish.label"), available: true },
+              { value: "xai", label: t("voice.grok.label"), available: true },
+              { value: "system", label: t("voice.macBuiltIn"), available: systemVoicesAvailable },
+              { value: "chatterbox", label: t("voice.chatterboxLocal"), available: true },
+            ] as const).map((option) => (
+              <RadioRow
+                key={option.value}
+                className="px-0"
+                title={option.label}
+                hint={option.available ? undefined : t("voice.macOnly")}
+                checked={provider === option.value}
+                disabled={switching || !option.available}
+                onClick={() => setProvider(option.value)}
+              />
+            ))}
           </div>
         </div>
       )}

@@ -259,12 +259,13 @@ export function TrashButton({ label, onClick, disabled, ...rest }: {
   );
 }
 
-export function RadioRow({ title, hint, checked, onClick, disabled, ...rest }: {
+export function RadioRow({ title, hint, checked, onClick, disabled, className, ...rest }: {
   title: ReactNode;
   hint?: ReactNode;
   checked: boolean;
   onClick: () => void;
   disabled?: boolean;
+  className?: string;
   "data-panel-choice"?: string;
 }) {
   return (
@@ -275,7 +276,7 @@ export function RadioRow({ title, hint, checked, onClick, disabled, ...rest }: {
       aria-checked={checked}
       disabled={disabled}
       onClick={onClick}
-      className={cn(rowCls, "w-full text-left enabled:hover:bg-ink/[0.03] disabled:cursor-not-allowed disabled:opacity-50")}
+      className={cn(rowCls, "w-full text-left enabled:hover:bg-ink/[0.03] disabled:cursor-not-allowed disabled:opacity-50", className)}
     >
       <RowText title={title} hint={hint} />
       <span className="flex w-4 shrink-0 text-ink">{checked && <Check size={16} aria-hidden="true" />}</span>

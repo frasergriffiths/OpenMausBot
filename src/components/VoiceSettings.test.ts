@@ -82,23 +82,24 @@ describe("VoiceSettings", () => {
     expect(onPatch).not.toHaveBeenCalled();
   });
 
-  it("lays the five voice services out as equal cells in the panel's pill track, three across once the panel is 420px", async () => {
+  it("lists the five voice services as radio rows, with the Mac-only reason in the row", async () => {
     fixture.api.mockResolvedValue({ voices: [] });
     await render(bot("pepper"), vi.fn());
-    const track = host.querySelector<HTMLElement>('[role="group"][aria-label="Voice provider"]')!;
-    expect(track.className).toContain("grid-cols-2");
-    expect(track.className).toContain("@[420px]:grid-cols-3");
-    expect(track.className).not.toContain("flex-auto");
-    const pills = [...track.querySelectorAll<HTMLButtonElement>("button")];
-    expect(pills.map((pill) => pill.textContent)).toEqual(["ElevenLabs", "Fish Audio", "Grok (xAI)", "Built-in Mac voices", "Chatterbox (local)"]);
-    for (const pill of pills) {
-      expect(pill.getAttribute("aria-pressed")).toMatch(/true|false/);
-      expect(pill.className).toContain("rounded-full");
-      expect(pill.className).toContain("w-full");
-      expect(pill.className).not.toMatch(/col-span-/);
-      expect(pill.getAttribute("title")!.startsWith(pill.textContent!)).toBe(true);
-      expect(pill.querySelector("span")!.className).toContain("truncate");
+    const group = host.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Voice provider"]')!;
+    expect(group.className).toContain("flex-col");
+    expect(group.className).toContain("divide-y");
+    const rows = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    const title = (row: Element) => row.firstElementChild?.firstElementChild?.textContent;
+    expect(rows.map(title)).toEqual(["ElevenLabs", "Fish Audio", "Grok (xAI)", "Built-in Mac voices", "Chatterbox (local)"]);
+    for (const row of rows) {
+      expect(row.getAttribute("aria-checked")).toMatch(/true|false/);
+      expect(row.getAttribute("aria-pressed")).toBeNull();
+      expect(row.className).toContain("px-0");
+      expect(row.className).not.toContain("rounded-full");
     }
-    expect(pills.filter((pill) => pill.getAttribute("aria-pressed") === "true")).toHaveLength(1);
+    expect(rows.filter((row) => row.getAttribute("aria-checked") === "true")).toHaveLength(1);
+    const system = rows[3]!;
+    expect(system.disabled).toBe(true);
+    expect(system.textContent).toContain("Built-in voices are available only on macOS");
   });
 });
