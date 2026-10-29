@@ -16,6 +16,7 @@ import { RoomMoreMenu } from "../RoomMoreMenu";
 import { RoomWorkingFolder, roomWorkingFolder } from "../RoomWorkingFolder";
 import { buttonCls, Card, ColRow, NavRow, PageHeader, roundButtonCls, rowCls, RowText } from "../bot-panel/rows";
 import { sidePanelCls } from "../bot-panel/side-panel";
+import { SidePanelResizeHandle, useSidePanelWidth } from "../bot-panel/side-panel-size";
 import { ResponderPage } from "./ResponderPage";
 
 type RoomPage = "responder" | "folder";
@@ -119,6 +120,7 @@ export function RoomPanel({ group, overlay = false }: { group: Group; overlay?: 
   const [page, setPage] = useState<RoomPage | null>(null);
   const [membersOpen, setMembersOpen] = useState(false);
   const dialogRef = useRef<HTMLElement>(null);
+  const sizing = useSidePanelWidth({ simple: true, active: !overlay });
   const bodyRef = useRef<HTMLDivElement>(null);
   const membersRowRef = useRef<HTMLButtonElement>(null);
   const leftPage = useRef<RoomPage | null>(null);
@@ -178,8 +180,10 @@ export function RoomPanel({ group, overlay = false }: { group: Group; overlay?: 
         tabIndex={-1}
         data-room-panel
         onKeyDown={onKeyDown}
+        style={overlay ? undefined : ({ "--side-panel-width": `${sizing.width}px` } as React.CSSProperties)}
         className={sidePanelCls(overlay, true)}
       >
+        {!overlay && <SidePanelResizeHandle sizing={sizing} />}
         <div {...dragProps} className={cn("flex h-[52px] shrink-0 items-center justify-end gap-2 px-3.5", padClass)}>
           <RoomMoreMenu group={group} />
           <button type="button" onClick={() => closeRoomPanel({ refocus: true })} aria-label={t("botSettings.simple.close")} className={roundButtonCls}>
