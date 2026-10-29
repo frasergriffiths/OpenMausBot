@@ -93,12 +93,26 @@ describe("signed-in sites", () => {
     expect(host.querySelector("button")).toBeNull();
   });
 
+  it("offers Sign out of all only when there is more than one site", async () => {
+    fixture.api.mockResolvedValueOnce({ running: false, sites: [google] });
+    await render({ target: { profile: "profile-one" }, sharedBy: [] });
+    await open();
+    expect(button("Sign out of google.com")).toBeDefined();
+    expect(host.textContent).not.toContain("Sign out of all");
+
+    fixture.api.mockResolvedValueOnce({ running: false, sites: [google, example] });
+    await render({ target: { profile: "profile-two" }, sharedBy: [] });
+    await act(async () => { host.querySelector("details")!.open = false; });
+    await open();
+    expect(button("Sign out of all")).toBeDefined();
+  });
+
   it("shows the server's reason when it cannot read the browser, and keeps buttons off while disabled", async () => {
     fixture.api.mockRejectedValueOnce(new Error("The browser did not answer. Try again when the bot has finished."));
     await render({ target: { profile: "profile-work" }, sharedBy: [] });
     await open();
     expect(host.querySelector('[role="alert"]')?.textContent).toBe("The browser did not answer. Try again when the bot has finished.");
-    fixture.api.mockResolvedValueOnce({ running: false, sites: [google] });
+    fixture.api.mockResolvedValueOnce({ running: false, sites: [google, example] });
     await render({ target: { profile: "profile-other" }, sharedBy: [], disabled: true });
     await act(async () => { host.querySelector("details")!.open = false; });
     await open();

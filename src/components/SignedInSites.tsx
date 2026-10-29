@@ -63,7 +63,7 @@ export function SignedInSites({ target, scope = {}, sharedBy, disabled = false, 
             ))}
           </ul>
         )}
-        {!!sites?.length && (
+        {!!sites?.length && (oneAction || sites.length > 1) && (
           <button type="button" disabled={locked} onClick={() => void signOut()} className={`${buttonClass} self-start`}>
             <LogOut size={13} />{oneAction ? t("settings.sites.logOutBrowser") : t("settings.sites.signOutAll")}
           </button>

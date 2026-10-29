@@ -1,4 +1,4 @@
-import { Globe2, Monitor, Smartphone } from "lucide-react";
+import { Globe2, Monitor, Plus, Smartphone } from "lucide-react";
 
 import { writeComputerPanelView, type ComputerPanelView } from "@/lib/computer-panel-view";
 import { t } from "@/lib/i18n";
@@ -14,7 +14,7 @@ import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerive
 import type { SimplePageId } from "./page-registry";
 import { PlaceControl } from "./PlaceControl";
 import { CloudBackendPicker } from "../CloudBackendPicker";
-import { Card, ColRow, NavRow } from "./rows";
+import { Card, ColRow, LinkRow, NavRow } from "./rows";
 
 type Derived = ReturnType<typeof useBotSettingsDerived>;
 
@@ -115,9 +115,12 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
         ) : (
           // Security: reading and clearing a browser's sign-ins is the owner's or an admin's; the server refuses anyone else.
           ownerOrAdmin !== false && (profileId === "" || profile) && (
-            <ColRow>
-              <SignedInSites bare signOutStyle="browser" key={`${bot.id}:${profileId}`} target={{ bot: bot.id }} sharedBy={sharedBy} disabled={Boolean(bot.busy)} />
-            </ColRow>
+            <>
+              <ColRow>
+                <SignedInSites bare key={`${bot.id}:${profileId}`} target={{ bot: bot.id }} sharedBy={sharedBy} disabled={Boolean(bot.busy)} />
+              </ColRow>
+              <LinkRow data-panel-action="add-login" icon={Plus} onClick={() => onOpen("browser")}>{t("settings.logins.add")}</LinkRow>
+            </>
           )
         )}
       </Card>

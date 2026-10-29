@@ -28,7 +28,7 @@ const sameSetting = (a: PreviewViewportSetting, b: PreviewViewportSetting) =>
 const item = "flex w-full items-center gap-2 rounded-md px-3 py-1.5 text-left hover:bg-inset disabled:cursor-not-allowed disabled:opacity-40";
 const small = "rounded-md border border-hairline p-1 text-ink-secondary hover:bg-inset hover:text-ink disabled:opacity-40";
 
-export function MoreMenu({ stream, ready, typing, setting, zoom, pip, onViewport, onZoom, onPip, onType, onSecret, onReconnect, onRestart }: {
+export function MoreMenu({ stream, ready, typing, setting, zoom, pip, onViewport, onZoom, onPip, onType, onSecret, onReconnect, onRestart, onLogOut }: {
   /** Viewport sizes, zoom and picture in picture come with the v2 stream only. */
   stream: boolean;
   /** The person holds the browser, so its page can be sized and zoomed. */
@@ -45,6 +45,7 @@ export function MoreMenu({ stream, ready, typing, setting, zoom, pip, onViewport
   onSecret: () => void;
   onReconnect: () => void;
   onRestart: () => void;
+  onLogOut: () => void;
 }) {
   const menu = useRef<HTMLDetailsElement>(null);
   const run = (action: () => void) => () => {
@@ -81,6 +82,7 @@ export function MoreMenu({ stream, ready, typing, setting, zoom, pip, onViewport
         {section(<>
           <button type="button" role="menuitem" className={item} onClick={run(onReconnect)}>Reconnect view</button>
           <button type="button" role="menuitem" className={item} onClick={run(onRestart)}>Restart browser…</button>
+          <button type="button" role="menuitem" className={item} onClick={run(onLogOut)}>{t("settings.sites.logOutBrowser")}</button>
         </>)}
       </div>
     </details>

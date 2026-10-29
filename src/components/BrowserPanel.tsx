@@ -305,6 +305,7 @@ export function LiveBrowser({ bot, signIn, page }: { bot: Bot; signIn?: BrowserS
         onSecret={() => { setMasked(true); setShowTyping(true); }}
         onReconnect={reconnect}
         onRestart={restart}
+        onLogOut={() => { void api("/api/browser-sites/sign-out", { method: "POST", body: JSON.stringify({ bot: bot.id }) }).catch(() => undefined); }}
       />}
     />
     {error && <div role="alert" className="flex shrink-0 items-center justify-between gap-2 border-b border-hairline/30 px-3 py-2 text-[12px] text-danger"><span>{error}</span>{!connected && <button className="shrink-0 underline" onClick={reconnect}>{t("browser.panel.reconnect")}</button>}</div>}
