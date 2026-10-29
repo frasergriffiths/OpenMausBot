@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, Monitor, RotateCcw, Square } from "lucide-react";
 
+import { cn } from "@/lib/cn";
 import { requestScreenPreview, stopScreenPreview } from "@/lib/screen-preview";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
@@ -24,7 +25,7 @@ const phaseCopy: Record<Exclude<PreviewPhase, "requesting" | "streaming">, Local
   error: "computer.screen.error",
 };
 
-export function LocalScreenPreview() {
+export function LocalScreenPreview({ className }: { className?: string } = {}) {
   const { capabilities, ready } = useDesktopCapabilities();
   const preview = capabilities.screenPreview;
   const isLinux = capabilities.host.platform === "linux";
@@ -120,7 +121,7 @@ export function LocalScreenPreview() {
     phase === "cancelled" || phase === "ended" || phase === "unavailable" || phase === "error";
 
   return (
-    <section className="mt-4 rounded-xl bg-card p-4" aria-labelledby="local-preview-title">
+    <section className={cn("mt-4 rounded-xl bg-card p-4", className)} aria-labelledby="local-preview-title">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div id="local-preview-title" className="text-[15px] font-medium text-ink">

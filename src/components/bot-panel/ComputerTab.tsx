@@ -50,7 +50,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
 
   return (
-    <div data-panel-tabpanel="computer">
+    <div data-panel-tabpanel="computer" className="[&>*:first-child]:mt-0">
       <LinuxLocalControl />
       <button
         type="button"

@@ -1626,7 +1626,7 @@ export function ComputerPanel({
         )}
 
         {phase !== "team-boat" && (bot.computer !== undefined || computerStatusCurrent) && <>
-          <LocalScreenPreview />
+          <LocalScreenPreview className={embedded ? "mt-0" : undefined} />
           <LinuxLocalControl />
           <div className="mt-4"><MacLocalControl /></div>
         </>}
