@@ -6320,5 +6320,6 @@
   "botPanel.tab.library": "ライブラリ",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "ブラウザー",
-  "botPanel.tab.computer": "コンピューター"
+  "botPanel.tab.computer": "コンピューター",
+  "chat.setupCard.submit": "Set up {name}"
 }

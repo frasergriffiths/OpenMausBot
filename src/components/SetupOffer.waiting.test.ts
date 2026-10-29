@@ -65,6 +65,7 @@ describe("the setup card while its answers are written", () => {
     expect(labels()).toEqual([...PERSONAL, "Something else"]);
     expect(card()!.getAttribute("aria-busy")).toBeNull();
     press("b");
+    act(() => void container.querySelector<HTMLButtonElement>("[data-setup-submit]")!.click());
     expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1", text: PERSONAL[1] }) });
   });
 
@@ -98,6 +99,7 @@ describe("the setup card while its answers are written", () => {
     show(greeting({ setupChoices: PERSONAL }));
     expect(labels()).toEqual([...FIXED, "Something else"]);
     press("c");
+    act(() => void container.querySelector<HTMLButtonElement>("[data-setup-submit]")!.click());
     expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1", text: FIXED[2] }) });
   });
 });

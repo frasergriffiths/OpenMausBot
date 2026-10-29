@@ -32,6 +32,7 @@ function renderOffer(message: Message, transcript: Message[] = [message]) {
   const all = nodes(tree);
   return { html, all, card: all.find((node) => node.props["data-setup-card"] !== undefined),
     choices: all.filter((node) => node.props["data-ask-choice"] !== undefined),
+    submit: all.find((node) => node.props["data-setup-submit"] !== undefined),
     close: all.find((node) => node.props["aria-label"] === "Close") };
 }
 const press = (node: Node | undefined) => (node!.props.onClick as () => void)();
@@ -92,17 +93,57 @@ describe("the setup card under a new bot's greeting", () => {
     expect(renderOffer({ ...offered, setupOffer: undefined } as Message).html).toBe("");
   });
 
-  it("sends a pick's words, once, and puts the cursor in the message box", async () => {
+  it("picking a job only selects it and sends nothing", async () => {
+    const first = renderOffer(offered);
+    press(first.choices[1]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(fixture.api).not.toHaveBeenCalled();
+    const picked = renderOffer(offered);
+    expect(picked.choices[1]!.props["aria-checked"]).toBe(true);
+    expect(picked.choices[0]!.props["aria-checked"]).toBe(false);
+    expect(picked.choices.filter((row) => row.props["aria-checked"] === true)).toHaveLength(1);
+  });
+
+  it("keeps the place question on screen until the submit, then shows both answers", () => {
+    const open = renderOffer(offered);
+    expect(open.html).toContain("data-setup-place");
+    const answered = { id: "u1", role: "user", kind: "text", at: 2, text: "Watch the news", setupRequest: true } as Message;
+    const settled = renderOffer(offered, [offered, answered]);
+    expect(settled.html).not.toContain("data-setup-place=");
+    expect(settled.html).toContain("data-setup-place-answer");
+  });
+
+  it("submits the picked words once and puts the cursor in the message box", async () => {
+    renderOffer(offered);
+    press(renderOffer(offered).choices[1]);
     const view = renderOffer(offered);
-    press(view.choices[1]);
-    press(view.choices[1]);
+    press(view.submit);
+    press(view.submit);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(fixture.api).toHaveBeenCalledExactlyOnceWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1", text: "Watch the news" }) });
     expect(fixture.focus).toHaveBeenCalled();
   });
 
+  it("disables the submit until a job is picked", () => {
+    const view = renderOffer(offered);
+    expect(view.submit!.props.disabled).toBe(true);
+    press(view.choices[0]);
+    expect(renderOffer(offered).submit!.props.disabled).toBe(false);
+  });
+
+  it("submits on Enter from a focused row", async () => {
+    const view = renderOffer(offered);
+    const enter = { key: "Enter", preventDefault: vi.fn() };
+    (view.choices[0]!.props.onKeyDown as (event: unknown) => void)(enter);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(enter.preventDefault).toHaveBeenCalled();
+    expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1", text: "Plan my trips" }) });
+  });
+
   it("asks for Something else without words, and shows the bot's line from that answer even if the live update never comes", async () => {
+    renderOffer(offered);
     press(renderOffer(offered).choices.at(-1));
+    press(renderOffer(offered).submit);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1" }) });
     expect(fixture.dispatch).toHaveBeenCalledWith({ type: "messageAdded", threadId: "t1", message: CANNED });
@@ -131,14 +172,13 @@ describe("the setup card under a new bot's greeting", () => {
     expect(renderOffer(offered, [offered, typed]).html).not.toContain("Where Ava works");
   });
 
-  it("picks with the answer's letter key, and leaves other keys alone", async () => {
+  it("selects with the answer's letter key, and leaves other keys alone", async () => {
     const view = renderOffer(offered);
     expect(key(view.card, "b").preventDefault).toHaveBeenCalled();
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1", text: "Watch the news" }) });
-    fixture.api.mockClear();
+    expect(fixture.api).not.toHaveBeenCalled();
+    expect(renderOffer(offered).choices[1]!.props["aria-checked"]).toBe(true);
     expect(key(renderOffer(offered).card, "z").preventDefault).not.toHaveBeenCalled();
-    expect(key(renderOffer(offered).card, "Enter").preventDefault).not.toHaveBeenCalled();
     expect(fixture.api).not.toHaveBeenCalled();
   });
 
@@ -178,6 +218,7 @@ describe("the setup card under a new bot's greeting", () => {
   it("says why when a pick is refused", async () => {
     fixture.api.mockRejectedValue(new Error("This bot is already set up."));
     press(renderOffer(offered).choices[0]);
+    press(renderOffer(offered).submit);
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(renderOffer(offered).html).toContain("This bot is already set up.");
   });

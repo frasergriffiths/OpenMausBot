@@ -6644,5 +6644,6 @@
   "computer.simple.placeChange": "Change where {name} works",
   "botPanel.page.browser.open": "Open the browser",
   "botPanel.library.files": "Files",
-  "computer.tab.files": "Files"
+  "computer.tab.files": "Files",
+  "chat.setupCard.submit": "Set up {name}"
 }

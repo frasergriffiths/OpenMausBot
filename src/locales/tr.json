@@ -4860,5 +4860,6 @@
   "botPanel.tab.library": "Kitaplık",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Tarayıcı",
-  "botPanel.tab.computer": "Bilgisayar"
+  "botPanel.tab.computer": "Bilgisayar",
+  "chat.setupCard.submit": "Set up {name}"
 }

@@ -2443,5 +2443,6 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "ब्राउज़र",
   "botPanel.tab.computer": "कंप्यूटर",
-  "settings.sites.logOutBrowser": "ब्राउज़र से साइन आउट करें"
+  "settings.sites.logOutBrowser": "ब्राउज़र से साइन आउट करें",
+  "chat.setupCard.submit": "Set up {name}"
 }

@@ -4247,5 +4247,6 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "瀏覽器",
   "botPanel.tab.computer": "電腦",
-  "settings.sites.logOutBrowser": "登出瀏覽器"
+  "settings.sites.logOutBrowser": "登出瀏覽器",
+  "chat.setupCard.submit": "Set up {name}"
 }

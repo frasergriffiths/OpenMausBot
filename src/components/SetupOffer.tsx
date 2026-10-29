@@ -1,9 +1,10 @@
 // The setup card under a new bot's greeting (server/setup-request.ts): "What should I help you with first?" with a few
-// answers, then Something else. A pick sends its words, which the server runs as setup at once; Something else is
-// answered by the bot's own line, and the next thing the person types is what the bot sets itself up for. While it
-// waits, a chip above the message box says so and its x stops it. Once answered, the card stays, quiet, with the answer.
+// answers, then Something else, then where the bot works. A pick only selects; the submit sends the words, which the
+// server runs as setup at once. Something else is answered by the bot's own line, and the next thing the person types is
+// what the bot sets itself up for. While it waits, a chip above the message box says so and its x stops it. Once
+// answered, the card stays, quiet, with both answers.
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { Sparkles, X } from "lucide-react";
+import { Check, Loader2, Sparkles, X } from "lucide-react";
 
 import { currentReactor, useReactor } from "@/lib/cloud-guest";
 import { cn } from "@/lib/cn";
@@ -11,6 +12,7 @@ import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { api, useStore, type Bot, type Message } from "@/state/store";
 import { moveChoiceFocus, returnFocusToComposer } from "./AskCard";
+import { MAUS_COLORS, mascotInk } from "@/lib/mascot";
 import { PlaceControl, PlaceAnswer } from "./bot-panel/PlaceControl";
 
 const blank = (bot: Pick<Bot, "soul" | "description">): boolean => !bot.soul?.trim() && !bot.description?.trim();
@@ -33,6 +35,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
   const [closed, setClosed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [waitedOut, setWaitedOut] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
   // A double click lands before the disabled buttons are drawn.
   const sending = useRef(false);
   // The first list the card shows stays, so a letter key always picks the job on screen.
@@ -82,15 +85,24 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
     setClosed(true);
     void api(`/api/bots/${botId}/setup-request`, { method: "DELETE", body: JSON.stringify({ threadId }) }).catch(() => setClosed(false));
   };
-  const options = [...choices.map((choice) => ({ label: choice, pick: () => ask(choice) })), { label: t("chat.setupCard.other"), pick: () => ask() }];
+  const labels = [...choices, t("chat.setupCard.other")];
+  const submit = (index: number | null) => {
+    if (index === null) return;
+    ask(index < choices.length ? choices[index] : undefined);
+  };
   const byLetter = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Enter" && event.target === event.currentTarget) {
+      event.preventDefault();
+      submit(selected);
+      return;
+    }
     const index = LETTERS.indexOf(event.key.toUpperCase());
-    if (event.key.length !== 1 || index < 0 || index >= options.length || event.metaKey || event.ctrlKey || event.altKey) {
+    if (event.key.length !== 1 || index < 0 || index >= labels.length || event.metaKey || event.ctrlKey || event.altKey) {
       moveChoiceFocus(event);
       return;
     }
     event.preventDefault();
-    options[index]!.pick();
+    setSelected(index);
   };
 
   return (
@@ -110,19 +122,44 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
           </div>
         ))}
       </div> : <div className={cn("mt-1.5 flex flex-col", waitedOnce.current && "motion-safe:animate-msg-in")}>
-        {options.map((option, index) => (
-          <button key={option.label} type="button" data-ask-choice="" disabled={settled || busy} onClick={option.pick}
-            className={cn("group flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-start",
-              settled ? "cursor-default" : "hover:bg-ink/[0.05] disabled:cursor-default")}>
-            <kbd className={cn("flex size-6 shrink-0 items-center justify-center rounded-md font-sans text-[12px] font-medium",
-              settled ? "bg-ink/[0.04] text-ink-tertiary" : "bg-ink/[0.07] text-ink-secondary group-hover:bg-ink/[0.1]")}>
-              {LETTERS[index]}
-            </kbd>
-            <span dir="auto" className={cn("min-w-0 break-words text-[14px] leading-5", settled ? "text-ink-tertiary" : "text-ink")}>{option.label}</span>
-          </button>
-        ))}
+        <div role="radiogroup" aria-label={title} className="flex flex-col">
+          {labels.map((label, index) => {
+            const chosen = selected === index;
+            return (
+              <button key={label} type="button" role="radio" aria-checked={chosen} data-ask-choice="" data-selected={chosen || undefined}
+                disabled={settled || busy} onClick={() => setSelected(index)}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter") return;
+                  event.preventDefault();
+                  setSelected(index);
+                  submit(index);
+                }}
+                className={cn("group flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-start",
+                  settled ? "cursor-default"
+                    : chosen ? "bg-accent/10 text-ink ring-1 ring-inset ring-accent/30"
+                    : "hover:bg-ink/[0.05] disabled:cursor-default")}>
+                <kbd className={cn("flex size-6 shrink-0 items-center justify-center rounded-md font-sans text-[12px] font-medium",
+                  settled ? "bg-ink/[0.04] text-ink-tertiary" : chosen ? "bg-accent/15 text-accent-text" : "bg-ink/[0.07] text-ink-secondary group-hover:bg-ink/[0.1]")}>
+                  {LETTERS[index]}
+                </kbd>
+                <span dir="auto" className={cn("min-w-0 flex-1 break-words text-[14px] leading-5", settled ? "text-ink-tertiary" : "text-ink")}>{label}</span>
+                {chosen && <Check size={14} className="shrink-0 text-accent" aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
       </div>}
       {!settled && !pending && <SetupPlaceQuestion bot={bot} />}
+      {!settled && !pending && (
+        <div className="px-1 pb-1 pt-3">
+          <button type="button" data-setup-submit="" disabled={selected === null || busy} onClick={() => submit(selected)}
+            style={(() => { const colour = bot.color && bot.color in MAUS_COLORS ? bot.color : "purple"; return { backgroundColor: MAUS_COLORS[colour], color: mascotInk(colour) }; })()}
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-45">
+            {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
+            {t("chat.setupCard.submit", { name: bot.name })}
+          </button>
+        </div>
+      )}
       {settled && answer && (
         <div data-setup-answer="" className="mx-3 mb-1 mt-1.5 border-t border-hairline/40 pt-2.5">
           <div className="text-[12px] leading-4 text-ink-tertiary">{t("chat.setupCard.answer")}</div>

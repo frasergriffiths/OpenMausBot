@@ -4860,5 +4860,6 @@
   "botPanel.tab.library": "Thư viện",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Trình duyệt",
-  "botPanel.tab.computer": "Máy tính"
+  "botPanel.tab.computer": "Máy tính",
+  "chat.setupCard.submit": "Set up {name}"
 }

@@ -6073,5 +6073,6 @@
   "botPanel.tab.library": "Biblioteca",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Navegador",
-  "botPanel.tab.computer": "Computador"
+  "botPanel.tab.computer": "Computador",
+  "chat.setupCard.submit": "Set up {name}"
 }

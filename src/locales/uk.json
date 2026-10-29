@@ -2886,5 +2886,6 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Браузер",
   "botPanel.tab.computer": "Комп'ютер",
-  "settings.sites.logOutBrowser": "Вийти з браузера"
+  "settings.sites.logOutBrowser": "Вийти з браузера",
+  "chat.setupCard.submit": "Set up {name}"
 }

@@ -3255,5 +3255,6 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "浏览器",
   "botPanel.tab.computer": "电脑",
-  "settings.sites.logOutBrowser": "退出浏览器登录"
+  "settings.sites.logOutBrowser": "退出浏览器登录",
+  "chat.setupCard.submit": "Set up {name}"
 }

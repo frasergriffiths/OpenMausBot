@@ -2443,5 +2443,6 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Navigateur",
   "botPanel.tab.computer": "Ordinateur",
-  "settings.sites.logOutBrowser": "Se déconnecter du navigateur"
+  "settings.sites.logOutBrowser": "Se déconnecter du navigateur",
+  "chat.setupCard.submit": "Set up {name}"
 }

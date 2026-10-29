@@ -61,6 +61,7 @@ describe("the setup card in the chat", () => {
     expect(firstAnswer()?.textContent).toBe("AResearch and digging into topics");
     sent.length = 0;
     flushSync(() => firstAnswer()!.click());
+    flushSync(() => card()!.querySelector<HTMLButtonElement>("[data-setup-submit]")!.click());
     await settle();
     const press = sent.find((call) => call.url.endsWith("/api/bots/pepper/setup-request"));
     expect(press?.init).toMatchObject({ method: "POST", body: JSON.stringify({ threadId: "pepper-thread", text: "Research and digging into topics" }) });

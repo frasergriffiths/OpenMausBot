@@ -2461,5 +2461,6 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Browser",
   "botPanel.tab.computer": "Computer",
-  "settings.sites.logOutBrowser": "Im Browser abmelden"
+  "settings.sites.logOutBrowser": "Im Browser abmelden",
+  "chat.setupCard.submit": "Set up {name}"
 }
