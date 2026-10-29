@@ -2,7 +2,7 @@ import { Children, createElement, isValidElement, type ReactElement, type ReactN
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Bot, Message } from "@/state/store";
-import { SetupOffer, SetupRequestChip, setupRequestPlaceholder } from "./SetupOffer";
+import { SetupOffer, SetupPlaceQuestion, SetupRequestChip, setupRequestPlaceholder } from "./SetupOffer";
 
 const fixture = vi.hoisted(() => ({ values: [] as unknown[], index: 0, api: vi.fn(), focus: vi.fn(), dispatch: vi.fn(), bots: [] as unknown[], instances: [] as unknown[], reactor: "user" }));
 vi.mock("react", async (original) => ({
@@ -30,7 +30,7 @@ function renderOffer(message: Message, transcript: Message[] = [message]) {
   function Capture() { fixture.index = 0; tree = SetupOffer({ botId: "b1", threadId: "t1", message, transcript }); return tree; }
   const html = renderToStaticMarkup(createElement(Capture));
   const all = nodes(tree);
-  return { html, card: all.find((node) => node.props["data-setup-card"] !== undefined),
+  return { html, all, card: all.find((node) => node.props["data-setup-card"] !== undefined),
     choices: all.filter((node) => node.props["data-ask-choice"] !== undefined),
     close: all.find((node) => node.props["aria-label"] === "Close") };
 }
@@ -106,6 +106,37 @@ describe("the setup card under a new bot's greeting", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1" }) });
     expect(fixture.dispatch).toHaveBeenCalledWith({ type: "messageAdded", threadId: "t1", message: CANNED });
+  });
+
+  const answeredLine = { id: "u1", role: "user", kind: "text", at: 2, text: "Neither, let me explain", setupRequest: true } as Message;
+  const renderPlace = (onSkip = vi.fn()) => {
+    let tree: ReactNode = null;
+    function Capture() { fixture.index = 0; tree = SetupPlaceQuestion({ bot: bot(), onSkip }); return tree; }
+    return { html: renderToStaticMarkup(createElement(Capture)), all: nodes(tree), onSkip };
+  };
+
+  it("asks where the bot works once the first answer is given, with the panel's six places", () => {
+    const view = renderOffer(offered, [offered, answeredLine]);
+    expect(view.html).toContain("Where Ava works");
+    expect(view.html).toContain("Automatic");
+    expect(view.html).toContain("No computer");
+    const place = renderPlace();
+    expect(place.all.filter((node) => node.props.role === "radio")).toHaveLength(6);
+    const browser = place.all.find((node) => label(node).startsWith("Built-in browser"))!;
+    press(browser);
+    expect(fixture.dispatch).toHaveBeenCalledExactlyOnceWith({ type: "updateBot", botId: "b1", patch: { computer: "browser", browser: true } });
+  });
+
+  it("lets the x skip the place question without writing a place", () => {
+    const place = renderPlace();
+    press(place.all.find((node) => node.props["aria-label"] === "Close"));
+    expect(place.onSkip).toHaveBeenCalled();
+    expect(fixture.dispatch).not.toHaveBeenCalled();
+  });
+
+  it("does not ask where it works on a card settled by an ordinary line", () => {
+    const typed = { id: "u1", role: "user", kind: "text", at: 2, text: "hello there" } as Message;
+    expect(renderOffer(offered, [offered, typed]).html).not.toContain("Where Ava works");
   });
 
   it("picks with the answer's letter key, and leaves other keys alone", async () => {
