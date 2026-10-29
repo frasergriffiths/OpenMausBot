@@ -57,7 +57,6 @@ describe("working folder through the rendered sidebar", () => {
   it("opens the dialog from the bot action menu and submits a new thread with its chosen path", () => {
     render();
     openMenu();
-    expect(menuItem("New thread")).toBeDefined();
     flushSync(() => menuItem("New thread in a working folder…")!.click());
     const dialog = document.querySelector<HTMLElement>('[role="dialog"][aria-label="New thread in a working folder…"]')!;
     expect(dialog).not.toBeNull();
@@ -73,13 +72,13 @@ describe("working folder through the rendered sidebar", () => {
     expect(document.activeElement).toBe(document.querySelector('[data-sidebar-bot-row="pepper"]'));
   });
 
-  it("retains one-click normal creation and hides explicit folders from chat-only sessions", () => {
+  it("hides explicit folders from chat-only sessions and offers no other new-thread row", () => {
     access.admin = false;
     render();
     openMenu();
     expect(menuItem("New thread in a working folder…")).toBeUndefined();
-    flushSync(() => menuItem("New thread")!.click());
-    expect(dispatch).toHaveBeenCalledExactlyOnceWith({ type: "newTask", botId: bot.id });
+    expect(menuItem("New thread")).toBeUndefined();
+    expect(dispatch).not.toHaveBeenCalled();
     expect(document.querySelector('[role="dialog"]')).toBeNull();
   });
 

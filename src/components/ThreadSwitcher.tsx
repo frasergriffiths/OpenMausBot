@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { Archive, ArchiveRestore, Check, MoreHorizontal, Pencil, Pin, PinOff, Plus, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Check, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -8,7 +8,6 @@ import { nextRename } from "@/lib/rename";
 import { usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 import { currentTaskBot, openBotThread, useStore, type Bot, type Task } from "@/state/store";
-import { MENU_ROW } from "./menu-recipe";
 import { useMenuMotion } from "./MenuMotion";
 import { anchoredMenuPosition } from "./SidebarPopoverMenu";
 import { SidebarPopoverMenu, type SidebarMenuItem } from "./SidebarPopoverMenu";
@@ -18,7 +17,6 @@ import { SIMPLE_ROW_FOCUS } from "./SidebarSimpleTop";
 import { displayTitle, chipStatus } from "./ChatThreadBar";
 
 type RowTask = Task & { queued?: boolean };
-const SEPARATOR = "mx-2 my-[5px] h-[0.5px] shrink-0 bg-ink/10";
 
 /** The current thread's switcher: a two-line list of every thread in this conversation, with its actions one layer down. */
 export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
@@ -241,17 +239,6 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
           </ul>
         )}
       </div>
-      <div role="separator" className={SEPARATOR} />
-      <button
-        type="button"
-        data-switcher-focus="new"
-        tabIndex={-1}
-        onClick={() => { dispatch({ type: "newTask", botId: bot.id }); onClose(true); }}
-        className={cn("flex h-10 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium text-ink hover:bg-menu-hover", MENU_ROW, "h-10")}
-      >
-        <span className="flex size-4 shrink-0 items-center justify-center"><Plus size={14} /></span>
-        {t("task.newShort")}
-      </button>
       {deleting && (
         <ConfirmDialog
           open

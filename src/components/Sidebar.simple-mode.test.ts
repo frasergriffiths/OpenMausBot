@@ -361,13 +361,13 @@ describe("bot-first sidebar", () => {
     expect(shown).toContain('data-sidebar-thread-row="idle-history"');
   });
 
-  it("only hides thread/folder creation in the bot context menu", () => {
+  it("keeps the bot context menu to folder creation and delete, never a new thread", () => {
     fixture.advanced = true;
     const render = () => renderToStaticMarkup(createElement(BotContextMenu, {
       menu: { botId: bot.id, x: 0, y: 0 }, onClose: vi.fn(), onArchive: vi.fn(), onDelete: vi.fn(), onMoveToSection: vi.fn(), onNewFolder: vi.fn(), onNewTaskFolder: vi.fn(),
     }));
     const enabled = render();
-    expect(enabled).toContain("New thread");
+    expect(enabled).not.toContain("New thread");
     expect(enabled).toContain("New folder");
     expect(enabled).toContain("Delete all threads…");
     fixture.showThreads = false;
