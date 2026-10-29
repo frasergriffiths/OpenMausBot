@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { Archive, ArchiveRestore, Check, MoreHorizontal, Pencil, Pin, PinOff, Plus, Trash2 } from "lucide-react";
+import { Archive, ArchiveRestore, Check, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -8,7 +8,6 @@ import { nextRename } from "@/lib/rename";
 import { usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { llmThreadTitlesEnabled } from "@/lib/feature-flags";
 import { currentTaskBot, openBotThread, useStore, type Bot, type Task } from "@/state/store";
-import { MENU_ROW } from "./menu-recipe";
 import { useMenuMotion } from "./MenuMotion";
 import { anchoredMenuPosition } from "./SidebarPopoverMenu";
 import { SidebarPopoverMenu, type SidebarMenuItem } from "./SidebarPopoverMenu";
@@ -18,7 +17,6 @@ import { SIMPLE_ROW_FOCUS } from "./SidebarSimpleTop";
 import { displayTitle, chipStatus } from "./ChatThreadBar";
 
 type RowTask = Task & { queued?: boolean };
-const SEPARATOR = "mx-2 my-[5px] h-[0.5px] shrink-0 bg-ink/10";
 
 /** The current thread's switcher: a two-line list of every thread in this conversation, with its actions one layer down. */
 export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
@@ -153,12 +151,12 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
         items[next]?.focus();
       }}
       className={cn(
-        "popover-surface z-[60] flex w-[17.5rem] max-w-[calc(100vw-16px)] flex-col overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]",
+        "popover-surface z-[60] flex w-[17.5rem] max-w-[calc(100vw-16px)] flex-col overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 pb-2 shadow-lg [&_svg.lucide]:stroke-[1.5]",
         motion.className,
       )}
       {...motion.exitProps}
     >
-      <div className="flex h-7 shrink-0 items-center justify-between px-2 text-[12px] font-medium leading-4 text-ink-tertiary">
+      <div className="mb-1.5 flex h-7 shrink-0 items-center justify-between px-2 text-[12px] font-medium leading-4 text-ink-tertiary">
         <span id={headingId}>{t("task.list")}</span>
         <span className="tabular-nums">{threads.length}</span>
       </div>
@@ -166,7 +164,7 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
         {threads.length === 0 ? (
           <p className="px-2 py-6 text-center text-[12px] leading-4 text-ink-tertiary">{t("thread.switcher.empty")}</p>
         ) : (
-          <ul className="flex flex-col">
+          <ul className="flex flex-col gap-0.5">
             {threads.map((task) => {
               const isCurrent = task.threadId === current;
               const status = chipStatus(task);
@@ -176,8 +174,8 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
                 <li key={task.threadId}>
                   <div className={cn("group/thread relative flex min-w-0 items-center rounded-md", isCurrent ? "bg-menu-active" : "hover:bg-menu-hover")}>
                     {renaming === task.threadId ? (
-                      <div className="flex h-10 min-w-0 flex-1 items-center gap-2 pl-2 pr-1">
-                        <span className="flex size-4 shrink-0" />
+                      <div className="flex h-11 min-w-0 flex-1 items-center gap-1.5 pl-2 pr-1">
+                        <span className="flex w-2 shrink-0" />
                         <input
                           autoFocus
                           value={draft}
@@ -203,18 +201,19 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
                         tabIndex={isCurrent ? 0 : -1}
                         onClick={() => { openBotThread(dispatch, bot, task.threadId, false); onClose(true); }}
                         className={cn(
-                          "flex h-10 min-w-0 flex-1 items-center gap-2 rounded-md pl-2 pr-1 text-left focus:bg-ink/[0.06]",
+                          "flex h-11 min-w-0 flex-1 items-center gap-1.5 rounded-md pl-2 pr-1 text-left",
                           SIMPLE_ROW_FOCUS,
                         )}
                       >
-                        <span className="flex size-4 shrink-0 items-center justify-center" aria-hidden="true">
+                        <span className="flex w-2 shrink-0 items-center justify-center" aria-hidden="true">
                           {waiting ? <span className="size-1.5 rounded-full bg-warning" /> : <span className="size-1.5 rounded-full bg-ink-tertiary/50" />}
                         </span>
                         <span className="flex min-w-0 flex-1 flex-col">
                           <span dir="auto" className={cn("truncate text-[13px] leading-[18px] text-ink", isCurrent ? "font-semibold" : "font-medium")}>{displayTitle(task)}</span>
                           <span className="flex min-w-0 items-center gap-1 text-[12px] leading-4">
-                            <span className="min-w-0 truncate text-ink-tertiary">{time} ·</span>
-                            <span className={cn("shrink-0", waiting ? "text-warning" : isCurrent ? "text-ink-secondary" : "text-ink-tertiary")}>{status}</span>
+                            <span className="shrink-0 whitespace-nowrap text-ink-tertiary">{time}</span>
+                            <span className="shrink-0 text-ink-tertiary" aria-hidden="true">·</span>
+                            <span title={status} className={cn("min-w-0 truncate", waiting ? "text-warning" : isCurrent ? "text-ink-secondary" : "text-ink-tertiary")}>{status}</span>
                           </span>
                         </span>
                         <span className="flex shrink-0 items-center gap-1">
@@ -229,7 +228,7 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
                         compact
                         ariaLabel={t("task.actions", { title: displayTitle(task) })}
                         triggerLabel={t("task.actions", { title: displayTitle(task) })}
-                        triggerClassName="flex size-7 items-center justify-center rounded-md text-ink-tertiary hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
+                        triggerClassName="flex size-[30px] items-center justify-center rounded-md text-ink-tertiary hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
                         renderTrigger={() => <MoreHorizontal size={14} />}
                       />
                     </div>
@@ -240,17 +239,6 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
           </ul>
         )}
       </div>
-      <div role="separator" className={SEPARATOR} />
-      <button
-        type="button"
-        data-switcher-focus="new"
-        tabIndex={-1}
-        onClick={() => { dispatch({ type: "newTask", botId: bot.id }); onClose(true); }}
-        className={cn("flex h-10 w-full items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium text-ink hover:bg-menu-hover", MENU_ROW, "h-10")}
-      >
-        <span className="flex size-4 shrink-0 items-center justify-center"><Plus size={14} /></span>
-        {t("task.newShort")}
-      </button>
       {deleting && (
         <ConfirmDialog
           open

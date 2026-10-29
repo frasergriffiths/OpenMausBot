@@ -160,7 +160,7 @@ describe("the thread chip in Simple mode", () => {
     expect(document.activeElement).toBe(chip());
   });
 
-  it("puts no New thread button in the header; the switcher's New thread row starts a conversation", () => {
+  it("puts no New thread button in the header, and none at the end of the switcher", () => {
     fixture.advanced = false;
     fixture.threadsShown = false;
     fixture.threadsWanted = true;
@@ -168,11 +168,9 @@ describe("the thread chip in Simple mode", () => {
 
     expect(document.querySelector("[data-chathead-new-thread]")).toBeNull();
     flushSync(() => chip()!.click());
-    const button = sheet()!.querySelector<HTMLButtonElement>('[data-switcher-focus="new"]')!;
-    expect(button.textContent).toContain("New thread");
-    actions.length = 0;
-    flushSync(() => button.dispatchEvent(new MouseEvent("click", { bubbles: true })));
-    expect(actions).toEqual([{ type: "newTask", botId: bot.id }]);
+    expect(sheet()!.querySelector('[data-switcher-focus="new"]')).toBeNull();
+    expect(sheet()!.textContent).not.toContain("New thread");
+    expect(sheet()!.querySelector('[role="separator"]')).toBeNull();
   });
 
   it("opens a row's three-dot menu over the switcher, not clipped inside it", () => {
