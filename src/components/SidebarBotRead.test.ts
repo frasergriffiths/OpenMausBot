@@ -9,9 +9,6 @@ import { setLocale } from "@/lib/i18n";
 
 vi.mock("./DesktopCapabilities", () => ({ useDesktopCapabilities: () => ({}) }));
 const mode = vi.hoisted(() => ({ advanced: true }));
-vi.mock("@/lib/interface-mode", async (original) => ({
-  ...await original<typeof import("@/lib/interface-mode")>(), useAdvancedMode: () => mode.advanced,
-}));
 
 const bot: Bot = { id: "reviewer", threadId: "selected", name: "Reviewer", title: "", description: "", color: "green",
   notifications: true, unread: true, messages: [], modelSelection: { instanceId: "fake", model: "test" },
@@ -28,7 +25,7 @@ const onRename = vi.fn();
 const dispatch = (action: Action) => { state = reducer(state, action); draw(); };
 const draw = () => flushSync(() => root.render(createElement(BotEditorStore, {
   value: { state, dispatch, flushBotPatches: async () => null, refreshInstances: async () => {}, refreshModels: async () => {} },
-  children: createElement(BotContextMenu, { menu, onClose, onArchive: vi.fn(), onDelete: vi.fn(), onMoveToSection: vi.fn(), onNewFolder: vi.fn(), onNewTaskFolder: vi.fn(), onRename }),
+  children: createElement(BotContextMenu, { menu, onClose, onArchive: vi.fn(), onDelete: vi.fn(), onMoveToSection: vi.fn(), onRename }),
 })));
 const button = (label = "Mark all conversations as read") => [...document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]')].find((node) => node.textContent === label)!;
 const response = (threadId: string) => {
@@ -49,11 +46,6 @@ describe("bot menu bulk reads", () => {
   it("remains available with the full thread tree hidden, including Portuguese copy", () => {
     setLocale("pt-br"); draw();
     expect(button("Marcar todas as conversas como lidas").disabled).toBe(false);
-  });
-
-  it("disables the action when there is no unread conversation", () => {
-    state.bots[0]!.tasks!.forEach((task) => { task.unread = false; }); draw();
-    expect(button().disabled).toBe(true);
   });
 
   it("guards repeat clicks, shows progress and closes only after the last read is confirmed", async () => {
@@ -106,16 +98,16 @@ describe("bot menu bulk reads", () => {
     draw(); expect(button()).toBeUndefined();
   });
 
-  it("offers Simple mode one toggle: Mark as read while anything is unread, Mark as unread once nothing is", async () => {
+  it("offers one toggle: Mark all conversations as read while anything is unread, Mark as unread once nothing is", async () => {
     mode.advanced = false;
     const fetch = vi.fn(async (_url: unknown, init?: RequestInit) => response(JSON.parse(String(init?.body)).threadId));
     vi.stubGlobal("fetch", fetch); draw();
     expect(button("Mark as unread")).toBeUndefined();
-    flushSync(() => button("Mark as read").click());
+    flushSync(() => button("Mark all conversations as read").click());
     await expect.poll(() => onClose.mock.calls.length).toBe(1);
     expect(state.bots[0]!.tasks!.every((task) => !task.unread)).toBe(true);
     draw();
-    expect(button("Mark as read")).toBeUndefined();
+    expect(button("Mark all conversations as read")).toBeUndefined();
     flushSync(() => button("Mark as unread").click());
     expect(state.bots[0]!.unread).toBe(true);
   });
@@ -132,10 +124,10 @@ describe("Simple mode's bot menu", () => {
   it("leads with Pin, Move and Mark as read, then Rename, then Copy conversation ID and More, and ends with Archive and Delete", () => {
     draw();
     expect([...sheet().querySelectorAll("button")].map((node) => node.textContent)).toEqual([
-      "Pin", "Move to department", "Mark as read", "Rename", "Copy conversation ID", "More", "Archive", "Delete",
+      "Pin", "Move to department", "Mark all conversations as read", "Rename", "Copy conversation ID", "More", "Archive", "Delete",
     ]);
     expect([...sheet().children].map((node) => node.getAttribute("role") === "separator" ? "|" : node.textContent)).toEqual([
-      "Pin", "Move to department", "Mark as read", "|", "Rename", "|", "Copy conversation ID", "More", "|", "Archive", "Delete",
+      "Pin", "Move to department", "Mark all conversations as read", "|", "Rename", "|", "Copy conversation ID", "More", "|", "Archive", "Delete",
     ]);
     flushSync(() => button("Rename").click());
     expect(onRename).toHaveBeenCalledWith(bot.id);

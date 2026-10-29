@@ -6,7 +6,7 @@ import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { BulkSelectFilters, ThreadListFooter, deleteThreadsInBulk, useBulkSelect } from "./BulkSelectBar";
 import { orderedThreadList, SidebarThreadRow, stampClock, threadRecency, useRelativeNow, useRevealedThreadRow, visibleSidebarThreads } from "./SidebarThreadRow";
 
-export function GroupThreadList({ group, selected, density = "comfortable", query = "", advanced = false }: { group: Group; selected: boolean; density?: SidebarDensity; query?: string; advanced?: boolean }) {
+export function GroupThreadList({ group, selected, density = "comfortable", query = "" }: { group: Group; selected: boolean; density?: SidebarDensity; query?: string }) {
   const { state, dispatch } = useStore();
   const now = useRelativeNow();
   const [showAll, setShowAll] = useState(false);
@@ -35,7 +35,7 @@ export function GroupThreadList({ group, selected, density = "comfortable", quer
   const locale = activeLocale();
   return <div className="mb-2 space-y-0.5" role="group" aria-label={t("task.namedList", { name: group.name })}>
     {bulk.active && <BulkSelectFilters rows={visible} selected={selection} now={now} onChange={bulk.setSelected} onDone={bulk.finish} />}
-    {visible.map((task) => <SidebarThreadRow key={task.threadId} task={task} ownerId={group.id} current={selected && task.threadId === group.threadId} compact={density === "compact"} advanced={advanced}
+    {visible.map((task) => <SidebarThreadRow key={task.threadId} task={task} ownerId={group.id} current={selected && task.threadId === group.threadId} compact={density === "compact"}
       now={stampClock(threadRecency(task), now)} locale={locale} {...actions} selectMode={bulk.active} checked={selection.has(task.threadId)} onToggleSelect={bulk.toggle} />)}
     <ThreadListFooter bulk={bulk} rows={visible} selected={selection} total={tasks.length} canShowAll={!query && !showAll && tasks.length > visible.length} canSelect={tasks.length > 1 && !group.dm}
       onShowAll={() => setShowAll(true)} maxDeletable={tasks.length - 1} freshConversation={false} onDelete={(threadIds) => deleteThreadsInBulk({ groupId }, threadIds, dispatch)} />

@@ -16,7 +16,6 @@ vi.mock("@/lib/cloud-guest", () => ({ useCanWriteIn: () => true, useReactor: () 
 vi.mock("./ModelPicker", () => ({ ModelPicker: () => null }));
 
 const fixture = { advanced: false, threadsShown: false, threadsWanted: true };
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: vi.fn() }));
 vi.mock("@/lib/thread-preferences", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/lib/thread-preferences")>(),
   useShowThreads: () => fixture.threadsShown,

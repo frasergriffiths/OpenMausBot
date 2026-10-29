@@ -6,7 +6,6 @@ import { expect, it, vi } from "vitest";
 vi.mock("./MenuMotion", () => ({ useMenuMotion: () => ({ shown: true, exitProps: {}, className: "" }) }));
 vi.mock("@/hooks/use-popover-dismiss", () => ({ usePopoverDismiss: () => {} }));
 // Simple mode draws the compact anchored look; that is where a noted row used to overflow.
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => false }));
 import { MenuRows, SidebarPopoverMenu } from "./SidebarPopoverMenu";
 
 // The inline "below" sheet; the anchored "above" one renders in a portal and is driven in a DOM elsewhere.

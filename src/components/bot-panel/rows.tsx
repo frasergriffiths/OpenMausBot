@@ -2,14 +2,13 @@ import type { ReactNode, Ref } from "react";
 import { Check, ChevronLeft, ChevronRight, Trash2, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/cn";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import type { MausColor } from "@/lib/mascot";
 import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "../pill-tabs";
 import { ELEVATED_CONTROL, ELEVATED_HOVER } from "../elevated";
 import { Switch } from "../SettingsPrimitives";
 
 export const rowCls = "flex min-h-[46px] items-center gap-2.5 px-3.5 py-[11px]";
-export const roundButtonCls = `flex size-[34px] shrink-0 items-center justify-center rounded-full text-ink ${ELEVATED_CONTROL} ${ELEVATED_HOVER} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [:root[data-interface=simple][data-skin=daylight]_&]:shadow-[0_1px_3px_rgb(28_28_28/0.12)]`;
+export const roundButtonCls = `flex size-[34px] shrink-0 items-center justify-center rounded-full text-ink ${ELEVATED_CONTROL} ${ELEVATED_HOVER} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [:root[data-skin=daylight]_&]:shadow-[0_1px_3px_rgb(28_28_28/0.12)]`;
 const titleCls = "truncate text-[14px] font-medium text-ink";
 const hintCls = "mt-px text-[13px] leading-[1.35] text-ink-secondary";
 export const buttonCls =
@@ -38,17 +37,11 @@ export function LabelAction({ children, onClick, ...rest }: { children: ReactNod
 }
 
 export function Card({ label, action, anchor, children }: { label?: ReactNode; action?: ReactNode; anchor?: string; children: ReactNode }) {
-  const advanced = useAdvancedMode();
   return (
     <section data-panel-card={anchor} className="mt-4 first:mt-0">
       <div
         data-panel-card-surface=""
-        className={cn(
-          "overflow-hidden",
-          advanced
-            ? "rounded-[14px] border border-ink/[0.04] bg-ink/[0.03]"
-            : "rounded-[14px] border-[0.5px] border-ink/[0.05] bg-menu max-md:rounded-[16px]",
-        )}
+        className="overflow-hidden rounded-[14px] border-[0.5px] border-ink/[0.05] bg-menu max-md:rounded-[16px]"
       >
         {label && (
           <div className="flex min-h-9 items-center justify-between gap-3 px-3.5 pb-0.5 pt-2.5 text-[12px] font-medium text-ink-tertiary">

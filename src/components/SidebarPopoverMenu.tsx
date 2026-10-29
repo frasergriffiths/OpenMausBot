@@ -5,7 +5,6 @@ import { cn } from "@/lib/cn";
 import { useMenuMotion } from "./MenuMotion";
 import { popoverClosesOnKey, usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { submenuIntent, type Point, type SubmenuIntent } from "@/lib/submenu-intent";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { MENU_ROW, SIMPLE_MENU_ROW } from "./menu-recipe";
 import { t } from "@/lib/i18n";
 
@@ -194,7 +193,6 @@ export function SidebarPopoverMenu({
   ariaLabel,
   openOnHover = false,
   placement = "above",
-  compact = false,
   triggerClassName = "w-full",
   triggerTitle,
   triggerLabel,
@@ -366,13 +364,12 @@ export function SidebarPopoverMenu({
   };
 
   const openItem = submenu ? items.find((item) => item.key === submenu) : undefined;
-  const advanced = useAdvancedMode();
-  // Simple mode has one anchored look: the compact menu. Advanced keeps its roomy/plain pair.
-  const look: MenuLook = !anchored ? "plain" : advanced ? (compact ? "compact" : "roomy") : "compact";
+  // One anchored look: the compact menu.
+  const look: MenuLook = !anchored ? "plain" : "compact";
   const width = look === "compact" ? COMPACT_MENU_WIDTH : ANCHORED_MENU_WIDTH;
   const sheetClass = look === "compact"
     ? "popover-surface flex flex-col gap-0.5 overflow-hidden rounded-[var(--radius-menu)] border border-hairline/50 bg-menu p-1.5 shadow-lg [&_svg.lucide]:stroke-[1.5]"
-    : cn("popover-surface overflow-hidden border border-hairline/50 bg-menu shadow-2xl shadow-black/50", look === "roomy" ? "rounded-2xl p-1.5" : "rounded-xl py-1.5");
+    : cn("popover-surface overflow-hidden border border-hairline/50 bg-menu shadow-2xl shadow-black/50");
 
   const sheet = motion.shown && (
     <div

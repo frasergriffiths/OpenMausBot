@@ -11,7 +11,6 @@ vi.mock("@/state/store", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/state/store")>();
   return { ...original, useStore: () => ({ state: { ...original.initialState, ...fixture.state }, dispatch: fixture.dispatch }) };
 });
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, readAdvancedMode: () => fixture.advanced, setAdvancedMode: vi.fn() }));
 vi.mock("./DesktopCapabilities", async (importOriginal) => {
   const original = await importOriginal<typeof import("./DesktopCapabilities")>();
   return {

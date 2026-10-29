@@ -4,7 +4,6 @@ import { TeamLibraryPanel } from "@/components/TeamLibraryPanel";
 import { cn } from "@/lib/cn";
 import { listOf } from "@/lib/cloud-send";
 import { t } from "@/lib/i18n";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { CARD, CARD_IDLE, CARD_PICKED, CardIcon, Footer, PRIMARY, QUIET, SECONDARY, StepHeading } from "./parts";
 
 export type BringOutcome = "team" | "here" | "skipped";
@@ -27,14 +26,13 @@ export function WelcomeBring({ name, desktop, older = false, cloudHasWork, sent 
   onTeam: () => void;
   onFinish: (outcome: BringOutcome) => void;
 }) {
-  const advanced = useAdvancedMode();
   const [teams, setTeams] = useState(false);
   const [more, setMore] = useState(false);
   const teamButton = useRef<HTMLButtonElement>(null);
   const freshBody = <>
     <CardIcon icon={Sparkles} />
     <span className="text-[15px] font-semibold text-ink">{t("cloudWelcome.bring.fresh")}</span>
-    <span className="text-[13px] leading-relaxed text-ink-secondary">{t(advanced ? "cloudWelcome.bring.freshHint" : "cloudWelcome.bring.freshChief")}</span>
+    <span className="text-[13px] leading-relaxed text-ink-secondary">{t("cloudWelcome.bring.freshChief")}</span>
   </>;
   const library = teams && <TeamLibraryPanel returnFocusRef={teamButton} onClose={() => setTeams(false)}
     onImported={() => { onTeam(); setTeams(false); onFinish("team"); }} />;
@@ -48,23 +46,21 @@ export function WelcomeBring({ name, desktop, older = false, cloudHasWork, sent 
           {sent.state === "sending" ? <Loader2 size={15} aria-hidden="true" className="mt-0.5 shrink-0 animate-spin" /> : <Check size={15} strokeWidth={2.5} aria-hidden="true" className="mt-0.5 shrink-0 text-success" />}
           <span>{line}</span>
         </span>} />
-      {advanced && (more
+      {more
         ? <div data-bring-choice="fresh" className={cn(CARD, CARD_IDLE)}>{freshBody}<Footer>
             <button ref={teamButton} type="button" className={SECONDARY} onClick={() => setTeams(true)}>{t("cloudWelcome.bring.chooseTeam")}</button>
           </Footer></div>
-        : <Footer><button type="button" data-bring-more className={QUIET} onClick={() => setMore(true)}>{t("cloudWelcome.bring.more")}</button></Footer>)}
+        : <Footer><button type="button" data-bring-more className={QUIET} onClick={() => setMore(true)}>{t("cloudWelcome.bring.more")}</button></Footer>}
       {library}
     </section>;
   }
 
   const actions = cloudHasWork
     ? <button type="button" className={PRIMARY} onClick={() => onFinish("here")}>{t("onboarding.continue")}</button>
-    : advanced
-      ? <>
-        <button ref={teamButton} type="button" className={PRIMARY} onClick={() => setTeams(true)}>{t("cloudWelcome.bring.chooseTeam")}</button>
-        <button type="button" className={QUIET} onClick={() => onFinish("skipped")}>{t("cloudIntent.skip")}</button>
-      </>
-      : <button type="button" className={PRIMARY} onClick={() => onFinish("skipped")}>{t("onboarding.continue")}</button>;
+    : <>
+      <button ref={teamButton} type="button" className={PRIMARY} onClick={() => setTeams(true)}>{t("cloudWelcome.bring.chooseTeam")}</button>
+      <button type="button" className={QUIET} onClick={() => onFinish("skipped")}>{t("cloudIntent.skip")}</button>
+    </>;
   return <section aria-labelledby="cloud-welcome-step" data-welcome-step="bring" className="flex flex-col gap-5">
     <StepHeading headingRef={headingRef} title={t("cloudWelcome.bring.title", { name })} sub={t(team ? "cloudWelcome.bring.subTeam" : "cloudWelcome.bring.sub", { name })} />
     {older && <p role="note" data-bring-update className="text-[13px] leading-relaxed text-ink">{t("cloudWelcome.bring.update")}</p>}

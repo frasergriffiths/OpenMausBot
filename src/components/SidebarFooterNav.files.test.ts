@@ -8,7 +8,6 @@ import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { BotEditorStore, initialState, type AppState, type useStore } from "@/state/store";
 
 const mode = vi.hoisted(() => ({ advanced: false }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => mode.advanced, setAdvancedMode: () => {} }));
 import { SidebarFooterNav } from "./SidebarFooterNav";
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -48,37 +47,4 @@ it("shows Files in Simple mode's icon column once My Cloud is Ready, and opens i
   expect(row()!.getAttribute("aria-label")).toBe("Files");
   await act(async () => row()!.click());
   expect(dispatch).toHaveBeenCalledWith({ type: "showFiles" });
-});
-
-it("hides Files without a Ready My Cloud, and shows it when main says My Cloud is Ready", async () => {
-  mode.advanced = true;
-  bridge("unavailable");
-  await render();
-  expect(row()).toBeNull();
-  await act(async () => emit(files("syncing")));
-  expect(row()).toBeTruthy();
-  await act(async () => emit(files("unavailable")));
-  expect(row()).toBeNull();
-  delete window.ogb;
-  await render();
-  expect(row()).toBeNull();
-});
-
-it("keeps Files while signed out or offline, so the page can say what to do", async () => {
-  mode.advanced = true;
-  bridge("signed-out");
-  await render();
-  expect(row()).toBeTruthy();
-  await act(async () => emit(files("offline")));
-  expect(row()).toBeTruthy();
-});
-
-it("in Advanced mode, Files is the only row under Tools, highlighted while open", async () => {
-  mode.advanced = true;
-  bridge("idle");
-  await render("comfortable", { activeView: "files" });
-  expect(host.querySelector('[data-sidebar-nav="team-map"]')).toBeNull();
-  expect(row()!.getAttribute("aria-current")).toBe("page");
-  act(() => root.unmount());
-  expect(off).toHaveBeenCalledOnce();
 });

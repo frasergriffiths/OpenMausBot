@@ -13,7 +13,6 @@ const fixture = vi.hoisted(() => {
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: () => {} });
   return { dispatch: vi.fn(), advanced: true };
 });
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced }));
 vi.mock("@/state/store", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/state/store")>()),
   useStore: () => ({ state: {}, dispatch: fixture.dispatch }),

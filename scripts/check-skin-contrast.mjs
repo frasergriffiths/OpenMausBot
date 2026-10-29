@@ -44,13 +44,6 @@ function parseSkins(source) {
     phoneTokens.set(id, declarations(body));
     skins.set(`${id} (phone)`, { ...skins.get(id), ...phoneTokens.get(id) });
   }
-  // Advanced mode re-declares some tokens of a skin, measured as "<id> (advanced)",
-  // and with the phone block over it as "<id> (advanced, phone)".
-  for (const [, id, body] of desktop.matchAll(/\[data-skin="([a-z-]+)"\]:where\(:root\[data-interface="advanced"\][^{]*\{([^}]*)\}/g)) {
-    const advanced = { ...skins.get(id), ...declarations(body) };
-    skins.set(`${id} (advanced)`, advanced);
-    if (phoneTokens.has(id)) skins.set(`${id} (advanced, phone)`, { ...advanced, ...phoneTokens.get(id) });
-  }
   return skins;
 }
 

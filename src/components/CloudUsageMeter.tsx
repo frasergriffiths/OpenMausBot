@@ -10,7 +10,6 @@ import { localDesktopPage } from "./onboarding/WelcomeGate";
 import { cloudPlanLabel } from "@/lib/cloud-plan";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import {
   includedUsePercent, meterAmounts, meterBand, meterLabel, meterPercent, nextPlan, readUsageCardDismissed, rememberUsageCardDismissed, resetLine,
   upgradeConfirmBody, upgradeLabel, upgradePath, usageCardView, type MeterBand,
@@ -169,7 +168,6 @@ export function CloudUsageCardView({ usage, meters, band, upgrade, onHide, onSee
 
 export function CloudUsageCard() {
   const { dispatch } = useStore();
-  const advanced = useAdvancedMode();
   const { usage, bridge, teamHome } = useCloudUsage();
   const [dismissed, setDismissed] = useState(readUsageCardDismissed);
   const upgrade = useUpgrade(bridge, usage, "app_usage");
@@ -178,7 +176,7 @@ export function CloudUsageCard() {
   const hide = () => { rememberUsageCardDismissed(view.dismissKey); setDismissed(view.dismissKey); };
   return (
     <CloudUsageCardView usage={usage} meters={view.meters} band={view.band} upgrade={{ busy: upgrade.busy, note: upgrade.note, onUpgrade: upgrade.start }}
-      onHide={hide} onSeeAll={() => dispatch({ type: "toggleAppSettings", open: true, section: advanced ? "general" : "usage" })}>
+      onHide={hide} onSeeAll={() => dispatch({ type: "toggleAppSettings", open: true, section: "usage" })}>
       {upgrade.dialog}
     </CloudUsageCardView>
   );

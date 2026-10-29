@@ -22,10 +22,6 @@ vi.mock("./ConfirmDialog", async (importOriginal) => ({
   },
 }));
 // Threads are an Advanced-mode surface (Simple keeps one conversation per bot), so these render as Advanced.
-vi.mock("@/lib/interface-mode", async (original) => ({
-  ...await original<typeof import("@/lib/interface-mode")>(),
-  useAdvancedMode: () => true,
-}));
 vi.mock("./DesktopCapabilities", async (importOriginal) => ({
   ...await importOriginal<typeof import("./DesktopCapabilities")>(),
   useDesktopCapabilities: () => ({ capabilities: { dictation: { available: false }, host: { packaged: true, platform: "other" }, localComputer: { available: false } }, ready: true }),
@@ -124,24 +120,6 @@ describe("sidebar rows", () => {
     for (const id of ["atlas", "scout", "pepper"]) expect(document.querySelector(`[data-sidebar-bot-row="${id}"]`)).not.toBeNull();
     for (const id of ["atlas-now", "atlas-earlier", "atlas-old"]) expect(document.querySelector(`[data-sidebar-thread-row="${id}"]`)).not.toBeNull();
     expect(document.body.textContent).toContain(t("task.updated.hours", { count: 1 }));
-  });
-
-  it("keeps the advanced focus ring on expanded thread rows", () => {
-    const row = document.querySelector('[data-sidebar-thread-row="atlas-now"]')!;
-    expect(row.className).toContain("focus-visible:ring-1");
-    expect(row.className).not.toContain("focus-visible:outline-2");
-  });
-
-  it("gives expanded advanced thread rows the advanced focus ring", () => {
-    const row = document.querySelector<HTMLElement>('[data-sidebar-thread-row="atlas-now"]')!;
-    expect(row.className).toContain("focus-visible:ring-1");
-    expect(row.className).not.toContain("focus-visible:outline-focus");
-  });
-
-  it("gives expanded advanced thread rows the advanced focus ring", () => {
-    const row = document.querySelector<HTMLElement>('[data-sidebar-thread-row="atlas-now"]')!;
-    expect(row.className).toContain("focus-visible:ring-1");
-    expect(row.className).not.toContain("focus-visible:outline-focus");
   });
 
   it("renders no row for a store event no row shows", async () => {

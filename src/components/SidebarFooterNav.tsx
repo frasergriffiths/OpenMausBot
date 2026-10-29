@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { useCloudFilesReady } from "@/lib/cloud-files";
 import { t } from "@/lib/i18n";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useSidebarToolsLayout, type SidebarDensity } from "@/lib/sidebar-preferences";
 import { useStore } from "@/state/store";
 
@@ -154,10 +153,9 @@ export function SidebarFooterNav({
   onToggleCollapsed?: () => void;
 }) {
   const { state, dispatch } = useStore();
-  const advanced = useAdvancedMode();
   const iconsOnly = density === "icons";
   const toolsLayout = useSidebarToolsLayout();
-  const toolbar = advanced && !iconsOnly && toolsLayout === "toolbar";
+  const toolbar = !iconsOnly && toolsLayout === "toolbar";
   const iconSize = iconsOnly && !rail ? 20 : 18;
   const tone = (active: boolean) => (active ? "text-accent" : "text-ink-secondary");
   const filesRow = useCloudFilesReady() && <NavRow
@@ -169,7 +167,7 @@ export function SidebarFooterNav({
     icon={(active) => <FolderOpen size={iconSize} className={tone(active)} />}
     onClick={() => dispatch({ type: "showFiles" })}
   />;
-  if (!advanced && !iconsOnly) return null;
+  if (!iconsOnly) return null;
   const appsRow = iconsOnly && <NavRow
     id="apps"
     label={t("sidebar.nav.apps")}

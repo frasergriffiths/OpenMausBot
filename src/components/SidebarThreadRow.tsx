@@ -232,8 +232,6 @@ type ThreadRowProps = {
    * has worked. */
   panel?: boolean;
   preview?: string;
-  /** Advanced keeps its own 1px accent ring, exactly as the sidebar row does. */
-  advanced?: boolean;
   /** The bot's mascot colour, used by every working indicator on its rows. */
   color?: string;
 };
@@ -246,9 +244,9 @@ const sameFields = <T extends object>(a: T, b: T): boolean => {
 const sameThreadRow = ({ task: previousTask, ...previous }: ThreadRowProps, { task, ...next }: ThreadRowProps): boolean =>
   sameFields(previousTask, task) && sameFields(previous, next);
 
-export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, current, compact, folders, onSelect, onRegenerateTitle, onDelete, onMove, onArchive, onSnooze, onLink, onRefreshPermissions, activityLabel, now, selectMode = false, checked = false, onToggleSelect, panel = false, preview, advanced = false, color }: ThreadRowProps) {
+export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, current, compact, folders, onSelect, onRegenerateTitle, onDelete, onMove, onArchive, onSnooze, onLink, onRefreshPermissions, activityLabel, now, selectMode = false, checked = false, onToggleSelect, panel = false, preview, color }: ThreadRowProps) {
   const workingColor = color ?? "var(--color-success)";
-  const rowFocus = advanced ? "outline-none focus-visible:ring-1 focus-visible:ring-accent/60" : SIMPLE_ROW_FOCUS;
+  const rowFocus = SIMPLE_ROW_FOCUS;
   const [menu, setMenu] = useState<{ left: number; top: number } | null>(null);
   const menuMotion = useHeldMenuMotion(menu);
   const [deleting, setDeleting] = useState(false);

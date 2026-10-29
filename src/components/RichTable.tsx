@@ -7,7 +7,6 @@ import { t } from "@/lib/i18n";
 import { copyText } from "@/lib/copy-text";
 import { columnMinimums, fitsColumns } from "@/lib/table-fit";
 import { cn } from "@/lib/cn";
-import { useAdvancedMode } from "@/lib/interface-mode";
 
 export interface TableCell { text: string; content?: ReactNode; align?: TableAlign; vAlign?: "top" | "middle" | "bottom" }
 export type TableAlign = "left" | "center" | "right" | "start" | "end";
@@ -53,7 +52,6 @@ const SMALL_TABLE_ROWS = 8;
 const TABLE_CARD = "group/table relative w-full overflow-hidden rounded-[20px] bg-composer text-ink shadow-[0_0_0_0.5px_var(--color-composer-ring),0_2px_8px_rgb(28_28_28/0.035)] touch:pt-11";
 
 export function RichTable({ columns, rows, name = t("table.title"), expanded = false, direction = "ltr", headless = false, card: asCard = true }: RichTableProps) {
-  const simple = !useAdvancedMode();
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const [sort, setSort] = useState<TableSort>(null);
@@ -108,7 +106,7 @@ export function RichTable({ columns, rows, name = t("table.title"), expanded = f
     </div>
   );
   const surface = (large: boolean) => {
-    if (simple && asCard && !large) return card();
+    if (asCard && !large) return card();
     const small = !large && rows.length <= SMALL_TABLE_ROWS;
     const actions = <>
         {!small && <button type="button" className="table-action" aria-label={t("table.wrap")} title={t("table.wrap")} aria-pressed={wrap} onClick={() => setWrap(!wrap)}><WrapText size={14} /></button>}
@@ -117,13 +115,13 @@ export function RichTable({ columns, rows, name = t("table.title"), expanded = f
         {!large && <button type="button" className="table-action" aria-label={t("table.expand")} title={t("table.expand")} onClick={(event) => { trigger.current = event.currentTarget; setOpen(true); }}><Maximize2 size={14} /></button>}
     </>;
     return (
-    <div className={cn("rich-table w-fit min-w-[min(100%,var(--chat-prose-max))] max-w-full overflow-hidden rounded-xl border border-hairline/50 text-ink", simple ? "bg-composer" : "bg-panel")} dir="ltr">
+    <div className="rich-table w-fit min-w-[min(100%,var(--chat-prose-max))] max-w-full overflow-hidden rounded-xl border border-hairline/50 bg-composer text-ink" dir="ltr">
       {!small && <div className="flex flex-wrap items-center gap-1 border-b border-hairline/40 px-2 py-1.5">
         {search("flex min-w-24 flex-1 items-center gap-2 px-1 text-ink-secondary")}
         {actions}
       </div>}
       <TableViewport columns={columns} rows={rows} order={order} name={name} wrap={wrap} large={large} sort={sort} direction={direction} headless={headless}
-        look={simple ? "quiet" : "panel"} onSort={sortBy} />
+        look="quiet" onSort={sortBy} />
       <footer className={small
         ? "flex items-center justify-end gap-0.5 border-t border-hairline/30 px-1.5 py-1 text-[11px] text-ink-tertiary"
         : "flex flex-wrap items-center justify-between gap-2 border-t border-hairline/40 px-3 py-2 text-[11px] text-ink-secondary"}>
@@ -137,11 +135,11 @@ export function RichTable({ columns, rows, name = t("table.title"), expanded = f
   return <><div hidden={open} className="chat-table">{surface(expanded)}</div>{open && <TableDialog title={name} returnFocus={trigger.current} onClose={() => setOpen(false)}>{surface(true)}</TableDialog>}</>;
 }
 
-/** "panel" is Advanced's table, "quiet" Simple mode's expanded one (no header fill, a faint zebra), "card" the table
- * card in a Simple reply: header names are the sort buttons, rows are split by hairlines, and nothing else is drawn. */
-type TableLook = "panel" | "quiet" | "card";
+/** "quiet" is the expanded table (no header fill, a faint zebra), "card" the table card in a reply: header names are
+ * the sort buttons, rows are split by hairlines, and nothing else is drawn. */
+type TableLook = "quiet" | "card";
 
-function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, direction, headless = false, look = "panel" }: RichTableProps & {
+function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, direction, headless = false, look = "quiet" }: RichTableProps & {
   order: number[]; wrap: boolean; large: boolean; sort: TableSort; onSort: (column: number) => void; look?: TableLook;
 }) {
   const card = look === "card";
@@ -188,7 +186,7 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
     style={{ maxHeight: large ? "65dvh" : virtual || !wrap ? 400 : undefined }} data-fit={fit || undefined}>
     <table dir={direction} aria-label={name} aria-rowcount={order.length + 1} className={cn("w-full border-separate border-spacing-0 text-[14px]", fit ? "table-auto" : "table-fixed", card && "leading-5")} style={fit ? undefined : { minWidth: widths.reduce((a, b) => a + b, 0) }}>
       {!fit && <colgroup>{widths.map((width, index) => <col key={index} style={{ width }} />)}</colgroup>}
-      <thead ref={heading} hidden={headless} className={cn("sticky top-0 z-10", look === "panel" ? "bg-raised" : "bg-composer")}><tr aria-rowindex={1}>
+      <thead ref={heading} hidden={headless} className="sticky top-0 z-10 bg-composer"><tr aria-rowindex={1}>
         {columns.map((column, index) => <th key={index} scope="col" aria-sort={sort?.column === index ? sort.descending ? "descending" : "ascending" : "none"}
           className={card ? "px-4 py-2.5 align-bottom font-semibold" : "h-10 border-b border-hairline/60 px-3 py-2 font-medium"} style={{ textAlign: alignment(column, index) }}>
           <div className="break-words [overflow-wrap:anywhere]" style={fit ? { minWidth: minimums[index] } : undefined}>
@@ -207,7 +205,7 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
       <tbody>
         {before > 0 && <tr aria-hidden="true"><td colSpan={columns.length} style={{ height: before, padding: 0 }} /></tr>}
         {items.map((item) => <tr key={item.key} data-index={item.index} ref={virtual ? virtualizer.measureElement : undefined} aria-rowindex={item.index + 2}
-          className={card ? undefined : item.index % 2 ? cn(look === "quiet" ? "bg-ink/[0.03]" : "bg-inset/35", "hover:bg-raised/70") : "hover:bg-raised/70"}>
+          className={card ? undefined : item.index % 2 ? "bg-ink/[0.03] hover:bg-raised/70" : "hover:bg-raised/70"}>
           {columns.map((column, index) => {
             const cell = rows[order[item.index]!]![index];
             return <td key={index} className={card ? "border-t-[0.5px] border-ink/[0.07] px-4 py-2.5 align-top tabular-nums" : "border-b border-hairline/20 px-3 py-2.5 align-top tabular-nums"} style={{ textAlign: cell?.align ?? alignment(column, index), verticalAlign: cell?.vAlign }}>

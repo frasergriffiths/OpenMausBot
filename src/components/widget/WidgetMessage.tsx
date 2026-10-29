@@ -8,7 +8,6 @@ import { resolvedThreadTarget } from "@/lib/thread-target";
 import { openThread } from "@/state/thread-navigation";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import {
   PHONE_PAIRING_ACTION, widgetActions, widgetFields, widgetInitialValues, widgetScope, widgetString, type WidgetField, type WidgetNode, type WidgetOther, type WidgetPayload,
   type WidgetSettled, type WidgetValues,
@@ -37,11 +36,10 @@ function isEmpty(field: WidgetField, values: WidgetValues, other: WidgetOther): 
 }
 
 export function WidgetMessage({ botId, threadId, message }: { botId: string; threadId?: string; message: Message }) {
-  const simple = !useAdvancedMode();
   const payload = message.widget;
   if (!payload?.root || typeof payload.root !== "object" || typeof payload.root.type !== "string") {
     return message.text
-      ? <div data-chat-bubble={simple ? "simple" : ""} className={plainBotBubble(simple)}>{message.text}</div>
+      ? <div data-chat-bubble="simple" className={plainBotBubble(true)}>{message.text}</div>
       : null;
   }
   // update_widget renumbers node ids, so a new revision remounts the card.

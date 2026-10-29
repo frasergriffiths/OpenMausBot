@@ -32,7 +32,6 @@ vi.mock("@/state/store", async (importOriginal) => {
 vi.mock("@/lib/analytics", () => ({ track: vi.fn() }));
 vi.mock("@/lib/cloud-guest", async (importOriginal) => ({ ...await importOriginal<typeof import("@/lib/cloud-guest")>(), useReactor: () => "user" }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => true }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: vi.fn() }));
 vi.mock("./CallView", () => ({ CallButton: (props: Record<string, unknown>) => {
   fixture.call = props;
   return null;
@@ -262,22 +261,3 @@ describe("the Simple composer in a group chat", () => {
   });
 });
 
-describe("the Advanced composer", () => {
-  it("keeps the paperclip, the approval shield and the split call button, with no +", () => {
-    fixture.advanced = true;
-    render({ bot });
-    expect(plus()).toBeNull();
-    expect(container.querySelector('button[aria-label="Attach a file"]')).not.toBeNull();
-    expect(container.querySelector('[aria-haspopup="menu"][aria-label$="for Claude"]')).not.toBeNull();
-    expect(fixture.call).toMatchObject({ placement: "composer" });
-    expect(fixture.call?.fill).toBeUndefined();
-    expect(container.querySelector("[data-composer-backdrop]")!.className.split(" ")).toContain("top-1/2");
-  });
-
-  it("keeps the room's Goal chip and its header call button", () => {
-    fixture.advanced = true;
-    render({ group: room, members: [bot, peer] });
-    expect(container.querySelector('[aria-label="Finish together"]')?.getAttribute("aria-pressed")).toBe("false");
-    expect(fixture.groupCall).toBeNull();
-  });
-});

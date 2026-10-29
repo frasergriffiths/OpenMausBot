@@ -11,7 +11,6 @@ const fixture = vi.hoisted(() => ({
   state: {} as Record<string, unknown>,
   toolsLayout: "rows" as SidebarToolsLayout,
 }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: () => {} }));
 vi.mock("@/state/store", () => ({ useStore: () => ({ state: fixture.state, dispatch: fixture.dispatch }) }));
 vi.mock("@/lib/sidebar-preferences", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/lib/sidebar-preferences")>(),
@@ -76,21 +75,6 @@ describe("sidebar footer places", () => {
     expect(html).toContain('aria-label="Apps"');
     expect(html).toContain('title="Apps"');
   });
-
-  it.each(["comfortable", "compact"] as const)("labels the places with a Tools header, expanded by default (%s)", (density) => {
-    fixture.advanced = true;
-    const { html } = render(density);
-    expect(html).toContain("Tools");
-  });
-
-  it("keeps the Tools label and hides the rows when collapsed", () => {
-    fixture.advanced = true;
-    const { html } = render("comfortable", { collapsed: true });
-    expect(html).toContain("Tools");
-    expect(html).not.toContain('data-sidebar-nav="team-map"');
-    expect(html).not.toContain('data-sidebar-nav="files"');
-  });
-
   it("toggles through the header", () => {
     fixture.advanced = true;
     const onToggleCollapsed = vi.fn();
@@ -108,14 +92,6 @@ describe("sidebar footer places", () => {
     expect(html).toContain('data-tour="nav-apps"');
     expect(tree).toBeTruthy();
   });
-
-  it.each(["comfortable", "compact"] as const)("toolbar renders the places as icon buttons with labels (%s)", (density) => {
-    fixture.advanced = true;
-    const { html } = render(density, { toolsLayout: "toolbar" });
-    expect(html).toContain("flex-row");
-    expect(html).not.toContain('data-sidebar-nav="team-map"');
-  });
-
   it("icons density ignores the tools layout", () => {
     fixture.advanced = true;
     const toolbar = render("icons", { toolsLayout: "toolbar" }).html;

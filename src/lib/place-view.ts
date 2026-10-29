@@ -5,7 +5,6 @@ import { cloudPlanView } from "@/lib/cloud-plan";
 import { engineSignedOut } from "@/lib/failed-turn";
 import { browserAvailable, builtInBrowserEnabled, type FeatureFlagConfig } from "@/lib/feature-flags";
 import { writeComputerPanelView } from "@/lib/computer-panel-view";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { openBotSettings } from "@/components/bot-panel/panel-link";
 import type { Action, Bot, ConfigStatus, InstanceInfo } from "@/state/store";
@@ -105,8 +104,7 @@ export function useCloudPlanPaid(): boolean {
 export function usePlaceSeat(config: Pick<ConfigStatus, "cloudHome"> | null | undefined, platform: DesktopCapabilities["host"]["platform"]): PlaceSeat {
   const plan = useCloudPlanPaid();
   const ownerOrAdmin = useOwnerOrAdmin();
-  const advanced = useAdvancedMode();
-  return { server: serverKind(config, platform), plan, role: ownerOrAdmin === false ? "user" : "admin", mode: advanced ? "advanced" : "simple" };
+  return { server: serverKind(config, platform), plan, role: ownerOrAdmin === false ? "user" : "admin", mode: "simple" };
 }
 
 export function openPlaceAction(

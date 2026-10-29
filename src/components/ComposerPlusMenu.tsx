@@ -8,7 +8,6 @@ import {
   shownApprovalMode,
   simpleApprovalName,
 } from "@/lib/approval-mode-options";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { CALL_MODES, effectiveCallMode, useCallMode } from "@/lib/call-mode";
 import { callCapabilityHelp } from "@/lib/call-capability";
 import { requestCallStart } from "@/lib/call-start-request";
@@ -66,8 +65,8 @@ export function GoalToggle({ on, onToggle, solo = false, compact = false }: { on
 
 const check = <Check size={15} className="shrink-0 text-accent" aria-hidden="true" />;
 
-/** The thread's approval level, the same choices the Advanced composer's shield offers: the level shown and its menu.
- * Simple mode names the levels as the bot panel does. */
+/** The thread's approval level, the choices the composer's shield offers: the level shown and its menu.
+ * The levels are named as the bot panel does. */
 function approvalMenu(choice: ApprovalChoice, simple: boolean) {
   const trusted = choice.trustedModesAvailable ?? true;
   const mode = shownApprovalMode(choice.driverKind, approvalModeFor({ approvalMode: choice.approvalMode, autoApprove: choice.autoApprove }));
@@ -124,7 +123,7 @@ function approvalItem(name: string, choice: ApprovalChoice, simple: boolean): Si
 /** The thread's approval level as a small pill that opens its choices: in the Simple composer while it is not the
  * default, and on the bot panel's Details. */
 export function ApprovalChip({ choice, quiet = false }: { choice: ApprovalChoice; quiet?: boolean }) {
-  const { current, note, items } = approvalMenu(choice, !useAdvancedMode());
+  const { current, note, items } = approvalMenu(choice, true);
   const CurrentIcon = current.Icon;
   return (
     <SidebarPopoverMenu
@@ -151,7 +150,7 @@ export function ApprovalChip({ choice, quiet = false }: { choice: ApprovalChoice
 /**
  * The composer's round +: attach files, Work until done (Finish together in a group) and Teach a task. A phone's + also
  * holds what its narrow composer has no room for: the thread's approval level, the call mode and where the bot works,
- * each running the handler its Advanced button runs. With attaching the only choice, the + opens the file picker.
+ * each running the handler the composer's button runs. With attaching the only choice, the + opens the file picker.
  */
 export function ComposerPlusMenu({ onAttach, goal, teach, approval, callBotId, extraItems = [], circle = false }: {
   onAttach: () => void;
@@ -177,7 +176,6 @@ export function ComposerPlusMenu({ onAttach, goal, teach, approval, callBotId, e
   // As the call button, which hides while Live is the mode and its line is held on another device.
   const lineHeldElsewhere = callMode === "live" && liveLineHeldElsewhere(media, state.liveCall);
   const calling = callBotId !== undefined && (onCall === callBotId || isLiveCallRunning(media.phase) || lineHeldElsewhere);
-  const simple = !useAdvancedMode();
   const items: SidebarMenuItem[] = [
     { key: "attach", label: t("composer.attachFiles"), icon: <Paperclip size={16} />, onSelect: onAttach },
     ...(goal ? [{
@@ -190,7 +188,7 @@ export function ComposerPlusMenu({ onAttach, goal, teach, approval, callBotId, e
     } satisfies SidebarMenuItem] : []),
     ...(teach ? [{ key: "teach", label: t("composer.teachTask"), icon: <GraduationCap size={16} />, onSelect: teach } satisfies SidebarMenuItem] : []),
     ...extraItems,
-    ...(approval ? [approvalItem(approval.name, approval.choice, simple)] : []),
+    ...(approval ? [approvalItem(approval.name, approval.choice, true)] : []),
     ...(callBotId === undefined ? [] : CALL_MODES.map((entry, index): SidebarMenuItem => {
       const unavailable = entry.id === "turns" ? turnsHelp : null;
       return {

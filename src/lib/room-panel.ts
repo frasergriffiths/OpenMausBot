@@ -51,11 +51,10 @@ export function useRoomPanelShown({ group, state, simple }: {
 }
 
 // A remote client cannot open desktop panels, so it keeps every control in the header.
-export function simpleRoomHeader({ advanced, remoteClient, group, setupPending }: {
-  advanced: boolean;
+export function simpleRoomHeader({ remoteClient, group, setupPending }: {
   remoteClient: boolean;
   group: Pick<Group, "dm">;
   setupPending: boolean;
 }): boolean {
-  return !advanced && !remoteClient && !group.dm && !setupPending;
+  return !remoteClient && !group.dm && !setupPending;
 }

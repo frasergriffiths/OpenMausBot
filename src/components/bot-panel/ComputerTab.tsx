@@ -1,9 +1,7 @@
 import { Globe2, Monitor, Plus, Smartphone } from "lucide-react";
 
-import { writeComputerPanelView, type ComputerPanelView } from "@/lib/computer-panel-view";
 import { t } from "@/lib/i18n";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useStore, type Bot } from "@/state/store";
 import { BotAvatar } from "../Avatar";
 import { LinuxLocalControl } from "../LinuxLocalControl";
@@ -18,15 +16,6 @@ import { Card, ColRow, LinkRow, NavRow } from "./rows";
 
 type Derived = ReturnType<typeof useBotSettingsDerived>;
 
-export function useOpenComputer(bot: Pick<Bot, "id">) {
-  const { dispatch } = useStore();
-  return (view: ComputerPanelView = "computer") => {
-    writeComputerPanelView(bot.id, view);
-    dispatch({ type: "toggleSettings", open: false });
-    dispatch({ type: "toggleComputer", open: true });
-  };
-}
-
 /** The Computer tab: the bot's screen, the one place control, and the browser behind it. Signed-in sites live here
  *  inline rather than on a view of their own, and the only sign-out is one plain "log out of browser". */
 export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
@@ -35,8 +24,6 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
   const { browserEnabled } = derived;
   const screenOf = t("computer.screenOf", { name: bot.name });
   const android = useAndroidUsbDevices();
-  const openComputer = useOpenComputer(bot);
-  const advanced = useAdvancedMode();
   const profileId = bot.browserProfile ?? "";
   const profile = (state.config?.browserProfiles ?? []).find((candidate) => candidate.id === profileId);
   const temporary = profileId === "guest";
@@ -55,7 +42,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
         type="button"
         data-panel-action="open-computer"
         aria-label={`${t("place.action.watch")}: ${screenOf}`}
-        onClick={() => (advanced ? openComputer("computer") : onOpen("computer"))}
+        onClick={() => onOpen("computer")}
         className="group relative mt-2.5 flex aspect-[16/10] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl bg-composer ring-1 ring-inset ring-ink/[0.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-border"
       >
         {screenSrc ? (

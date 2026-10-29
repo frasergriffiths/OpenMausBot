@@ -4,20 +4,18 @@ import { t } from "@/lib/i18n";
 
 export const SIDE_PANEL_WIDTH_KEYS = {
   simple: "openmausbot.sidePanelWidth.simple",
-  advanced: "openmausbot.sidePanelWidth.advanced",
 } as const;
 
 const BOUNDS = {
   simple: { default: 320, min: 280, max: 420 },
-  advanced: { default: 420, min: 360, max: 560 },
 } as const;
 
 const STEP = 16;
 /** Room the chat needs beside the sidebar and the panel before the panel may take the rest. */
 const CHAT_FLOOR = 320;
 
-export function sidePanelWidthBounds(simple: boolean) {
-  return simple ? BOUNDS.simple : BOUNDS.advanced;
+export function sidePanelWidthBounds(_simple: boolean) {
+  return BOUNDS.simple;
 }
 
 export function clampSidePanelWidth(width: number, simple: boolean, effectiveMax: number): number {
@@ -28,7 +26,7 @@ export function clampSidePanelWidth(width: number, simple: boolean, effectiveMax
 export function readSidePanelWidth(simple: boolean, storage: Pick<Storage, "getItem"> | undefined = typeof localStorage === "undefined" ? undefined : localStorage): number {
   const bounds = sidePanelWidthBounds(simple);
   try {
-    const stored = Number(storage?.getItem(simple ? SIDE_PANEL_WIDTH_KEYS.simple : SIDE_PANEL_WIDTH_KEYS.advanced));
+    const stored = Number(storage?.getItem(SIDE_PANEL_WIDTH_KEYS.simple));
     if (Number.isFinite(stored) && stored >= bounds.min && stored <= bounds.max) return Math.round(stored);
   } catch {
   }
@@ -40,7 +38,7 @@ export function readSidePanelWidth(simple: boolean, storage: Pick<Storage, "getI
 export function sidePanelEffectiveMax(simple: boolean): number {
   const bounds = sidePanelWidthBounds(simple);
   const sidebar = typeof document === "undefined" ? undefined : document.querySelector<HTMLElement>("[data-sidebar]");
-  const sidebarWidth = sidebar?.getBoundingClientRect().width ?? (simple ? 280 : 320);
+  const sidebarWidth = sidebar?.getBoundingClientRect().width ?? 280;
   return Math.max(bounds.min, Math.min(bounds.max, (typeof window === "undefined" ? 1280 : window.innerWidth) - sidebarWidth - CHAT_FLOOR));
 }
 
@@ -71,7 +69,7 @@ export function useSidePanelWidth({ simple, active }: { simple: boolean; active:
 
   const save = useCallback((next: number) => {
     try {
-      localStorage.setItem(simple ? SIDE_PANEL_WIDTH_KEYS.simple : SIDE_PANEL_WIDTH_KEYS.advanced, String(next));
+      localStorage.setItem(SIDE_PANEL_WIDTH_KEYS.simple, String(next));
     } catch {
     }
   }, [simple]);

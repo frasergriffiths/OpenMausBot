@@ -3,7 +3,6 @@ import { useMemo, useState, type KeyboardEvent } from "react";
 import { Check, X } from "lucide-react";
 import { useStore, type Bot, type Message } from "@/state/store";
 import { cn } from "@/lib/cn";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { t } from "@/lib/i18n";
 import {
   answerWithoutPreamble,
@@ -67,8 +66,6 @@ export function choiceIndexForKey(key: string, count: number): number {
 
 const TITLE_MAX = 160;
 
-const CHOICE_ROW =
-  "flex w-full items-center gap-3 px-3 py-2.5 text-start transition-colors focus-visible:bg-ink/[0.06] focus-visible:outline-none";
 const CHOICE_ROW_IDLE = "hover:bg-ink/[0.04]";
 const CHOICE_ROW_PICKED = "bg-ink/[0.07]";
 
@@ -107,7 +104,6 @@ export function QuestionCard({
   typedPast?: boolean;
 }) {
   const { dispatch } = useStore();
-  const simple = !useAdvancedMode();
   const card = message.card;
   const questions = card?.questionRequest?.questions ?? [];
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
@@ -189,11 +185,11 @@ export function QuestionCard({
         </AskSettledLine>
       );
     }
-    return <SettledQuestion questions={questions} answer={answer} simple={simple} />;
+    return <SettledQuestion questions={questions} answer={answer} />;
   }
 
   const single = questions.length === 1;
-  const quiet = simple && typedPast && draft.picked.length === 0;
+  const quiet = typedPast && draft.picked.length === 0;
   const named = bot ? t("question.card.named", { name: bot.name }) : t("question.card.title");
   const questionIsTitle = single && current.question.length <= TITLE_MAX;
   const title = questionIsTitle ? current.question : single && current.header ? current.header : named;
@@ -223,7 +219,7 @@ export function QuestionCard({
         <>
           <span className="me-auto text-[12px] text-ink-tertiary">{t("question.status.waiting")}</span>
           <button type="button" onClick={submit} disabled={!complete} className={ASK_PRIMARY_BUTTON}>
-            {simple && multi && questions.length === 1 ? t("question.done") : questions.length > 1 ? t("question.submitAll") : t("question.submit")}
+            {multi && questions.length === 1 ? t("question.done") : questions.length > 1 ? t("question.submitAll") : t("question.submit")}
           </button>
         </>
       )}
@@ -266,7 +262,7 @@ export function QuestionCard({
           aria-label={current.question}
           onKeyDown={moveChoiceFocus}
           data-quiet={quiet || undefined}
-          className={simple ? ASK_CHOICE_LIST : "divide-y divide-ink/[0.12] overflow-hidden rounded-2xl border border-ink/[0.12]"}
+          className={ASK_CHOICE_LIST}
         >
           {current.options.map((option, index) => {
             const picked = draft.picked.includes(option.label);
@@ -279,11 +275,11 @@ export function QuestionCard({
                 aria-checked={picked}
                 aria-keyshortcuts={choiceKey(index)}
                 onClick={() => choose(option.label)}
-                className={cn(simple ? ASK_CHOICE_ROW : CHOICE_ROW, picked ? CHOICE_ROW_PICKED : CHOICE_ROW_IDLE)}
+                className={cn(ASK_CHOICE_ROW, picked ? CHOICE_ROW_PICKED : CHOICE_ROW_IDLE)}
               >
-                {simple ? <AskChoiceLetter letter={choiceKey(index)} picked={picked} quiet={quiet} /> : <KeyBadge letter={choiceKey(index)} picked={picked} />}
+                <AskChoiceLetter letter={choiceKey(index)} picked={picked} quiet={quiet} />
                 <span className="min-w-0 flex-1">
-                  <span className={simple ? cn(ASK_CHOICE_LABEL, "block", quiet ? "text-ink-tertiary" : "text-ink") : "block break-words text-[15px] leading-6 text-ink [unicode-bidi:plaintext]"}>{option.label}</span>
+                  <span className={cn(ASK_CHOICE_LABEL, "block", quiet ? "text-ink-tertiary" : "text-ink")}>{option.label}</span>
                   {option.description && (
                     <span className="block break-words text-[13px] leading-snug text-ink-secondary [unicode-bidi:plaintext]">{option.description}</span>
                   )}
@@ -295,7 +291,7 @@ export function QuestionCard({
         </div>
       )}
       {/* ACP engines answer with an option id, never text, so an options-only question has no free-text field. */}
-      {freeText && simple && current.options.length > 0 && (
+      {freeText && current.options.length > 0 && (
         <div className={ASK_CHOICE_LIST}>
           <AskSomethingElse>
             <textarea
@@ -316,7 +312,7 @@ export function QuestionCard({
           </AskSomethingElse>
         </div>
       )}
-      {freeText && !(simple && current.options.length > 0) && (
+      {freeText && current.options.length === 0 && (
         <textarea
           dir="auto"
           rows={1}
@@ -329,7 +325,7 @@ export function QuestionCard({
             event.preventDefault();
             if (complete) submit();
           }}
-          placeholder={current.options.length ? t(simple ? "question.somethingElse" : "question.otherPlaceholder") : t("question.answerPlaceholder")}
+          placeholder={current.options.length ? t("question.somethingElse") : t("question.answerPlaceholder")}
           className={cn(
             "block max-h-40 min-h-11 w-full resize-none rounded-xl border border-ink/[0.12] bg-inset px-3 py-2.5 text-[15px] leading-6 text-ink outline-none placeholder:text-ink-tertiary focus:border-accent/70 [field-sizing:content]",
             current.options.length > 0 && "mt-2.5",
@@ -340,7 +336,7 @@ export function QuestionCard({
   );
 }
 
-function SettledQuestion({ questions, answer, simple = false }: { questions: readonly AskQuestion[]; answer: string | null; simple?: boolean }) {
+function SettledQuestion({ questions, answer }: { questions: readonly AskQuestion[]; answer: string | null }) {
   const [open, setOpen] = useState(false);
   const line = settledQuestionLine(questions, answer);
   const full = answer ? answerWithoutPreamble(answer) : "";
@@ -358,22 +354,9 @@ function SettledQuestion({ questions, answer, simple = false }: { questions: rea
         </div>
       )}
     >
-      <span>{simple && answer ? t("question.yourAnswer") : line.label}</span>
+      <span>{answer ? t("question.yourAnswer") : line.label}</span>
       {line.value && <span className="text-ink-secondary"> · {line.value}</span>}
     </AskSettledLine>
   );
 }
 
-function KeyBadge({ letter, picked }: { letter: string; picked: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        "flex size-6 shrink-0 items-center justify-center rounded-md text-[12px] font-medium leading-none transition-colors",
-        picked ? "bg-ink/[0.16] text-ink" : "bg-ink/[0.08] text-ink-secondary",
-      )}
-    >
-      {letter}
-    </span>
-  );
-}

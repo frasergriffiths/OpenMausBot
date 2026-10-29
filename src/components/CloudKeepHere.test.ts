@@ -8,7 +8,6 @@ vi.mock("react", async original => ({ ...await original<typeof import("react")>(
   useState: (initial: unknown) => { const index = f.index++; if (!(index in f.values)) f.values[index] = initial; return [f.values[index], (next: unknown) => { f.values[index] = next; }]; },
   useEffect: (effect: EffectCallback) => { f.effects.push(effect); },
 }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => f.advanced }));
 import { CloudKeepHere } from "./CloudKeepHere";
 
 type Node = ReactElement<{ children?: ReactNode; onClick?: () => void; disabled?: boolean; checked?: boolean; "aria-label"?: string }>;

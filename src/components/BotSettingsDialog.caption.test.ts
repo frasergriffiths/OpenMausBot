@@ -5,10 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Bot } from "@/state/store";
 
 // The full fold-out panel this checks is Advanced mode's.
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => true, setAdvancedMode: () => {} }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => false }));
 vi.mock("./bot-settings/useSlackManagement", () => ({ useSlackManagementUrl: () => null }));
-vi.mock("./bot-settings/useBotSettingsDerived", () => ({ useBotSettingsDerived: () => ({}) }));
 vi.mock("@/state/store", async (importOriginal) => {
   const store = await importOriginal<typeof import("@/state/store")>();
   return { ...store, useStore: () => ({ state: store.initialState, dispatch: vi.fn(), flushBotPatches: vi.fn() }) };
@@ -16,11 +14,15 @@ vi.mock("@/state/store", async (importOriginal) => {
 import { BotSettingsDialog } from "./BotSettingsDialog";
 import { DesktopCapabilitiesProvider } from "./DesktopCapabilities";
 
-const bot = { id: "bot-1", name: "Maily" } as never as Bot;
+const bot = {
+  id: "bot-1", threadId: "thread-1", name: "Maily", title: "", description: "", soul: "",
+  notifications: true, color: "green", unread: false, messages: [],
+  modelSelection: { instanceId: "claude", model: "claude-opus-5-5" },
+} as never as Bot;
 // The provider reads window.ogb.platform on render, so each case sees its stub.
 const headerTag = () => {
   const html = renderToStaticMarkup(createElement(DesktopCapabilitiesProvider, null, createElement(BotSettingsDialog, { bot })));
-  return html.match(/<div[^>]*>(?=<span id="bot-settings-title")/)?.[0] ?? "";
+  return html.match(/<div[^>]*data-panel-header[^>]*>/)?.[0] ?? "";
 };
 const header = () => headerTag().match(/class="([^"]*)"/)?.[1] ?? "";
 
@@ -35,7 +37,8 @@ describe("bot settings caption inset", () => {
   it("keeps the header flush elsewhere", () => {
     vi.stubGlobal("window", { ogb: { platform: "darwin" } });
     const classes = header();
-    expect(classes).toContain("py-3");
+    expect(classes).toContain("h-14");
+    expect(classes).toContain("px-3");
     expect(classes).not.toContain("pt-[28px]");
   });
 

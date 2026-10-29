@@ -8,15 +8,12 @@ import { bootstrapBrand } from "./lib/brand";
 import { applySkinChoice, readSkinChoice } from "./lib/skins";
 import { applyChatWidth, readChatWidth } from "./lib/chat-width";
 import { applyFont, readFont } from "./lib/fonts";
-import { applyInterfaceMode, settleAdvancedModeDefault } from "./lib/interface-mode";
 import { BrowserSignInPage } from "./pair/BrowserSignInPage";
 import { PairPage } from "./pair/PairPage";
 import { HomeScreen, SignedOutAtHome } from "./components/HomeScreen";
 import "./styles.css";
 
-// Before first paint; settleAdvancedModeDefault must run before applySkin writes omb-skin.
-settleAdvancedModeDefault();
-applyInterfaceMode();
+// Before first paint.
 applySkinChoice(readSkinChoice());
 applyFont(readFont());
 applyChatWidth(readChatWidth());

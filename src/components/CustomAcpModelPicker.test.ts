@@ -27,7 +27,6 @@ vi.mock("react", async (original) => ({
   useEffect: () => {},
 }));
 vi.mock("./MenuMotion", () => ({ useMenuMotion: (open: boolean) => ({ shown: open, closing: false, className: "" }) }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: () => {} }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => true }));
 vi.mock("@/state/store", async (original) => ({
   ...await original<typeof import("@/state/store")>(),

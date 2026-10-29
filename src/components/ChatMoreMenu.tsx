@@ -1,7 +1,6 @@
 import { useMemo, useState, type JSX } from "react";
 import { Bug, Copy, Cpu, Download, Gauge, ListChecks, MessagesSquare, Monitor, MoreHorizontal, Search, Share, SquarePen, UserRound } from "lucide-react";
 import { currentTaskBot, openBotThread, useStore, visibleMessages, type Bot } from "@/state/store";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { requestChatFind, useChatFindOpen } from "@/lib/chat-find";
 import { usageSummary } from "@/lib/chat-usage-summary";
@@ -26,7 +25,6 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
   const bot = useMemo(() => currentTaskBot(profile), [profile]);
   const messages = useMemo(() => visibleMessages(bot), [bot]);
   const { state, dispatch } = useStore();
-  const advanced = useAdvancedMode();
   const showThreads = useShowThreads();
   const findOpen = useChatFindOpen(bot.threadId);
   const [copyStatus, setCopyStatus] = useState<"copied" | "failed" | null>(null);
@@ -60,8 +58,8 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
       key: "computer",
       label: t("chat.computer"),
       icon: <Monitor size={16} />,
-      active: advanced ? state.computerOpen : state.settingsOpen && state.botSettingsSection === "access",
-      onSelect: () => advanced ? dispatch({ type: "toggleComputer" }) : dispatch({ type: "toggleSettings", open: true, section: "access", botId: bot.id }),
+      active: state.settingsOpen && state.botSettingsSection === "access",
+      onSelect: () => dispatch({ type: "toggleSettings", open: true, section: "access", botId: bot.id }),
     },
   ] : [];
   const items: SidebarMenuItem[] = [
@@ -131,11 +129,11 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
       separatorBefore: !usage,
       onSelect: () => openBotSettings(dispatch, "usage", { page: "activity" }),
     } satisfies SidebarMenuItem, {
-      key: "inspector",
-      label: t("chat.inspector"),
+      key: "runlog",
+      label: t("botPanel.page.runLog"),
       icon: <Bug size={16} />,
       active: state.settingsOpen && state.botSettingsSection === "usage",
-      // Activity and Inspector share the panel's usage page.
+      // Activity and the run log share the panel's usage page.
       separatorBefore: false,
       onSelect: () => openBotSettings(dispatch, "usage", { page: "runlog" }),
     } satisfies SidebarMenuItem]),
@@ -204,7 +202,7 @@ function ShareMenu({ bot, className }: { bot: Bot; className: string }) {
   );
 }
 
-/** The same menu as the chat header's plain ⋯ in Advanced mode, opening on hover below the header. */
+/** The same menu as the chat header's plain ⋯, opening on hover below the header. */
 export function ChatHeaderMenu({ bot }: { bot: Bot }): JSX.Element {
   const { items, on } = useChatMoreItems(bot);
   return (

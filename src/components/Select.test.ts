@@ -4,7 +4,6 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const fixture = vi.hoisted(() => ({ advanced: false }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced }));
 
 const { Select, readSelectOptions } = await import("./Select");
 

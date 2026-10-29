@@ -16,11 +16,11 @@ export function lastPreviewable<T extends { kind: string }>(messages: readonly T
   return messages?.findLast((message) => !isReceipt(message) && message.kind !== "screen");
 }
 
-export function botPreview(bot: Bot, visible: Message[], instances: InstanceInfo[], advanced: boolean): string {
+export function botPreview(bot: Bot, visible: Message[], instances: InstanceInfo[]): string {
   if (bot.activity === "waiting-on-you") return t("sidebar.preview.waiting");
   if (bot.waitingForTeammates) return t("sidebar.preview.waitingOnTeammate");
   if (bot.busy) return t("sidebar.preview.working");
-  return lastLine(bot, visible, instances, advanced);
+  return lastLine(bot, visible, instances);
 }
 
 function plainStep(message: Message): boolean {
@@ -29,8 +29,8 @@ function plainStep(message: Message): boolean {
 }
 
 /** Simple mode quotes the bot: a step that went fine gives way to the newest thing said since the person last wrote. */
-function quotedLine(messages: readonly Message[], last: Message, advanced: boolean): Message {
-  if (advanced || !plainStep(last)) return last;
+function quotedLine(messages: readonly Message[], last: Message): Message {
+  if (!plainStep(last)) return last;
   for (let index = messages.length - 1; index >= 0; index--) {
     const message = messages[index]!;
     if (message.role === "user") break;
@@ -40,16 +40,16 @@ function quotedLine(messages: readonly Message[], last: Message, advanced: boole
 }
 
 /** The conversation's newest line as a preview shows it, whatever the bot is doing now. */
-export function lastLine(bot: Bot, visible: Message[], instances: InstanceInfo[], advanced: boolean): string {
+export function lastLine(bot: Bot, visible: Message[], instances: InstanceInfo[]): string {
   const newest = lastPreviewable(visible);
   if (!newest) return "";
-  const last = quotedLine(visible, newest, advanced);
+  const last = quotedLine(visible, newest);
   if (last.kind === "options" && last.card) {
     // MausBot's intro by its first line, as each mode's intro says it.
-    if (last.helperIntro) return t(advanced ? "helperIntro.title" : bot.chiefOfStaff ? "helperIntro.hello" : "helperIntro.hi.helper", { name: bot.name });
+    if (last.helperIntro) return t(bot.chiefOfStaff ? "helperIntro.hello" : "helperIntro.hi.helper", { name: bot.name });
     return (last.card.requestId && last.card.tool && !last.card.questionRequest && approvalCardOutcome(last.card)) || last.card.title;
   }
-  if (last.kind === "activity" && last.tool) return activityPreview(last.tool, botEngine(bot, instances), last.dataResult, advanced);
+  if (last.kind === "activity" && last.tool) return activityPreview(last.tool, botEngine(bot, instances), last.dataResult);
   if (last.kind === "connector" && last.connector) return sidebarConnectorPreview(last.connector, t);
   if (last.kind === "routine.run" && last.routineRun) return automationRunPreview(last.routineRun);
   const peer = peerLine(last);
@@ -68,19 +68,19 @@ export function automationRunPreview(run: Pick<RoutineRunCardData, "routineName"
   return t(RUN_PREVIEW[run.status], { name: run.routineName });
 }
 
-export function groupPreview(group: Group, bots: Bot[], instances: InstanceInfo[], advanced: boolean): string {
+export function groupPreview(group: Group, bots: Bot[], instances: InstanceInfo[]): string {
   const working = roomWorkingPreview(group, (botId) => bots.find((b) => b.id === botId)?.name);
   if (working) return working;
   if (group.working) return t("sidebar.preview.teamWorking");
   const newest = lastPreviewable(group.messages);
   if (!newest) return t("sidebar.preview.noMessages");
-  const last = quotedLine(group.messages, newest, advanced);
+  const last = quotedLine(group.messages, newest);
   if (last.kind === "text" && last.role !== "user" && isClientCancellation(last.text ?? "")) {
     const stopped = t("chat.turnStopped");
     return last.from ? `${last.from.name}: ${stopped}` : stopped;
   }
   const text = last.kind === "activity" && last.tool
-    ? activityPreview(last.tool, botEngine(bots.find((bot) => bot.id === last.from?.botId), instances), last.dataResult, advanced)
+    ? activityPreview(last.tool, botEngine(bots.find((bot) => bot.id === last.from?.botId), instances), last.dataResult)
     : last.kind === "goal.run" && last.goalRun
       ? sidebarGoalRunPreview(last.goalRun)
       : last.kind === "connector" && last.connector

@@ -7,7 +7,6 @@ import { setLocale } from "@/lib/i18n";
 import type { Bot } from "@/state/store";
 
 const f = vi.hoisted(() => ({ advanced: false, dispatch: vi.fn() }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => f.advanced }));
 vi.mock("@/state/store", () => ({ useStore: () => ({ state: {}, dispatch: f.dispatch }) }));
 vi.mock("../HelperIntro", () => ({ HELPER_ASK_KEYS: ["helperIntro.ask.overview", "helperIntro.ask.inbox", "helperIntro.ask.routine", "helperIntro.ask.howto"] }));
 const { TryAsking } = await import("./TryAsking");

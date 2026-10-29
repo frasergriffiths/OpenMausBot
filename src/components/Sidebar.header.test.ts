@@ -18,7 +18,6 @@ vi.mock("@/lib/sidebar-preferences", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/lib/sidebar-preferences")>(),
   useSidebarDensity: () => fixture.density,
 }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: () => {} }));
 vi.mock("./DesktopCapabilities", async (importOriginal) => ({
   ...await importOriginal<typeof import("./DesktopCapabilities")>(),
   useDesktopCapabilities: () => {

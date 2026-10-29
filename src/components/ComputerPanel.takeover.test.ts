@@ -29,7 +29,6 @@ vi.mock("./DesktopCapabilities", async (importOriginal) => ({
     },
   }),
 }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => false, setAdvancedMode: () => {} }));
 vi.mock("./CloudScreenPreview", () => ({
   CloudScreenPreview: ({ onOpen }: { onOpen: () => void }) => createElement("button", { "data-preview": "", onClick: onOpen }, "preview"),
 }));
@@ -195,14 +194,6 @@ describe("taking control of a Local VM", () => {
     expect(fixture.controls.at(-1)).toEqual({ action: "release" });
     expect(liveDesktop()).toBeNull();
     expect(button("Take control")).toBeDefined();
-  });
-
-  it("Full screen takes control straight into the whole window", async () => {
-    await open(makeBot({ computer: "vm" }));
-    await press("Full screen");
-    expect(fixture.controls.map((control) => control.action)).toEqual(["take"]);
-    await shownLive();
-    expect(liveDesktop()!.dataset.expanded).toBe("true");
   });
 
   it("closing the panel, leaving its Screen view or closing the page gives back the hold it took", async () => {

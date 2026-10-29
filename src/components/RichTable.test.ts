@@ -4,11 +4,6 @@ import { describe, expect, it, vi } from "vitest";
 
 // Advanced mode's table chrome; Simple mode's table card has its own tests below.
 const mode = vi.hoisted(() => ({ advanced: true }));
-vi.mock("@/lib/interface-mode", async (importOriginal) => ({
-  ...await importOriginal<typeof import("@/lib/interface-mode")>(),
-  useAdvancedMode: () => mode.advanced,
-  readAdvancedMode: () => mode.advanced,
-}));
 import { RichTable } from "./RichTable";
 import { ChatMarkdown } from "./ChatMarkdown";
 import { AttachedFileChip } from "./AttachmentPreview";

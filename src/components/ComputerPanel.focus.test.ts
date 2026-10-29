@@ -23,7 +23,6 @@ vi.mock("./DesktopCapabilities", async (importOriginal) => ({
     },
   }),
 }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: () => {} }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => true }));
 vi.mock("./CloudScreenPreview", () => ({ CloudScreenPreview: () => null }));
 vi.mock("./AndroidDevicePanel", () => ({ AndroidDevicePanel: () => null, useAndroidUsbDevices: () => ({ devices: [] }) }));
@@ -189,9 +188,9 @@ describe("computer panel entry focus", () => {
     expect(document.activeElement).toBe(activeTab());
 
     // Auto resolves its surface, or a data result and a sign-in move the tab.
-    flushSync(() => tabByLabel("Data").click());
+    flushSync(() => tabByLabel("Files").click());
     await settle();
-    expect(document.activeElement).toBe(tabByLabel("Data"));
+    expect(document.activeElement).toBe(tabByLabel("Files"));
   });
 
   it("stops following the selection once focus leaves the tab row", async () => {
@@ -201,7 +200,7 @@ describe("computer panel entry focus", () => {
     const content = document.querySelector<HTMLElement>('[role="tabpanel"]')!;
     flushSync(() => content.focus());
 
-    flushSync(() => tabByLabel("Data").click());
+    flushSync(() => tabByLabel("Files").click());
     await settle();
     expect(document.activeElement).toBe(content);
   });

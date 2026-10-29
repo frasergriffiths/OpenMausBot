@@ -2,10 +2,9 @@ import { useState } from "react";
 import { MessageCircleQuestion, X } from "lucide-react";
 import { useStore, visibleMessages, type Message } from "@/state/store";
 import { cn } from "@/lib/cn";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { t } from "@/lib/i18n";
 import { isPersistentQuestionCard, parseChoices } from "../../shared/ask-question";
-import { ASK_CHOICE_LABEL, ASK_CHOICE_LIST, ASK_CHOICE_ROW, ASK_FIELD, ASK_QUIET_BUTTON, ASK_SOMETHING_ELSE_FIELD, AskCard, AskChoiceLetter, AskSettledLine, AskSomethingElse, moveChoiceFocus, returnFocusToComposer } from "./AskCard";
+import { ASK_CHOICE_LABEL, ASK_CHOICE_LIST, ASK_CHOICE_ROW, ASK_QUIET_BUTTON, ASK_SOMETHING_ELSE_FIELD, AskCard, AskChoiceLetter, AskSettledLine, AskSomethingElse, moveChoiceFocus, returnFocusToComposer } from "./AskCard";
 import { ExpandableText } from "./ExpandableText";
 import { choiceIndexForKey } from "./QuestionCard";
 
@@ -40,7 +39,6 @@ export function OptionCard({
   groupId?: string;
 }) {
   const { state, dispatch } = useStore();
-  const simple = !useAdvancedMode();
   const [custom, setCustom] = useState("");
   const card = message.card;
   const bot = state.bots.find((candidate) => candidate.id === botId);
@@ -48,13 +46,13 @@ export function OptionCard({
   // Full thread, not the mounted window: a search-focus slice can omit the later message that hides this quiz.
   if (!card || shouldHideOnboardingCard(message, transcript) || (card.requestId && card.dismissed && card.answered)) return null;
 
-  // A bot's own question reads as itself in Simple mode, not under "Your bot has a question".
-  const asksItself = simple && card.requestType === "question" && Boolean(card.subtitle);
+  // A bot's own question reads as itself, not under "Your bot has a question".
+  const asksItself = card.requestType === "question" && Boolean(card.subtitle);
   const title = asksItself ? card.subtitle! : card.title;
   const subtitle = asksItself ? undefined : card.subtitle;
   const options = parseChoices(card.options, LETTERS.length) ?? [];
   const index = transcript.findIndex((entry) => entry.id === message.id);
-  const quiet = simple && !card.answered && index >= 0 && transcript.slice(index + 1).some((later) => later.role === "user" && later.kind === "text");
+  const quiet = !card.answered && index >= 0 && transcript.slice(index + 1).some((later) => later.role === "user" && later.kind === "text");
 
   const answer = (text: string) => {
     if (!text.trim()) return;
@@ -81,7 +79,7 @@ export function OptionCard({
           </button>
         )}
       >
-        <span>{simple && !closed && picked ? t("question.yourAnswer") : title}</span>
+        <span>{!closed && picked ? t("question.yourAnswer") : title}</span>
         <span className="text-ink-secondary"> · {closed ? t("question.status.closed") : picked || t("question.status.answered")}</span>
       </AskSettledLine>
     );
@@ -95,7 +93,7 @@ export function OptionCard({
       explanation={subtitle ? <ExpandableText text={subtitle} className="text-[13px] text-ink-secondary" /> : undefined}
       onDismiss={dismiss}
       dismissLabel={t("onboarding.card.dismiss")}
-      onKeyDown={simple && !card.answered ? (event) => {
+      onKeyDown={!card.answered ? (event) => {
         const target = event.target as HTMLElement;
         if (event.altKey || event.ctrlKey || event.metaKey || target.closest("input, textarea")) return;
         const index = choiceIndexForKey(event.key, options.length);
@@ -104,7 +102,7 @@ export function OptionCard({
         answer(options[index]!);
       } : undefined}
     >
-      {options.length > 0 && simple && (
+      {options.length > 0 && (
         <div onKeyDown={moveChoiceFocus} className={ASK_CHOICE_LIST}>
           {options.map((opt, i) => (
             <button
@@ -121,33 +119,8 @@ export function OptionCard({
           ))}
         </div>
       )}
-      {options.length > 0 && !simple && (
-        <div onKeyDown={moveChoiceFocus} className="overflow-hidden rounded-2xl border border-hairline/40">
-          {options.map((opt, i) => (
-            <button
-              key={opt}
-              type="button"
-              data-ask-choice=""
-              disabled={!!card.answered}
-              onClick={() => answer(opt)}
-              className={cn(
-                "flex w-full items-center gap-2.5 px-3 py-2 text-start text-[13px] font-medium leading-5 text-ink",
-                i > 0 && "border-t border-hairline/40",
-                (card.answeredText ?? card.answered) === opt
-                  ? "bg-raised-hover"
-                  : "hover:bg-raised-hover/60 disabled:hover:bg-transparent",
-              )}
-            >
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-hairline/50 bg-control text-[11px] font-medium text-ink-secondary">
-                {LETTERS[i]}
-              </span>
-              <span dir="auto" className="min-w-0 break-words">{opt}</span>
-            </button>
-          ))}
-        </div>
-      )}
 
-      {!card.answered && !card.tool && !card.fixedOptions && (simple ? (
+      {!card.answered && !card.tool && !card.fixedOptions && (
         <div className={ASK_CHOICE_LIST}>
           <AskSomethingElse>
             <input
@@ -161,21 +134,7 @@ export function OptionCard({
             />
           </AskSomethingElse>
         </div>
-      ) : (
-        <input
-          dir="auto"
-          value={custom}
-          aria-label={t("onboarding.card.custom")}
-          onChange={(e) => setCustom(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && answer(custom)}
-          placeholder={t("onboarding.card.custom")}
-          className={cn(
-            ASK_FIELD,
-            "block w-full",
-            options.length > 0 && "mt-2",
-          )}
-        />
-      ))}
+      )}
     </AskCard>
   );
 }

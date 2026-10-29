@@ -2,38 +2,14 @@ import { createElement, type KeyboardEvent } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const mode = vi.hoisted(() => ({ advanced: true }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => mode.advanced }));
-
 import { AskCard, AskChoiceLetter, AskSettledLine, moveChoiceFocus } from "./AskCard";
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  mode.advanced = true;
 });
 
 describe("AskCard", () => {
-  it("leads with an accent title and an optional line on why in Advanced mode", () => {
-    const html = renderToStaticMarkup(createElement(AskCard, {
-      ariaLabel: "Plan",
-      icon: null,
-      title: "Choose a plan",
-      explanation: "The workspace needs one before it can start.",
-    }));
-    expect(html).toContain('role="group"');
-    expect(html).toContain('aria-label="Plan"');
-    expect(html).toMatch(/text-accent-text[^"]*"><bdi dir="auto">Choose a plan</);
-    expect(html).toContain("The workspace needs one before it can start.");
-    expect(html).toContain("text-start");
-    expect(html).not.toContain("text-left");
-    expect(html).toContain("rounded-2xl bg-composer");
-    expect(html).toContain("ring-1 ring-composer-ring");
-    expect(html).not.toContain("border-accent");
-    expect(html).not.toContain("shadow");
-  });
-
-  it("is Simple mode's question card: the composer's surface, 560 wide, rounded 20, a 16/22 semibold title in secondary ink", () => {
-    mode.advanced = false;
+  it("is the question card: the composer's surface, 560 wide, rounded 20, a 16/22 semibold title in secondary ink", () => {
     const html = renderToStaticMarkup(createElement(AskCard, { ariaLabel: "Plan", icon: null, title: "Choose a plan", explanation: "Why it asks." }));
     const card = html.match(/^<div[^>]*class="([^"]*)"/)![1]!.split(" ");
     expect(card).toEqual(expect.arrayContaining(["bg-composer", "ring-[0.5px]", "ring-ink/10", "max-w-[560px]", "rounded-[24px]", "w-full"]));

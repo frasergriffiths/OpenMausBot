@@ -7,7 +7,6 @@ import { z } from "zod";
 import { waitForLocalVmReady } from "@/lib/local-vm-readiness";
 import { Columns2, Globe, Hand, Loader2, Maximize2, Monitor, Moon, Power, Settings, X } from "lucide-react";
 import { api, ApiError, currentTaskBot, useStore, type Bot, type ConfigStatus } from "@/state/store";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { ComputerFilesPane } from "./ComputerFilesPane";
 import { effectivePlace, isComputerPlace, placeOffered } from "@/lib/place";
 import type { CloudBackend } from "../../shared/wire";
@@ -247,12 +246,11 @@ export function ComputerPanel({
   const [viewerOpen, setViewerOpen] = useState(false);
   const [error, setError] = useState<Error | string | null>(null);
   const errorText = panelErrorText(error);
-  const advanced = useAdvancedMode();
   const [storedPanelView, setPanelView] = useState<ComputerPanelView>(() => readComputerPanelView(bot.id));
   const androidStatus = useAndroidUsbDevices();
   const androidConnected = androidStatus.devices.length > 0;
-  const panelTabs = computerPanelTabs({ advanced, androidConnected });
-  const panelView = embedded ? "computer" as const : resolveComputerPanelView(storedPanelView, { advanced, androidConnected });
+  const panelTabs = computerPanelTabs({ advanced: false, androidConnected });
+  const panelView = embedded ? "computer" as const : resolveComputerPanelView(storedPanelView, { advanced: false, androidConnected });
   const panelRef = useComputerPanelEntry(profileBot.id, panelView);
   const browserAvailableHere = browserAvailable(state.config);
   const browserEnabled = builtInBrowserEnabled(state.config) && bot.browser !== false
@@ -1164,19 +1162,17 @@ export function ComputerPanel({
       {/* ml-1.5 keeps the drag region clear of the resize handle: a later drag region in the DOM wins. */}
       {!embedded && <div {...dragProps} className={cn("@container/paneltabs ml-1.5 py-3 pl-2.5 pr-4", padClass)}>
         <div className="relative flex min-h-7 items-center justify-center">
-          {advanced && (
-            <button
-              onClick={() => {
-                releaseComputerPanelFocus(panelRef.current, bot.id);
-                dispatch({ type: "toggleComputer", open: false });
-                dispatch({ type: "toggleSettings", open: true, section: "access" });
-              }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 rounded-md p-1 text-ink-secondary hover:bg-control hover:text-ink"
-              title={t("computer.botSettings")}
-            >
-              <Settings size={18} />
-            </button>
-          )}
+          <button
+            onClick={() => {
+              releaseComputerPanelFocus(panelRef.current, bot.id);
+              dispatch({ type: "toggleComputer", open: false });
+              dispatch({ type: "toggleSettings", open: true, section: "access" });
+            }}
+            className="absolute left-0 top-1/2 -translate-y-1/2 rounded-md p-1 text-ink-secondary hover:bg-control hover:text-ink"
+            title={t("computer.botSettings")}
+          >
+            <Settings size={18} />
+          </button>
           <div className="mx-9 flex min-w-0 touch-pan-x gap-0.5 overflow-x-auto whitespace-nowrap rounded-full bg-inset p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" data-tour="computer-tabs" data-testid="computer-tabs" role="tablist" aria-label={t("computer.tabsAria")} onWheel={scrollTabsWithWheel} onKeyDown={(event) => moveBetweenTabs(event, panelTabs, chooseTab)}>
             {panelTabs.map((view) => {
               const { Icon, label, tour } = PANEL_TABS[view];
@@ -1400,7 +1396,7 @@ export function ComputerPanel({
                   </button>
                 )
               )}
-              {advanced && computerStatusCurrent && (phase === "vps-unconfigured" || phase === "vps-stopped") && (
+              {computerStatusCurrent && (phase === "vps-unconfigured" || phase === "vps-stopped") && (
                 <button
                   onClick={openConnectionSettings}
                   className="mt-1 rounded-lg bg-control px-3 py-1.5 text-[12px] text-ink hover:bg-raised-hover"
@@ -1408,7 +1404,7 @@ export function ComputerPanel({
                   {t("computer.openVpsSettings")}
                 </button>
               )}
-              {advanced && computerStatusCurrent && (phase === "vps-stopped" || (phase === "vps-unconfigured" && vpsStatus?.configured)) &&
+              {computerStatusCurrent && (phase === "vps-stopped" || (phase === "vps-unconfigured" && vpsStatus?.configured)) &&
                 canManageCloud && (
                 <button
                   onClick={() => run("provision")}
@@ -1419,7 +1415,7 @@ export function ComputerPanel({
                   {phase === "vps-stopped" ? t("computer.startVps") : t("computer.prepareVps")}
                 </button>
               )}
-              {advanced && computerStatusCurrent && phase === "vps-incompatible" && vpsStatus?.managed &&
+              {computerStatusCurrent && phase === "vps-incompatible" && vpsStatus?.managed &&
                 canManageCloud && (
                 <button
                   onClick={() => void replaceVpsComputer()}
@@ -1447,7 +1443,7 @@ export function ComputerPanel({
             />
           </div>
         )}
-        {advanced && phase === "vps-unconfigured" && (
+        {phase === "vps-unconfigured" && (
           <div className="mt-3 rounded-xl bg-card p-4">
             <div className="mb-3 text-[13px] text-ink-secondary">
               {t("computer.vpsAliasHint")}
@@ -1461,8 +1457,7 @@ export function ComputerPanel({
           </div>
         )}
 
-        {advanced &&
-          phase === "vm" &&
+        {phase === "vm" &&
           vmStatus?.mode === "per-bot" &&
           window.ogb?.desktopWorkspace &&
           onOpenVmWorkspace && (
@@ -1485,7 +1480,7 @@ export function ComputerPanel({
           <div className="mt-3 rounded-xl border border-accent/25 bg-accent/10 p-4">
             <div className="text-[13px] leading-relaxed text-ink">
               {t("computer.youHaveWheel")}
-              {cloudPreviewReady && !liveTarget && ` ${t(advanced ? "computer.useOpenDesktop" : "computer.simple.useFullScreen")}`}
+              {cloudPreviewReady && !liveTarget && ` ${t("computer.simple.useFullScreen")}`}
             </div>
             <button
               onClick={() => void handBack()}
@@ -1497,7 +1492,7 @@ export function ComputerPanel({
             </button>
           </div>
         )}
-        {advanced && phase === "vm" && (control.held || !bannerTakesControl) && (
+        {phase === "vm" && (control.held || !bannerTakesControl) && (
           <button
             onClick={() => void takeControl(control.held)}
             disabled={controlPending || !liveTarget}
@@ -1508,7 +1503,7 @@ export function ComputerPanel({
             {t(control.held ? "computer.fullScreen" : "computer.takeControl")}
           </button>
         )}
-        {advanced && canManageVm && phase === "vm" && vmStatus?.mode === "per-bot" && (
+        {canManageVm && phase === "vm" && vmStatus?.mode === "per-bot" && (
           <button
             onClick={() => void runVmAction("vm-delete")}
             disabled={pending !== null || profileBot.busy}
@@ -1519,45 +1514,7 @@ export function ComputerPanel({
             {t("computer.deleteVm")}
           </button>
         )}
-        {!advanced && (cloudPreviewReady || phase === "vm") && (
-          <div className="mt-3 flex gap-2" data-testid="computer-actions">
-            {!control.held && !bannerTakesControl && (
-              <button
-                type="button"
-                onClick={() => void takeControl()}
-                disabled={controlPending || pending === "join" || (phase === "vm" && !liveTarget)}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-accent py-2 text-[13px] font-medium text-accent-ink hover:brightness-110 disabled:opacity-50"
-                title={t("computer.takeControlTitle")}
-              >
-                {pending === "join" ? <Loader2 size={14} className="animate-spin" /> : <Hand size={14} />}
-                {t("computer.takeControl")}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => void takeControl(true)}
-              disabled={pending === "join" || (!control.held && controlPending) || (phase === "vm" && !liveTarget)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-control py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-50"
-              title={t("computer.openLiveDesktop")}
-            >
-              <Maximize2 size={14} />
-              {t("computer.fullScreen")}
-            </button>
-            {cloudPreviewReady && canManageCloud && (cloudBackend === "vps" || boatState !== "archived") && (
-              <button
-                type="button"
-                onClick={() => run("sleep")}
-                disabled={pending === "sleep" || profileBot.busy}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-control px-3 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-50"
-                title={t("computer.sleepTitle")}
-              >
-                {pending === "sleep" ? <Loader2 size={14} className="animate-spin" /> : <Moon size={14} />}
-                {t("vm.cloud.sleep")}
-              </button>
-            )}
-          </div>
-        )}
-        {advanced && cloudPreviewReady && (
+        {cloudPreviewReady && (
           <div className="mt-3 flex gap-2">
             {!control.held && !bannerTakesControl && (
               <button

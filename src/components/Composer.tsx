@@ -1,14 +1,13 @@
 import { directMessageSent, roomMessageSent } from "@/lib/product-events";
 import { useComposerDictation } from "@/lib/use-composer-dictation";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentProps, type SetStateAction } from "react";
-import { ArrowUp, Clock, Mic, Paperclip, Square, X } from "lucide-react";
+import { ArrowUp, Clock, Mic, Square, X } from "lucide-react";
 import { useStore, visibleMessages, currentTaskBot, type Bot, type Group, type InstanceInfo, type Message } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { PHONE_LAYOUT, useMediaQuery } from "@/lib/use-media-query";
 import { useMenuMotion } from "./MenuMotion";
 import { ELEVATED_FLOAT } from "./elevated";
 import { activeLocale, t } from "@/lib/i18n";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { imeComposing, sendKeyLabel, sendsMessage, useSendKey } from "@/lib/send-key";
 import {
   draftRevision,
@@ -36,8 +35,7 @@ import { ComposerAttachments, pathForFile } from "./ComposerAttachments";
 import { PointedChips } from "./app/PointedChips"; import { SetupRequestChip, setupRequestPlaceholder } from "./SetupOffer";
 import { takePointedChips } from "@/lib/pointed-chips";
 import { withoutCitationMarkers } from "@/lib/citation-legacy";
-import { PlaceChip, usePlaceMenuItem } from "./PlaceChip";
-import { ApprovalModeSelector } from "./ApprovalModeSelector";
+import { usePlaceMenuItem } from "./PlaceChip";
 import { approvalModeFor } from "../../shared/approval-mode";
 import { useOnCall } from "@/lib/call";
 import { isLiveCallRunning, useLiveMedia } from "@/lib/live-call-media";
@@ -141,15 +139,13 @@ export function Composer({
   const { state, dispatch } = useStore();
   const { threads, currentBotId } = useThreadRefs();
   const { capabilities } = useDesktopCapabilities();
-  const advanced = useAdvancedMode();
   // On a phone the composer is a dock: a round + (attach and every other tool), then one pill with the field, the mic and the voice button.
   const singleRow = useMediaQuery(PHONE_LAYOUT);
   // Simple mode on a wider screen: one pill holding a round +, the field, the mic and one round button in the bot's colour.
-  const simpleDock = !advanced && !singleRow;
+  const simpleDock = !singleRow;
   const sendKey = useSendKey();
   const sendLabel = sendKeyLabel(sendKey);
   const busySend = useBusySendMode();
-  const remoteClient = window.ogb?.remoteClient?.active === true;
   const threadId = group?.threadId ?? bot?.threadId ?? "";
   const currentGroupTask = group?.tasks?.find((task) => task.threadId === threadId);
   const groupBusyBotId = currentGroupTask?.busyBotId ?? (currentGroupTask?.working ? group?.busyBotId : (group?.threadId === threadId ? group?.busyBotId : null));
@@ -162,7 +158,6 @@ export function Composer({
     state.instances.find((i) => i.instanceId === steerInstanceId)?.capabilities?.queueing === true;
   // Rooms keep queueing; a 1:1 chat with Steer chosen stops the turn first when the engine has no mid-turn steering.
   const steerInterrupts = steerInterruptsTurn({ direct: !group, busy, busySend, canSteer });
-  const composerTask = profile?.tasks?.find((task) => task.threadId === threadId);
   // Visible branch only: an approval left on an abandoned branch must not block the composer.
   const approvals = pendingApprovals(group ? group.messages : bot ? visibleMessages(bot) : []);
   const approval = approvals[0];
@@ -592,7 +587,7 @@ export function Composer({
   const stopInSlot = simpleDock && stoppable && !locked && !hasContent && !calling;
   const callShown = !simpleDock || (!hasContent && !stopInSlot);
   const slot = slotColors(bot?.color, Boolean(group));
-  const sendNames = sendLabels({ simple: !advanced, busySend, busy, canSteer, steerInterrupts, name: busyName, sendLabel });
+  const sendNames = sendLabels({ simple: true, busySend, busy, canSteer, steerInterrupts, name: busyName, sendLabel });
   const retryFailedSend = (failed: FailedComposerSend) => {
     const failedMode = failed.channelMode ?? "chat";
     if (failed.requestText.includes("<attached-image ") && !imageTargetsSupport(failed.requestText, failedMode)) {
@@ -861,11 +856,11 @@ export function Composer({
         />
         <div className="relative">
           {/* Plain canvas behind the composer and the strip below it, so the transcript ends at the composer
-              with no fade. Simple mode starts it at the composer's top edge, Advanced at its middle. */}
+              with no fade. The backdrop starts at the composer's top edge. */}
           <div
             aria-hidden
             data-composer-backdrop
-            className={cn("pointer-events-none absolute -left-5 -right-5 bg-app", advanced ? "-bottom-3 top-1/2" : cn("top-0", simpleDock ? "-bottom-4" : "-bottom-3"))}
+            className={cn("pointer-events-none absolute -left-5 -right-5 bg-app", cn("top-0", simpleDock ? "-bottom-4" : "-bottom-3"))}
           />
         <div ref={shellRef} data-tour="composer" data-multiline={multiline ? "" : undefined} className={cn("@container/composer relative z-[1]", singleRow ? "flex items-end gap-2" : simpleDock ? cn(SIMPLE_COMPOSER, multiline ? "rounded-[18px]" : "rounded-[22px]") : "rounded-2xl bg-composer px-2 py-1.5 ring-1 ring-composer-ring")}>
         <SlashCommandMenu listRef={commandListRef} motion={commandMotion} commands={commandCandidates} highlight={highlight} query={slash?.query}
@@ -884,19 +879,13 @@ export function Composer({
             <PhonePlus
               onAttach={() => fileInput.current?.click()}
               goal={goal}
-              teach={!advanced && canLearn ? teachTask : undefined}
+              teach={canLearn ? teachTask : undefined}
               approval={approvalChoice && modeBot && { name: modeBot.name, choice: approvalChoice }}
               callBotId={bot && !group ? bot.id : undefined}
-              place={modeBot && !remoteClient && advanced ? {
-                bot: modeBot,
-                task: composerTask,
-                disabled: Boolean(modeBot.busy),
-                onPin: (surface) => dispatch({ type: "updateTask", botId: modeBot.id, threadId: modeBot.threadId, patch: { surface } }),
-              } : undefined}
             />
           </div>
         )}
-        <div className={singleRow ? cn("min-w-0 flex-1 rounded-[26px] px-3 py-1.5", advanced ? "bg-composer ring-1 ring-composer-ring" : ELEVATED_FLOAT) : "contents"}>
+        <div className={singleRow ? cn("min-w-0 flex-1 rounded-[26px] px-3 py-1.5", ELEVATED_FLOAT) : "contents"}>
         {replyTo && <ComposerReplyStrip message={replyTo} fallbackName={bot?.name} onClear={onClearReply} />}
         <div data-composer-row className={cn("flex items-end", simpleDock ? "gap-1.5" : "gap-1", !singleRow && !simpleDock && "@max-[30rem]/composer:flex-wrap")}>
           <input
@@ -913,28 +902,9 @@ export function Composer({
           {!locked && !singleRow && (
             <div className={cn("flex items-center gap-1", simpleDock ? "shrink-0" : "flex-wrap")}>
               {simpleDock && <ComposerPlusMenu onAttach={() => fileInput.current?.click()} goal={goal} teach={canLearn ? teachTask : undefined} />}
-              {advanced && <button
-                type="button"
-                onClick={() => fileInput.current?.click()}
-                aria-label={t("composer.attach")}
-                title={t("composer.attach")}
-                className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-secondary hover:bg-control hover:text-ink"
-              >
-                <Paperclip size={17} />
-              </button>}
               {/* Simple mode shows a mode's chip only while it is on, so a choice made in the + menu or the bot panel stays in view. */}
-              {goal && (advanced || goal.on) && <GoalToggle {...goal} compact={simpleDock} />}
-              {advanced && approvalChoice && <ApprovalModeSelector {...approvalChoice} />}
+              {goal && goal.on && <GoalToggle {...goal} compact={simpleDock} />}
               {simpleDock && approvalChoice && profile && bot && approvalModeFor(bot) !== approvalModeFor(profile) && <ApprovalChip choice={approvalChoice} />}
-              {modeBot && !remoteClient && advanced && (
-                <PlaceChip
-                  bot={modeBot}
-                  task={composerTask}
-                  live={Boolean(modeBot.busy)}
-                  disabled={Boolean(modeBot.busy)}
-                  onPin={(surface) => dispatch({ type: "updateTask", botId: modeBot.id, threadId: modeBot.threadId, patch: { surface } })}
-                />
-              )}
             </div>
           )}
           <MentionTextarea
@@ -1040,7 +1010,7 @@ export function Composer({
             disabled={Boolean(approval) || locked}
             aria-busy={bot?.awaitingThreadSnapshot || undefined}
             placeholder={composerPlaceholder({
-              simple: !advanced, busySend, locked: setupLocked, approval: Boolean(approval), attaching: attachmentPending, listening: recording,
+              simple: true, busySend, locked: setupLocked, approval: Boolean(approval), attaching: attachmentPending, listening: recording,
               replying: Boolean(replyTo), busy, canSteer, steerInterrupts, queued: pendingCount > 0, busyName, sendLabel, group, members: members ?? [],
               jevOn: jevRoomRoutingOn(state.config), goal: channelMode === "goal", botName: bot?.name ?? "",
               setupHint: group ? null : setupRequestPlaceholder(bot, threadId),
@@ -1080,15 +1050,15 @@ export function Composer({
               simpleDock ? "size-7" : "size-8",
               recording
                 ? "animate-pulse bg-danger/20 text-danger"
-                : advanced || singleRow ? "text-ink-secondary hover:bg-raised hover:text-ink" : SIMPLE_CONTROL,
+                : singleRow ? "text-ink-secondary hover:bg-raised hover:text-ink" : SIMPLE_CONTROL,
             )}
             title={recording ? t("composer.dictation.stopHint") : t("composer.dictation.hint")}
           >
             {simpleDock ? <Mic size={16} strokeWidth={1.75} absoluteStrokeWidth className="[&_rect]:fill-current" /> : <Mic size={18} />}
           </button>
         )}
-        {callShown && bot && !group && <CallButton bot={bot} placement="composer" fill={advanced || singleRow ? undefined : slot.fill} ink={slot.ink} inverse={singleRow} />}
-        {callShown && group && !advanced && <GroupCallButton group={group} members={members ?? []} placement="composer" fill={slot.fill} ink={slot.ink} />}
+        {callShown && bot && !group && <CallButton bot={bot} placement="composer" fill={singleRow ? undefined : slot.fill} ink={slot.ink} inverse={singleRow} />}
+        {callShown && group && <GroupCallButton group={group} members={members ?? []} placement="composer" fill={slot.fill} ink={slot.ink} />}
         {hasContent && !locked && (
           <button
             onClick={send}

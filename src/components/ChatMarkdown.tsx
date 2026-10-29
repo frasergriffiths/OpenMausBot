@@ -4,11 +4,9 @@ import Markdown, { defaultUrlTransform, type Components, type ExtraProps } from 
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import { fromMarkdown, type Options as MarkdownParseOptions } from "mdast-util-from-markdown";
-import { Check, Copy, Download, LoaderCircle, RotateCcw, WrapText, X } from "lucide-react";
+import { Check, Download, LoaderCircle, RotateCcw, WrapText } from "lucide-react";
 import { useCopyFeedback } from "@/lib/copy-text";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/cn";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { remarkMentions, sameMentionPerson, type MentionPeer, type MentionPerson } from "@/lib/mentions";
 
 import { parseFenceInfo } from "../lib/code-block";
@@ -167,7 +165,6 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
   const [error, setError] = useState<string | null>(null);
   const [showSource, setShowSource] = useState(false);
   const { state: copied, copy } = useCopyFeedback(code);
-  const simple = !useAdvancedMode();
 
   useEffect(() => {
     if (typeof MutationObserver === "undefined" || typeof document === "undefined") return;
@@ -226,68 +223,15 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
     )}
     {markup && <div className="overflow-x-auto p-3 [&_svg]:!max-w-full" dangerouslySetInnerHTML={markup} />}
     {(showSource || !svg || error) && (
-      <pre className={cn("overflow-x-auto text-[13px]", simple ? "px-3 py-2 leading-5 text-ink-secondary" : "p-3 leading-relaxed text-ink")}>{code}</pre>
+      <pre className="overflow-x-auto px-3 py-2 text-[13px] leading-5 text-ink-secondary">{code}</pre>
     )}
   </>;
-  if (simple) {
-    return (
-      <div ref={frame} dir="ltr" className="group/code relative my-2.5 overflow-hidden rounded-lg bg-ink/[0.04]">
-        <CodePlate copied={copied} onCopy={copy} copyLabel={t("code.copySource")} items={[
-          { key: "source", label: t(showSource ? "code.hideSource" : "code.showSource"), icon: <WrapText size={14} aria-hidden="true" />, active: showSource, onSelect: () => setShowSource((shown) => !shown) },
-          { key: "about", label: t("code.mermaid"), disabled: true, separatorBefore: true, onSelect: () => {} },
-        ]} />
-        {diagram}
-      </div>
-    );
-  }
   return (
-    <div ref={frame} dir="ltr" className="my-2 overflow-hidden rounded-lg border border-hairline/40 bg-inset">
-      <div className="flex items-center justify-between gap-2 border-b border-hairline/30 bg-raised/30 px-3 py-1.5 text-xs">
-        <span title="Mermaid diagram" className="min-w-0 truncate rounded border border-hairline/40 bg-raised px-1.5 py-0.5 text-[11px] font-medium tracking-wide text-ink select-none">
-          Mermaid diagram
-        </span>
-        <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-          <button
-            type="button"
-            onClick={() => setShowSource((visible) => !visible)}
-            className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] transition-colors ${
-              showSource
-                ? "bg-accent/15 text-accent font-medium"
-                : "text-ink-secondary hover:bg-raised hover:text-ink"
-            }`}
-            title={showSource ? "Hide diagram source" : "Show diagram source"}
-            aria-label={showSource ? "Hide diagram source" : "Show diagram source"}
-            aria-pressed={showSource}
-          >
-            <WrapText size={12} aria-hidden="true" />
-            <span className="hidden sm:inline">{showSource ? "Hide source" : "Show source"}</span>
-          </button>
-          <button
-            type="button"
-            onClick={copy}
-            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-ink-secondary hover:bg-raised hover:text-ink transition-colors"
-            title={copied === "copied" ? "Copied to clipboard" : copied === "failed" ? t("common.copyFailed") : "Copy diagram source"}
-            aria-label={copied === "copied" ? "Diagram source copied to clipboard" : copied === "failed" ? t("common.copyFailed") : "Copy diagram source to clipboard"}
-          >
-            {copied === "failed" ? (
-              <>
-                <X size={12} className="text-danger" aria-hidden="true" />
-                <span className="text-danger font-medium hidden sm:inline">{t("common.copyFailed")}</span>
-              </>
-            ) : copied === "copied" ? (
-              <>
-                <Check size={12} className="text-success" aria-hidden="true" />
-                <span className="text-success font-medium hidden sm:inline">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy size={12} aria-hidden="true" />
-                <span className="hidden sm:inline">Copy</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+    <div ref={frame} dir="ltr" className="group/code relative my-2.5 overflow-hidden rounded-lg bg-ink/[0.04]">
+      <CodePlate copied={copied} onCopy={copy} copyLabel={t("code.copySource")} items={[
+        { key: "source", label: t(showSource ? "code.hideSource" : "code.showSource"), icon: <WrapText size={14} aria-hidden="true" />, active: showSource, onSelect: () => setShowSource((shown) => !shown) },
+        { key: "about", label: t("code.mermaid"), disabled: true, separatorBefore: true, onSelect: () => {} },
+      ]} />
       {diagram}
     </div>
   );

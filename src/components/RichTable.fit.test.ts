@@ -12,7 +12,6 @@ import { CHAR_PX, COLUMN_MAX_CHARS, COLUMN_MIN_CHARS, columnMinimums, fitsColumn
 import { formattedReplyWidth } from "@/lib/formatted-reply";
 
 // Simple mode draws its own plain table; this pins the Advanced table's fitting.
-vi.mock("@/lib/interface-mode", async (original) => ({ ...(await original<typeof import("@/lib/interface-mode")>()), useAdvancedMode: () => true, readAdvancedMode: () => true }));
 
 const header = ["App", "Stars", "License", "Target user", "Strength", "Weakness", "Verdict"];
 const row = ["OpenHands (ex-OpenDevin)", "~85k", "MIT", "Developers who want an autonomous coder",

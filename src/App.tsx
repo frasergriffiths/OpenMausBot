@@ -17,10 +17,9 @@ import { GroupView } from "@/components/GroupView";
 import { PHONE_LAYOUT, SIDEBAR_AND_PANEL_FIT, SIDEBAR_INLINE, TWO_SIDE_PANELS_FIT, useMediaQuery } from "@/lib/use-media-query";
 import { PluginsPanel, preloadConnectedApps } from "@/components/PluginsPanel";
 import {
-  BotSettingsDialog, ComputerPanel, FilesView, KeyboardShortcutsModal, LocalVmWorkspace,
-  preloadScreens, RemoteAgentSettingsPanel, RemoteDesktopPanel, RoomPanel, SettingsModal, TeamMapPage,
+  BotSettingsDialog, FilesView, KeyboardShortcutsModal, LocalVmWorkspace,
+  preloadScreens, RemoteAgentSettingsPanel, RoomPanel, SettingsModal, TeamMapPage,
 } from "@/components/lazy-screens";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useRoomPanelShown } from "@/lib/room-panel";
 import { WorkspaceBackupRecovery } from "@/components/WorkspaceBackupSettings";
 import { NotificationRail, NotificationsPanel } from "@/components/NotificationsPanel";
@@ -131,9 +130,8 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   const chiefStep = useChiefStepOpen();
   const bot = group || chiefStep ? undefined : (state.bots.find((b) => b.id === state.selectedId) ?? state.bots[0]);
   const notificationFeed = useNotificationFeed() && !remoteClient;
-  const advanced = useAdvancedMode();
-  const roomPanelOpen = useRoomPanelShown({ group, state, simple: !advanced && !remoteClient });
-  const botPanelOpen = advanced ? (state.settingsOpen || state.computerOpen || state.inspectorOpen || state.activityOpen) : state.settingsOpen;
+  const roomPanelOpen = useRoomPanelShown({ group, state, simple: !remoteClient });
+  const botPanelOpen = state.settingsOpen;
   const sidePanelOpen = (Boolean(bot) && botPanelOpen) || roomPanelOpen || (notificationFeed && state.notificationsOpen);
   const collapseSidebar = sidePanelOpen && !sidebarAndPanelFit;
 
@@ -215,15 +213,14 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   }, [localVmWorkspaceBotId, state.activeView, state.selectedId]);
 
   const openLocalVmWorkspace = (botId: string) => {
-    dispatch({ type: "toggleComputer", open: false });
+    dispatch({ type: "toggleSettings", open: false });
     setLocalVmWorkspaceBotId(botId);
   };
 
   const openComputerFromWorkspace = (botId: string) => {
     setLocalVmWorkspaceBotId(null);
     dispatch({ type: "select", id: botId });
-    if (advanced) dispatch({ type: "toggleComputer", open: true });
-    else dispatch({ type: "toggleSettings", open: true, section: "access", botId });
+    dispatch({ type: "toggleSettings", open: true, section: "access", botId });
   };
 
   const nativeViewOverlayOpen =
@@ -346,20 +343,7 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       {state.settingsOpen && bot && (
         remoteClient
           ? <RemoteAgentSettingsPanel bot={bot} overlay={state.computerOpen && !twoSidePanelsFit} />
-          : <BotSettingsDialog key={`settings:${bot.id}`} bot={bot} overlay={advanced
-            ? (state.inspectorOpen || state.computerOpen || (notificationFeed && state.notificationsOpen)) && !twoSidePanelsFit
-            : simplePanelOverlay} />
-      )}
-      {advanced && state.computerOpen && bot && (
-        remoteClient ? (
-          <RemoteDesktopPanel key={`computer:${bot.id}`} bot={bot} />
-        ) : (
-          <ComputerPanel
-            key={`computer:${bot.id}`}
-            bot={bot}
-            onOpenVmWorkspace={openLocalVmWorkspace}
-          />
-        )
+          : <BotSettingsDialog key={`settings:${bot.id}`} bot={bot} overlay={simplePanelOverlay} onOpenVmWorkspace={openLocalVmWorkspace} />
       )}
       {roomPanelOpen && group && (
         <RoomPanel key={`room:${group.id}`} group={group} overlay={notificationFeed && state.notificationsOpen && !twoSidePanelsFit} />

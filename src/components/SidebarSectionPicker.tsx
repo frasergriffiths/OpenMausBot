@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Check, FolderMinus } from "lucide-react";
 import { useStore } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { useHeldMenuMotion } from "./MenuMotion";
+import { anchoredMenuPosition } from "./SidebarPopoverMenu";
+import { MENU_LABEL } from "./menu-recipe";
+import { SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_MENU_SEPARATOR } from "./SidebarSimpleTop";
 
 /** "Move to context": the sidebar sections in use, a field for a new one, and "remove from context". */
 export function SectionPicker({
@@ -21,6 +24,7 @@ export function SectionPicker({
   const [name, setName] = useState("");
   const motion = useHeldMenuMotion(anchor);
   const shown = motion.value;
+  const panelRef = useRef<HTMLDivElement>(null);
   const heldCurrent = useRef(current);
   if (anchor) heldCurrent.current = current;
   const trimmed = name.trim();
@@ -41,6 +45,26 @@ export function SectionPicker({
     };
   }, [anchor, onClose]);
 
+  // The panel grows with the section list, so measure it on every render: below the click with a 6px gap, flipped
+  // above when it does not fit, then held 8px inside every edge.
+  useLayoutEffect(() => {
+    const element = panelRef.current;
+    if (!element || !shown) return;
+    const place = () => {
+      const { width, height } = element.getBoundingClientRect();
+      const at = anchoredMenuPosition(
+        { left: shown.x, right: shown.x, top: shown.y, bottom: shown.y },
+        { width, height },
+        { width: window.innerWidth, height: window.innerHeight },
+      );
+      element.style.left = `${at.left}px`;
+      element.style.top = `${at.top}px`;
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  });
+
   const sections = [
     ...new Set([
       ...(state.sections ?? []),
@@ -56,37 +80,42 @@ export function SectionPicker({
 
   if (!motion.shown || !shown) return null;
   const sectionCurrent = heldCurrent.current;
-  const top = Math.max(8, Math.min(shown.y, window.innerHeight - 300));
-  const left = Math.min(shown.x, window.innerWidth - 260);
 
   return (
     <div
+      ref={panelRef}
       data-section-picker
-      style={{ top, left }}
-      className={cn("popover-surface fixed z-40 w-[236px] overflow-hidden rounded-xl border border-hairline/50 bg-menu py-2 shadow-2xl shadow-black/60", motion.className)} {...motion.exitProps}
+      style={{ top: shown.y, left: shown.x }}
+      className={cn("fixed z-40 max-h-[calc(100dvh-16px)] w-max min-w-[220px] max-w-[calc(100vw-16px)] overflow-y-auto overscroll-contain", SIMPLE_MENU, motion.className)}
+      {...motion.exitProps}
+      onKeyDown={(event) => {
+        if (event.key !== "Tab") return;
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }}
     >
-      <div className="px-3.5 pb-1 text-[10px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
-        {t("sidebar.section.moveToContext")}
-      </div>
-      {sections.length > 0 && (
-        <div className="flex flex-col gap-0.5 px-1.5 py-1">
-          {sections.map((section) => (
-            <button
-              key={section}
-              onClick={() => assign(section)}
-              className={cn(
-                "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px]",
-                section === sectionCurrent ? "bg-menu-active text-ink" : "text-ink hover:bg-menu-hover",
-              )}
-            >
-              <span className="truncate">{section}</span>
-              {section === sectionCurrent && <Check size={14} className="shrink-0 text-accent" />}
-            </button>
-          ))}
-        </div>
-      )}
+      <div className={MENU_LABEL}>{t("sidebar.section.moveToContext")}</div>
+      {sections.map((section) => (
+        <button
+          key={section}
+          type="button"
+          onClick={() => assign(section)}
+          className={cn(
+            SIMPLE_MENU_ITEM,
+            "text-ink hover:bg-menu-hover",
+            section === sectionCurrent && "bg-menu-active",
+          )}
+        >
+          <span className="flex size-4 shrink-0 items-center justify-center">
+            {section === sectionCurrent && <Check size={16} className="text-accent" />}
+          </span>
+          <span className="min-w-0 flex-1 truncate">{section}</span>
+        </button>
+      ))}
+      {sections.length > 0 && <div role="separator" className={SIMPLE_MENU_SEPARATOR} />}
       <form
-        className="flex items-center gap-1.5 px-2.5 py-1"
+        className="flex min-h-[30px] items-center gap-1.5 px-2"
         onSubmit={(e) => {
           e.preventDefault();
           if (!trimmed || trimmed.length > 60) return;
@@ -100,13 +129,13 @@ export function SectionPicker({
           onChange={(e) => setName(e.target.value)}
           placeholder={t("sidebar.section.newContext")}
           aria-label={t("sidebar.section.newContextAria")}
-          className="w-full rounded-lg bg-raised/70 px-2.5 py-1.5 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
+          className="h-[30px] min-w-0 flex-1 rounded-md bg-raised/70 px-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none"
         />
         <button
           type="submit"
           disabled={!trimmed || trimmed.length > 60}
           className={cn(
-            "shrink-0 rounded-lg px-2.5 py-1.5 text-[12px] font-medium",
+            "h-7 shrink-0 rounded-full px-2.5 text-[14px] font-medium",
             trimmed ? "bg-accent text-panel" : "bg-raised/70 text-ink-secondary",
           )}
         >
@@ -115,12 +144,13 @@ export function SectionPicker({
       </form>
       {sectionCurrent && (
         <>
-          <div className="mx-2 my-1 border-t border-hairline/40" />
+          <div role="separator" className={SIMPLE_MENU_SEPARATOR} />
           <button
+            type="button"
             onClick={() => assign("")}
-            className="flex w-full items-center gap-3 px-3.5 py-2 text-left text-[13px] text-danger hover:bg-menu-hover"
+            className={cn(SIMPLE_MENU_ITEM, "text-danger hover:bg-menu-hover")}
           >
-            <FolderMinus size={15} />
+            <FolderMinus size={16} />
             {t("sidebar.section.removeFromContext")}
           </button>
         </>

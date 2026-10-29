@@ -54,8 +54,8 @@ const SIMPLE_STEPS: Partial<Record<TourStepId, Partial<TourStep>>> = {
 
 const SIMPLE_TOUR_STEPS: TourStep[] = TOUR_STEPS.map((step) => ({ ...step, ...SIMPLE_STEPS[step.id] }));
 
-/** The steps as the plain UI draws them. The advanced copy of each step is gone. */
-export function tourSteps(_advanced?: boolean): TourStep[] {
+/** The steps as the plain UI draws them. */
+export function tourSteps(): TourStep[] {
   return SIMPLE_TOUR_STEPS;
 }
 
@@ -63,8 +63,8 @@ function stepDone(record: OnboardingStatus | undefined, id: TourStepId): boolean
   return (record?.hintsSeen ?? []).includes(id);
 }
 
-export function currentStep(record: OnboardingStatus | undefined, advanced = true): TourStep | null {
-  return tourSteps(advanced).find((step) => !stepDone(record, step.id)) ?? null;
+export function currentStep(record: OnboardingStatus | undefined): TourStep | null {
+  return tourSteps().find((step) => !stepDone(record, step.id)) ?? null;
 }
 
 export function stepNumber(step: TourStep): { current: number; total: number } {

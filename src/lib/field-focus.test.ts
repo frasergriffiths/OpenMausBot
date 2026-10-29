@@ -78,14 +78,14 @@ describe("text field focus", () => {
     expect(cssText).toMatch(/:is\(\.ui-field, \[data-field-shell\]\) :is\(input, textarea, select\):focus-visible\s*\{[^}]*box-shadow:\s*none/);
   });
 
-  it("scopes the field recipe to Simple so Advanced keeps its own chrome", () => {
+  it("applies the field recipe to the one field chrome", () => {
     const scoped = [
       ...unlayered(css).matchAll(/([^{}]+)\{[^}]*border-color:\s*var\(--color-focus\)[^}]*\}/g),
       ...unlayered(css).matchAll(/([^{}]+)\{[^}]*box-shadow:[^}]*var\(--color-focus\)[^}]*\}/g),
       ...unlayered(css).matchAll(/([^{}]+)\{[^}]*border-radius:\s*var\(--radius-lg[^}]*\}/g),
     ].map((match) => match[1]!.replace(/\/\*[\s\S]*?\*\//g, "").trim()).filter((selector) => selector.includes(":is(input"));
     expect(scoped.length).toBeGreaterThan(0);
-    for (const selector of scoped) expect(selector.includes(':root[data-interface="simple"]')).toBe(true);
+    for (const selector of scoped) expect(selector.startsWith(":root")).toBe(true);
   });
 
   it("never fades focus to the resting hairline", () => {    const faint: string[] = [];

@@ -5,13 +5,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const values = new Map<string, string>();
 const os = { dark: false, listeners: new Set<() => void>() };
 
-// Each case loads fresh modules over the same storage, as a launch would; interface-mode keeps a per-session choice.
+// Each case loads fresh modules over the same storage, as a launch would.
 async function boot() {
   vi.resetModules();
-  const [{ settleAdvancedModeDefault, readAdvancedMode }, skins] = await Promise.all([import("./interface-mode"), import("./skins")]);
-  settleAdvancedModeDefault();
+  const skins = await import("./skins");
   skins.applySkinChoice(skins.readSkinChoice());
-  return { skin: document.documentElement.dataset.skin, advanced: readAdvancedMode(), stored: values.get("omb-skin") };
+  return { skin: document.documentElement.dataset.skin, stored: values.get("omb-skin") };
 }
 
 function setOsDark(dark: boolean) {
@@ -39,11 +38,11 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllGlobals(); });
 
 describe("default skin", () => {
-  it("opens a fresh install following the computer's light or dark setting, in Simple mode, and keeps following it", async () => {
-    expect(await boot()).toEqual({ skin: "daylight", advanced: false, stored: "system" });
+  it("opens a fresh install following the computer's light or dark setting, and keeps following it", async () => {
+    expect(await boot()).toEqual({ skin: "daylight", stored: "system" });
     values.set("omb-installed", "2026-10-17T00:00:00.000Z");
     os.dark = true;
-    expect(await boot()).toEqual({ skin: "midnight", advanced: false, stored: "system" });
+    expect(await boot()).toEqual({ skin: "midnight", stored: "system" });
   });
 
   it("switches between Daylight and Midnight when the computer does, while following it", async () => {
@@ -70,7 +69,7 @@ describe("default skin", () => {
 
   it("keeps Midnight for an earlier install whose saved skin is missing or no longer exists", async () => {
     values.set("omb-installed", "2026-01-01T00:00:00.000Z");
-    expect(await boot()).toEqual({ skin: "midnight", advanced: true, stored: "midnight" });
+    expect(await boot()).toEqual({ skin: "midnight", stored: "midnight" });
     values.set("omb-skin", "retired-skin");
     expect(await boot()).toMatchObject({ skin: "midnight", stored: "midnight" });
   });
@@ -80,8 +79,7 @@ describe("default skin", () => {
     expect(await boot()).toMatchObject({ skin: "lagoon" });
     values.clear();
     values.set("omb-skin", "midnight");
-    values.set("omb-advanced-mode", "0");
-    expect(await boot()).toMatchObject({ skin: "midnight", advanced: false });
+    expect(await boot()).toMatchObject({ skin: "midnight" });
   });
 
   it("shows System as the theme and the matching look as the selected skin in Appearance on a fresh install", async () => {

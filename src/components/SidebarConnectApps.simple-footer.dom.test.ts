@@ -30,7 +30,6 @@ vi.mock("./SidebarPhoneButton", () => ({ SidebarPhoneButton: () => null, phoneSe
 vi.mock("./PluginsPanel", () => ({ preloadConnectedApps: () => Promise.resolve(fixture.inventory) }));
 vi.mock("./bot-settings/useBotApps", () => ({ loadAppCatalogue: () => Promise.resolve(fixture.catalogue) }));
 vi.mock("@/lib/native-app-connections", () => ({ loadNativeAppConnections: () => Promise.resolve(fixture.native) }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced }));
 
 const { SidebarFooter } = await import("./SidebarFooter");
 const { SimpleRailFooter } = await import("./SidebarSimpleRail");
@@ -167,15 +166,3 @@ describe("the Apps entry a dismissal leaves in the shipping Simple rail", () => 
   });
 });
 
-describe("the restore control belongs to Simple mode", () => {
-  it("is absent in Advanced mode, where no sidebar pill exists to bring back", () => {
-    dismissConnectAppsPill();
-    fixture.advanced = true;
-    flushSync(() => root.render(createElement(ConnectAppsPillRestore)));
-    expect(host.querySelector("[data-show-connect-apps]")).toBeNull();
-
-    fixture.advanced = false;
-    flushSync(() => root.render(createElement(ConnectAppsPillRestore)));
-    expect(host.querySelector("[data-show-connect-apps]")).not.toBeNull();
-  });
-});

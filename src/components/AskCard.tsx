@@ -1,6 +1,5 @@
 import type { KeyboardEvent, ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { Check, Pencil, X } from "lucide-react";
 
 export function AskCard({
@@ -30,7 +29,6 @@ export function AskCard({
   footer?: ReactNode;
   onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
 }) {
-  const simple = !useAdvancedMode();
   return (
     <div
       role="group"
@@ -38,22 +36,11 @@ export function AskCard({
       data-tour={tour}
       data-ask-card="pending"
       onKeyDown={onKeyDown}
-      className={simple
-        ? "w-full max-w-[560px] rounded-[24px] bg-composer px-[17px] pb-2 pt-[13px] text-start ring-[0.5px] ring-ink/10"
-        : "w-full max-w-[600px] rounded-2xl bg-composer px-4 py-3 text-start ring-1 ring-composer-ring"}
+      className="w-full max-w-[560px] rounded-[24px] bg-composer px-[17px] pb-2 pt-[13px] text-start ring-[0.5px] ring-ink/10"
     >
-      <div className={cn("flex min-w-0 gap-2", plain || simple ? "items-start" : "items-center")}>
-        {icon && <span aria-hidden="true" className={cn("flex shrink-0 text-accent-text", simple && "mt-[3px]")}>{icon}</span>}
-        <div
-          className={cn(
-            "min-w-0 flex-1",
-            simple
-              ? "break-words text-[16px] font-semibold leading-[22px] text-ink-secondary"
-              : plain
-                ? "break-words text-[15px] font-semibold leading-6 text-ink"
-                : "truncate text-[14px] font-semibold text-accent-text",
-          )}
-        >
+      <div className="flex min-w-0 items-start gap-2">
+        {icon && <span aria-hidden="true" className="mt-[3px] flex shrink-0 text-accent-text">{icon}</span>}
+        <div className="min-w-0 flex-1 break-words text-[16px] font-semibold leading-[22px] text-ink-secondary">
           <bdi dir="auto">{title}</bdi>
         </div>
         {meta && <span className="shrink-0 text-[12px] tabular-nums text-ink-tertiary">{meta}</span>}
@@ -72,9 +59,9 @@ export function AskCard({
           </button>
         )}
       </div>
-      {explanation && <div className={cn("mt-1 leading-snug text-ink-secondary", simple ? "text-[14px]" : "text-[13px]")}>{explanation}</div>}
-      {children && <div className={simple ? "mt-2" : plain ? "mt-3" : "mt-2.5"}>{children}</div>}
-      {footer && <div className={cn("flex flex-wrap items-center justify-end gap-2", simple ? "mb-1.5 mt-2" : "mt-3")}>{footer}</div>}
+      {explanation && <div className="mt-1 text-[14px] leading-snug text-ink-secondary">{explanation}</div>}
+      {children && <div className="mt-2">{children}</div>}
+      {footer && <div className="mb-1.5 mt-2 flex flex-wrap items-center justify-end gap-2">{footer}</div>}
     </div>
   );
 }

@@ -28,7 +28,6 @@ vi.mock("@/state/store", async (importOriginal) => {
 });
 vi.mock("@/lib/analytics", () => ({ track: vi.fn() }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => true }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: vi.fn() }));
 vi.mock("./CallView", () => ({ CallButton: (props: Record<string, unknown>) => {
   fixture.call = props;
   return null;
@@ -56,17 +55,6 @@ let root: Root;
 let container: HTMLDivElement;
 const render = (props: Parameters<typeof Composer>[0]) => flushSync(() => root.render(createElement(Composer, props)));
 const plus = () => container.querySelector<HTMLElement>("[data-composer-plus]")?.closest("button") ?? null;
-const menu = () => document.body.querySelector<HTMLElement>('[data-sidebar-popover-menu="anchored"]');
-const item = (key: string) => document.body.querySelector<HTMLButtonElement>(`[data-menu-key="${key}"]`);
-const click = (element: Element | null) => {
-  if (!element) throw new Error("nothing to click");
-  flushSync(() => (element as HTMLElement).click());
-};
-function openPlus() {
-  click(plus());
-  expect(menu()).not.toBeNull();
-}
-
 beforeEach(() => {
   fixture.advanced = false;
   vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("max-width: 767.98px"), addEventListener() {}, removeEventListener() {} }));
@@ -98,25 +86,5 @@ describe("the phone composer", () => {
     expect(fixture.call?.fill).toBeUndefined();
   });
 
-  it("moves Advanced mode's row of buttons into the +", () => {
-    fixture.advanced = true;
-    render({ bot });
-    expect(container.querySelector('button[aria-label="Attach a file"]')).toBeNull();
-    expect(container.querySelector('[aria-label^="Ask for approval for"]')).toBeNull();
-    expect(container.querySelector('[data-testid="place-chip"]')).toBeNull();
-    expect(fixture.call).toMatchObject({ inverse: true });
-    openPlus();
-    const keys = [...menu()!.querySelectorAll("[data-menu-key]")].map((row) => row.getAttribute("data-menu-key"));
-    expect(keys).toEqual(expect.arrayContaining(["attach", "place", "approval", "call:turns", "call:live"]));
-    expect(item("place")?.textContent).toContain("Works on");
-  });
 
-  it("keeps Advanced mode's buttons in a row on a wider screen", () => {
-    vi.stubGlobal("matchMedia", (query: string) => ({ matches: !query.includes("max-width"), addEventListener() {}, removeEventListener() {} }));
-    fixture.advanced = true;
-    render({ bot });
-    expect(container.querySelector('button[aria-label="Attach a file"]')).not.toBeNull();
-    expect(container.querySelector('[data-testid="place-chip"]')).not.toBeNull();
-    expect(fixture.call?.inverse).toBe(false);
-  });
 });

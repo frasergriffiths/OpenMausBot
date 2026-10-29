@@ -25,7 +25,6 @@ vi.mock("./DesktopCapabilities", async (importOriginal) => ({
     },
   }),
 }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: () => {} }));
 // The owner: starting a cloud computer early is an Admin's shortcut.
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => true }));
 vi.mock("./CloudScreenPreview", () => ({

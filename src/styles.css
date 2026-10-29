@@ -950,60 +950,36 @@
   --identity-chrome: #B3BAC4;
 }
 
-/* Advanced mode keeps Midnight's and Daylight's brighter inks, firmer fields and raised menu rows. :where() holds
-   these at a skin block's specificity, so the phone and wide-gamut blocks below still win. */
-[data-skin="midnight"]:where(:root[data-interface="advanced"], :root[data-interface="advanced"] *) {
-  --color-raised-hover: #2e2e2e;
-  --color-composer-ring: #2e2e2e;
-  --color-inset: #171717;
-  --color-ink: #fcfcfc;
-  --color-ink-secondary: #fcfcfcbf;
-  --color-ink-tertiary: #fcfcfc90;
-  --color-bubble-user-ink: #fcfcfc;
-  --color-maus-line: #fcfcfc;
-  --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
-  --color-menu-active: var(--color-raised);
-}
-[data-skin="daylight"]:where(:root[data-interface="advanced"], :root[data-interface="advanced"] *) {
-  --color-inset: #e6e6e6;
-  --color-control: #dedede;
-  --color-composer-ring: #e4e4e4;
-  --color-ink: #0d0d0d;
-  --color-ink-secondary: #444444;
-  --color-menu-hover: color-mix(in srgb, var(--color-raised) 70%, transparent);
-  --color-menu-active: var(--color-raised);
-}
-
-/* Simple mode: every popover and menu in the menu tone, flat in Midnight and on a soft lift in Daylight. A
+/* Every popover and menu in the menu tone, flat in Midnight and on a soft lift in Daylight. A
    popover's rim is its border, never a ring, so clearing box-shadow leaves the rim. */
-:root[data-interface="simple"] .popover-surface {
+:root .popover-surface {
   background-color: var(--color-menu);
 }
-:root[data-interface="simple"][data-skin="midnight"] .popover-surface {
+:root[data-skin="midnight"] .popover-surface {
   box-shadow: none;
 }
-:root[data-interface="simple"][data-skin="daylight"] .popover-surface {
+:root[data-skin="daylight"] .popover-surface {
   box-shadow: 0 10px 20px -3px rgb(28 28 28 / 0.1), 0 4px 6px -4px rgb(28 28 28 / 0.1);
 }
 
-/* Simple mode's primary action in Midnight and Daylight is a neutral pill: white on dark, black on light. Unlayered,
+/* The primary action in Midnight and Daylight is a neutral pill: white on dark, black on light. Unlayered,
    so it wins over the accent fill a call site may still carry. */
-:root[data-interface="simple"]:is([data-skin="midnight"], [data-skin="daylight"]) .ui-button-primary {
+:root:is([data-skin="midnight"], [data-skin="daylight"]) .ui-button-primary {
   border-color: transparent;
   background: var(--color-ink);
   color: var(--color-app);
 }
-:root[data-interface="simple"]:is([data-skin="midnight"], [data-skin="daylight"]) .ui-button-primary:not(:disabled):is(:hover, :active) {
+:root:is([data-skin="midnight"], [data-skin="daylight"]) .ui-button-primary:not(:disabled):is(:hover, :active) {
   background: color-mix(in srgb, var(--color-ink) 88.5%, var(--color-app));
   color: var(--color-app);
   filter: none;
 }
-:root[data-interface="simple"]:is([data-skin="midnight"], [data-skin="daylight"]) .ui-button-primary:disabled {
+:root:is([data-skin="midnight"], [data-skin="daylight"]) .ui-button-primary:disabled {
   opacity: 1;
   background: color-mix(in srgb, var(--color-ink) 13%, transparent);
   color: color-mix(in srgb, var(--color-ink) 30%, transparent);
 }
-:root[data-interface="simple"][data-skin="daylight"] .ui-button-primary:disabled {
+:root[data-skin="daylight"] .ui-button-primary:disabled {
   background: color-mix(in srgb, var(--color-ink) 15%, transparent);
 }
 
@@ -1337,18 +1313,18 @@ body {
   }
   /* Simple mode's secondary action in Midnight and Daylight: a faint ink wash with a hairline of ink. Layered, so a
      call site's own fill (an ink pill, a danger outline) still wins. */
-  :root[data-interface="simple"][data-skin="midnight"] .ui-button {
+  :root[data-skin="midnight"] .ui-button {
     border-color: color-mix(in srgb, var(--color-ink) 10%, transparent);
     background: color-mix(in srgb, var(--color-ink) 4%, transparent);
   }
-  :root[data-interface="simple"][data-skin="midnight"] .ui-button:enabled:is(:hover, :active) {
+  :root[data-skin="midnight"] .ui-button:enabled:is(:hover, :active) {
     background: color-mix(in srgb, var(--color-ink) 8%, transparent);
   }
-  :root[data-interface="simple"][data-skin="daylight"] .ui-button {
+  :root[data-skin="daylight"] .ui-button {
     border-color: color-mix(in srgb, var(--color-ink) 12%, transparent);
     background: color-mix(in srgb, var(--color-ink) 6%, transparent);
   }
-  :root[data-interface="simple"][data-skin="daylight"] .ui-button:enabled:is(:hover, :active) {
+  :root[data-skin="daylight"] .ui-button:enabled:is(:hover, :active) {
     background: color-mix(in srgb, var(--color-ink) 10%, transparent);
   }
   /* A dialog for the first-run surfaces: the menu tone on a hairline of ink, lifted only in Daylight. */
@@ -1614,7 +1590,7 @@ body {
 }
 /* Simple mode shows keyboard focus on a menu row with an inset ring in the focus colour. The hover fill
    alone is white-on-white on Atelier, Lagoon and Linen, so the ring is what carries focus on every skin. */
-:root[data-interface="simple"] [role="menu"] :is(button, [role^="menuitem"]):focus-visible {
+:root [role="menu"] :is(button, [role^="menuitem"]):focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: -2px;
   background-color: var(--color-menu-hover);
@@ -1627,8 +1603,8 @@ body {
    sliders, colour wells and file pickers are not text fields: they have no
    border to repaint, so they keep the ring, or a keyboard user tabbing onto
    one sees nothing. */
-:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus,
-:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible {
+:root :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus,
+:root :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible {
   outline: none;
 }
 
@@ -1642,34 +1618,34 @@ body {
    in the focus colour.
    A field reporting an error (aria-invalid) keeps its danger border, so the
    red does not vanish while the user is fixing it. */
-:root[data-interface="simple"] :is(input, textarea, select):focus-visible:not([aria-invalid="true"]) {
+:root :is(input, textarea, select):focus-visible:not([aria-invalid="true"]) {
   border-color: var(--color-focus);
 }
 
 /* One focus indicator for a text field: its own 1px border takes the focus colour. No second halo, which read as a
    doubled ring on the new input style. */
-:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible:not([aria-invalid="true"]):not([data-menu-search]):not([data-tour="composer"] textarea) {
+:root :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), textarea, select):focus-visible:not([aria-invalid="true"]):not([data-menu-search]):not([data-tour="composer"] textarea) {
   outline: none;
   border-color: var(--color-focus);
   box-shadow: none;
 }
 
 /* A composed field draws the same single indicator around its wrapper, never a second one inside the pill or the field box. */
-:root[data-interface="simple"] :is(.ui-field):focus-within:not(:has([aria-invalid="true"])) {
+:root :is(.ui-field):focus-within:not(:has([aria-invalid="true"])) {
   border-color: var(--color-focus);
   box-shadow: none;
 }
 
 /* Inside a composed wrapper the wrapper owns the indicator; the inner input stays quiet. The broad field
    rule above is deliberately high-specificity, so this one states the reset outright. */
-:root[data-interface="simple"] :is(.ui-field, [data-field-shell]) :is(input, textarea, select):focus-visible {
+:root :is(.ui-field, [data-field-shell]) :is(input, textarea, select):focus-visible {
   border-color: transparent !important;
   box-shadow: none !important;
 }
 
 /* One field radius: every text field takes the skin's control radius, so a
    dialog, a settings row and a sidebar filter agree. */
-:root[data-interface="simple"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea, select):not([data-menu-search], [data-tour="composer"] textarea) {
+:root :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="submit"], [type="button"], [type="reset"]), textarea, select):not([data-menu-search], [data-tour="composer"] textarea) {
   border-radius: var(--radius-lg, 0.5rem);
 }
 

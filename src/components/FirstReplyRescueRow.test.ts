@@ -4,7 +4,6 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { resetAiSwitch, useAiSwitch } from "@/lib/ai-switch";
-import { setAdvancedMode } from "@/lib/interface-mode";
 import { forgetStops } from "@/lib/stop-turn";
 import { runtimeFrameAction, StoreContext, type Bot, type InstanceInfo, type Message } from "@/state/store";
 import type { RuntimeEvent } from "../../shared/runtime-events";
@@ -33,11 +32,10 @@ let host: HTMLDivElement;
 let root: Root;
 let dispatch: ReturnType<typeof vi.fn>;
 const opened = { header: vi.fn(), panel: vi.fn() };
-let headerBot: Bot | null = null;
 
 /** The pickers this chat could draw; Switch AI must reach exactly one of them. */
 function Pickers() {
-  headerBot = useAiSwitch({ bot: bot(true), threadId: "thread-1", contained: false, dispatch: vi.fn(), setOpen: opened.header }).bot;
+  useAiSwitch({ bot: bot(true), threadId: "thread-1", contained: false, dispatch: vi.fn(), setOpen: opened.header });
   useAiSwitch({ bot: bot(true), threadId: "thread-1", contained: true, dispatch: vi.fn(), setOpen: opened.panel });
   return null;
 }
@@ -60,7 +58,6 @@ beforeEach(() => {
 afterEach(() => {
   act(() => root.unmount());
   document.body.innerHTML = "";
-  setAdvancedMode(false);
   delete (window as { ogb?: unknown }).ogb;
   resetAiSwitch();
 });
@@ -102,39 +99,17 @@ describe("first-reply rescue row", () => {
     expect(dispatch.mock.calls).toEqual([[{ type: "toggleAppSettings", open: true, section: "engines" }]]);
   });
 
-  it("in Simple mode, opens the bot panel's picker for this turn, and leaves the turn running", () => {
-    setAdvancedMode(false);
-    render(row());
+  it("opens the bot panel's picker for this turn, and leaves the turn running", () => {
+      render(row());
     act(() => button("Switch AI")!.click());
     expect(dispatch.mock.calls).toEqual([[expect.objectContaining({ type: "toggleSettings", open: true, section: "model", botId: "bot-1" })]]);
     expect(opened.panel).toHaveBeenCalledWith(true);
     expect(opened.header).not.toHaveBeenCalled();
   });
 
-  it("in Advanced mode, opens the header's model chip for this turn, and leaves the turn running", () => {
-    setAdvancedMode(true);
-    render(row());
-    act(() => button("Switch AI")!.click());
-    expect(dispatch).not.toHaveBeenCalled();
-    expect(opened.header).toHaveBeenCalledWith(true);
-    expect(opened.panel).not.toHaveBeenCalled();
-  });
 
-  it("hands the picker back to the running turn once the row's own turn is over", () => {
-    setAdvancedMode(true);
-    render(row());
-    act(() => button("Switch AI")!.click());
-    expect(headerBot!.busy).toBe(false);
-    render(row({ ...rescue, over: true }));
-    expect(headerBot!.busy).toBe(true);
-  });
 
   it.each([
-    ["a remote client in Advanced mode, whose header has no model chip", () => {
-      setAdvancedMode(true);
-      (window as { ogb?: unknown }).ogb = { remoteClient: { active: true } };
-      render(row());
-    }],
     ["a room, whose header has no model chip", () => render(row({ ...rescue, groupId: "room-1" }), { groups: [{ id: "room-1", busyBotId: "bot-1", turnStartedAt: AT - 1 }] })],
   ])("offers no Switch AI for %s", (_label, show) => {
     show();

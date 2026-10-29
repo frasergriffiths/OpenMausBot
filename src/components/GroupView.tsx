@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { formattedReplyWidth, isFormattedReply, splitReplyBlocks } from "@/lib/formatted-reply";
+import { splitReplyBlocks } from "@/lib/formatted-reply";
 import { activeLocale, t } from "@/lib/i18n";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { useReactor } from "@/lib/cloud-guest";
@@ -33,7 +33,6 @@ import { ChatMarkdown } from "./ChatMarkdown";
 import { FailedTurnRow, MessageBoundary } from "./ChatView";
 import { SIMPLE_BOT_BUBBLE, SIMPLE_BUBBLE_MAX, SIMPLE_BUBBLE_TEXT, SIMPLE_USER_BUBBLE } from "./chat-bubble";
 import { ReplyBlocks } from "./ReplyBlocks";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { CopyButton, MESSAGE_ROW, MessageActions, messageActionClass, ReplyAction } from "./MessageActions";
 import { ReactAction, ReactionChips, useCanReact } from "./Reactions";
 import { ClusterLabel } from "./RoomClusterLabel";
@@ -171,7 +170,6 @@ function RoomTextMessage({
   const focusedSearch = focus?.messageId === m.id && Boolean(focus.matchText) && focus.threadId === group.threadId;
   const collapsible = user && !expanded && (display.length > USER_COLLAPSE_CHARS || display.split("\n").length > USER_COLLAPSE_LINES);
   useEffect(() => { if (focusedSearch && collapsible) setExpanded(true); }, [focusedSearch, collapsible, focus?.nonce]);
-  const simple = !useAdvancedMode();
   const speakerBot = members.find((member) => member.id === m.from?.botId);
   const botText = rawText; const teammates = useTeammates(); const peers = useMemo(() => [...members, ...teammates.peers], [members, teammates]);
   const pin = roomPin(group, m, dispatch);
@@ -188,7 +186,7 @@ function RoomTextMessage({
     pin,
   });
   const replyGroup = useMemo(() => !user && botText.trim() ? replyAttachmentGroup(botText, m.attachments) : null, [user, botText, m.attachments]);
-  const blocks = useMemo(() => simple && !user && !viewRaw && botText.trim() ? splitReplyBlocks(botText) : null, [simple, user, viewRaw, botText]);
+  const blocks = useMemo(() => !user && !viewRaw && botText.trim() ? splitReplyBlocks(botText) : null, [user, viewRaw, botText]);
   const tabled = Boolean(blocks?.some((block) => block.kind === "table"));
   const botActions = !user && (
     <MessageActions side="bot" forceOpen={viewRaw || speaking} menu={botMenu}>
@@ -210,18 +208,16 @@ function RoomTextMessage({
           </MessageActions>
         )}
         <div
-          data-chat-bubble={simple ? "simple" : ""}
+          data-chat-bubble="simple"
           className={cn(
             tabled ? "w-full" : "w-fit",
-            simple ? cn(!tabled && SIMPLE_BUBBLE_MAX, SIMPLE_BUBBLE_TEXT) : "max-w-[min(var(--chat-bubble-max),var(--chat-bubble-pct))] rounded-2xl text-[15px] leading-relaxed",
+            cn(!tabled && SIMPLE_BUBBLE_MAX, SIMPLE_BUBBLE_TEXT),
             !user && emerging && "turn-answer",
             tabled || (!user && !m.text?.trim() && !m.replyToId && m.attachments?.length)
               ? "text-ink"
-              : !simple && !user && isFormattedReply(m.text ?? "")
-                ? cn(formattedReplyWidth(m.text ?? ""), "px-1 text-ink")
-                : user
-                  ? cn("chat-text whitespace-pre-wrap text-ink", simple ? SIMPLE_USER_BUBBLE : "bg-bubble-user px-4 py-2.5")
-                  : simple ? SIMPLE_BOT_BUBBLE : "bg-card px-4 py-2.5 text-ink",
+              : user
+                ? cn("chat-text whitespace-pre-wrap text-ink", SIMPLE_USER_BUBBLE)
+                : SIMPLE_BOT_BUBBLE,
           )}
           title={new Date(m.at).toLocaleString()}
         >
@@ -905,8 +901,7 @@ export function GroupView({ group }: { group: Group }) {
   const threadSpeakerId = roomThreadSpeakerId(group, group.threadId);
   const threadSpeaker = threadSpeakerId ? members.find((b) => b.id === threadSpeakerId) : undefined;
   const setupPending = !remoteClient && roomNeedsSetup(group);
-  const advancedMode = useAdvancedMode();
-  const simpleHeader = simpleRoomHeader({ advanced: advancedMode, remoteClient, group, setupPending });
+  const simpleHeader = simpleRoomHeader({ remoteClient, group, setupPending });
 
   const lastGroupMessage = group.messages.at(-1);
   const toolInFlight = lastGroupMessage?.kind === "activity" && lastGroupMessage.tool?.ok === undefined;

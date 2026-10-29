@@ -23,12 +23,14 @@ function initialTarget(section: BotSettingsSection | null, link: PanelLink | nul
   return section ? linkTarget(section, link) : { tab: "profile" };
 }
 
-export function BotPanel({ bot, derived, linkedSection, onClose }: {
+export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspace, headerClassName, headerProps }: {
   bot: Bot;
   derived: ReturnType<typeof useBotSettingsDerived>;
   headerClassName?: string;
+  headerProps?: React.HTMLAttributes<HTMLDivElement>;
   linkedSection: BotSettingsSection | null;
   onClose: () => void;
+  onOpenVmWorkspace?: (botId: string) => void;
 }) {
   const link = usePanelLink();
   const [tab, setTab] = useState(() => initialTarget(linkedSection, link).tab);
@@ -114,7 +116,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
       {page === null ? (
         <>
           <div ref={editorRef} className="relative">
-            <div data-panel-header="" className="flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3">
+            <div data-panel-header="" className={cn("flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3", headerClassName)} {...headerProps}>
               <div data-panel-leading="" className="flex w-[34px] shrink-0 justify-center">
                 <button
                   type="button"
@@ -188,7 +190,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           </div>
         </>
       ) : (
-        <div data-panel-header="" className="flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3">
+        <div data-panel-header="" className={cn("flex h-14 shrink-0 items-center gap-2 border-b border-hairline/40 px-3", headerClassName)} {...headerProps}>
           <div data-panel-leading="" className="flex w-[34px] shrink-0 justify-start">
             <button type="button" data-panel-back onClick={back} aria-label={backLabel} className={cn(roundButtonCls, "shrink-0")}>
               <ArrowLeft size={16} className="pointer-events-none" />
@@ -239,6 +241,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
                 onOpen={openPage}
                 editingInstructions={editingInstructions}
                 onEditInstructions={setEditingInstructions}
+                onOpenVmWorkspace={onOpenVmWorkspace}
               />
             </div>
           </div>

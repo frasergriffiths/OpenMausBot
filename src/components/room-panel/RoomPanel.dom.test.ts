@@ -14,7 +14,6 @@ vi.mock("@/state/store", async (importOriginal) => {
     useStore: () => ({ state: { ...original.initialState, bots: fixtureBots, config: fixture.config } as AppState, dispatch: fixture.dispatch }),
   };
 });
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => false, readAdvancedMode: () => false, setAdvancedMode: vi.fn() }));
 vi.mock("../DesktopCapabilities", async (importOriginal) => ({
   ...await importOriginal<typeof import("../DesktopCapabilities")>(),
   useCaptionChrome: () => ({ dragProps: {}, padClass: "" }),

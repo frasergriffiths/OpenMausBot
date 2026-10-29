@@ -27,7 +27,8 @@ afterEach(() => {
 describe("Share team", () => {
   it("is in every named team's menu", () => {
     const markup = renderToStaticMarkup(createElement(TeamMenuItems, { onAddBots: vi.fn(), onRename: vi.fn(), onShare: vi.fn(), onDelete: vi.fn() }));
-    expect(text(markup)).toMatch(/Add bots .*Rename department .*Share department… .*Delete department/);
+    expect(text(markup)).toMatch(/Add bots .*Rename department .*Share department… .*Delete\s*$/);
+    expect(markup).not.toContain("Delete department");
     expect(markup.match(/role="menuitem"/g)).toHaveLength(4);
   });
 

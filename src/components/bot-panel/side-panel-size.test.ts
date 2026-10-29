@@ -29,12 +29,10 @@ describe("side panel sizes", () => {
 
   it("remembers one width per mode and ignores a stored value outside the range", () => {
     expect(readSidePanelWidth(true, store())).toBe(320);
-    expect(readSidePanelWidth(false, store())).toBe(420);
     expect(readSidePanelWidth(true, store("380"))).toBe(380);
     expect(readSidePanelWidth(true, store("900"))).toBe(320);
-    expect(readSidePanelWidth(false, store("300"))).toBe(420);
+    expect(readSidePanelWidth(true, store("300"))).toBe(320);
     expect(SIDE_PANEL_WIDTH_KEYS.simple).toBe("openmausbot.sidePanelWidth.simple");
-    expect(SIDE_PANEL_WIDTH_KEYS.advanced).toBe("openmausbot.sidePanelWidth.advanced");
   });
 
   it("draws an 8px keyboard-resizable edge with no grip", () => {

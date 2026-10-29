@@ -1,7 +1,5 @@
 import { useSyncExternalStore } from "react";
 
-import { useAdvancedMode } from "./interface-mode";
-
 export const SHOW_THREADS_KEY = "omb-show-threads";
 
 let sessionChoice: boolean | undefined;
@@ -62,6 +60,5 @@ export function useShowThreadsChoice(): boolean {
 }
 
 export function useShowThreads(): boolean {
-  const chosen = useShowThreadsChoice();
-  return useAdvancedMode() && chosen;
+  return useShowThreadsChoice();
 }

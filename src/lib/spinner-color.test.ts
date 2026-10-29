@@ -92,8 +92,8 @@ describe("the running mark on a tab", () => {
     expect(spinnerColor("green")).toBe("color-mix(in oklab, #009957 65%, var(--color-ink))");
   });
 
-  it("gives the focused Simple menu row an inset ring with 3:1 contrast on every skin", () => {
-    const rule = css.match(/:root\[data-interface="simple"\] \[role="menu"\] :is\(button, \[role\^="menuitem"\]\):focus-visible\s*\{([^}]*)\}/)?.[1] ?? "";
+  it("gives the focused menu row an inset ring with 3:1 contrast on every skin", () => {
+    const rule = css.match(/:root \[role="menu"\] :is\(button, \[role\^="menuitem"\]\):focus-visible\s*\{([^}]*)\}/)?.[1] ?? "";
     expect(rule).toContain("outline: 2px solid var(--color-focus)");
     expect(rule).toContain("outline-offset: -2px");
     expect(rule).not.toContain("outline: none");

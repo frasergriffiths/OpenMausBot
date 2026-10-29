@@ -22,7 +22,6 @@ import { SimpleModelMenu, type SimpleThinking } from "./SimpleModelMenu";
 import { apiKeysLabel, ClaudeAccountSelect, engineStatus, FollowBotModelRow, ModelEngineRail, ModelRow, ModelSearch } from "./ModelPickerFull";
 import { MENU_LABEL, MENU_LINE, MENU_ROW, MENU_SEPARATOR, MENU_STROKE, MENU_TRAILING } from "./menu-recipe";
 import { nextMenuIndex } from "./SidebarPopoverMenu";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 
 import { t } from "@/lib/i18n";
@@ -278,7 +277,6 @@ export function ModelPicker({
   const [probing, setProbing] = useState<ReadonlySet<string>>(() => new Set());
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
   const [scope, setScope] = useState<"bot" | "thread">("thread");
-  const advanced = useAdvancedMode();
   const ownerOrAdmin = useOwnerOrAdmin();
   // A guest changes only their own conversation's model, never the shared bot's default; thread-only until
   // authority loads.
@@ -300,7 +298,7 @@ export function ModelPicker({
   const inside = useRef({ contains: (target: unknown) => [rootRef.current, menuRef.current].some((node) => node?.contains(target as Node)) });
 
   const floating = typeof document !== "undefined";
-  const simpleView = !advanced && !fullView;
+  const simpleView = !fullView;
   const popoverWidth = simpleView ? SIMPLE_POPOVER_WIDTH : POPOVER_WIDTH;
   useLayoutEffect(() => {
     if (!open) return;
@@ -600,7 +598,7 @@ export function ModelPicker({
       handled();
       if (query) setQuery("");
       else if (!simpleView && pane === "custom" && canReturnToOfficial) setPane("main");
-      else if (fullView && !advanced) backToList(true);
+      else if (fullView) backToList(true);
       else close(true);
       return;
     }
@@ -679,10 +677,10 @@ export function ModelPicker({
     ? `${active.displayName} · ${modelLabel(active, selection.model)}${
         modelProvider(active, selection.model) ? ` · ${modelProvider(active, selection.model)}` : ""
       }${selectedVariantLabel ? ` · ${selectedVariantLabel}` : selection.effort
-        ? ` · ${t(advanced ? "model.effort.summary" : "model.simple.thinkingSummary", { level: effortLabel(selection.effort) })}` : ""}`
+        ? ` · ${t("model.simple.thinkingSummary", { level: effortLabel(selection.effort) })}` : ""}`
     : selection.model;
   const followLine = follows === true ? `\n${t("model.followsBot", { name: profile.name })}` : follows === false ? `\n${t("model.ownModel")}` : "";
-  const attentionLine = !advanced && attention ? `\n${attention}` : "";
+  const attentionLine = attention ? `\n${attention}` : "";
   const busyLine = bot.busy ? `\n${t(threadId ? "model.threadBusy" : "model.busy")}` : "";
 
   const triggerProps = {
@@ -743,7 +741,7 @@ export function ModelPicker({
 
   const fullPane = (
     <>
-      {fullView && !advanced && (
+      {fullView && (
         <div className="shrink-0 border-b-[0.5px] border-ink/10 p-1.5">
           <button type="button" data-menu-row data-model-back onClick={(event) => backToList(event.detail === 0)} className={cn(MENU_ROW, "text-ink-secondary hover:text-ink")}>
             <ChevronLeft size={16} strokeWidth={MENU_STROKE} className="shrink-0 rtl:-scale-x-100" aria-hidden="true" />
@@ -853,7 +851,7 @@ export function ModelPicker({
                 </div>
               ) : blocked ? (
                 <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3 pt-1">
-                  <EngineSetup instance={railInstance} intent={pane === "custom" ? "inject" : "cloud"} quiet={!advanced} />
+                  <EngineSetup instance={railInstance} intent={pane === "custom" ? "inject" : "cloud"} quiet />
                   {railInstance.claudeAccount && needsSignIn(railInstance) && pane !== "custom" && (
                     <p className="mt-2 px-1.5 text-[12px] leading-4 text-ink-tertiary">
                       {railInstance.claudeAccount.signInShell === "powershell" && `${t("engines.account.powershell")} `}

@@ -23,10 +23,6 @@ vi.mock("./DesktopCapabilities", async (importOriginal) => ({
   useDesktopCapabilities: () => ({ capabilities: { dictation: { available: false }, host: { packaged: true, platform: "darwin" }, localComputer: { available: true } }, ready: true }),
   useCaptionChrome: () => ({}),
 }));
-vi.mock("@/lib/interface-mode", async (importOriginal) => ({
-  ...await importOriginal<typeof import("@/lib/interface-mode")>(),
-  useAdvancedMode: () => fixture.advanced,
-}));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => fixture.ownerOrAdmin }));
 vi.mock("@/lib/analytics", () => ({ track: vi.fn() }));
 

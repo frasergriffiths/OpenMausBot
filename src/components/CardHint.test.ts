@@ -7,7 +7,6 @@ import { setLocale } from "@/lib/i18n";
 import { EMPTY_ONBOARDING, WELCOME_VERSION } from "@/lib/onboarding";
 
 const f = vi.hoisted(() => ({ advanced: false, api: vi.fn(), dispatch: vi.fn() }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => f.advanced }));
 const StoreContext = vi.hoisted(() => ({ current: null as null | import("react").Context<unknown> }));
 vi.mock("@/state/store", async () => {
   const { createContext, useContext } = await import("react");

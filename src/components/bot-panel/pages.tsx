@@ -34,6 +34,8 @@ type Derived = ReturnType<typeof useBotSettingsDerived>;
 export interface PageContext {
   bot: Bot;
   derived: Derived;
+  /** Opens the two-desktop Local VM workspace; only the Computer page uses it. */
+  onOpenVmWorkspace?: (botId: string) => void;
 }
 
 export const pageSurfaceCls = "flex flex-col gap-3";
@@ -379,8 +381,8 @@ export function FilesPage({ bot }: PageContext) {
   return <ComputerFilesPane bot={bot} />;
 }
 
-export function ComputerPage({ bot }: PageContext) {
-  return <ComputerPanel bot={bot} embedded />;
+export function ComputerPage({ bot, onOpenVmWorkspace }: PageContext) {
+  return <ComputerPanel bot={bot} embedded onOpenVmWorkspace={onOpenVmWorkspace} />;
 }
 
 export function AndroidPage() {

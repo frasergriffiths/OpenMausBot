@@ -10,7 +10,7 @@ import { t } from "@/lib/i18n";
 
 export function RoomTurnTimeoutSettings() {
   const { state, dispatch } = useStore();
-  const confirmedMinutes = state.config?.rooms.turnTimeoutMinutes ?? 5;
+  const confirmedMinutes = state.config?.rooms?.turnTimeoutMinutes ?? 5;
   const [value, setValue] = useState(String(confirmedMinutes));
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState("");
@@ -36,7 +36,7 @@ export function RoomTurnTimeoutSettings() {
         body: JSON.stringify({ rooms: { turnTimeoutMinutes: parsed.minutes } }),
       });
       dispatch({ type: "configStatus", config });
-      setValue(String(config.rooms.turnTimeoutMinutes));
+      setValue(String(config.rooms?.turnTimeoutMinutes ?? 5));
       setDirty(false);
       setError("");
     } catch (cause) {

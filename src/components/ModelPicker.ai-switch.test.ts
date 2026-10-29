@@ -9,7 +9,6 @@ const fixture = vi.hoisted(() => ({ dispatch: (() => {}) as (...args: unknown[])
   refreshInstances: (() => Promise.resolve()) as () => Promise<void>, refreshModels: ((_id: string) => Promise.resolve()) as (id: string) => Promise<void> }));
 const api = vi.hoisted(() => vi.fn());
 vi.mock("@/state/api", () => ({ api, ApiError: Error }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: () => {} }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => true }));
 // The store's refresh callbacks keep one identity across renders, as the real store's do.
 const refresh = { instances: () => fixture.refreshInstances(), models: (id: string) => fixture.refreshModels(id) };

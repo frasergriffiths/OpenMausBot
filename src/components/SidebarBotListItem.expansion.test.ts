@@ -28,7 +28,6 @@ vi.mock("react", async (original) => {
 });
 vi.mock("./DesktopCapabilities", () => ({ useDesktopCapabilities: () => ({}) }));
 // Thread trees are an Advanced surface: Simple mode lists bots only.
-vi.mock("@/lib/interface-mode", async (original) => ({ ...await original<typeof import("@/lib/interface-mode")>(), useAdvancedMode: () => true }));
 vi.mock("@/lib/thread-preferences", async (original) => ({ ...await original<typeof import("@/lib/thread-preferences")>(),
   useShowThreads: () => true,
 }));
@@ -95,18 +94,5 @@ describe("bot row expansion follows the visible thread tree", () => {
     const sole = render();
     expectSoleRow(sole);
     expect(sole).toContain("The latest reply");
-  });
-
-  it.each([
-    [{ busy: true }, 'class="sr-only">Working…'],
-    [{ activity: "waiting-on-you" }, '<span dir="auto" class="truncate">Waiting for you…'],
-    [{ waitingForTeammates: true }, '<span dir="auto" class="truncate">Waiting on a teammate…'],
-  ] as const)("keeps sole-thread activity visible after a reveal (%j)", (status, label) => {
-    fixture.state.revealThread = { threadId: "current", nonce: 1 };
-    render({ ...bot, ...status });
-    fixture.effects.forEach(effect => effect());
-    const markup = render({ ...bot, ...status });
-    expectSoleRow(markup);
-    expect(markup).toContain(label);
   });
 });

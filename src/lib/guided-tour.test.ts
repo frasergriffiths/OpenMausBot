@@ -59,13 +59,8 @@ describe("guided tour", () => {
     expect(ANCHOR_EFFECTS.has("closeApps")).toBe(false);
   });
 
-  it("draws the plain steps for every caller", () => {
-    expect(tourSteps(true)).toBe(tourSteps(false));
-    expect(tourSteps(true).find((s) => s.id === "tour.model")).toMatchObject({ anchor: "bot-pill", skipIfMissing: true });
-  });
-
   it("walks Simple mode through the bot pill where the header's model chip and Computer button were", () => {
-    const simple = tourSteps(false);
+    const simple = tourSteps();
     expect(simple.map((s) => s.id)).toEqual(TOUR_STEPS.map((s) => s.id));
     expect(simple.map((s) => s.anchor)).toEqual([
       "composer", "bot-pill", "bot-pill", "computer-browser", "tools", "nav-apps", "apps-panel", "composer",
@@ -84,13 +79,12 @@ describe("guided tour", () => {
     expect(simple.find((s) => s.id === "tour.computer-browser")!.onEnter).toBe("openComputer");
   });
 
-  it("resumes at the same step and number in either mode", () => {
+  it("resumes at the same step and number", () => {
     const record = withDone(["tour.composer"]);
-    expect(currentStep(record, false)).toMatchObject({ id: "tour.model", anchor: "bot-pill" });
-    expect(currentStep(record, true)).toMatchObject({ id: "tour.model", anchor: "bot-pill" });
-    expect(currentStep(record)).toBe(tourSteps(false).find((s) => s.id === "tour.model"));
-    expect(stepNumber(currentStep(record, false)!)).toEqual(stepNumber(step("tour.model")));
-    expect(stepNumber(currentStep(record, false)!).current).toBe(2);
-    expect(currentStep(withDone(TOUR_STEPS.map((s) => s.id)), false)).toBeNull();
+    expect(currentStep(record)).toMatchObject({ id: "tour.model", anchor: "bot-pill" });
+    expect(currentStep(record)).toBe(tourSteps().find((s) => s.id === "tour.model"));
+    expect(stepNumber(currentStep(record)!)).toEqual(stepNumber(step("tour.model")));
+    expect(stepNumber(currentStep(record)!).current).toBe(2);
+    expect(currentStep(withDone(TOUR_STEPS.map((s) => s.id)))).toBeNull();
   });
 });

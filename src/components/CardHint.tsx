@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { t } from "@/lib/i18n";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { hintSeen, hintSeenPatch } from "@/lib/onboarding";
 import { api, useStore } from "@/state/store";
 
@@ -21,9 +20,8 @@ function useStoreIfAny(): ReturnType<typeof useStore> | null {
 export function CardHint({ id }: { id: keyof typeof COPY }) {
   const store = useStoreIfAny();
   const dispatch = store?.dispatch;
-  const advanced = useAdvancedMode();
   const record = store?.state.config?.onboarding;
-  const [show] = useState(() => Boolean(dispatch) && !advanced && Boolean(record?.completedAt) && !hintSeen(record, id) && !shownHere.has(id));
+  const [show] = useState(() => Boolean(dispatch) && Boolean(record?.completedAt) && !hintSeen(record, id) && !shownHere.has(id));
   useEffect(() => {
     if (!show) return;
     shownHere.add(id);

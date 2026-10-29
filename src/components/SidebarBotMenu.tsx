@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Archive, BellDot, CheckCheck, ChevronRight, ClipboardCopy, Copy, Crown, FolderOpen, FolderPlus, Loader2, MoreHorizontal, Pencil, Pin, PinOff, SquarePen, Trash2, Users } from "lucide-react";
+import { Archive, BellDot, CheckCheck, ChevronRight, ClipboardCopy, Copy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, Pin, PinOff, SquarePen, Trash2, Users } from "lucide-react";
 import { api, useStore, openBot, type Bot } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { useHeldMenuMotion } from "./MenuMotion";
@@ -9,7 +9,6 @@ import { copyText } from "@/lib/copy-text";
 import { allThreadRows, BotDeleteMenuItem, useDeleteAllThreads } from "./BotMenuDelete";
 import { HideDefaultBotItem } from "./DefaultBotControls";
 import { navigateThreadMenu } from "./BotProjects";
-import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { botUnreadThreadIds, markBotRead } from "@/lib/folder-read";
 import { ownerMenuLabel, pickOwnerOf } from "./TeamOwner";
 import { mayChangeOwner, useTeamPeople } from "@/state/team-people";
@@ -17,7 +16,6 @@ import { SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_MENU_SEPARATOR } from "./SidebarS
 import { useShowThreads } from "@/lib/thread-preferences";
 import { submenuPosition } from "./SidebarPopoverMenu";
 import { submenuIntent, type SubmenuIntent } from "@/lib/submenu-intent";
-import { useAdvancedMode } from "@/lib/interface-mode";
 import { useMoveToTeam } from "./MoveToTeam";
 import type { MenuState } from "./Sidebar";
 
@@ -27,8 +25,6 @@ export function BotContextMenu({
   onArchive,
   onDelete,
   onMoveToSection,
-  onNewFolder,
-  onNewTaskFolder,
   onRename,
 }: {
   menu: MenuState | null;
@@ -36,12 +32,9 @@ export function BotContextMenu({
   onArchive: (bot: Bot) => void;
   onDelete: (bot: Bot) => void;
   onMoveToSection: (botId: string) => void;
-  onNewFolder: (botId: string) => void;
-  onNewTaskFolder: (botId: string) => void;
   onRename?: (botId: string) => void;
 }) {
   const motion = useHeldMenuMotion(menu);
-  const simpleMenu = !useAdvancedMode();
   const moreRef = useRef<HTMLButtonElement>(null);
   const flyoutRef = useRef<HTMLDivElement>(null);
   const hoveredRow = useRef<Element | null>(null);
@@ -57,8 +50,7 @@ export function BotContextMenu({
   const shown = motion.value;
   const { state, dispatch } = useStore();
   const showThreads = useShowThreads();
-  const canChooseFolder = useOwnerOrAdmin();
-  const clearThreads = useDeleteAllThreads(simpleMenu), moveToTeam = useMoveToTeam({ blocked: (bot) => (bot.defaultBot ? t("teamMove.blockedDefault", { name: bot.name }) : bot.chiefOfStaff ? t("teamMove.blockedChief") : state.bots.filter((candidate) => !candidate.hidden).length <= 1 ? t("teamMove.blockedLast") : undefined) });
+  const clearThreads = useDeleteAllThreads(true), moveToTeam = useMoveToTeam({ blocked: (bot) => (bot.defaultBot ? t("teamMove.blockedDefault", { name: bot.name }) : bot.chiefOfStaff ? t("teamMove.blockedChief") : state.bots.filter((candidate) => !candidate.hidden).length <= 1 ? t("teamMove.blockedLast") : undefined) });
   const remoteClient = window.ogb?.remoteClient?.active === true;
   const bot = shown ? state.bots.find((b) => b.id === shown.botId) : undefined;
   const team = useTeamPeople();
@@ -168,7 +160,7 @@ export function BotContextMenu({
       }}
       title={opts?.hint}
       className={cn(
-        simpleMenu ? SIMPLE_MENU_ITEM : "flex w-full items-center gap-3 px-3.5 py-2 text-left text-[14px]",
+        SIMPLE_MENU_ITEM,
         opts?.danger ? "text-danger" : "text-ink",
         opts?.disabled ? "cursor-default opacity-40" : "hover:bg-menu-hover",
       )}
@@ -177,11 +169,9 @@ export function BotContextMenu({
       {label}
     </button>
   );
-  const divider = (key: string) => simpleMenu
-    ? <div key={key} role="separator" className={SIMPLE_MENU_SEPARATOR} />
-    : <div key={key} className="mx-2 my-1 border-t border-hairline/40" />;
+  const divider = (key: string) =>
+    <div key={key} role="separator" className={SIMPLE_MENU_SEPARATOR} />;
 
-  if (simpleMenu) {
     const showMore = (focus: boolean) => {
       more.openNow("more");
       if (focus) requestAnimationFrame(() => flyoutRef.current?.querySelector<HTMLButtonElement>("button:not([disabled])")?.focus());
@@ -198,7 +188,7 @@ export function BotContextMenu({
     const readState = readingBotId === bot.id || botUnreadThreadIds(bot).length > 0
       ? item(
         readingBotId === bot.id ? <Loader2 size={16} className="animate-spin text-ink-secondary" /> : <CheckCheck size={16} className="text-ink-secondary" />,
-        readingBotId === bot.id ? t("sidebar.bot.markingAllRead") : t("sidebar.bot.simple.markRead"),
+        readingBotId === bot.id ? t("sidebar.bot.markingAllRead") : t("sidebar.bot.markAllRead"),
         () => { void readAll(bot); },
         { disabled: readingBotId !== null, keepOpen: true },
       )
@@ -313,86 +303,4 @@ export function BotContextMenu({
       </div>,
       document.body,
     )}</>;
-  }
-
-  return <>{clearThreads.dialog}{moveToTeam.dialog}{createPortal(
-    <div
-      ref={menuRef}
-      data-bot-menu
-      data-sidebar
-      role="menu"
-      aria-label={t("sidebar.bot.actions", { name: bot.name })}
-      onKeyDown={navigateThreadMenu}
-      style={{ top: shown.y, left: shown.x }}
-      className={cn("popover-surface fixed z-40 max-h-[calc(100dvh-16px)] w-[228px] max-w-[calc(100vw-16px)] overflow-y-auto overscroll-contain rounded-xl border border-hairline/50 bg-menu py-1.5 shadow-2xl shadow-black/60", motion.className)} {...motion.exitProps}
-    >
-      {showThreads && <>
-        {canChooseFolder && item(<FolderOpen size={16} className="shrink-0 text-ink-secondary" />, t("task.folder.new"), () => onNewTaskFolder(bot.id))}
-        {item(<FolderPlus size={16} className="text-ink-secondary" />, t("folder.new"), () => onNewFolder(bot.id))}
-      </>}
-      {item(<Trash2 size={16} />, t("task.deleteAll"), () => clearThreads.ask(bot.id), { danger: true })}
-      {divider("threads")}
-      {team && mayChangeOwner(bot, team) && item(<Users size={16} className="text-ink-secondary" />, ownerMenuLabel(bot, team), () => pickOwnerOf([bot], team, shown))}
-      {remoteClient ? [
-        item(<FolderPlus size={16} className="text-ink-secondary" />, t("sidebar.bot.moveToSection"), () => {
-          onClose();
-          onMoveToSection(bot.id);
-        }),
-        item(<Pencil size={16} className="text-ink-secondary" />, t("sidebar.bot.editProfile"), () => {
-          openForSettings();
-          if (!state.settingsOpen) dispatch({ type: "toggleSettings", open: true });
-        }),
-        item(<ClipboardCopy size={16} className="text-ink-secondary" />, t("sidebar.copyConversationId"), () => {
-          void copyText(bot.threadId);
-        }),
-      ] : [
-        item(
-          bot.pinned ? <PinOff size={16} className="text-ink-secondary" /> : <Pin size={16} className="text-ink-secondary" />,
-          bot.pinned ? t("sidebar.bot.unpin") : t("sidebar.bot.pin"),
-          () => dispatch({ type: "updateBot", botId: bot.id, patch: { pinned: !bot.pinned } }),
-        ),
-        item(
-          <Crown size={16} className={bot.chiefOfStaff ? "text-accent" : "text-ink-secondary"} />,
-          bot.chiefOfStaff ? t("sidebar.bot.removeChief") : t("sidebar.bot.makeChief"),
-          () => dispatch({ type: "updateBot", botId: bot.id, patch: { chiefOfStaff: !bot.chiefOfStaff } }),
-          {
-            disabled: !bot.chiefOfStaff && !canCoordinate,
-            hint: !bot.chiefOfStaff && !canCoordinate ? t("sidebar.bot.chiefNeedsEngine") : undefined,
-          },
-        ),
-        item(<FolderPlus size={16} className="text-ink-secondary" />, t("sidebar.bot.moveToSection"), () => {
-          onClose();
-          onMoveToSection(bot.id);
-        }),
-        item(<BellDot size={16} className="text-ink-secondary" />, t("sidebar.bot.markUnread"), () =>
-          dispatch({ type: "markUnread", botId: bot.id }),
-        ),
-        item(
-          readingBotId === bot.id ? <Loader2 size={16} className="animate-spin text-ink-secondary" /> : <CheckCheck size={16} className="text-ink-secondary" />,
-          readingBotId === bot.id ? t("sidebar.bot.markingAllRead") : t("sidebar.bot.markAllRead"),
-          () => { void readAll(bot); },
-          { disabled: readingBotId !== null || botUnreadThreadIds(bot).length === 0, keepOpen: true },
-        ),
-        divider("d1"),
-        item(<Pencil size={16} className="text-ink-secondary" />, t("sidebar.bot.editProfile"), () => {
-          openForSettings();
-          if (!state.settingsOpen) dispatch({ type: "toggleSettings", open: true });
-        }),
-        item(<Copy size={16} className="text-ink-secondary" />, t("sidebar.bot.duplicate"), () =>
-          dispatch({ type: "duplicateBot", botId: bot.id }),
-        ),
-        divider("d2"),
-        item(<ClipboardCopy size={16} className="text-ink-secondary" />, t("sidebar.copyConversationId"), () => {
-          void copyText(bot.threadId);
-        }),
-        divider("d3"), ...moveToTeam.items(bot, item),
-        ...(bot.defaultBot ? [<HideDefaultBotItem key="hide" bot={bot} onDone={onClose} />] : [
-          item(<Archive size={16} className="text-ink-secondary" />, t("sidebar.bot.archive"), () => onArchive(bot), { disabled: archiveBlocked, hint: archiveHint }),
-          <BotDeleteMenuItem key="delete" deleting={deleting} onClick={() => { onClose(); onDelete(bot); }} />,
-        ]),
-      ]}
-      {readError?.botId === bot.id && <p role="alert" className="px-3.5 py-2 text-[12px] text-danger">{readError.message}</p>}
-    </div>,
-    document.body,
-  )}</>;
 }
