@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useVisibleInterval } from "@/hooks/use-visible-interval";
 import { ExternalLink, Mic, MicOff, PhoneOff, RotateCcw, Settings, X } from "lucide-react";
 
 import { t } from "@/lib/i18n";
@@ -93,12 +94,7 @@ export function LiveCallBar({ bot }: { bot: Bot }) {
   const view = liveCallBarView({ bot, media, server: state.liveCall, now });
   const kind = view?.kind;
 
-  useEffect(() => {
-    if (kind !== "local") return;
-    setNow(Date.now());
-    const timer = setInterval(() => setNow(Date.now()), 1_000);
-    return () => clearInterval(timer);
-  }, [kind]);
+  useVisibleInterval(() => setNow(Date.now()), 1_000, kind === "local");
 
   useEffect(() => {
     if (kind !== "local") setSettingsOpen(false);
