@@ -95,7 +95,7 @@ export function SimpleLooksPage({ onBack }: { onBack: () => void }) {
     <>
       <div><button type="button" className="ui-button" onClick={onBack}>{t("settings.simple.looks.back")}</button></div>
       <div data-settings-block="looks"><SkinPicker /></div>
-      <div data-settings-block="thread-chip-style"><ThreadChipStyleRow /></div>
+      <SettingsRows data-settings-block="thread-chip-style"><ThreadChipStyleRow /></SettingsRows>
     </>
   );
 }

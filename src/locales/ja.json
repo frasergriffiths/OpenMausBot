@@ -6329,5 +6329,6 @@
   "settings.threadChip.tabs": "Browser tabs",
   "composer.placeholder.steerUnavailable": "{name} is working — {key} stops this turn and sends this message now",
   "composer.send.steerUnavailable": "Stop this turn and send",
-  "composer.notice.steerQueued": "Still working — queued this message instead"
+  "composer.notice.steerQueued": "Still working — queued this message instead",
+  "task.archivedNone": "No archived threads"
 }

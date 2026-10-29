@@ -191,19 +191,23 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose, scope = "all" }:
       {...motion.exitProps}
     >
       <div className="mb-1.5 flex h-7 shrink-0 items-center justify-between px-2 text-[12px] font-medium leading-4 text-ink-tertiary">
-        <span id={headingId}>{t("task.list")}</span>
+        <span id={headingId}>{t(scope === "archived" ? "task.archived" : "task.list")}</span>
         <span className="tabular-nums">{threads.length}</span>
       </div>
       <div ref={listRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain" style={{ maxHeight: "20rem" }}>
         {threads.length === 0 ? (
-          <p className="px-2 py-6 text-center text-[12px] leading-4 text-ink-tertiary">{t("thread.switcher.empty")}</p>
+          <p className="px-2 py-6 text-center text-[12px] leading-4 text-ink-tertiary">{t(scope === "archived" ? "task.archivedNone" : "thread.switcher.empty")}</p>
         ) : (
           <ul className="flex flex-col gap-0.5">
-            {openThreads.map(renderRow)}
-            {archivedThreads.length > 0 && (
+            {scope === "archived" ? threads.map(renderRow) : (
               <>
-                <li role="presentation" data-thread-switcher-archived="" className="px-2 pb-1 pt-2 text-[11px] font-medium leading-4 text-ink-tertiary">{t("task.archived")}</li>
-                {archivedThreads.map(renderRow)}
+                {openThreads.map(renderRow)}
+                {archivedThreads.length > 0 && (
+                  <>
+                    <li role="presentation" data-thread-switcher-archived="" className="px-2 pb-1 pt-2 text-[11px] font-medium leading-4 text-ink-tertiary">{t("task.archived")}</li>
+                    {archivedThreads.map(renderRow)}
+                  </>
+                )}
               </>
             )}
           </ul>

@@ -6651,5 +6651,6 @@
   "settings.threadChip.subtitle": "One pill is the current look. Browser tabs show every conversation across the top of the chat.",
   "settings.threadChip.aria": "Conversation switcher style",
   "settings.threadChip.pill": "One pill",
-  "settings.threadChip.tabs": "Browser tabs"
+  "settings.threadChip.tabs": "Browser tabs",
+  "task.archivedNone": "No archived threads"
 }

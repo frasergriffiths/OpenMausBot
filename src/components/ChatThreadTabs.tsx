@@ -3,6 +3,7 @@ import { Archive, Clock, Loader2, MessageSquare, Plus, X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
+import { spinnerColor } from "@/lib/mascot";
 import { openBotThread, useStore, type Bot } from "@/state/store";
 import { chipStatus, displayTitle } from "./ChatThreadBar";
 import { isArchived, isWorking } from "./SidebarThreadRow";
@@ -16,11 +17,13 @@ const ICON_BUTTON = "flex size-7 shrink-0 items-center justify-center rounded-lg
 /** The title-bar switcher as browser tabs: one tab per conversation, a pinned "+" and the archived list. It only
  *  draws when the appearance setting is "tabs"; the pill is ChatThreadChip and is untouched. */
 export function ChatThreadTabs({ bot }: { bot: Bot }) {
-  const { dispatch } = useStore();
-  const tasks = (bot.tasks ?? []).filter((task) => !task.routineRunId);
+  const { state, dispatch } = useStore();
+  // The pill's rule: an archived thread is not a tab unless it is the one open.
+  const tasks = (bot.tasks ?? []).filter((task) => !task.routineRunId && (!isArchived(task) || task.threadId === bot.threadId));
   const current = bot.threadId;
   const [archivedOpen, setArchivedOpen] = useState(false);
   const archivedRef = useRef<HTMLButtonElement>(null);
+  const plusRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const activeRef = useRef<HTMLDivElement>(null);
 
@@ -29,13 +32,20 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
   }, [current]);
 
   const select = (threadId: string) => openBotThread(dispatch, bot, threadId, false);
-  const archive = (threadId: string) => {
-    const open = tasks.filter((task) => !isArchived(task));
-    if (threadId === current) {
-      const next = open.find((task) => task.threadId !== threadId);
+  const focusActive = () => {
+    requestAnimationFrame(() => {
+      const active = listRef.current?.querySelector<HTMLElement>('[data-thread-tab][aria-selected="true"]');
+      (active ?? plusRef.current)?.focus();
+    });
+  };
+  const archive = (task: (typeof tasks)[number]) => {
+    if (isWorking(task)) return;
+    if (task.threadId === current) {
+      const next = tasks.find((candidate) => candidate.threadId !== task.threadId && !isArchived(candidate));
       if (next) select(next.threadId);
     }
-    dispatch({ type: "updateTask", botId: bot.id, threadId, patch: { archivedAt: Date.now() } });
+    dispatch({ type: "updateTask", botId: bot.id, threadId: task.threadId, patch: { archivedAt: Date.now() } });
+    focusActive();
   };
 
   const onTabKey = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -53,7 +63,7 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
     if (event.key === "End") return at(tasks.length - 1);
     if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
-      archive(tasks[index]!.threadId);
+      archive(tasks[index]!);
       return;
     }
     if (event.key === "Enter" || event.key === " ") {
@@ -61,6 +71,9 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
       select(tasks[index]!.threadId);
     }
   };
+
+  const currentTask = tasks.find((task) => task.threadId === current);
+  const activeStatus = currentTask ? chipStatus({ ...currentTask, queued: (state.pendingQueued?.[currentTask.threadId]?.length ?? 0) > 0 }) : "";
 
   return (
     <div className="flex min-w-0 flex-1 items-center gap-1">
@@ -75,8 +88,9 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
           const archived = isArchived(task);
           const waiting = task.activity === "waiting-on-you";
           const working = isWorking(task) && !waiting;
+          const queued = state.pendingQueued?.[task.threadId]?.length ?? 0;
           const title = displayTitle(task);
-          const status = chipStatus(task);
+          const status = chipStatus({ ...task, queued: queued > 0 });
           return (
             <div
               key={task.threadId}
@@ -87,9 +101,11 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
             >
               <span className="relative flex size-4 shrink-0 items-center justify-center" aria-hidden="true">
                 {waiting ? <Clock size={13} className="text-warning" />
-                  : working ? <Loader2 size={13} className="animate-spin" />
-                    : archived ? <Archive size={13} className="text-ink-tertiary" />
-                      : <MessageSquare size={13} className="text-ink-tertiary" />}
+                  : working ? <Loader2 size={13} className="animate-spin" style={{ color: spinnerColor(bot.color) }} />
+                    : queued > 0 ? <span className="flex size-4 items-center justify-center rounded-full bg-ink/[0.08] text-[10px] font-medium tabular-nums text-ink">{queued > 9 ? "9+" : queued}</span>
+                      : archived ? <Archive size={13} className="text-ink-tertiary" />
+                        : <MessageSquare size={13} className="text-ink-tertiary" />}
+                {task.unread && !active && <span className="absolute -right-0.5 -top-0.5 size-1.5 rounded-full bg-accent" />}
               </span>
               <button
                 type="button"
@@ -98,7 +114,7 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
                 aria-selected={active}
                 tabIndex={active ? 0 : -1}
                 aria-keyshortcuts="Delete"
-                aria-label={`${title}. ${status}`}
+                aria-label={status ? `${title}. ${status}` : title}
                 title={status ? `${title} · ${status}` : title}
                 onClick={() => select(task.threadId)}
                 onKeyDown={(event) => onTabKey(event, index)}
@@ -109,18 +125,21 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
               <button
                 type="button"
                 tabIndex={active ? 0 : -1}
+                disabled={working}
                 aria-label={t("sidebar.bot.archiveAria", { name: title })}
                 title={t("task.archive")}
-                onClick={() => archive(task.threadId)}
-                className={cn("flex size-6 shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-inset hover:text-ink", FOCUS)}
+                onClick={() => archive(task)}
+                className={cn("flex size-6 shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-inset hover:text-ink disabled:cursor-not-allowed disabled:opacity-50", FOCUS)}
               >
                 <X size={13} aria-hidden="true" />
               </button>
             </div>
           );
         })}
+        <span role="status" className="sr-only">{activeStatus}</span>
       </div>
       <button
+        ref={plusRef}
         type="button"
         data-thread-new=""
         aria-label={t("task.newShort")}
