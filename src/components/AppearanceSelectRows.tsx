@@ -2,25 +2,9 @@ import { useState } from "react";
 import { t } from "@/lib/i18n";
 import { CHAT_WIDTH_IDS, applyChatWidth, readChatWidth, type ChatWidthId } from "@/lib/chat-width";
 import { FONT_IDS, applyFont, readFont, type FontId } from "@/lib/fonts";
-import { parseSidebarToolsLayout, setSidebarToolsLayout, setThreadChipStyle, SIDEBAR_TOOLS_LAYOUTS, useSidebarToolsLayout, useThreadChipStyle } from "@/lib/sidebar-preferences";
+import { parseSidebarToolsLayout, setSidebarToolsLayout, SIDEBAR_TOOLS_LAYOUTS, useSidebarToolsLayout } from "@/lib/sidebar-preferences";
 import { SettingRow } from "./SettingsPrimitives";
 import { Select } from "./Select";
-
-export function ThreadChipStyleRow() {
-  const current = useThreadChipStyle();
-  return (
-    <SettingRow title={t("settings.threadChip.title")} subtitle={t("settings.threadChip.subtitle")}>
-      <Select size="sm" className="w-full max-w-[240px]"
-        value={current}
-        aria-label={t("settings.threadChip.aria")}
-        onChange={(event) => setThreadChipStyle(event.target.value === "tabs" ? "tabs" : "pill")}
-      >
-        <option value="pill">{t("settings.threadChip.pill")}</option>
-        <option value="tabs">{t("settings.threadChip.tabs")}</option>
-      </Select>
-    </SettingRow>
-  );
-}
 
 export function FontRow() {
   const [current, setCurrent] = useState<FontId>(readFont);

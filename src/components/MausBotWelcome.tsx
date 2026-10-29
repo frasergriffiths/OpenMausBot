@@ -148,7 +148,7 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
           event.preventDefault();
           if (editing && panelRef.current?.contains(event.target as Node)) { setEditing(false); pictureRef.current?.focus(); } else dismiss();
         }}
-        className={cn("animate-pop-in w-full max-w-[460px] rounded-2xl px-6 pb-5 pt-5", "ui-modal border-0")}
+        className={cn("w-full max-w-[460px] rounded-2xl px-6 pb-5 pt-5", "ui-modal border-0")}
       >
         <div className="flex flex-col items-center text-center">
           <button

@@ -23,7 +23,7 @@ import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "
 import { UsageSection } from "./UsageSection";
 import { PlanUsageSummary } from "./PlanUsage";
 import { SkinPicker } from "./SkinPicker";
-import { ChatWidthRow, FontRow, SidebarToolsLayoutRow, ThreadChipStyleRow } from "./AppearanceSelectRows";
+import { ChatWidthRow, FontRow, SidebarToolsLayoutRow } from "./AppearanceSelectRows";
 import { ProfileSummaryRow } from "./ProfileSettings";
 import { ImportSettings } from "./ImportSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
@@ -47,6 +47,7 @@ export type SimpleDisclosureId = "ai-more" | "computer-elsewhere" | "billing-lim
 export type SimpleSettingsPage = {
   id: string;
   labelKey: LocaleKey;
+  descriptionKey?: LocaleKey;
   icon: LucideIcon;
   sections: AppSettingsSection[];
   keywords?: string[];
@@ -56,20 +57,51 @@ export type Disclose = (id: SimpleDisclosureId) => { id: SimpleDisclosureId; ope
 
 type Has = (id: AppSettingsSection) => boolean;
 
-export function SimpleGeneralPage({ has, peopleOpen, onLooks, disclose }: { has: Has; peopleOpen: boolean; onLooks: () => void; disclose: Disclose }) {
+export function SimpleAccountPage({ has, peopleOpen }: { has: Has; peopleOpen: boolean }) {
   return (
     <>
-      {(has("general") || has("people")) && (
-        <SettingsGroup label={t("settings.group.account")} block="general">
+      {has("general") && (
+        <SettingsGroup block="general">
           <SettingsRows>
-            {has("general") && <ProfileSummaryRow />}
-            {has("general") && <CloudPlanRow place="account" />}
-            {has("people") && <div data-settings-block="people" className="scroll-mt-4"><PeopleSection simple startOpen={peopleOpen} /></div>}
+            <ProfileSummaryRow />
+            <CloudPlanRow place="account" />
           </SettingsRows>
         </SettingsGroup>
       )}
+      {has("people") && (
+        <SettingsGroup block="people">
+          <SettingsRows>
+            <PeopleSection simple startOpen={peopleOpen} />
+          </SettingsRows>
+        </SettingsGroup>
+      )}
+      {has("general") && (
+        <SettingsGroup label={t("settings.simple.group.system")}>
+          <SettingsRows>
+            <OpenAtLoginRow simple />
+            <BusySendRow simple />
+            <DefaultBotSidebarRow simple />
+            <AnalyticsRow simple />
+          </SettingsRows>
+        </SettingsGroup>
+      )}
+      {has("general") && (
+        <SettingsGroup label={t("settings.simple.group.limits")} block="limits">
+          <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4"><RoomTurnTimeoutSettings /></div>
+          <ThreadConcurrencySettings />
+          <AutomaticRecoverySettings />
+          <ThreadCleanupSettings />
+        </SettingsGroup>
+      )}
+    </>
+  );
+}
+
+export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onLooks: () => void; disclose: Disclose }) {
+  return (
+    <>
       {has("appearance") && (
-        <SettingsGroup label={t("settings.section.appearance")} block="appearance">
+        <SettingsGroup block="appearance">
           <SettingsRows>
             <ThemeRow simple />
             <ColorUserBubblesRow simple />
@@ -99,24 +131,13 @@ export function SimpleGeneralPage({ has, peopleOpen, onLooks, disclose }: { has:
           <SettingsRows><NotificationRows simple /></SettingsRows>
         </SettingsGroup>
       )}
-      {has("general") && (
-        <SettingsGroup label={t("settings.simple.group.system")}>
-          <SettingsRows>
-            <OpenAtLoginRow simple />
-            <BusySendRow simple />
-            <DefaultBotSidebarRow simple />
-            <AnalyticsRow simple />
-          </SettingsRows>
-        </SettingsGroup>
-      )}
-      {has("general") && (
-        <SettingsGroup label={t("settings.simple.group.limits")} block="limits">
-          <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4"><RoomTurnTimeoutSettings /></div>
-          <ThreadConcurrencySettings />
-          <AutomaticRecoverySettings />
-          <ThreadCleanupSettings />
-        </SettingsGroup>
-      )}
+    </>
+  );
+}
+
+export function SimpleDataPage({ has, disclose }: { has: Has; disclose: Disclose }) {
+  return (
+    <>
       <SettingsDisclosureRow title={t("settings.section.backups")} subtitle={t("settings.simple.backups.subtitle")} block="backups" {...disclose("general-backups")}>
         <div className="flex flex-col gap-4"><WorkspaceBackupSettings /><CompanyBackupSettings /></div>
       </SettingsDisclosureRow>
@@ -131,7 +152,6 @@ export function SimpleLooksPage({ onBack }: { onBack: () => void }) {
     <>
       <div><button type="button" className="ui-button" onClick={onBack}>{t("settings.simple.looks.back")}</button></div>
       <div data-settings-block="looks"><SkinPicker /></div>
-      <SettingsRows data-settings-block="thread-chip-style"><ThreadChipStyleRow /></SettingsRows>
     </>
   );
 }
@@ -148,20 +168,25 @@ export function SimpleAiPage({ has, disclose }: { has: Has; disclose: Disclose }
           </SettingsRows>
         </SettingsGroup>
       )}
-      <SettingsGroup label={t("settings.simple.group.performance")} block="performance">
-        <CacheKeepWarmSettings />
-      </SettingsGroup>
-      {has("decisionModel") && <div data-settings-block="decisionModel" className="scroll-mt-4"><DecisionModelSettings /></div>}
-      {has("skills") && (
-        <SettingsGroup label={t("settings.section.skills")} block="skills">
-          <SkillsSection />
+      {has("engines") && (
+        <SettingsGroup label={t("settings.simple.group.performance")} block="performance">
+          <CacheKeepWarmSettings />
         </SettingsGroup>
       )}
+      {has("decisionModel") && <div data-settings-block="decisionModel" className="scroll-mt-4"><DecisionModelSettings /></div>}
       <SettingsGroup label={t("settings.simple.group.tools")} block="mcp-calls">
         <CardBlock>
           <McpCallTimeoutSettings />
         </CardBlock>
       </SettingsGroup>
+    </>
+  );
+}
+
+export function SimpleSkillsPage({ has }: { has: Has }) {
+  return (
+    <>
+      {has("skills") && <div data-settings-block="skills" className="scroll-mt-4"><SkillsSection /></div>}
       {has("experimental") && <div data-settings-block="experimental" className="scroll-mt-4"><ExperimentalFeaturesRow /></div>}
     </>
   );

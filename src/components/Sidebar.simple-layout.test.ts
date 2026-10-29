@@ -269,7 +269,7 @@ describe("Simple-mode sidebar layout", () => {
     const plus = () => nodes(top().props.children).find((node) => node.type === "button" && node.props["aria-label"] === "New or share")!;
     expect(plus().props.className).toEqual(expect.stringContaining("size-9"));
     (plus().props.onClick as () => void)();
-    const menu = nodes(top().props.children).find((node) => /\bmin-w-\[200px\]/.test(node.props.className ?? ""))!;
+    const menu = nodes(top().props.children).find((node) => /\bmin-w-\[198px\]/.test(node.props.className ?? ""))!;
     expect(menu.props.className).toEqual(expect.stringContaining("left-full top-0"));
     expect(menu.props.className).toEqual(expect.stringContaining("rounded-[var(--radius-menu)]"));
     const item = (label: string) => nodes(top().props.children).find((node) => node.type === "button" && nodes(node.props.children).concat(node).some((part) => Children.toArray(part.props.children).includes(label)));

@@ -4,8 +4,8 @@ import { useStore } from "@/state/store";
 
 import { CloudUsageCard } from "./CloudUsageMeter";
 import { endCloudHowTo, useWorkspacePlace, type WorkspacePlace } from "./DesktopWorkspaceSwitcher";
+import { SidebarAppsButton, SidebarBottomButtons, SidebarFooterNav, SidebarTeamMapButton, SidebarTemplatesButton } from "./SidebarFooterNav";
 import { SidebarConnectApps } from "./SidebarConnectApps";
-import { SidebarBottomButtons, SidebarFooterNav, SidebarTeamMapButton, SidebarTemplatesButton } from "./SidebarFooterNav";
 import { phoneSettingsAction, SidebarPhoneButton } from "./SidebarPhoneButton";
 import { SidebarProfileMenu, useSimpleAccount, type ArchivedBots } from "./SidebarProfileMenu";
 import { UpdateIndicator } from "./UpdateIndicator";
@@ -32,15 +32,16 @@ function SimpleSidebarFooter({ owner, archived, places }: { owner: string | null
   const place = useSimplePlace();
   const account = useSimpleAccount(place, owner, archived);
   return (
-    <div data-sidebar-footer="simple" className="px-4 pb-4 pt-2">
+    <div data-sidebar-footer="simple" className="px-3 pb-3 pt-2">
       <CloudUsageCard />
       <SidebarPlaceStatus place={place} className="mb-2 px-1" />
+      <SidebarConnectApps />
       <div className="flex items-center gap-2 not-first:mt-2">
-        <SidebarProfileMenu simple={account} />
-        <SidebarConnectApps />
+        <div className="min-w-0 flex-1"><SidebarProfileMenu simple={account} /></div>
+        <SidebarAppsButton />
         <SidebarTeamMapButton open={places.teamMapOpen} onOpen={places.onOpenTeamMap} />
         <SidebarTemplatesButton open={places.templatesOpen} onOpen={places.onOpenTemplates} />
-        <UpdateIndicator className="size-9" />
+        <UpdateIndicator />
       </div>
     </div>
   );
@@ -79,7 +80,7 @@ export function SidebarFooter({ density, simple = false, owner = null, archived,
       ) : (
         <>
           <CloudUsageCard />
-          <div className="flex items-center gap-1 not-first:mt-3">
+          <div className="flex items-center gap-2 not-first:mt-3">
             <div className="min-w-0 flex-1">
               <SidebarProfileMenu />
             </div>

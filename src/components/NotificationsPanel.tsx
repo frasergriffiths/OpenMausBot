@@ -132,7 +132,7 @@ export function NotificationsPanel() {
   return (
     <aside
       aria-label={t("notifications.title")}
-      className="animate-panel-in flex h-full w-[300px] max-w-full shrink-0 flex-col border-l border-hairline/40 bg-panel max-md:absolute max-md:inset-y-0 max-md:right-0 max-md:z-30"
+      className="flex h-full w-[300px] max-w-full shrink-0 flex-col border-l border-hairline/40 bg-panel max-md:absolute max-md:inset-y-0 max-md:right-0 max-md:z-30"
     >
       <div className="flex items-center gap-1.5 border-b border-hairline/40 px-3.5 py-2.5">
         <span className="flex-1 text-[13px] font-medium text-ink">

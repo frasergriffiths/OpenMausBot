@@ -59,12 +59,14 @@ function NavRow({
   );
 }
 
-/** A footer control's one geometry: the apps button's, so every place sits on the same 36px square. */
-function FooterIconButton({ nav, tour, label, active, onOpen, children }: {
+/** A footer place's one geometry: 36px square, 12px radius, the ink hover, and the same open fill for all three. */
+function FooterIconButton({ nav, tour, label, active = false, haspopup = false, current = false, onOpen, children }: {
   nav: string;
   tour?: string;
   label: string;
-  active: boolean;
+  active?: boolean;
+  haspopup?: boolean;
+  current?: boolean;
   onOpen?: () => void;
   children: ReactNode;
 }) {
@@ -76,10 +78,11 @@ function FooterIconButton({ nav, tour, label, active, onOpen, children }: {
       onClick={onOpen}
       aria-label={label}
       title={label}
-      aria-pressed={active}
+      aria-current={current ? "page" : undefined}
+      aria-haspopup={haspopup ? "dialog" : undefined}
       className={cn(
-        "flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors",
-        active ? "bg-raised text-accent" : "text-ink-secondary hover:bg-raised/50 hover:text-ink",
+        "flex size-9 shrink-0 items-center justify-center rounded-xl transition-colors duration-[120ms] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+        active ? "bg-raised text-ink hover:bg-raised" : "text-ink-secondary hover:bg-raised/60 hover:text-ink",
       )}
     >
       {children}
@@ -95,18 +98,20 @@ export function SidebarAppsButton() {
       tour="nav-apps"
       label={t("sidebar.nav.apps")}
       active={state.pluginsOpen}
+      haspopup
       onOpen={() => dispatch({ type: "togglePlugins", open: true })}
     >
-      <Puzzle size={18} />
+      <Puzzle size={18} strokeWidth={1.5} />
     </FooterIconButton>
   );
 }
 
 /** Team map is a place, so it sits beside Apps rather than inside a menu. */
 export function SidebarTeamMapButton({ open = false, onOpen }: { open?: boolean; onOpen?: () => void }) {
+  const { state } = useStore();
   return (
-    <FooterIconButton nav="team-map" tour="team-tools" label={t("sidebar.nav.teamMap")} active={open} onOpen={onOpen}>
-      <UsersRound size={18} />
+    <FooterIconButton nav="team-map" tour="team-tools" label={t("sidebar.nav.teamMap")} active={open} current={state.activeView === "team-map"} onOpen={onOpen}>
+      <UsersRound size={18} strokeWidth={1.5} />
     </FooterIconButton>
   );
 }
@@ -114,8 +119,8 @@ export function SidebarTeamMapButton({ open = false, onOpen }: { open?: boolean;
 /** Templates opens the panel that installs a team, another place that used to hide in the + menu. */
 export function SidebarTemplatesButton({ open = false, onOpen }: { open?: boolean; onOpen?: () => void }) {
   return (
-    <FooterIconButton nav="templates" label={t("sidebar.teamLibrary")} active={open} onOpen={onOpen}>
-      <Library size={18} />
+    <FooterIconButton nav="templates" label={t("sidebar.teamLibrary")} active={open} haspopup onOpen={onOpen}>
+      <Library size={18} strokeWidth={1.5} />
     </FooterIconButton>
   );
 }
@@ -132,7 +137,7 @@ export function SidebarBottomButtons({
   onOpenTemplates?: () => void;
 }) {
   return (
-    <div data-sidebar-bottom-buttons="" className="flex shrink-0 items-center gap-0.5">
+    <div data-sidebar-bottom-buttons="" className="flex shrink-0 items-center gap-2">
       <SidebarAppsButton />
       <SidebarTeamMapButton open={teamMapOpen} onOpen={onOpenTeamMap} />
       <SidebarTemplatesButton open={templatesOpen} onOpen={onOpenTemplates} />

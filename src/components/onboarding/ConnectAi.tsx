@@ -168,7 +168,7 @@ export function ConnectAiDialog({ hosted = false, tested, onClose }: { hosted?: 
           event.stopPropagation();
           onClose();
         }}
-        className="ui-modal animate-pop-in flex max-h-[min(640px,calc(100vh-32px))] w-[440px] max-w-full flex-col overflow-hidden text-left"
+        className="ui-modal flex max-h-[min(640px,calc(100vh-32px))] w-[440px] max-w-full flex-col overflow-hidden text-left"
       >
         <div className="flex h-[52px] shrink-0 items-center justify-between pl-4 pr-3">
           <h2 id="connect-ai-title" className="text-[14px] font-semibold leading-[22px] text-ink">{t("onboarding.meet.connectAi")}</h2>

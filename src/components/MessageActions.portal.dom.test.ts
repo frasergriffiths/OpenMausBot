@@ -44,7 +44,7 @@ afterEach(async () => {
 });
 
 describe("message actions menu", () => {
-  it("renders on <body> with fixed position and the standard menu motion", async () => {
+  it("renders on <body> with fixed position and no motion class", async () => {
     await mount();
     const scroller = host.querySelector<HTMLElement>("[data-chat-scroller]")!;
     await act(async () => more().click());
@@ -54,18 +54,17 @@ describe("message actions menu", () => {
     expect(sheet.parentElement).toBe(document.body);
     expect(sheet.style.position).toBe("fixed");
     expect(sheet.className).toContain("z-50");
-    expect(sheet.className).toContain("animate-pop-in");
+    expect(sheet.className).not.toContain("animate-pop-in");
+    expect(sheet.className).not.toContain("animate-pop-out");
     expect(sheet.className).toContain("rounded-[var(--radius-menu)]");
     expect(document.activeElement).toBe(items()[0]);
   });
 
-  it("runs the picked action, closes with the exit motion and returns focus to the three dots", async () => {
+  it("runs the picked action, closes at once and returns focus to the three dots", async () => {
     await mount();
     await act(async () => more().click());
     await act(async () => items()[0]!.click());
     expect(picked).toEqual(["pin"]);
-    expect(menu()!.className).toContain("animate-pop-out");
-    await settle();
     expect(menu()).toBeNull();
     expect(document.activeElement).toBe(more());
   });

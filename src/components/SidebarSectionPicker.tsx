@@ -129,15 +129,12 @@ export function SectionPicker({
           onChange={(e) => setName(e.target.value)}
           placeholder={t("sidebar.section.newContext")}
           aria-label={t("sidebar.section.newContextAria")}
-          className="h-[30px] min-w-0 flex-1 rounded-md bg-raised/70 px-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none"
+          className="ui-field ui-field-sm min-w-0 flex-1"
         />
         <button
           type="submit"
           disabled={!trimmed || trimmed.length > 60}
-          className={cn(
-            "h-7 shrink-0 rounded-full px-2.5 text-[14px] font-medium",
-            trimmed ? "bg-accent text-panel" : "bg-raised/70 text-ink-secondary",
-          )}
+          className="ui-button ui-button-primary ui-button-md shrink-0"
         >
           {t("common.add")}
         </button>

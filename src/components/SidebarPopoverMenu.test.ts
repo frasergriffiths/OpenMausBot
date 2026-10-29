@@ -24,7 +24,7 @@ it("draws an item's second line (where it connects) and third line (a note) unde
   expect(html).toContain('<span class="flex-1 truncate">Settings</span>');
 });
 
-it("grows a compact row that carries a note, and leaves a single-line row at 30px", () => {
+it("grows a compact row that carries a note, and keeps a single-line row at the 30px menu height", () => {
   const draw = (items: Parameters<typeof MenuRows>[0]["items"]) =>
     renderToStaticMarkup(createElement(MenuRows, { items, look: "compact", onItem: () => {} }));
   const noted = draw([{ key: "approve", label: "Approve each change", note: "Asks before it edits anything.", onSelect: () => {} }]);
@@ -34,8 +34,9 @@ it("grows a compact row that carries a note, and leaves a single-line row at 30p
   expect(noted).toContain("line-clamp-2");
   expect(noted).not.toContain(" h-[30px]");
   const flat = draw([{ key: "settings", label: "Settings", onSelect: () => {} }]);
-  expect(flat).toContain(" h-[30px]");
-  expect(flat).not.toContain("min-h-[30px]");
+  expect(flat).toContain("min-h-[30px]");
+  expect(flat).not.toContain("items-start");
+  expect(flat).toContain("text-[14px]");
 });
 
 it("draws an item's attention dot on the item itself, in its tone", () => {  const html = render([

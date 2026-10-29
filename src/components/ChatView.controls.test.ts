@@ -183,23 +183,12 @@ describe("glass header", () => {
     expect(markup.slice(scroller)).toMatch(/class="glass-scroller-content[^"]*"[^>]*role="log"/);
   });
 
-  it("keeps the glass while the thread bar shows, and fades only when there is no bar", () => {
+  it("fades the glass header over the transcript now that no title-bar switcher sits in it", () => {
     const bar = (markup: string) => markup.match(/<div data-glass-bar="top"[^>]*>/)?.[0] ?? "";
-    expect(bar(renderToStaticMarkup(createElement(ChatView, { bot })))).not.toContain("data-glass-fade");
-    fixture.advanced = false;
-    try {
-      // The bar is the title bar's solid surface, so the header must not fade out from under it.
-      const withBar = renderToStaticMarkup(createElement(ChatView, { bot }));
-      expect(bar(withBar)).not.toContain("data-glass-fade");
-      expect(withBar).toMatch(/class="glass-scroller [^"]*" style="scroll-padding-bottom:calc\(/);
-
-      // A thread with no tab of its own keeps Simple mode's fade.
-      const faded = renderToStaticMarkup(createElement(ChatView, { bot: { ...bot, threadId: "missing" } }));
-      expect(bar(faded)).toContain('data-glass-fade=""');
-      expect(bar(faded)).not.toContain("before:hidden");
-    } finally {
-      fixture.advanced = true;
-    }
+    const markup = renderToStaticMarkup(createElement(ChatView, { bot }));
+    expect(bar(markup)).toContain('data-glass-fade=""');
+    expect(bar(markup)).not.toContain("before:hidden");
+    expect(markup).toMatch(/class="glass-scroller [^"]*" style="scroll-padding-bottom:calc\(/);
   });
 
   it("holds every row's positioned parts inside the transcript, so nothing in it can make the window scroll", () => {
@@ -492,31 +481,5 @@ describe("the way back to the bot's own conversation", () => {
     expect(header(true, visiting)).not.toContain("data-chathead-back");
     expect(header(false, { ...visiting, threadId: "main" })).not.toContain("data-chathead-back");
     expect(header(false, { ...visiting, mainThreadId: "unknown" })).not.toContain("data-chathead-back");
-  });
-});
-
-describe("the thread chip in the chat header", () => {
-  const threaded: Bot = {
-    ...bot,
-    tasks: [
-      { threadId: "selected", title: "Selected", createdAt: 2 },
-      { threadId: "launch", title: "Launch post", createdAt: 1, unread: true },
-      { threadId: "pricing", title: "Competitor pricing", createdAt: 0, busy: true, activity: "working", turnStartedAt: 1 },
-      { threadId: "routine", title: "Morning brief", createdAt: 0, routineRunId: "run-1" },
-    ],
-  };
-
-  it("names the open thread to the left of the identity, clear of the model picker", () => {
-    const markup = renderToStaticMarkup(createElement(ChatView, { bot: threaded }));
-    expect(markup).toContain("data-thread-chip-bar");
-    expect(markup.indexOf("data-thread-chip-bar")).toBeLessThan(markup.indexOf("data-chathead-identity"));
-    expect(markup.indexOf("data-chathead-identity")).toBeLessThan(markup.indexOf("data-chathead-controls"));
-    const slot = markup.slice(markup.indexOf("data-chathead-tabbar"), markup.indexOf("data-chathead-identity"));
-    expect(slot).toContain("Selected");
-    expect(slot).not.toContain("Morning brief");
-    expect(slot).not.toContain("data-thread-tab=");
-    expect(slot).toContain('aria-haspopup="dialog"');
-    const controls = markup.slice(markup.indexOf("data-chathead-controls"));
-    expect(controls).toContain("data-test-model-control");
   });
 });

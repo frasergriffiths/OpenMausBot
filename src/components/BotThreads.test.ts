@@ -100,7 +100,7 @@ describe("sidebar bot threads", () => {
     }
   });
 
-  it("folds open threads another bot opened into one collapsed group outside the six visible rows", () => {
+  it("draws threads another bot opened as ordinary rows, sorted with the rest", () => {
     const openedBy = { botId: "pepper", name: "Pepper", at: 1 };
     const own = Array.from({ length: 7 }, (_, index) => ({ threadId: `own-${index}`, title: `Own ${index}`, createdAt: 10 + index, busy: false, activity: "idle" as const }));
     const helpers = [
@@ -109,18 +109,17 @@ describe("sidebar bot threads", () => {
       { threadId: "review", title: "Review copy", createdAt: 5, busy: false, activity: "idle" as const, openedBy, unread: true },
     ];
     const markup = renderToStaticMarkup(threadList({ ...bot, threadId: "own-6", tasks: [...own, ...helpers] }));
-    const group = markup.slice(markup.indexOf("data-sidebar-helper-threads"));
-    expect(group).toContain('aria-expanded="false" aria-label="Expand Opened by bots threads"');
-    expect(group).toContain('opacity-50">2</span>');
-    expect(group).toContain("animate-spin");
-    expect(markup).not.toContain('data-sidebar-thread-row="email"');
-    expect(markup).not.toContain('data-sidebar-thread-row="pricing"');
+    expect(markup).not.toContain("data-sidebar-helper-threads");
+    expect(markup).not.toContain("Opened by bots");
+    expect(markup).not.toContain("opened by");
+    expect(markup).not.toContain("Show all");
+    expect(markup).toContain('data-sidebar-thread-row="email"');
+    expect(markup).toContain('data-sidebar-thread-row="pricing"');
     expect(markup).toContain('data-sidebar-thread-row="review"');
-    for (let index = 1; index < 7; index += 1) expect(markup).toContain(`data-sidebar-thread-row="own-${index}"`);
-    expect(markup).toContain("Show all 8 threads");
+    expect(markup).toContain('data-sidebar-thread-row="own-6"');
+    expect(markup).not.toContain('data-sidebar-thread-row="own-0"');
     const searched = renderToStaticMarkup(threadList({ ...bot, threadId: "own-6", tasks: [...own, ...helpers] }, "pricing"));
     expect(searched).toContain('data-sidebar-thread-row="pricing"');
-    expect(searched).not.toContain("data-sidebar-helper-threads");
   });
 
   it("exposes group history through the same nested thread rows and All threads picker", () => {

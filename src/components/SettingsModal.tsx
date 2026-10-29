@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Archive, ChartNoAxesColumn, Cloud, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Search, Settings, Sparkles, TabletSmartphone, Terminal, User, Users, X, Building2, Zap, BookOpen } from "lucide-react";
+import { Archive, ChartNoAxesColumn, Cloud, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Search, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen } from "lucide-react";
 import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
@@ -20,7 +20,7 @@ import { shortcutLabel } from "./ShortcutHint";
 import { LicenseExpiryBanner } from "./LicenseExpiryBanner";
 import { WorkspacesSection, workspacesAvailable } from "./WorkspacesSection";
 import { Select } from "./Select";
-import { SimpleAiPage, SimpleBillingPage, SimpleComputerPage, SimpleGeneralPage, SimpleKeysPage, SimpleLooksPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
+import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleBillingPage, SimpleComputerPage, SimpleDataPage, SimpleKeysPage, SimpleLooksPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
 import { cn } from "@/lib/cn";
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { Chevron } from "./chevron";
@@ -68,15 +68,21 @@ export const SECTIONS: Array<{
 export type { SimpleSettingsPage };
 
 export const SIMPLE_PAGES: SimpleSettingsPage[] = [
-  { id: "general", labelKey: "settings.section.general", icon: Settings, sections: ["general", "appearance", "people", "backups", "import", "activity"],
-    keywords: ["account", "theme", "looks", "open at login", "startup", "analytics", "sidebar", "backups", "restore"] },
-  { id: "ai", labelKey: "settings.group.ai", icon: Sparkles, sections: ["engines", "skills", "decisionModel", "experimental"],
-    keywords: ["effort", "new bots", "decision", "skills", "experimental", "keep warm"] },
-  { id: "keys", labelKey: "settings.section.connections", icon: KeyRound, sections: ["connections"],
+  { id: "account", labelKey: "settings.simple.page.account", descriptionKey: "settings.simple.page.account.description", icon: UserRound, sections: ["general", "people"],
+    keywords: ["account", "profile", "plan", "people", "open at login", "startup", "analytics", "limits", "recovery"] },
+  { id: "appearance", labelKey: "settings.section.appearance", descriptionKey: "settings.simple.page.appearance.description", icon: Palette, sections: ["appearance"],
+    keywords: ["theme", "looks", "sidebar", "density", "notifications", "font", "chat width", "language", "send key"] },
+  { id: "data", labelKey: "settings.simple.page.data", descriptionKey: "settings.simple.page.data.description", icon: Archive, sections: ["backups", "import", "activity"],
+    keywords: ["backups", "restore", "export", "import", "activity", "audit", "history"] },
+  { id: "ai", labelKey: "settings.group.ai", descriptionKey: "settings.simple.page.ai.description", icon: Sparkles, sections: ["engines", "decisionModel"],
+    keywords: ["effort", "new bots", "decision", "keep warm", "engines", "model"] },
+  { id: "skills", labelKey: "settings.section.skills", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental"],
+    keywords: ["skills", "experimental", "early", "preview", "learn"] },
+  { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
     keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },
-  { id: "computer", labelKey: "settings.simple.page.computer", icon: Monitor, sections: ["companion", "desktopWorkspaces", "computer", "logins", "workspaces"] },
-  { id: "billing", labelKey: "settings.simple.page.billing", icon: ChartNoAxesColumn, sections: ["usage", "cloudAccount"], keywords: ["billing", "included", "allowance", "cloud hours", "voice", "keep this computer"] },
-  { id: "updates", labelKey: "settings.simple.page.updates", icon: CloudDownload, sections: ["updates"],
+  { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["companion", "desktopWorkspaces", "computer", "logins", "workspaces"] },
+  { id: "billing", labelKey: "settings.simple.page.billing", descriptionKey: "settings.simple.page.billing.description", icon: ChartNoAxesColumn, sections: ["usage", "cloudAccount"], keywords: ["billing", "included", "allowance", "cloud hours", "voice", "keep this computer"] },
+  { id: "updates", labelKey: "settings.simple.page.updates", descriptionKey: "settings.simple.page.updates.description", icon: CloudDownload, sections: ["updates"],
     keywords: ["update", "version", "release", "product updates", "newsletter", "email updates", "welcome", "tour", "diagnostics", "logs", "support"] },
 ];
 
@@ -105,7 +111,7 @@ export function revealSettingsBlock(
 
 function simplePageMatches(page: SimpleSettingsPage, query: string): boolean {
   if (!query) return true;
-  if ([t(page.labelKey), ...page.keywords ?? []].some((part) => part.toLowerCase().includes(query))) return true;
+  if ([t(page.labelKey), ...(page.descriptionKey ? [t(page.descriptionKey)] : []), ...page.keywords ?? []].some((part) => part.toLowerCase().includes(query))) return true;
   return page.sections.some((id) => {
     const entry = SECTIONS.find((candidate) => candidate.id === id);
     return entry ? sectionMatches(entry, query) : false;
@@ -299,10 +305,13 @@ export function SettingsModal() {
   const renderSimplePage = (page: SimpleSettingsPage) => {
     const has = (id: AppSettingsSection) => page.sections.includes(id);
     switch (page.id) {
-      case "general": return looks
+      case "account": return <SimpleAccountPage has={has} peopleOpen={section === "people"} />;
+      case "appearance": return looks
         ? <SimpleLooksPage onBack={() => { setLooks(false); setReveal("appearance"); }} />
-        : <SimpleGeneralPage has={has} peopleOpen={section === "people"} onLooks={() => setLooks(true)} disclose={disclose} />;
+        : <SimpleAppearancePage has={has} onLooks={() => setLooks(true)} disclose={disclose} />;
+      case "data": return <SimpleDataPage has={has} disclose={disclose} />;
       case "ai": return <SimpleAiPage has={has} disclose={disclose} />;
+      case "skills": return <SimpleSkillsPage has={has} />;
       case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} />;
       case "computer": return <SimpleComputerPage has={has} remoteAccess={remoteAccess} servers={renderSection("desktopWorkspaces")} installs={workspacesAvailable(state.config) ? <WorkspacesSection /> : undefined} disclose={disclose} />;
       case "billing": return <SimpleBillingPage has={has} disclose={disclose} cloudAccount={renderSection("cloudAccount")} />;
@@ -333,7 +342,7 @@ export function SettingsModal() {
     </div>
   );
 
-  const looksOpen = looks && currentPage?.id === "general";
+  const looksOpen = looks && currentPage?.id === "appearance";
   const goTo = (id: AppSettingsSection) => { setLooks(false); openSection(id); };
   return (
     <div
@@ -351,7 +360,7 @@ export function SettingsModal() {
         aria-labelledby="app-settings-title"
         tabIndex={-1}
         style={{ outline: "none" }}
-        className="glass-surface glass-popup animate-pop-in relative flex overflow-hidden rounded-2xl text-ink"
+        className="glass-surface glass-popup relative flex overflow-hidden rounded-2xl text-ink"
       >
         <span id="app-settings-title" className="sr-only">{t("settings.title")}</span>
         <nav aria-label={t("settings.title")} className="glass-rail hidden min-h-0 w-[198px] shrink-0 flex-col gap-0.5 overflow-y-auto px-3 py-4 sm:flex">
@@ -399,9 +408,14 @@ export function SettingsModal() {
                 <option key={page.id} value={page.id}>{t(page.labelKey)}</option>
               ))}
             </Select>
-            <h2 className="hidden truncate text-[17px] font-medium leading-6 tracking-[-0.008em] text-ink sm:block">
-              {looksOpen ? t("settings.simple.page.looks") : currentPage ? t(currentPage.labelKey) : null}
-            </h2>
+            <div className="hidden min-w-0 sm:block">
+              <h2 className="truncate text-[17px] font-medium leading-6 tracking-[-0.008em] text-ink">
+                {looksOpen ? t("settings.simple.page.looks") : currentPage ? t(currentPage.labelKey) : null}
+              </h2>
+              {!looksOpen && currentPage?.descriptionKey && (
+                <p className="mt-0.5 max-w-[64ch] text-[13px] leading-5 text-ink-secondary">{t(currentPage.descriptionKey)}</p>
+              )}
+            </div>
           </header>
           <button
             type="button"
@@ -417,7 +431,7 @@ export function SettingsModal() {
             ref={scrollRef}
             data-settings-scroll
             className={cn(
-              "flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto px-4 pb-8 pt-4 sm:px-8 sm:pb-7 sm:pt-[22px]",
+              "flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto px-4 pb-8 pt-4 sm:px-8 sm:pb-7 sm:pt-4",
               "[&_.ui-button]:h-8 [&_.ui-button]:rounded-full [&_.ui-button]:border-0 [&_.ui-button]:px-3 [&_.ui-button]:text-[14px] [&_.ui-button]:font-normal",
               "[&_.ui-button:not(.ui-button-primary)]:bg-ink/5 [&_.ui-button:not(.ui-button-primary)]:text-ink [&_.ui-button:not(.ui-button-primary):enabled:hover]:bg-ink/10",
               "[&_.ui-button-primary]:bg-ink [&_.ui-button-primary]:text-app [&_.ui-button-primary:enabled:hover]:bg-ink/85",

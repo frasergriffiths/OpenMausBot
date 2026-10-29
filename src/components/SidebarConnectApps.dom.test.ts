@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
-// The sidebar's Connect apps pill may only leave once the whole catalogue is connected, not merely every app in the
-// connected-only inventory. An unknown, empty or partial catalogue keeps it, because a hidden pill must never mean a
-// hidden problem. It starts hidden so a fully connected sidebar never paints it and then removes it.
+// The connect-apps prompt may only leave once the whole catalogue is connected, not merely every app in the
+// connected-only inventory. An unknown, empty or partial catalogue keeps it, because a hidden prompt must never mean a
+// hidden problem. The footer's Apps squircle is the permanent entry and is tested in the footer composition.
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
@@ -75,33 +75,27 @@ function memoryStorage(failWrites = false): Storage {
   };
 }
 
-const pill = () => host.querySelector<HTMLElement>("[data-connect-apps-pill]");
-const compact = () => host.querySelector<HTMLElement>("[data-connect-apps-compact]");
-/** The pill only counts as shown once it is in the tree without the hidden attribute. */
-const shown = () => {
-  const element = pill();
-  return element && !element.hasAttribute("hidden") ? element : null;
-};
+const row = () => host.querySelector<HTMLElement>("[data-connect-apps-pill]");
+const dismiss = () => host.querySelector<HTMLElement>("[data-connect-apps-dismiss]");
 
-describe("the Connect apps pill against the catalogue", () => {
+describe("the connect-apps prompt against the catalogue", () => {
   it("starts hidden and stays hidden for a fully connected workspace, with no flash", async () => {
     fixture.inventory = { services: { gmail: { connected: true }, slack: { connected: true }, notion: { connected: true } }, authoritative: true };
     fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack", "notion"], complete: true };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
-    expect(pill()).not.toBeNull();
-    expect(pill()!.hasAttribute("hidden")).toBe(true);
-    expect(shown()).toBeNull();
+    expect(row()).toBeNull();
     await settle();
-    expect(pill()).toBeNull();
+    expect(row()).toBeNull();
   });
 
   it("starts hidden and appears once an app is still unconnected", async () => {
     fixture.inventory = { services: { gmail: { connected: true } }, authoritative: true };
     fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
-    expect(shown()).toBeNull();
+    expect(row()).toBeNull();
     await settle();
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
+    expect(row()!.textContent).toContain("Connect apps");
   });
 
   it("stays when one app is connected and the catalogue names others", async () => {
@@ -110,7 +104,7 @@ describe("the Connect apps pill against the catalogue", () => {
     fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack", "notion"], complete: true };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
     await settle();
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
   });
 
   it("leaves when every catalogue app and every native app is connected", async () => {
@@ -118,25 +112,7 @@ describe("the Connect apps pill against the catalogue", () => {
     fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
     await settle();
-    expect(pill()).toBeNull();
-    // Advanced keeps nothing: the Apps panel has its own entry in the full sidebar.
-    expect(compact()).toBeNull();
-  });
-
-  it("keeps an Apps entry on the Simple rail when every app is already connected", async () => {
-    fixture.inventory = { services: { gmail: { connected: true }, slack: { connected: true } }, authoritative: true };
-    fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
-    flushSync(() => root.render(createElement(SidebarConnectApps, { circle: true })));
-    // Mounting must not pull focus: nothing here asks the person to act.
-    expect(document.activeElement).not.toBe(compact());
-    await settle();
-    expect(pill()).toBeNull();
-    const entry = compact();
-    expect(entry).not.toBeNull();
-    expect(entry!.getAttribute("aria-label")).toBe("Apps");
-    expect(document.activeElement).not.toBe(entry);
-    flushSync(() => entry!.click());
-    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "togglePlugins", open: true });
+    expect(row()).toBeNull();
   });
 
   it("stays when a native app outside the catalogue is not connected", async () => {
@@ -145,32 +121,29 @@ describe("the Connect apps pill against the catalogue", () => {
     fixture.native = [{ slug: "whop", connected: false }, { slug: "highlevel", connected: true }, { slug: "x", connected: true }];
     flushSync(() => root.render(createElement(SidebarConnectApps)));
     await settle();
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
   });
 
-  it("stays when the catalogue is empty", async () => {
+  it("stays when the catalogue is empty or could not be read", async () => {
     fixture.inventory = { services: { gmail: { connected: true } }, authoritative: true };
     fixture.catalogue = { cards: new Map(), slugs: [], complete: true };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
     await settle();
-    expect(shown()).not.toBeNull();
-  });
+    expect(row()).not.toBeNull();
 
-  it("stays when the catalogue could not be read", async () => {
-    fixture.inventory = { services: { gmail: { connected: true }, slack: { connected: true } }, authoritative: true };
     fixture.catalogue = { cards: new Map(), slugs: [], complete: false };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
     await settle();
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
   });
 
   it("stays when a partial catalogue hides slugs it could not page in", async () => {
-    // Without the complete guard this hides the pill: every named app is connected and the list looks finished.
+    // Without the complete guard this hides the prompt: every named app is connected and the list looks finished.
     fixture.inventory = { services: { gmail: { connected: true }, slack: { connected: true } }, authoritative: true };
     fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: false };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
     await settle();
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
   });
 
   it("stays when the server could not read the full inventory", async () => {
@@ -178,19 +151,19 @@ describe("the Connect apps pill against the catalogue", () => {
     fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
     flushSync(() => root.render(createElement(SidebarConnectApps)));
     await settle();
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
   });
 
-  it("stays on the collapsed rail too while an app is unconnected", async () => {
+  it("stays settled on a fresh mount while the panel is already open", () => {
+    fixture.pluginsOpen = true;
     fixture.inventory = { services: { gmail: { connected: true } }, authoritative: true };
-    fixture.catalogue = { cards: new Map(), slugs: ["gmail", "notion"], complete: true };
-    flushSync(() => root.render(createElement(SidebarConnectApps, { circle: true })));
-    await settle();
-    expect(shown()?.getAttribute("aria-label")).toBe("Connect apps");
+    fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
+    flushSync(() => root.render(createElement(SidebarConnectApps)));
+    expect(row()).not.toBeNull();
   });
 });
 
-describe("dismissing the Connect apps pill", () => {
+describe("dismissing the connect-apps prompt", () => {
   const renderWithRestore = () => flushSync(() => root.render(createElement("div", null,
     createElement(SidebarConnectApps),
     createElement(ConnectAppsPillRestore),
@@ -201,16 +174,11 @@ describe("dismissing the Connect apps pill", () => {
     fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
     renderWithRestore();
     await settle();
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
 
-    const dismiss = host.querySelector<HTMLElement>("[data-connect-apps-dismiss]")!;
-    expect(dismiss.getAttribute("aria-label")).toBe("Hide Connect apps");
-    // A sibling of the pill, never inside it, so the main click stays the main click.
-    expect(pill()!.contains(dismiss)).toBe(false);
-    flushSync(() => dismiss.click());
-    expect(pill()).toBeNull();
-    // The entry stays: an icon-only button in the slot the pill occupied, never nothing.
-    expect(compact()).not.toBeNull();
+    expect(dismiss()!.getAttribute("aria-label")).toBe("Hide Connect apps");
+    flushSync(() => dismiss()!.click());
+    expect(row()).toBeNull();
     expect(window.localStorage.getItem(CONNECT_APPS_PILL_KEY)).toBe("1");
 
     // A fresh mount is the restart: the saved flag must still hold.
@@ -218,34 +186,13 @@ describe("dismissing the Connect apps pill", () => {
     root = createRoot(host);
     renderWithRestore();
     await settle();
-    expect(compact()).not.toBeNull();
-    expect(pill()).toBeNull();
+    expect(row()).toBeNull();
 
     const restore = host.querySelector<HTMLElement>("[data-show-connect-apps]");
     expect(restore).not.toBeNull();
     flushSync(() => restore!.click());
-    expect(shown()).not.toBeNull();
-    expect(window.localStorage.getItem(CONNECT_APPS_PILL_KEY)).toBeNull();
-  });
-
-  it("offers the dismiss control on the collapsed rail as well", async () => {
-    fixture.inventory = { services: { gmail: { connected: true } }, authoritative: true };
-    fixture.catalogue = { cards: new Map(), slugs: ["gmail", "notion"], complete: true };
-    flushSync(() => root.render(createElement(SidebarConnectApps, { circle: true })));
     await settle();
-    const dismiss = host.querySelector<HTMLElement>("[data-connect-apps-dismiss]");
-    expect(dismiss?.getAttribute("aria-label")).toBe("Hide Connect apps");
-    flushSync(() => dismiss!.click());
-    expect(pill()).toBeNull();
-    expect(compact()?.getAttribute("aria-label")).toBe("Apps");
-    expect(compact()?.getAttribute("title")).toBe("Apps");
-  });
-
-  it("keeps the pill settled on a fresh mount while the panel is already open", () => {
-    fixture.pluginsOpen = true;
-    fixture.inventory = { services: { gmail: { connected: true } }, authoritative: true };
-    fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
-    flushSync(() => root.render(createElement(SidebarConnectApps)));
-    expect(shown()).not.toBeNull();
+    expect(row()).not.toBeNull();
+    expect(window.localStorage.getItem(CONNECT_APPS_PILL_KEY)).toBeNull();
   });
 });

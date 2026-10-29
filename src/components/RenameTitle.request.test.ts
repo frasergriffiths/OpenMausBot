@@ -16,7 +16,7 @@ it("starts editing when a new edit request arrives, never for the one it mounted
   });
   await draw(3);
   expect(host.querySelector("input")).toBeNull();
-  expect(host.querySelector('[role="button"]')?.getAttribute("title")).toBe("Scout · Researcher");
+  expect(host.querySelector("span")?.getAttribute("title")).toBe("Scout · Researcher");
   await draw(4);
   expect(host.querySelector<HTMLInputElement>("input")?.value).toBe("Scout");
   expect(onEditingChange).toHaveBeenLastCalledWith(true);

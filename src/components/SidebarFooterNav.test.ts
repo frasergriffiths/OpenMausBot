@@ -139,10 +139,11 @@ describe("the footer's place buttons", () => {
       expect(html).toContain(`data-sidebar-nav="${nav}"`);
       expect(html).toContain(`aria-label="${label}"`);
       expect(html).toContain(`title="${label}"`);
-      expect(html).toContain('aria-pressed="true"');
+      expect(html).not.toContain("aria-pressed");
       expect(html).toContain("bg-raised");
       expect(html).toContain("size-9");
       expect(html).toContain("rounded-xl");
+      if (nav === "templates") expect(html).toContain('aria-haspopup="dialog"');
     }
   });
 

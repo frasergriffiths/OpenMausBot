@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 export const BOT_PANEL_ID = "bot-panel";
 
 export const sidePanelCls = (overlay: boolean, simple = false) => cn(
-  "animate-sheet-in md:animate-panel-in absolute inset-0 z-40 flex h-full min-w-0 flex-col outline-none focus-visible:outline-none",
+  "absolute inset-0 z-40 flex h-full min-w-0 flex-col outline-none focus-visible:outline-none",
   simple && !overlay ? "border-s-[0.5px] border-ink/[0.06] bg-app" : "border-s border-hairline/40 bg-panel",
   overlay
     ? simple

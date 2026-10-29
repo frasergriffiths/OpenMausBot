@@ -1,7 +1,6 @@
 // @vitest-environment happy-dom
-// A dismissed pill must leave a reachable Apps entry in the Simple footer and rail. These tests mount the compositions
-// that actually ship (SidebarFooter in Simple mode, SimpleRailFooter) while dismissed: a sibling mount of the pill is
-// what let a previous version pass while the entry disappeared from the sidebar.
+// The connect-apps prompt is its own row above the Simple footer's three-squircle cluster. Dismissing it must leave the
+// footer Apps squircle focused and reachable; the PluginsPanel control brings the row back.
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
@@ -13,19 +12,17 @@ const fixture = vi.hoisted(() => ({
   inventory: { services: { gmail: { connected: true } } as Record<string, { connected: boolean }>, authoritative: true },
   catalogue: { cards: new Map<string, unknown>(), slugs: ["gmail", "slack"] as string[], complete: true },
   native: [] as Array<{ slug: string; connected: boolean }>,
-  advanced: false,
   pluginsOpen: false,
   dispatch: vi.fn(),
 }));
 
 vi.mock("@/state/store", () => ({
-  useStore: () => ({ state: { pluginsOpen: fixture.pluginsOpen }, dispatch: fixture.dispatch }),
+  useStore: () => ({ state: { pluginsOpen: fixture.pluginsOpen, activeView: "chat" }, dispatch: fixture.dispatch }),
 }));
 vi.mock("./CloudUsageMeter", () => ({ CloudUsageCard: () => null }));
 vi.mock("./DesktopWorkspaceSwitcher", () => ({ endCloudHowTo: vi.fn(), useWorkspacePlace: () => ({ error: null, waking: null }) }));
 vi.mock("./SidebarProfileMenu", () => ({ SidebarProfileMenu: () => null, useSimpleAccount: () => ({}) }));
 vi.mock("./UpdateIndicator", () => ({ UpdateIndicator: () => null }));
-vi.mock("./SidebarFooterNav", () => ({ SidebarBottomButtons: () => null, SidebarFooterNav: () => null, SidebarTeamMapButton: () => null, SidebarTemplatesButton: () => null }));
 vi.mock("./SidebarPhoneButton", () => ({ SidebarPhoneButton: () => null, phoneSettingsAction: () => ({ type: "phone-settings" }) }));
 vi.mock("./PluginsPanel", () => ({ preloadConnectedApps: () => Promise.resolve(fixture.inventory) }));
 vi.mock("./bot-settings/useBotApps", () => ({ loadAppCatalogue: () => Promise.resolve(fixture.catalogue) }));
@@ -61,7 +58,6 @@ beforeEach(() => {
   fixture.inventory = { services: { gmail: { connected: true } }, authoritative: true };
   fixture.catalogue = { cards: new Map(), slugs: ["gmail", "slack"], complete: true };
   fixture.native = [];
-  fixture.advanced = false;
   fixture.pluginsOpen = false;
   fixture.dispatch.mockClear();
   restoreConnectAppsPill();
@@ -77,54 +73,52 @@ const settle = async () => {
   for (let i = 0; i < 8; i++) await new Promise((resolve) => setTimeout(resolve, 0));
 };
 
-const pill = () => host.querySelector<HTMLElement>("[data-connect-apps-pill]");
-const compact = () => host.querySelector<HTMLElement>("[data-connect-apps-compact]");
+const row = () => host.querySelector<HTMLElement>("[data-connect-apps-pill]");
 const dismiss = () => host.querySelector<HTMLElement>("[data-connect-apps-dismiss]");
+const apps = () => host.querySelector<HTMLElement>('[data-sidebar-footer="simple"] [data-sidebar-nav="apps"]');
 
 function renderFooter() {
   flushSync(() => root.render(createElement(SidebarFooter, { density: "compact", simple: true, owner: null, toolsCollapsed: false })));
 }
 
-describe("the Apps entry a dismissal leaves in the shipping Simple footer", () => {
-  it("replaces the labelled pill with a 36px icon button in the same slot, and the button opens the panel", async () => {
+describe("the connect-apps prompt in the shipping Simple footer", () => {
+  it("sits in its own row above three 36px squircles, with no app faces in the cluster", async () => {
     renderFooter();
     await settle();
-    expect(pill()).not.toBeNull();
+    expect(row()).not.toBeNull();
+    expect(dismiss()).not.toBeNull();
     expect(dismiss()!.className).toContain("size-6");
 
-    flushSync(() => dismiss()!.click());
-    await settle();
-    expect(pill()).toBeNull();
-
-    const entry = compact()!;
-    expect(entry).not.toBeNull();
-    expect(host.querySelector('[data-sidebar-footer="simple"]')!.contains(entry)).toBe(true);
-    expect(entry.getAttribute("aria-label")).toBe("Apps");
-    expect(entry.getAttribute("data-tour")).toBe("nav-apps");
-    expect(entry.getAttribute("data-sidebar-nav")).toBe("apps");
-    expect(entry.className).toContain("size-9");
-
-    flushSync(() => entry.click());
-    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "togglePlugins", open: true });
+    const cluster = row()!.nextElementSibling!;
+    for (const nav of ["apps", "team-map", "templates"]) {
+      const button = cluster.querySelector<HTMLElement>(`[data-sidebar-nav="${nav}"]`)!;
+      expect(button).not.toBeNull();
+      expect(button.className).toContain("size-9");
+    }
+    expect(apps()!.querySelector("[data-app-face]")).toBeNull();
+    expect(apps()!.textContent?.trim()).toBe("");
+    expect(apps()!.querySelector(".lucide-puzzle")).not.toBeNull();
   });
 
-  it("renders the compact button on a mount that starts dismissed", async () => {
+  it("hides the row on dismiss, keeps the Apps squircle and puts focus on it, not on the body", async () => {
+    renderFooter();
+    await settle();
+    flushSync(() => dismiss()!.click());
+    await settle();
+    expect(row()).toBeNull();
+    expect(apps()).not.toBeNull();
+    expect(document.activeElement).toBe(apps());
+  });
+
+  it("renders no prompt on a mount that starts dismissed, but keeps the Apps squircle", async () => {
     dismissConnectAppsPill();
     renderFooter();
     await settle();
-    expect(pill()).toBeNull();
-    expect(compact()).not.toBeNull();
+    expect(row()).toBeNull();
+    expect(apps()).not.toBeNull();
   });
 
-  it("puts focus on the compact button after dismissing, not on the body", async () => {
-    renderFooter();
-    await settle();
-    flushSync(() => dismiss()!.click());
-    await settle();
-    expect(document.activeElement).toBe(compact());
-  });
-
-  it("puts focus back on the labelled pill when the panel's control restores it", async () => {
+  it("brings the row back from the PluginsPanel control", async () => {
     flushSync(() => root.render(createElement("div", null,
       createElement(SidebarFooter, { density: "compact", simple: true, owner: null, toolsCollapsed: false }),
       createElement(ConnectAppsPillRestore),
@@ -132,37 +126,27 @@ describe("the Apps entry a dismissal leaves in the shipping Simple footer", () =
     await settle();
     flushSync(() => dismiss()!.click());
     await settle();
-    expect(document.activeElement).toBe(compact());
+    expect(row()).toBeNull();
 
     const restore = host.querySelector<HTMLElement>("[data-show-connect-apps]")!;
     expect(restore).not.toBeNull();
     flushSync(() => restore.click());
     await settle();
-    expect(pill()).not.toBeNull();
-    expect(document.activeElement).toBe(pill());
+    expect(row()).not.toBeNull();
   });
 });
 
-describe("the Apps entry a dismissal leaves in the shipping Simple rail", () => {
-  it("keeps the round 36px button above the update indicator and opens the panel", async () => {
+describe("the Simple rail", () => {
+  it("keeps the Apps squircle as the only entry and never mounts the prompt row", async () => {
     flushSync(() => root.render(createElement(SimpleRailFooter, { owner: null })));
     await settle();
-    flushSync(() => dismiss()!.click());
-    await settle();
-    expect(pill()).toBeNull();
-
-    const entry = compact()!;
+    expect(row()).toBeNull();
+    const entry = host.querySelector<HTMLElement>('[data-sidebar-rail-footer] [data-sidebar-nav="apps"]')!;
     expect(entry).not.toBeNull();
-    const foot = host.querySelector("[data-sidebar-rail-footer]")!;
-    expect(foot.contains(entry)).toBe(true);
-    expect(entry.getAttribute("aria-label")).toBe("Apps");
     expect(entry.className).toContain("size-9");
-    expect(entry.className).toContain("rounded-full");
-    // One row, in the pill's slot: the button is the rail footer's first child, not an extra row below the account.
-    expect(foot.firstElementChild!.contains(entry)).toBe(true);
-
+    expect(entry.className).toContain("rounded-xl");
+    expect(entry.querySelector("[data-app-face]")).toBeNull();
     flushSync(() => entry.click());
     expect(fixture.dispatch).toHaveBeenCalledWith({ type: "togglePlugins", open: true });
   });
 });
-

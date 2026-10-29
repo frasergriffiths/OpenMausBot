@@ -506,7 +506,7 @@ export function PluginsPanel() {
         aria-modal="true"
         aria-labelledby="plugins-title"
         tabIndex={-1}
-        className="glass-surface glass-popup animate-pop-in relative flex max-w-[780px] flex-col overflow-hidden rounded-2xl"
+        className="glass-surface glass-popup relative flex max-w-[780px] flex-col overflow-hidden rounded-2xl"
       >
         <header className="flex flex-col gap-4 px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
           <div>

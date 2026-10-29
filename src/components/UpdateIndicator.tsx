@@ -40,7 +40,7 @@ export function UpdateIndicator({ className }: { className?: string }) {
   const ready = state.status === "downloaded";
   return (
     <div
-      className={cn("flex size-[46px] shrink-0 items-center justify-center", className)}
+      className={cn("flex size-9 shrink-0 items-center justify-center", className)}
     >
       <button
         ref={buttonRef}
@@ -169,7 +169,7 @@ export function UpdateCard({
         aria-labelledby="update-card-title"
         aria-describedby="update-card-note"
         data-update-card
-        className="animate-pop-in relative w-full max-w-[420px] rounded-2xl border border-hairline/50 bg-panel p-6 shadow-2xl shadow-black/50"
+        className="relative w-full max-w-[420px] rounded-2xl border border-hairline/50 bg-panel p-6 shadow-2xl shadow-black/50"
       >
         <button
           type="button"

@@ -115,7 +115,7 @@ describe("the anchored menu in a document", () => {
     const support = [...menu.querySelectorAll('[role="menuitem"]')].find((node) => node.textContent?.includes("Help and support"))!;
     expect(support.getAttribute("aria-haspopup")).toBe("menu");
     expect(support.querySelector("svg")).not.toBeNull();
-    expect(menu.querySelector('[role="menuitem"]')!.className).toContain("text-[13px]");
+    expect(menu.querySelector('[role="menuitem"]')!.className).toContain("text-[14px]");
   });
 
   it("opens from the keyboard on the first item and walks the items", async () => {
@@ -178,7 +178,10 @@ describe("the anchored menu in a document", () => {
     it("opens it at once on a click, without moving focus into it", async () => {
       await act(async () => trigger().dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 })));
       const support = rows()[1]!;
-      await act(async () => support.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 })));
+      await act(async () => {
+        support.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, detail: 1, button: 0 }));
+        support.dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }));
+      });
       await flush();
       expect(submenu()).not.toBeNull();
       expect(submenu()!.contains(document.activeElement)).toBe(false);

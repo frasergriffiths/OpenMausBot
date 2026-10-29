@@ -104,13 +104,16 @@ describe("the setup card under a new bot's greeting", () => {
     expect(picked.choices.filter((row) => row.props["aria-checked"] === true)).toHaveLength(1);
   });
 
-  it("keeps the place question on screen until the submit, then shows both answers", () => {
+  it("keeps one live place question on screen before and after settling", () => {
     const open = renderOffer(offered);
-    expect(open.html).toContain("data-setup-place");
+    expect(open.html.match(/data-setup-place=/g)).toHaveLength(1);
     const answered = { id: "u1", role: "user", kind: "text", at: 2, text: "Watch the news", setupRequest: true } as Message;
     const settled = renderOffer(offered, [offered, answered]);
-    expect(settled.html).not.toContain("data-setup-place=");
-    expect(settled.html).toContain("data-setup-place-answer");
+    expect(settled.html.match(/data-setup-place=/g)).toHaveLength(1);
+    expect(settled.html.match(/data-setup-place-answer=/g)).toHaveLength(1);
+    expect(settled.html.match(/>Where Ava works</g)).toHaveLength(1);
+    expect(settled.html).not.toContain("data-place-answer");
+    expect(settled.html).toContain("Your answer");
   });
 
   it("submits the picked words once and puts the cursor in the message box", async () => {
@@ -129,6 +132,26 @@ describe("the setup card under a new bot's greeting", () => {
     expect(view.submit!.props.disabled).toBe(true);
     press(view.choices[0]);
     expect(renderOffer(offered).submit!.props.disabled).toBe(false);
+  });
+
+  it("hugs its label with the setup pill's metrics", () => {
+    const view = renderOffer(offered);
+    const className = String(view.submit!.props.className);
+    expect(className).toContain("min-w-[160px]");
+    expect(className).toContain("max-w-full");
+    expect(className).toContain("px-5");
+    expect(className).toContain("self-start");
+    expect(className.split(" ")).not.toContain("w-full");
+    expect(className).toContain("h-10");
+    expect(className).toContain("rounded-full");
+  });
+
+  it("settles when the greeting has no written choices and still shows the live place question", () => {
+    const bare = { ...offered, setupChoices: undefined } as Message;
+    const picked = { id: "u1", role: "user", kind: "text", at: 2, text: "Watch the news", setupRequest: true } as Message;
+    const settled = renderOffer(bare, [bare, picked]);
+    expect(settled.html).toContain("Watch the news");
+    expect(settled.html).toContain("data-setup-place=");
   });
 
   it("selects on Enter from a focused row without sending anything", async () => {
@@ -167,9 +190,12 @@ describe("the setup card under a new bot's greeting", () => {
     expect(place.html).toContain("Uses the built-in browser. It starts a desktop only when a task needs one.");
   });
 
-  it("does not ask where it works on a card settled by an ordinary line", () => {
+  it("keeps asking where it works after an ordinary line settles the card", () => {
     const typed = { id: "u1", role: "user", kind: "text", at: 2, text: "hello there" } as Message;
-    expect(renderOffer(offered, [offered, typed]).html).not.toContain("Where Ava works");
+    const view = renderOffer(offered, [offered, typed]);
+    expect(view.html).toContain("data-setup-place=");
+    expect(view.html.match(/>Where Ava works</g)).toHaveLength(1);
+    expect(view.html).not.toContain("Your answer");
   });
 
   it("selects with the answer's letter key, and leaves other keys alone", async () => {
@@ -188,6 +214,7 @@ describe("the setup card under a new bot's greeting", () => {
     expect(settled.html).toContain("Your answer");
     expect(settled.html).toContain("Watch the news");
     expect(settled.html).toContain("Where Ava works");
+    expect(settled.html).toContain("data-setup-place=");
     expect(settled.html).toContain('data-setup-place-answer=""');
     expect(settled.html).toContain("Automatic");
     expect(settled.choices.every((node) => node.props.disabled === true)).toBe(true);
@@ -202,6 +229,7 @@ describe("the setup card under a new bot's greeting", () => {
       const view = renderOffer(offered, [offered, { id: "u1", role: "user", kind: "text", at: 2, text } as Message]);
       expect(view.html).toContain("What should I help you with first?");
       expect(view.html).not.toContain("Your answer");
+      expect(view.html).toContain("data-setup-place=");
       expect(view.choices.every((node) => node.props.disabled === true)).toBe(true);
     }
     fixture.instances = [{ instanceId: "claude", capabilities: { agentsMcp: false } }];

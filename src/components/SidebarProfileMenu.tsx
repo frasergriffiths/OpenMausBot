@@ -581,7 +581,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
   });
   const noteworthy = update && updateNoteworthy(update.phase, update.pending) && !updateHasButton(update.phase);
   const initials = profileInitials(profile);
-  const nameless = simple && initials === "?" ? <UserRound size={18} strokeWidth={1.75} aria-hidden /> : undefined;
+  const nameless = initials === "?" ? <UserRound size={18} strokeWidth={1.75} aria-hidden /> : undefined;
   const label = simple ? accountLabel(name, { update: noteworthy && update ? update.label : null }) : name;
 
   return (
@@ -591,11 +591,11 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
         ariaLabel={name}
         compact={simple}
         onOpenChange={simple ? setMenuOpen : undefined}
-        triggerClassName={iconOnly || simple ? cn("shrink-0", circle || simple ? "rounded-full" : "rounded-xl") : "w-full"}
+        triggerClassName={iconOnly ? cn("shrink-0", circle || (simple && iconOnly) ? "rounded-full" : "rounded-xl") : "w-full min-w-0"}
         triggerTitle={iconOnly || simple ? label : undefined}
         triggerLabel={label}
         triggerTour={account?.place.switchable ? "server-switcher" : undefined}
-        renderTrigger={({ open }) => simple ? (
+        renderTrigger={({ open }) => simple && iconOnly ? (
           <span
             ref={triggerRef}
             data-sidebar-account=""
@@ -636,25 +636,26 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
         ) : (
           <span
             ref={triggerRef}
+            data-sidebar-account=""
             className={cn(
-              "flex min-h-[46px] w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors",
+              "relative flex min-h-9 w-full min-w-0 items-center gap-2 rounded-xl px-2 text-left transition-colors",
               open ? "bg-raised" : "hover:bg-raised/50",
             )}
           >
-            <InitialsAvatar initials={profileInitials(profile)} avatarUrl={profile?.avatarUrl} size={28} />
-            <span className="min-w-0 flex-1 truncate text-[14px] font-medium leading-5 text-ink">{name}</span>
-            {noteworthy && (
-              <span
-                title={update.label}
-                aria-label={update.label}
-                className={cn(
-                  "flex size-6 shrink-0 items-center justify-center rounded-full",
-                  update.phase === "error" ? "bg-danger/15 text-danger" : "bg-accent/15 text-accent",
-                )}
-              >
-                <UpdateIcon phase={update.phase} pending={update.pending} size={14} />
-              </span>
-            )}
+            <span className="relative flex size-6 shrink-0 items-center justify-center">
+              <InitialsAvatar initials={initials} avatarUrl={profile?.avatarUrl} size={24} fallback={nameless} fontSize={12} className="ring-1 ring-inset ring-ink/[0.04]" />
+              {noteworthy && (
+                <span
+                  title={update.label}
+                  aria-label={update.label}
+                  className={cn(
+                    "absolute -right-1 -top-1 size-2.5 rounded-full ring-2 ring-panel",
+                    update?.phase === "error" ? "bg-danger" : "bg-accent",
+                  )}
+                />
+              )}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-[13px] font-medium leading-[18px] text-ink">{name}</span>
           </span>
         )}
       />

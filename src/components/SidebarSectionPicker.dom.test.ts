@@ -96,7 +96,7 @@ describe("the move-to-department picker", () => {
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
     expect(add.disabled).toBe(false);
-    expect(add.className).toContain("bg-accent");
+    expect(add.className).toContain("ui-button-primary");
   });
 
   it("offers the danger row as a normal menu row when the bot is in a department", () => {

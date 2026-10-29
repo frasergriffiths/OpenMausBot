@@ -21,7 +21,6 @@ import { botPreview, groupPreview } from "./sidebar-preview";
 import { activeLocale, t } from "@/lib/i18n";
 import { copyText } from "@/lib/copy-text";
 import { ConfirmDialog } from "./ConfirmDialog";
-import { BulkSelectFilters, ThreadListFooter, deleteThreadsInBulk, useBulkSelect } from "./BulkSelectBar";
  
 import { StackedMauses } from "./StackedMauses";
 import { LocalComputerAutoWarning } from "./LocalComputerAutoWarning";
@@ -40,7 +39,7 @@ import { GroupThreadList } from "./SidebarGroupThreadList";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { draggedFolder, FOLDER_DRAG_TYPE, moveFolder, placeFolder } from "@/lib/folder-order";
 import { folderUnreadThreadIds, markFolderRead } from "@/lib/folder-read";
-import { HelperThreadGroup, orderedThreadList, splitArchivedThreads, partitionHelperThreads, SidebarThreadRow, stampClock, threadRecency, threadRowActions, useRelativeNow, useRevealedThreadRow, useSnoozeExpiry, visibleSidebarThreads } from "./SidebarThreadRow";
+import { orderedThreadList, splitArchivedThreads, SidebarThreadRow, stampClock, threadRecency, threadRowActions, useRelativeNow, useRevealedThreadRow, useSnoozeExpiry, visibleSidebarThreads } from "./SidebarThreadRow";
 import {
   loadCollapsedSections,
   loadSectionOrder,
@@ -305,7 +304,7 @@ function RoomContextMenu({
       aria-label={t("sidebar.bot.actions", { name: group.name })}
       onKeyDown={navigateThreadMenu}
       style={{ top, left }}
-      className={cn("fixed z-40 w-[228px] overflow-hidden", SIMPLE_MENU, motion.className)} {...motion.exitProps}
+      className={cn("fixed z-40 w-[228px] max-h-[calc(100dvh-16px)] overflow-y-auto overscroll-contain", SIMPLE_MENU, motion.className)} {...motion.exitProps}
     >
       {!remoteClient && describing ? (
         <div className="flex items-center gap-1 px-2 py-1">
@@ -483,7 +482,6 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
   const [reorderStatus, setReorderStatus] = useState("");
   const [folderDrop, setFolderDrop] = useState<{ id: string; place: "before" | "after" } | null>(null);
   const draggingFolder = useRef<string | null>(null);
-  const [showAll, setShowAll] = useState(false);
   const [permissionRefresh, setPermissionRefresh] = useState<{ threadId: string; kind: "local-auto" } | null>(null);
   const currentProjectId = tasks.find((task) => task.threadId === bot.threadId)?.projectId;
   useEffect(() => {
@@ -495,9 +493,7 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
     });
   }, [selected, currentProjectId]);
   useSnoozeExpiry(tasks);
-  const bulk = useBulkSelect();
-  const { own: ownTasks, helpers } = bulk.active ? { own: tasks, helpers: [] } : partitionHelperThreads(tasks, bot.threadId, query, projects);
-  const visibleTasks = orderedThreadList(visibleSidebarThreads(ownTasks, bot.threadId, query, projects, showAll || bulk.active));
+  const visibleTasks = orderedThreadList(visibleSidebarThreads(tasks, bot.threadId, query, projects));
   // Archived threads keep their own group at the end of the list, never mixed into the open ones or a folder.
   const { open: activeVisible, archived: archivedVisible } = splitArchivedThreads(visibleTasks);
   const visibleProjectIndex = (projectId: string) => activeVisible.findIndex((task) => task.projectId === projectId);
@@ -530,13 +526,9 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
   const renderThread = (task: (typeof tasks)[number]) => {
     const thread = currentTaskBot(bot, task.threadId);
     return <SidebarThreadRow key={task.threadId} task={{ ...task, busy: thread.busy, activity: thread.activity, waitingForTeammates: thread.waitingForTeammates }} ownerId={bot.id} current={selected && task.threadId === bot.threadId} compact={density === "compact"} folders={projects} color={spinnerColor(bot.color)}
-      activityLabel={task.threadId === bot.threadId ? activityLabel : undefined} now={stampClock(threadRecency(task), now)} locale={locale} {...actions}
-      selectMode={bulk.active} checked={selection.has(task.threadId)} onToggleSelect={bulk.toggle} />;
+      activityLabel={task.threadId === bot.threadId ? activityLabel : undefined} now={stampClock(threadRecency(task), now)} locale={locale} {...actions} />;
   };
   const ungrouped = activeVisible.filter((task) => !projects.some((project) => project.id === task.projectId));
-  const shownRows = [...orderedProjects.filter((project) => query || bulk.active || !collapsed.has(project.id)).flatMap((project) => activeVisible.filter((task) => task.projectId === project.id)), ...ungrouped]
-    .map((task) => { const thread = currentTaskBot(bot, task.threadId); return { ...task, busy: thread.busy, activity: thread.activity }; });
-  const selection = bulk.forRows(shownRows);
   const projectToEdit = projects.find((project) => project.id === editingProject);
   const projectIds = projects.map((project) => project.id);
   const saveOrder = (ids: string[], onSaved?: () => void) => {
@@ -564,13 +556,12 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
       onDragOver={(event) => { if (event.dataTransfer.types.includes(FOLDER_DRAG_TYPE)) event.stopPropagation(); }}
       onDrop={(event) => { if (event.dataTransfer.types.includes(FOLDER_DRAG_TYPE)) { event.preventDefault(); event.stopPropagation(); resetFolderDrag(); } }}>
       {!hidden && <>
-      {bulk.active && <BulkSelectFilters rows={shownRows} selected={selection} now={now} onChange={bulk.setSelected} onDone={bulk.finish} />}
       {orderedProjects.map((project) => {
         const index = projects.indexOf(project);
         const projectTasks = tasks.filter((task) => task.projectId === project.id);
         const visible = activeVisible.filter((task) => task.projectId === project.id);
         if (query && visible.length === 0 && !project.name.toLowerCase().includes(query.toLowerCase())) return null;
-        const open = Boolean(query) || bulk.active || !collapsed.has(project.id);
+        const open = Boolean(query) || !collapsed.has(project.id);
         const waiting = projectTasks.some((task) => task.activity === "waiting-on-you");
         const working = projectTasks.some((task) => task.busy);
         return <div key={project.id} data-sidebar-project={project.id}>
@@ -644,9 +635,6 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
           {archivedVisible.map(renderThread)}
         </div>
       )}
-      <HelperThreadGroup tasks={orderedThreadList(helpers)} busy={helpers.some((task) => currentTaskBot(bot, task.threadId).busy)} renderThread={renderThread} />
-      <ThreadListFooter bulk={bulk} rows={shownRows} selected={selection} total={ownTasks.length} canShowAll={!query && !showAll && ownTasks.length > visibleTasks.length} canSelect={tasks.length > 1}
-        onShowAll={() => setShowAll(true)} freshConversation onDelete={(threadIds) => deleteThreadsInBulk({ botId: bot.id }, threadIds, dispatch)} />
       <LocalComputerAutoWarning
         open={permissionRefresh?.kind === "local-auto"}
         onCancel={() => setPermissionRefresh(null)}
@@ -1276,7 +1264,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
     {plusMotion.shown && (
       <>
         <div role="menu" aria-label={remoteClient ? t("sidebar.new") : t("sidebar.newOrShare")} onKeyDown={navigateThreadMenu} className={cn(
-          "absolute z-40 w-max min-w-[200px] overflow-hidden", SIMPLE_MENU,
+          "absolute z-40 w-max min-w-[198px] max-h-[calc(100dvh-16px)] overflow-y-auto overscroll-contain", SIMPLE_MENU,
           rail ? "left-full top-0 ml-4" : cn("top-full", "mt-1.5", density === "icons" ? "left-0" : "right-0"),
           plusMotion.className,
         )} {...plusMotion.exitProps}>

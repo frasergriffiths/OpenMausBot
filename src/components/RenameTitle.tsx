@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { t } from "@/lib/i18n";
-import { Pencil } from "lucide-react";
 
 import { nextRename } from "@/lib/rename";
 import { cn } from "@/lib/cn";
@@ -10,23 +9,17 @@ export function RenameTitle({
   value,
   onCommit,
   onEditingChange,
-  onActivate,
-  showEditButton = false,
   editRequest = 0,
   title,
   className,
-  editButtonClassName,
   inputClassName,
 }: {
   value: string;
   onCommit: (next: string) => void;
   onEditingChange?: (editing: boolean) => void;
-  onActivate?: () => void;
-  showEditButton?: boolean;
   editRequest?: number;
   title?: string;
   className?: string;
-  editButtonClassName?: string;
   inputClassName?: string;
 }) {
   const [editing, setEditing] = useState(false);
@@ -84,57 +77,5 @@ export function RenameTitle({
     );
   }
 
-  const startRename = (event: { preventDefault(): void; stopPropagation(): void }) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setDraft(value);
-    setMode(true);
-  };
-
-  if (showEditButton) {
-    return (
-      <span className="flex min-w-0 items-center gap-0.5">
-        {onActivate ? (
-          <button
-            type="button"
-            onClick={onActivate}
-            aria-label={t("chat.openProfileAria", { name: value })}
-            className={cn("min-w-0 truncate text-left", className)}
-            title={t("chat.openProfile")}
-          >
-            {value}
-          </button>
-        ) : (
-          <span className={cn("min-w-0 truncate", className)}>{value}</span>
-        )}
-        <button
-          type="button"
-          onClick={startRename}
-          aria-label={t("rename.named", { name: value })}
-          title={t("rename.agent")}
-          className={cn("flex size-10 shrink-0 items-center justify-center rounded text-ink-secondary opacity-70 hover:bg-raised hover:text-ink hover:opacity-100", editButtonClassName)}
-        >
-          <Pencil size={12} />
-        </button>
-      </span>
-    );
-  }
-
-  return (
-    <span
-      className={cn("cursor-text", className)}
-      title={title ?? t("rename.doubleClick")}
-      tabIndex={0}
-      role="button"
-      aria-label={t("rename.named", { name: value })}
-      onDoubleClick={startRename}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          startRename(event);
-        }
-      }}
-    >
-      {value}
-    </span>
-  );
+  return <span className={className} title={title}>{value}</span>;
 }

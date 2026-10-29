@@ -13,7 +13,7 @@ import type { LocaleKey } from "@/locales";
 import { api, useStore, type Bot, type Message } from "@/state/store";
 import { moveChoiceFocus, returnFocusToComposer } from "./AskCard";
 import { MAUS_COLORS, mascotInk } from "@/lib/mascot";
-import { PlaceControl, PlaceAnswer } from "./bot-panel/PlaceControl";
+import { PlaceControl } from "./bot-panel/PlaceControl";
 
 const blank = (bot: Pick<Bot, "soul" | "description">): boolean => !bot.soul?.trim() && !bot.description?.trim();
 const LETTERS = "ABCDEFGH";
@@ -61,7 +61,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
   else if (shown.current?.id !== message.id) {
     shown.current = { id: message.id, choices: message.setupChoices?.length ? message.setupChoices : FALLBACK_CHOICES.map((key) => t(key)) };
   }
-  const choices = pending ? [] : shown.current!.choices;
+  const choices = pending ? [] : (shown.current?.choices ?? []);
   const title = t("chat.setupCard.title");
 
   const ask = (text?: string) => {
@@ -138,12 +138,12 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
           })}
         </div>
       </div>}
-      {!settled && !pending && <SetupPlaceQuestion bot={bot} />}
+      {!pending && <SetupPlaceQuestion bot={bot} answered={settled} />}
       {!settled && !pending && (
-        <div className="px-0 pb-1 pt-3">
+        <div className="flex px-3 pb-1 pt-3">
           <button type="button" data-setup-submit="" disabled={selected === null || busy} onClick={() => submit(selected)}
             style={(() => { const colour = bot.color && Object.hasOwn(MAUS_COLORS, bot.color) ? bot.color : "purple"; return { backgroundColor: MAUS_COLORS[colour], color: mascotInk(colour) }; })()}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60">
+            className="flex h-10 min-w-[160px] max-w-full items-center justify-center gap-2 self-start rounded-full px-5 text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60">
             {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {t("chat.setupCard.submit", { name: bot.name })}
           </button>
@@ -153,8 +153,6 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
         <div data-setup-answer="" className="mx-3 mb-1 mt-1.5 border-t border-hairline/40 pt-2.5">
           <div className="text-[12px] leading-4 text-ink-tertiary">{t("chat.setupCard.answer")}</div>
           <div dir="auto" className="mt-0.5 break-words text-[14px] leading-5 text-ink">{answer.text}</div>
-          <div className="mt-2.5 text-[12px] leading-4 text-ink-tertiary">{t("computer.simple.whereWorks", { name: bot.name })}</div>
-          <div data-setup-place-answer="" className="mt-0.5"><PlaceAnswer bot={bot} /></div>
         </div>
       )}
       {error && <p role="alert" dir="auto" className="mx-3 mb-1 mt-1 text-[12px] text-danger">{error}</p>}
@@ -165,10 +163,10 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
 /** The card's place question, shown with the first so both are on screen at once: the profile's own place control, so
  *  the words, the states and the menu are the ones every other surface draws. A pick writes the same bot fields that
  *  control writes; the card's job pick is what sends the setup request. */
-export function SetupPlaceQuestion({ bot }: { bot: Bot }) {
+export function SetupPlaceQuestion({ bot, answered = false }: { bot: Bot; answered?: boolean }) {
   const { dispatch } = useStore();
   return (
-    <div data-setup-place="" className="mx-3 mb-1 mt-2 border-t border-hairline/40 pt-2.5">
+    <div data-setup-place="" {...(answered ? { "data-setup-place-answer": "" } : {})} className="mx-3 mb-1 mt-2 border-t border-hairline/40 pt-2.5">
       <h4 dir="auto" className="mb-1.5 py-px text-[13px] font-medium leading-[18px] text-ink">{t("computer.simple.whereWorks", { name: bot.name })}</h4>
       <PlaceControl
         bot={bot}

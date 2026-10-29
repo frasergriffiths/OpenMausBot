@@ -88,7 +88,7 @@ export function TraceDialog({ id, at, onClose }: { id: string; at?: number; onCl
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/55 p-3 sm:p-8"
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
     >
-      <div role="dialog" aria-modal="true" aria-label={t("trace.title")} className="w-full max-w-[1100px] animate-pop-in shadow-2xl">
+      <div role="dialog" aria-modal="true" aria-label={t("trace.title")} className="w-full max-w-[1100px] shadow-2xl">
         <TraceView id={id} at={at} actions={(
           <button
             ref={closeRef}

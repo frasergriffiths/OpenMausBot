@@ -147,7 +147,7 @@ export function InspectorPanel({ bot, embedded = false }: { bot: Bot; embedded?:
   return (
     <aside aria-label="Inspector" className={embedded
       ? "flex min-h-0 min-w-0 flex-1 flex-col"
-      : "animate-panel-in absolute inset-0 z-40 flex h-full min-w-0 flex-col border-l border-hairline/40 bg-panel md:static md:z-auto md:w-[min(460px,45vw)] md:shrink-0"}>
+      : "absolute inset-0 z-40 flex h-full min-w-0 flex-col border-l border-hairline/40 bg-panel md:static md:z-auto md:w-[min(460px,45vw)] md:shrink-0"}>
       {!embedded && <div {...dragProps} className={cn("flex items-center justify-between px-4 py-3", padClass)}>
         <span className="flex items-center gap-2 text-[15px] font-semibold text-ink">
           <Bug size={16} className="text-ink-secondary" /> Inspector

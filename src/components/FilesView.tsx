@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Folder, FolderOpen, MoreHorizontal } from "lucide-react";
 import type { CloudFilesBridge, CloudFilesDisk, CloudFilesState, FolderCheck, SharedFolder } from "../../electron/cloud-sync.mjs";
 import { cn } from "@/lib/cn";
+import { SIMPLE_MENU, SIMPLE_MENU_ITEM } from "./SidebarSimpleTop";
 import { cloudFilesBridge, useCloudFiles } from "@/lib/cloud-files";
 import { activeLocale, t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
@@ -207,11 +208,11 @@ function FolderMenu({ name, busy, onOpen, onStop }: { name: string; busy: boolea
     return () => { window.removeEventListener("keydown", onKey, true); window.removeEventListener("pointerdown", onDown); };
   }, [open]);
   const item = (label: string, action: () => void, danger = false) => <button type="button" role="menuitem" disabled={busy}
-    className={cn("ui-menu-row w-full text-left", danger ? "text-danger" : "text-ink")} onClick={() => { setOpen(false); action(); }}>{label}</button>;
+    className={cn(SIMPLE_MENU_ITEM, danger && "text-danger")} onClick={() => { setOpen(false); action(); }}>{label}</button>;
   return <div ref={ref} className="relative shrink-0">
     <button type="button" aria-haspopup="menu" aria-expanded={open} aria-label={t("files.more", { name })}
       className="ui-icon-button hover:bg-control hover:text-ink" onClick={() => setOpen((value) => !value)}><MoreHorizontal size={16} /></button>
-    {open && <div role="menu" className="popover-surface absolute right-0 top-full z-40 mt-1 w-[220px] overflow-hidden rounded-xl border border-hairline/50 bg-card py-1.5 text-[13px] shadow-2xl shadow-black/50">
+    {open && <div role="menu" className={cn("absolute right-0 top-full z-40 mt-1 w-[220px] max-h-[calc(100dvh-16px)] overflow-y-auto overscroll-contain", SIMPLE_MENU)}>
       {item(t("files.openHere"), onOpen)}
       {item(t("files.stop"), onStop, true)}
     </div>}

@@ -502,7 +502,7 @@ export function TeamLibraryPanel({
         aria-modal="true"
         aria-labelledby="team-library-title"
         tabIndex={-1}
-        className="glass-surface glass-popup animate-pop-in relative flex max-w-[780px] flex-col overflow-hidden rounded-2xl outline-none"
+        className="glass-surface glass-popup relative flex max-w-[780px] flex-col overflow-hidden rounded-2xl outline-none"
       >
         <header className="flex flex-col gap-4 px-5 pb-4 pt-5 sm:px-7 sm:pt-6">
           <div>

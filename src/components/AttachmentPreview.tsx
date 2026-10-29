@@ -544,7 +544,7 @@ export function AttachmentPreviewDialog({
         aria-modal="true"
         aria-label={t("attach.previewAria", { name: current.name })}
         tabIndex={-1}
-        className="animate-pop-in flex h-full max-h-[900px] w-full max-w-[1200px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-black/70 shadow-2xl outline-none"
+        className="flex h-full max-h-[900px] w-full max-w-[1200px] flex-col overflow-hidden rounded-2xl border border-white/15 bg-black/70 shadow-2xl outline-none"
       >
         <header className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 bg-black/45 px-4 py-3">
           <div className="min-w-0">

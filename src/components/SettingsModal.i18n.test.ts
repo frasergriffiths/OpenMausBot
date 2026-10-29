@@ -38,7 +38,7 @@ describe("Settings → General", () => {
     setLocale("pt-br");
     const pt = await renderSettings();
     expect(pt).toContain("Configurações");
-    expect(pt).toContain("Idioma do app");
+    expect(pt).toContain("Análise de uso");
     expect(pt).toContain("Duração máxima do turno");
 
     // Same module instance, no reload: a frozen label would still say "Provedores de modelos" here.
@@ -46,7 +46,7 @@ describe("Settings → General", () => {
     const ja = await renderSettings();
     expect(ja).toContain("設定");
     for (const key of [
-      "settings.section.appearance", "settings.section.backups", "settings.section.people",
+      "settings.section.appearance", "settings.section.connections",
     ] as const) {
       expect(locales.ja[key], key).toBeTruthy();
       expect(locales.ja[key], key).not.toBe(en[key]);

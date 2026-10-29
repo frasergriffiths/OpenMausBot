@@ -78,7 +78,8 @@ describe("the Simple computer switcher", () => {
     expect(menu.className).toContain("gap-0.5");
     expect(menu.className).toContain("shadow-lg");
     expect(menu.className).not.toContain("shadow-2xl");
-    expect(menu.className).toContain("animate-pop-in");
+    expect(menu.className).not.toContain("animate-pop-in");
+    expect(menu.className).not.toContain("animate-pop-out");
     const rowsNow = rows();
     for (const token of ["min-h-[30px]", "text-[13px]", "rounded-md", "px-2"]) expect(rowsNow[1]!.className).toContain(token);
     expect(rowsNow[1]!.querySelector("span")!.className).toContain("size-4");

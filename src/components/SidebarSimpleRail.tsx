@@ -1,6 +1,5 @@
-import { SidebarConnectApps } from "./SidebarConnectApps";
 import { SidebarPlaceStatus, useSimplePlace, type FooterPlaceButtons } from "./SidebarFooter";
-import { SidebarTeamMapButton, SidebarTemplatesButton } from "./SidebarFooterNav";
+import { SidebarAppsButton, SidebarTeamMapButton, SidebarTemplatesButton } from "./SidebarFooterNav";
 import { SidebarProfileMenu, useSimpleAccount, type ArchivedBots } from "./SidebarProfileMenu";
 import { UpdateIndicator } from "./UpdateIndicator";
 
@@ -16,8 +15,8 @@ export function SimpleRailFooter({ owner = null, archived, places }: {
   const place = useSimplePlace();
   const account = useSimpleAccount(place, owner, archived);
   return (
-    <div data-sidebar-rail-footer="" className="relative flex flex-col items-center gap-2 px-2 pb-4 pt-2">
-      <SidebarConnectApps circle />
+    <div data-sidebar-rail-footer="" className="relative flex flex-col items-center gap-2 px-2 pb-3 pt-2">
+      <SidebarAppsButton />
       <SidebarTeamMapButton open={places?.teamMapOpen} onOpen={places?.onOpenTeamMap} />
       <SidebarTemplatesButton open={places?.templatesOpen} onOpen={places?.onOpenTemplates} />
       <UpdateIndicator />

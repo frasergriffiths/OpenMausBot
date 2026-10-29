@@ -1,7 +1,7 @@
 import { createContext, memo, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type Dispatch } from "react";
 import { PHONE_LAYOUT, useMediaQuery } from "@/lib/use-media-query";
 import { ThreadLinkContext } from "@/components/ThreadLinkMenu";
-import { useShowThreads, useShowThreadsChoice } from "@/lib/thread-preferences";
+import { useShowThreads } from "@/lib/thread-preferences";
 import { AlertTriangle, ChevronLeft, ChevronRight, Copy, Monitor, RefreshCw, Reply, Square, Webhook } from "lucide-react";
 import { WorkingDots } from "@/components/WorkingIndicator";
 import { ACTION_ICON, CopyButton, MESSAGE_ROW, MessageActions, messageActionClass, ReplyAction, type MessageMenuItem } from "@/components/MessageActions";
@@ -89,9 +89,7 @@ import { ChatHeadRole, chiefOfStaffBadge } from "./BotRole";
 import { BotActivityPicker } from "./TaskPicker"; import { ChatHeadPill } from "./ChatHeadPill";
 import { ELEVATED_FLOAT, ELEVATED_HOVER } from "./elevated";
 import { ModelPicker } from "./ModelPicker";
-import { ChatHeaderMenu, ChatMoreMenu } from "./ChatMoreMenu"; import { ChatThreadChip, chatThreadChipShown } from "./ChatThreadBar";
-import { ChatThreadTabs } from "./ChatThreadTabs";
-import { useThreadChipStyle } from "@/lib/sidebar-preferences"; import { TeamPrivateFirstLine, TeamPrivateHeader, TeamSharedHeader } from "./TeamPrivateChatsLine";
+import { ChatHeaderMenu, ChatMoreMenu } from "./ChatMoreMenu"; import { TeamPrivateFirstLine, TeamPrivateHeader, TeamSharedHeader } from "./TeamPrivateChatsLine";
 import { useChatFindRequests } from "@/lib/chat-find";
 import { SpeakButton } from "./SpeakButton";
 import { CallOverlay } from "./CallView";
@@ -809,18 +807,12 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
   const bot = useMemo(() => currentTaskBot(profile), [profile]);
   const { state, dispatch } = useStore();
   const showThreads = useShowThreads();
-  // The strip is a chat-header control, not a panel: it follows the person's threads preference, so the chat can still
-  // switch threads without opening the bot panel.
-  const threadsWanted = useShowThreadsChoice();
   const remoteClient = window.ogb?.remoteClient?.active === true;
   const { dragProps: headerDragProps, noDragStyle: headerNoDragStyle, controlsShiftStyle } = useCaptionChrome();
   const composerDockRef = useRef<HTMLDivElement>(null);
   const composerDock = useComposerDockPad(composerDockRef);
   const phone = useMediaQuery(PHONE_LAYOUT);
   const phoneMenu = phone && !remoteClient;
-  const threadChipVisible = threadsWanted && !phone && chatThreadChipShown(profile);
-  const threadChipStyle = useThreadChipStyle();
-  // A strip hidden by the header's container query has zero width; only a measured, visible strip may label the panel.
   const simpleHead = !remoteClient;
   const canWrite = useCanWriteIn(bot.threadId);
 
@@ -992,7 +984,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
       <CallOverlay bot={bot} />
       <GlassScrollFrame className="flex-1 [--glass-tint:var(--color-app)]">
       {/* z-[25]: above the room set-up card (z-20), below the CallOverlay (z-30). */}
-      <GlassBar edge="top" fade={simpleHead && !threadChipVisible} className="z-[25]">
+      <GlassBar edge="top" fade={simpleHead} className="z-[25]">
       <div
         {...headerDragProps}
         className={cn(
@@ -1002,11 +994,6 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
         )}
       >
         <div data-chathead-row className={cn("flex items-center justify-between", phone ? "gap-2" : "@max-[30rem]/chathead:flex-wrap @max-[30rem]/chathead:gap-y-1 @min-[30rem]/chathead:grid @min-[30rem]/chathead:grid-cols-[minmax(0,1fr)_minmax(0,auto)_minmax(max-content,1fr)]")}>
-        {threadChipVisible && (
-          <div data-chathead-tabbar className="flex min-w-0 @min-[30rem]/chathead:w-full @min-[30rem]/chathead:col-start-1 @min-[30rem]/chathead:justify-self-start">
-            {threadChipStyle === "tabs" ? <ChatThreadTabs bot={profile} /> : <ChatThreadChip bot={profile} noDragStyle={headerNoDragStyle} />}
-          </div>
-        )}
         <div data-chathead-identity className={cn("flex min-w-0 items-center gap-2", phone ? "flex-1" : "@max-[30rem]/chathead:basis-full @min-[30rem]/chathead:col-start-2 @min-[30rem]/chathead:justify-self-center", simpleHead && phone && "justify-center")} style={headerNoDragStyle}>
           {simpleHead ? (
             <ChatHeadPill

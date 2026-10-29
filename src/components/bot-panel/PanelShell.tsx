@@ -14,13 +14,28 @@ import { AvatarEditorCard } from "./AvatarEditorCard";
 import { ComputerTab } from "./ComputerTab";
 import { DetailsTab } from "./DetailsTab";
 import { LibraryTab } from "./LibraryTab";
-import { PANEL_TABS, PAGES, TAB_LABEL, type PanelTarget, type SimplePageId } from "./page-registry";
+import { PANEL_TABS, PAGES, TAB_LABEL, type PanelTarget, type PanelTab, type SimplePageId } from "./page-registry";
 import { PageBody, pageSurfaceCls } from "./pages";
 import { linkTarget, usePanelLink, type PanelLink } from "./panel-link";
 import { roundButtonCls } from "./rows";
 
-function initialTarget(section: BotSettingsSection | null, link: PanelLink | null): PanelTarget {
-  return section ? linkTarget(section, link) : { tab: "profile" };
+/** The top-level tab is remembered per device: switching bots remounts the panel, but should land on the same tab's
+ * root. A new named open still wins. */
+let lastPanelTab: PanelTab = "profile";
+let lastLinkNonce: number | null = null;
+let lastBotId: string | null = null;
+
+/** Test seam: the tab is device memory in the app; tests start each case as a fresh device. */
+export function resetPanelTabMemory(): void {
+  lastPanelTab = "profile";
+  lastLinkNonce = null;
+  lastBotId = null;
+}
+
+function initialTarget(section: BotSettingsSection | null, link: PanelLink | null, botId: string): PanelTarget {
+  const freshLink = link && link.section === section && link.nonce !== lastLinkNonce;
+  const switching = lastBotId !== null && lastBotId !== botId;
+  return freshLink ? linkTarget(section, link) : !switching && section ? linkTarget(section, link) : { tab: lastPanelTab };
 }
 
 export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspace, headerClassName, headerProps }: {
@@ -33,14 +48,12 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
   onOpenVmWorkspace?: (botId: string) => void;
 }) {
   const link = usePanelLink();
-  const [tab, setTab] = useState(() => initialTarget(linkedSection, link).tab);
-  const [stack, setStack] = useState<SimplePageId[]>(() => {
-    const page = initialTarget(linkedSection, link).page;
-    return page ? [page] : [];
-  });
-  const [anchor, setAnchor] = useState<string | null>(() => initialTarget(linkedSection, link).anchor ?? null);
+  const start = useRef(initialTarget(linkedSection, link, bot.id)).current;
+  const [tab, setTab] = useState(start.tab);
+  const [stack, setStack] = useState<SimplePageId[]>(start.page ? [start.page] : []);
+  const [anchor, setAnchor] = useState<string | null>(start.anchor ?? null);
   const [editorOpen, setEditorOpen] = useState(false);
-  const [editingInstructions, setEditingInstructions] = useState(() => Boolean(initialTarget(linkedSection, link).editInstructions));
+  const [editingInstructions, setEditingInstructions] = useState(Boolean(start.editInstructions));
   const bodyRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -48,6 +61,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
 
   const scrollTop = () => bodyRef.current?.scrollTo({ top: 0 });
   const go = (target: PanelTarget) => {
+    lastPanelTab = target.tab;
     setTab(target.tab);
     setStack(target.page ? [target.page] : []);
     setAnchor(target.anchor ?? null);
@@ -70,9 +84,17 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
     scrollTop();
   };
 
+  const seen = useRef({ section: linkedSection, link });
   useEffect(() => {
-    if (linkedSection) go(linkTarget(linkedSection, link));
+    const changed = seen.current.section !== linkedSection || seen.current.link !== link;
+    seen.current = { section: linkedSection, link };
+    if (changed && linkedSection) go(linkTarget(linkedSection, link));
   }, [linkedSection, link]);
+  useEffect(() => {
+    lastPanelTab = tab;
+    lastBotId = bot.id;
+    if (link) lastLinkNonce = link.nonce;
+  }, [bot.id, link, tab]);
 
   useEffect(() => {
     if (!anchor) return;

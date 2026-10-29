@@ -5,25 +5,19 @@ import { describe, expect, it, vi } from "vitest";
 import { RenameTitle } from "./RenameTitle";
 
 describe("RenameTitle", () => {
-  it("does not expose an inert profile button when onActivate is absent", () => {
+  it("renders a plain label with no rename gesture and no text cursor", () => {
     const markup = renderToStaticMarkup(createElement(RenameTitle, {
       value: "Maus",
       onCommit: vi.fn(),
-      showEditButton: true,
+      title: "Maus · Researcher",
+      className: "truncate",
     }));
 
-    expect(markup).not.toContain("Open Maus&#x27;s profile");
-    expect(markup).toContain('aria-label="Rename Maus"');
-  });
-
-  it("exposes the profile button when onActivate is provided", () => {
-    const markup = renderToStaticMarkup(createElement(RenameTitle, {
-      value: "Maus",
-      onCommit: vi.fn(),
-      onActivate: vi.fn(),
-      showEditButton: true,
-    }));
-
-    expect(markup).toContain("Open Maus&#x27;s profile");
+    expect(markup).toContain("Maus");
+    expect(markup).toContain('title="Maus · Researcher"');
+    expect(markup).not.toContain("cursor-text");
+    expect(markup).not.toContain("tabindex");
+    expect(markup).not.toContain('role="button"');
+    expect(markup).not.toContain("aria-label");
   });
 });

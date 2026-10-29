@@ -86,7 +86,7 @@ describe("the department menu's rows", () => {
 });
 
 describe("the department menu's panel", () => {
-  it("carries the shared recipe and pop motion, and sits fully inside a 320x480 window from the right edge", async () => {
+  it("carries the shared recipe with no motion, and sits fully inside a 320x480 window from the right edge", async () => {
     flushSync(() => root.render(createElement(Harness)));
     trigger().dispatchEvent(new MouseEvent("click", { bubbles: true }));
     await tick();
@@ -96,7 +96,8 @@ describe("the department menu's panel", () => {
     expect(sheet.className).toContain("bg-menu");
     expect(sheet.className).toContain("p-1.5");
     expect(sheet.className).toContain("shadow-lg");
-    expect(sheet.className).toContain("animate-pop-in");
+    expect(sheet.className).not.toContain("animate-pop-in");
+    expect(sheet.className).not.toContain("animate-pop-out");
     expect(sheet.className).toContain("max-w-[calc(100vw-16px)]");
     expect(sheet.getAttribute("role")).toBe("menu");
     expect(sheet.getAttribute("aria-label")).toBe("Engineering");

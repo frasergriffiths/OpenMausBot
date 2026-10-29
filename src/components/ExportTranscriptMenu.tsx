@@ -3,6 +3,7 @@ import { Check, Copy, Download, Share } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { useMenuMotion } from "./MenuMotion";
+import { SIMPLE_MENU, SIMPLE_MENU_ITEM } from "./SidebarSimpleTop";
 import {
   copyTranscriptToClipboard,
   downloadMarkdownTranscript,
@@ -114,7 +115,7 @@ export function ExportTranscriptMenu({
         <div
           role="menu"
           aria-label="Export options"
-          className={cn("popover-surface absolute right-0 top-full z-40 mt-1 w-[220px] overflow-hidden rounded-xl border border-hairline/50 bg-card py-1.5 shadow-2xl shadow-black/50", motion.className)} {...motion.exitProps}
+          className={cn("absolute right-0 top-full z-40 mt-1 w-[220px] max-h-[calc(100dvh-16px)] overflow-y-auto overscroll-contain", SIMPLE_MENU, motion.className)} {...motion.exitProps}
         >
           <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-ink-tertiary">
             Export Conversation
@@ -130,7 +131,7 @@ export function ExportTranscriptMenu({
                 type="button"
                 role="menuitem"
                 onClick={() => void handleCopy()}
-                className="ui-menu-row text-ink"
+                className={SIMPLE_MENU_ITEM}
               >
                 {copied ? (
                   <Check size={14} className="shrink-0 text-success" />
@@ -152,7 +153,7 @@ export function ExportTranscriptMenu({
                 type="button"
                 role="menuitem"
                 onClick={handleDownload}
-                className="ui-menu-row text-ink"
+                className={SIMPLE_MENU_ITEM}
               >
                 <Download size={14} className="shrink-0 text-ink-secondary" />
                 <span className="flex-1 truncate">Download as .md</span>

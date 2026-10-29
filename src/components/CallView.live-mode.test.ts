@@ -118,8 +118,10 @@ describe("call modes", () => {
     // no plan to buy and no key field: the key goes in Settings → API keys
     for (const gone of ["Pro plan", "Start free trial", 'type="password"']) expect(header).not.toContain(gone);
     expect(header).toMatch(/aria-expanded="true" aria-controls="[^"]+"[^>]*aria-label="Live call with Atlas"/);
-    const popup = /<div id="([^"]+)" class="animate-pop-in/.exec(header);
+    const popup = /<div id="([^"]+)" class="([^"]*)"/.exec(header);
     expect(popup).not.toBeNull();
+    expect(popup![2]).not.toContain("animate-pop-in");
+    expect(popup![2]).not.toContain("animate-pop-out");
     expect(header).toContain(`aria-controls="${popup![1]}"`);
     const composer = render(createElement(CallButton, { bot, placement: "composer" }));
     expect(composer).toContain("Live calls use your own OpenAI key.");

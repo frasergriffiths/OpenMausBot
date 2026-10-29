@@ -50,6 +50,7 @@ describe("the setup card while its answers are written", () => {
     expect(container.querySelectorAll("[data-setup-waiting] > div")).toHaveLength(6);
     expect(container.querySelectorAll("kbd")).toHaveLength(0);
     expect(card()!.textContent).not.toContain("Something else");
+    expect(container.querySelector("[data-setup-place]")).toBeNull();
     press("a");
     press("f");
     expect(fixture.api).not.toHaveBeenCalled();
@@ -64,6 +65,7 @@ describe("the setup card while its answers are written", () => {
     expect(container.querySelector("[data-setup-waiting]")).toBeNull();
     expect(labels()).toEqual([...PERSONAL, "Something else"]);
     expect(card()!.getAttribute("aria-busy")).toBeNull();
+    expect(container.querySelector("[data-setup-place]")).not.toBeNull();
     press("b");
     act(() => void container.querySelector<HTMLButtonElement>("[data-setup-submit]")!.click());
     expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1", text: PERSONAL[1] }) });
@@ -90,6 +92,7 @@ describe("the setup card while its answers are written", () => {
     expect(labels()).toEqual([...FIXED, "Something else"]);
     expect([...container.querySelectorAll<HTMLButtonElement>("[data-ask-choice]")].every((button) => button.disabled)).toBe(true);
     expect(container.querySelector('button[aria-label="Close"]')).toBeNull();
+    expect(container.querySelector("[data-setup-place]")).not.toBeNull();
   });
 
   it("keeps the first list it showed when the answers change afterwards, so a letter never picks a job that was not on screen", () => {

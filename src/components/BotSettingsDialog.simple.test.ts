@@ -109,7 +109,7 @@ vi.mock("@/state/store", async (importOriginal) => {
 });
 
 const { BotSettingsDialog } = await import("./BotSettingsDialog");
-const { BotPanel } = await import("./bot-panel/PanelShell");
+const { BotPanel, resetPanelTabMemory } = await import("./bot-panel/PanelShell");
 const { PanelHero } = await import("./bot-panel/PanelHero");
 const { AvatarEditorCard } = await import("./bot-panel/AvatarEditorCard");
 const { DetailsTab } = await import("./bot-panel/DetailsTab");
@@ -225,6 +225,7 @@ const switches = (html: string) => html.match(/role="switch"/g)?.length ?? 0;
 const pressed = (html: string, attr: string) => [...html.matchAll(new RegExp(`${attr}="([\\w-]+)" aria-pressed="true"`, "g"))].map((match) => match[1]);
 
 beforeEach(() => {
+  resetPanelTabMemory();
   fixture.advanced = false;
   fixture.setAdvanced = vi.fn();
   fixture.ownerOrAdmin = false;
@@ -279,6 +280,23 @@ describe("the bot panel in Simple mode", () => {
       expect(shown(rendered).tab).toBe(tab);
       expect(ofType(rendered, type)).toBeDefined();
     }
+  });
+
+  it("keeps the last top-level tab when another bot takes the panel, at that tab's root", () => {
+    const scout = makeBot();
+    const nova = makeBot({ id: "nova", threadId: "thread-nova", name: "Nova" });
+    click(find(panel(scout), "data-panel-tab", "library"));
+    expect(shown(panel(scout)).tab).toBe("library");
+    (ofType(panel(scout), LibraryTab)!.props.onOpen as (page: string) => void)("memory");
+    expect(shown(panel(scout))).toEqual({ tab: undefined, page: "memory" });
+    fresh();
+    const switched = panel(nova);
+    expect(shown(switched)).toEqual({ tab: "library", page: undefined });
+    expect(ofType(switched, LibraryTab)).toBeDefined();
+    click(find(panel(nova), "data-panel-tab", "profile"));
+    fresh();
+    expect(shown(panel(nova, "access")).tab).toBe("computer");
+    click(find(panel(nova), "data-panel-tab", "profile"));
   });
 
   it("drills into a page with its intro and back, naming where Back goes", () => {

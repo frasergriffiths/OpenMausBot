@@ -1,7 +1,7 @@
 import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { setLocale } from "@/lib/i18n";
+import { setLocale, t } from "@/lib/i18n";
 import type { AppSettingsSection } from "@/state/store";
 import type { Switch } from "./SettingsPrimitives";
 import { SECTIONS, SIMPLE_FOLDED, SIMPLE_HIDDEN_SECTIONS, SIMPLE_PAGES, SettingsModal, revealSettingsBlock } from "./SettingsModal";
@@ -129,14 +129,30 @@ const placement = (html: string, needle: string): "shown" | "folded" | "missing"
 const open = (section: AppSettingsSection) => { fixture.section = section; return render(); };
 
 describe("Settings, the one plain UI", () => {
-  it("draws six pages and no section rail", () => {
+  it("draws nine pages in the split order and no section rail", () => {
     const html = render();
-    expect(pages(html)).toEqual(["general", "ai", "keys", "computer", "billing", "updates"]);
-    expect(SIMPLE_PAGES.map((page) => page.id)).toEqual(["general", "ai", "keys", "computer", "billing", "updates"]);
+    const order = ["account", "appearance", "data", "ai", "skills", "keys", "computer", "billing", "updates"];
+    expect(pages(html)).toEqual(order);
+    expect(SIMPLE_PAGES.map((page) => page.id)).toEqual(order);
     expect(html).not.toContain("data-settings-group=");
     expect(html).not.toContain("data-settings-section=");
     expect(html).toContain('data-settings-look="simple"');
     expect(html).not.toMatch(/Advanced mode/);
+  });
+
+  it("gives every page a description line under its title", () => {
+    expect(SIMPLE_PAGES.map((page) => page.descriptionKey)).toEqual([
+      "settings.simple.page.account.description",
+      "settings.simple.page.appearance.description",
+      "settings.simple.page.data.description",
+      "settings.simple.page.ai.description",
+      "settings.simple.page.skills.description",
+      "settings.simple.page.keys.description",
+      "settings.simple.page.computer.description",
+      "settings.simple.page.billing.description",
+      "settings.simple.page.updates.description",
+    ]);
+    expect(render()).toContain(t("settings.simple.page.account.description"));
   });
 
   it("places every section on a page, with none left over", () => {
@@ -147,25 +163,37 @@ describe("Settings, the one plain UI", () => {
     expect(SIMPLE_HIDDEN_SECTIONS).toEqual([]);
   });
 
-  it("opens General on Account, Appearance, Sidebar, Notifications, System, Limits and recovery, Backups, Import", () => {
+  it("opens Account on the profile, the plan, People, System and Limits", () => {
     const html = render();
-    expect(currentPage(html)).toBe("general");
-    expect(groupLabels(html)).toEqual(["Account", "Appearance", "Notifications", "System", "Limits and recovery", "Import"]);
-    expect(html).toContain("Sidebar");
-    expect(html).toContain("Export or restore every bot, chat and setting in one encrypted file.");
+    expect(currentPage(html)).toBe("account");
+    expect(groupLabels(html)).toEqual(["System", "Limits and recovery"]);
     expect(html).toContain("Add your name");
-    expect(html).toContain('data-settings-disclosure="general-sidebar"');
-    expect(html).toContain('data-settings-disclosure="general-backups"');
+    expect(html).not.toContain('data-settings-disclosure="general-backups"');
+  });
+
+  it("keeps Appearance, Sidebar, notifications and Backups on their own pages", () => {
+    const appearance = open("appearance");
+    expect(currentPage(appearance)).toBe("appearance");
+    expect(groupLabels(appearance)).toEqual(["Notifications"]);
+    expect(appearance).toContain("Sidebar");
+    expect(appearance).toContain('data-settings-disclosure="general-sidebar"');
+    const data = open("backups");
+    expect(currentPage(data)).toBe("data");
+    expect(groupLabels(data)).toEqual(["Import"]);
+    expect(data).toContain('data-settings-disclosure="general-backups"');
+    expect(data).toContain("Export or restore every bot, chat and setting in one encrypted file.");
   });
 
   it("keeps the everyday rows and every merged control reachable by its own page", () => {
-    const general = open("general");
-    for (const shown of ['aria-label="Send usage analytics"', 'aria-label="Color my messages with the bot&#x27;s color"', 'aria-label="Send messages with"',
+    const account = open("general");
+    expect(placement(account, 'aria-label="Send usage analytics"')).toBe("shown");
+    expect(markers(account)).toEqual(expect.arrayContaining(["roomTurns", "threads", "recovery", "threadCleanup"]));
+    const appearance = open("appearance");
+    for (const shown of ['aria-label="Color my messages with the bot&#x27;s color"', 'aria-label="Send messages with"',
       'aria-label="Notification sounds"', 'aria-label="Show the notification feed"', 'aria-label="App language"', 'role="radiogroup" aria-label="Theme"']) {
-      expect(placement(general, shown), shown).toBe("shown");
+      expect(placement(appearance, shown), shown).toBe("shown");
     }
-    expect(placement(general, 'aria-label="Choose sidebar density"')).toBe("folded");
-    expect(markers(general)).toEqual(expect.arrayContaining(["roomTurns", "threads", "recovery", "threadCleanup"]));
+    expect(placement(appearance, 'aria-label="Choose sidebar density"')).toBe("folded");
     const ai = open("engines");
     expect(markers(ai)).toEqual(expect.arrayContaining(["engines", "keepWarm", "decisionModel", "mcpCalls", "defaults"]));
     expect(ai).toContain('aria-label="Effort for new bots"');
@@ -199,10 +227,10 @@ describe("Settings, the one plain UI", () => {
     expect(SIMPLE_FOLDED).toEqual({ remote: "computer-elsewhere", desktopWorkspaces: "computer-elsewhere" });
   });
 
-  it("lands a deep link to the skills library on AI when the library is on", () => {
+  it("lands a deep link to the skills library on Skills when the library is on", () => {
     fixture.config = { ...fixture.config, features: { browser: false, skillsLibrary: true } };
     const html = open("skills");
-    expect(currentPage(html)).toBe("ai");
+    expect(currentPage(html)).toBe("skills");
     expect(blocks(html)).toContain("skills");
     expect(markers(html)).toContain("skills");
   });
@@ -236,41 +264,43 @@ describe("Settings, the one plain UI", () => {
     expect(groupLabels(html)).toContain("Plan");
   });
 
-  it("shows a hosted workspace's admins People in Account and Activity as its own group", () => {
+  it("shows a hosted workspace's admins People in Account and Activity as its own group on Data", () => {
     vi.stubGlobal("window", {});
     fixture.ownerOrAdmin = true;
     fixture.section = "people";
     const html = render();
-    expect(pages(html)).toEqual(["general", "ai", "keys", "computer", "billing", "updates"]);
-    expect(currentPage(html)).toBe("general");
+    expect(pages(html)).toEqual(["account", "appearance", "data", "ai", "skills", "keys", "computer", "billing", "updates"]);
+    expect(currentPage(html)).toBe("account");
     expect(placement(html, "MARKER:people;")).toBe("shown");
-    expect(placement(html, "MARKER:activity;")).toBe("shown");
-    expect(groupLabels(html)).toContain("Activity");
+    expect(placement(html, "MARKER:activity;")).toBe("missing");
+    const data = open("activity");
+    expect(currentPage(data)).toBe("data");
+    expect(placement(data, "MARKER:activity;")).toBe("shown");
+    expect(groupLabels(data)).toContain("Activity");
   });
 
-  it("keeps a paired remote client's reduced set: General for appearance, and Computer with your devices and Connect from elsewhere", () => {
+  it("keeps a paired remote client's reduced set: Appearance, and Computer with your devices and Connect from elsewhere", () => {
     vi.stubGlobal("window", { ogb: { ...desktop.ogb, remoteClient: { active: true } } });
     fixture.section = "desktopWorkspaces";
     const html = render();
-    expect(pages(html)).toEqual(["general", "computer"]);
+    expect(pages(html)).toEqual(["appearance", "computer"]);
     expect(currentPage(html)).toBe("computer");
     expect(blocks(html)).toEqual(["companion", "elsewhere", "remote", "desktopWorkspaces", "workspaces"]);
     expect(html).not.toContain('aria-label="Enable the built-in browser"');
     fixture.section = "appearance";
-    const general = render();
-    expect(currentPage(general)).toBe("general");
-    expect(general).not.toContain("Add your name");
-    expect(general).toContain('aria-label="App language"');
+    const appearance = render();
+    expect(currentPage(appearance)).toBe("appearance");
+    expect(appearance).not.toContain("Add your name");
+    expect(appearance).toContain('aria-label="App language"');
   });
 
   it.each<[AppSettingsSection, string]>([
-    ["general", "general"],
-    ["appearance", "general"],
-    ["import", "general"],
-    ["backups", "general"],
-    ["experimental", "ai"],
+    ["general", "account"],
+    ["appearance", "appearance"],
+    ["import", "data"],
+    ["backups", "data"],
+    ["experimental", "skills"],
     ["decisionModel", "ai"],
-
     ["engines", "ai"],
     ["connections", "keys"],
     ["companion", "computer"],

@@ -112,7 +112,7 @@ export function CallSheet({ message, transcript, botName, threadId, busy, partia
         aria-modal="true"
         aria-labelledby="call-sheet-title"
         data-testid="call-sheet"
-        className="animate-pop-in flex max-h-[min(720px,calc(100dvh-2rem))] w-full max-w-[640px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel text-ink shadow-2xl"
+        className="flex max-h-[min(720px,calc(100dvh-2rem))] w-full max-w-[640px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel text-ink shadow-2xl"
         style={{ outline: "none" }}
       >
         <header className="flex items-start justify-between gap-4 border-b border-hairline/40 px-5 pb-3.5 pt-4">

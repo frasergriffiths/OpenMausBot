@@ -72,14 +72,16 @@ describe("the place control", () => {
     expect(trigger().className).toContain("rounded-xl");
   });
 
-  it("opens the shared menu sheet: 240px, --radius-menu, 30px rows, 16px icons, shadow-lg, pop-in motion", async () => {
+  it("opens the shared menu sheet: 240px, --radius-menu, 30px rows, 16px icons, shadow-lg, no motion class", async () => {
     await mount();
     expect(sheet()).toBeNull();
     await press(trigger());
     const menu = sheet()!;
-    for (const cls of ["popover-surface", "rounded-[var(--radius-menu)]", "bg-menu", "p-1.5", "shadow-lg", "gap-1", "animate-pop-in"]) {
+    for (const cls of ["popover-surface", "rounded-[var(--radius-menu)]", "bg-menu", "p-1.5", "shadow-lg", "gap-1"]) {
       expect(menu.className, cls).toContain(cls);
     }
+    expect(menu.className).not.toContain("animate-pop-in");
+    expect(menu.className).not.toContain("animate-pop-out");
     expect(menu.style.width).toBe("240px");
     expect(menu.parentElement).toBe(document.body);
     const options = rows();
@@ -93,13 +95,11 @@ describe("the place control", () => {
     }
   });
 
-  it("writes the place the panel writes, and closes with the shared exit motion", async () => {
+  it("writes the place the panel writes, and closes at once", async () => {
     await mount();
     await press(trigger());
     await press(row("Built-in browser"));
     expect(fixture.patch).toHaveBeenCalledExactlyOnceWith({ computer: "browser", browser: true });
-    expect(sheet()!.className).toContain("animate-pop-out");
-    await settle();
     expect(sheet()).toBeNull();
   });
 

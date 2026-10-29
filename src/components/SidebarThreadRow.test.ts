@@ -2,7 +2,7 @@ import { createElement, type ComponentProps, type MemoExoticComponent, type Reac
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setLocale } from "@/lib/i18n";
-import { formatUpdatedAt, nextSnoozeExpiry, orderedSidebarThreads, orderedThreadList, partitionHelperThreads, SidebarThreadRow, splitArchivedThreads, stampClock, threadByline, threadOpenerLabel, threadUpdatedLabel, visibleSidebarThreads } from "./SidebarThreadRow";
+import { formatUpdatedAt, nextSnoozeExpiry, orderedSidebarThreads, orderedThreadList, SidebarThreadRow, splitArchivedThreads, stampClock, threadByline, threadUpdatedLabel, visibleSidebarThreads } from "./SidebarThreadRow";
 
 type ThreadRowProps = ComponentProps<typeof SidebarThreadRow>;
 
@@ -45,7 +45,6 @@ describe("sidebar thread visibility", () => {
   it("keeps the active and attention-needed threads visible beyond the six recent rows", () => {
     const rows = tasks.map((task) => ({ ...task, busy: task.threadId === "7", unread: task.threadId === "9" }));
     expect(visibleSidebarThreads(rows, "8").map((task) => task.threadId)).toEqual(["0", "1", "2", "3", "4", "5", "7", "8", "9"]);
-    expect(visibleSidebarThreads(rows, "8", "", [], true)).toEqual(rows);
   });
   it("searches folder names and historical thread titles without the recent-row limit", () => {
     expect(visibleSidebarThreads(tasks, "0", " RESEARCH ", [{ id: "research", name: "Research" }]).map((task) => task.threadId)).toEqual(["8", "9"]);
@@ -105,27 +104,16 @@ describe("threads waiting on a teammate", () => {
 
 describe("threads a bot opened", () => {
   const openedBy = { botId: "scout", name: "Scout", at: 5 };
-  const render = (task: ThreadRowProps["task"]) => renderToStaticMarkup(createElement(SidebarThreadRow, {
-    task, ownerId: "scout", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
-  }));
-  it("says who opened the thread in plain words, and nothing for the person's own", () => {
-    expect(threadOpenerLabel({ openedBy })).toBe("opened by Scout");
-    expect(threadOpenerLabel({})).toBeNull();
-    expect(threadOpenerLabel({ openedBy: { ...openedBy, name: "  " } })).toBeNull();
-  });
-  it("shows the opener quietly under the title without changing the row's name or status", () => {
-    const markup = render({ threadId: "qa", title: "QA PR 245", openedBy, activity: "waiting-on-you" });
-    expect(markup).toContain("opened by Scout");
-    expect(markup).toContain('title="QA PR 245 · Waiting"');
-    expect(markup.indexOf("QA PR 245")).toBeLessThan(markup.indexOf("opened by Scout"));
-    expect(render({ threadId: "own", title: "Quick question" })).not.toContain("opened by");
-  });
-  it("gives a bot-opened thread the same waiting and unread signals as any other", () => {
-    const waiting = render({ threadId: "qa", title: "QA PR 245", openedBy, activity: "waiting-on-you", unread: true });
-    expect(waiting).toContain('title="QA PR 245 · Waiting · Unread"');
-    expect(waiting).toContain(">Waiting</span>");
-    expect(waiting).toContain('aria-label="Unread"');
-    expect(waiting).toContain("opened by Scout");
+  it("lists a bot-opened thread as an ordinary row with no opener byline", () => {
+    const task = { threadId: "qa", title: "QA PR 245", openedBy, activity: "waiting-on-you" as const, unread: true };
+    const markup = renderToStaticMarkup(createElement(SidebarThreadRow, {
+      task,
+      ownerId: "scout", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
+    }));
+    expect(markup).not.toContain("opened by");
+    expect(markup).toContain('title="QA PR 245 · Waiting · Unread"');
+    expect(markup).toContain(">Waiting</span>");
+    expect(markup).toContain('aria-label="Unread"');
     const rows = Array.from({ length: 9 }, (_, index) => ({ threadId: String(index), title: `Thread ${index}` }));
     const opened = [...rows, { threadId: "qa", title: "QA PR 245", openedBy, activity: "waiting-on-you" as const, busy: false }];
     expect(visibleSidebarThreads(opened, "0").map((task) => task.threadId)).toEqual(["0", "1", "2", "3", "4", "5", "qa"]);
@@ -141,7 +129,6 @@ describe("snoozed threads", () => {
   it("folds an idle snoozed thread out of the default list while show-all and search still list it", () => {
     const withSnoozed = [{ ...rows[0], snoozedUntil: Date.now() + 3_600_000 }, ...rows.slice(1)];
     expect(visibleSidebarThreads(withSnoozed, "8").map((task) => task.threadId)).toEqual(["1", "2", "3", "4", "5", "6", "8"]);
-    expect(visibleSidebarThreads(withSnoozed, "8", "", [], true)).toEqual(withSnoozed);
     expect(visibleSidebarThreads(withSnoozed, "8", "thread 0").map((task) => task.threadId)).toEqual(["0"]);
   });
   it("treats snoozedUntil: 0 as snoozed — presence, not truthiness — and says so in the byline", () => {
@@ -165,35 +152,6 @@ describe("snoozed threads", () => {
   });
 });
 
-describe("threads a bot opened", () => {
-  const openedBy = { botId: "scout", name: "Scout", at: 5 };
-  const render = (task: ThreadRowProps["task"]) => renderToStaticMarkup(createElement(SidebarThreadRow, {
-    task, ownerId: "scout", current: false, onSelect: vi.fn(), onDelete: vi.fn(), locale: "en",
-  }));
-  it("says who opened the thread in plain words, and nothing for the person's own", () => {
-    expect(threadOpenerLabel({ openedBy })).toBe("opened by Scout");
-    expect(threadOpenerLabel({})).toBeNull();
-    expect(threadOpenerLabel({ openedBy: { ...openedBy, name: "  " } })).toBeNull();
-  });
-  it("shows the opener quietly under the title without changing the row's name or status", () => {
-    const markup = render({ threadId: "qa", title: "QA PR 245", openedBy, activity: "waiting-on-you" });
-    expect(markup).toContain("opened by Scout");
-    expect(markup).toContain('title="QA PR 245 · Waiting"');
-    expect(markup.indexOf("QA PR 245")).toBeLessThan(markup.indexOf("opened by Scout"));
-    expect(render({ threadId: "own", title: "Quick question" })).not.toContain("opened by");
-  });
-  it("gives a bot-opened thread the same waiting and unread signals as any other", () => {
-    const waiting = render({ threadId: "qa", title: "QA PR 245", openedBy, activity: "waiting-on-you", unread: true });
-    expect(waiting).toContain('title="QA PR 245 · Waiting · Unread"');
-    expect(waiting).toContain(">Waiting</span>");
-    expect(waiting).toContain('aria-label="Unread"');
-    expect(waiting).toContain("opened by Scout");
-    const rows = Array.from({ length: 9 }, (_, index) => ({ threadId: String(index), title: `Thread ${index}` }));
-    const opened = [...rows, { threadId: "qa", title: "QA PR 245", openedBy, activity: "waiting-on-you" as const, busy: false }];
-    expect(visibleSidebarThreads(opened, "0").map((task) => task.threadId)).toEqual(["0", "1", "2", "3", "4", "5", "qa"]);
-  });
-});
-
 describe("threads a bot closed", () => {
   const openedBy = { botId: "pm", name: "Parker", at: 5 };
   const closedBy = { botId: "pm", name: "Parker", at: 9 };
@@ -204,7 +162,6 @@ describe("threads a bot closed", () => {
     const helpers = Array.from({ length: 3 }, (_, index) => ({ threadId: `h${index}`, title: `Helper ${index}`, openedBy, closedBy }));
     const own = Array.from({ length: 8 }, (_, index) => ({ threadId: String(index), title: `Thread ${index}` }));
     expect(visibleSidebarThreads([...helpers, ...own], "0").map((task) => task.threadId)).toEqual(["0", "1", "2", "3", "4", "5"]);
-    expect(visibleSidebarThreads([...helpers, ...own], "0", "", [], true)).toHaveLength(11);
     expect(visibleSidebarThreads([...helpers, ...own], "0", "helper 1").map((task) => task.threadId)).toEqual(["h1"]);
   });
   it("keeps a closed thread on screen while the person is in it or it has something new", () => {
@@ -217,10 +174,9 @@ describe("threads a bot closed", () => {
     expect(visibleSidebarThreads(rows, "current").map((task) => task.threadId)).toEqual(["current", "unread", "busy"]);
   });
   it("says who closed it under the title, dims the row, and says Closed in the tooltip", () => {
-    expect(threadByline({ openedBy, closedBy: { ...closedBy, name: "Scout" } })).toBe("closed by Scout");
-    expect(threadByline({ openedBy })).toBe("opened by Parker");
+    expect(threadByline({ closedBy: { ...closedBy, name: "Scout" } })).toBe("closed by Scout");
     expect(threadByline({})).toBeNull();
-    const markup = render({ threadId: "h", title: "Helper 1", openedBy, closedBy });
+    const markup = render({ threadId: "h", title: "Helper 1", closedBy });
     expect(markup).toContain("closed by Parker");
     expect(markup).not.toContain("opened by");
     expect(markup).toContain('title="Helper 1 · Closed"');
@@ -493,7 +449,6 @@ describe("archived threads", () => {
       { threadId: "6", title: "Teammates", archivedAt: 5, waitingForTeammates: true },
     ];
     expect(visibleSidebarThreads(rows, "0").map((task) => task.threadId)).toEqual(["0"]);
-    expect(visibleSidebarThreads(rows, "0", "", [], true).map((task) => task.threadId)).toEqual(["0", "1", "2", "3", "4", "5", "6"]);
     expect(visibleSidebarThreads(rows, "0", "put away").map((task) => task.threadId)).toEqual(["1"]);
   });
   it("shows an archived thread while it is the open one", () => {
@@ -505,9 +460,7 @@ describe("archived threads", () => {
   });
   it("says Archived under the title and dims the row, behind any live status", () => {
     expect(threadByline({ archivedAt: 5 })).toBe("Archived");
-    expect(threadByline({ openedBy: { botId: "scout", name: "Scout", at: 1 }, archivedAt: 5 })).toBe("Archived");
-    expect(threadByline({ openedBy: { botId: "scout", name: "Scout", at: 1 } })).toBe("opened by Scout");
-    expect(threadByline({ openedBy: { botId: "scout", name: "Scout", at: 1 }, archivedAt: 5, closedBy: { botId: "pm", name: "Parker", at: 2 } })).toBe("closed by Parker");
+    expect(threadByline({ archivedAt: 5, closedBy: { botId: "pm", name: "Parker", at: 2 } })).toBe("closed by Parker");
     const markup = render({ threadId: "1", title: "Put away", archivedAt: 5 });
     expect(markup).toContain("Archived");
     expect(markup).toContain('text-ink-tertiary">Put away</span>');
@@ -716,43 +669,50 @@ describe("Thread link", () => {
   });
 });
 
-describe("helper threads a bot opened", () => {
-  const opener = { botId: "pepper", name: "Pepper", at: 1 };
-  const thread = (threadId: string, patch: Record<string, unknown> = {}) =>
-    ({ threadId, title: threadId, createdAt: 1, updatedAt: 1, ...patch }) as any;
+describe("the per-thread menu's flyouts", () => {
+  const task = { threadId: "t1", title: "Fix the login" };
+  const folders = [{ id: "launch", name: "Launch" }];
+  const openMenu = (tree: RowNode) => {
+    (moreMenuButton(tree)!.props!.onClick as (event: unknown) => void)({ currentTarget: { getBoundingClientRect: () => ({ left: 100, bottom: 200 }) } });
+  };
+  const draw = (props: Partial<ThreadRowProps>) => renderRow(task, "scout", false, props);
 
-  it("folds open bot-opened threads into a group and keeps the person's own threads", () => {
-    const tasks = [thread("mine"), thread("email", { openedBy: opener, busy: true }), thread("pricing", { openedBy: opener })];
-    const { own, helpers } = partitionHelperThreads(tasks, "mine");
-    expect(own.map((task) => task.threadId)).toEqual(["mine"]);
-    expect(helpers.map((task) => task.threadId)).toEqual(["email", "pricing"]);
+  it("keeps the snooze presets behind a submenu and stops a snooze from there", () => {
+    vi.stubGlobal("window", { innerWidth: 1024, innerHeight: 768 });
+    vi.stubGlobal("document", { body: { nodeType: 1 } });
+    const onSnooze = vi.fn();
+    openMenu(renderRow(task, "scout"));
+    const menu = draw({ onSnooze, onArchive: vi.fn() });
+    expect(buttonWithLabel(menu, "Until 6 PM")).toBeUndefined();
+    const snooze = buttonWithLabel(menu, "Snooze");
+    expect(snooze?.props?.["aria-haspopup"]).toBe("menu");
+    (snooze!.props!.onClick as () => void)();
+
+    const flyout = draw({ onSnooze, onArchive: vi.fn() });
+    const preset = buttonWithLabel(flyout, "Until new activity");
+    expect(preset).toBeDefined();
+    (preset!.props!.onClick as () => void)();
+    expect(onSnooze).toHaveBeenCalledWith(task, 0);
+    vi.unstubAllGlobals();
   });
 
-  it("keeps a helper thread in view while it needs the person", () => {
-    const tasks = [
-      thread("open-now", { openedBy: opener }),
-      thread("approval", { openedBy: opener, activity: "waiting-on-you" }),
-      thread("reply", { openedBy: opener, unread: true }),
-      thread("quiet", { openedBy: opener }),
-    ];
-    const { own, helpers } = partitionHelperThreads(tasks, "open-now");
-    expect(own.map((task) => task.threadId)).toEqual(["open-now", "approval", "reply"]);
-    expect(helpers.map((task) => task.threadId)).toEqual(["quiet"]);
-  });
+  it("moves a thread through a folder submenu that marks the current folder", () => {
+    vi.stubGlobal("window", { innerWidth: 1024, innerHeight: 768 });
+    vi.stubGlobal("document", { body: { nodeType: 1 } });
+    const onMove = vi.fn();
+    const filed = { ...task, projectId: "launch" };
+    openMenu(renderRow(filed, "scout"));
+    const menu = draw({ onMove, folders });
+    const move = buttonWithLabel(menu, "Move to folder");
+    expect(move?.props?.["aria-haspopup"]).toBe("menu");
+    (move!.props!.onClick as () => void)();
 
-  it("leaves filed, closed, archived and snoozed helper threads where they already go", () => {
-    const tasks = [
-      thread("filed", { openedBy: opener, projectId: "launch" }),
-      thread("closed", { openedBy: opener, closedBy: opener }),
-      thread("archived", { openedBy: opener, archivedAt: 1 }),
-      thread("snoozed", { openedBy: opener, snoozedUntil: Date.now() + 60_000 }),
-    ];
-    const { helpers } = partitionHelperThreads(tasks, "mine", "", [{ id: "launch", name: "Launch" } as any]);
-    expect(helpers).toEqual([]);
-  });
-
-  it("does not group search results", () => {
-    const tasks = [thread("email", { openedBy: opener })];
-    expect(partitionHelperThreads(tasks, "mine", "email")).toEqual({ own: tasks, helpers: [] });
+    const flyout = draw({ onMove, folders });
+    expect(buttonWithLabel(flyout, "Launch")).toBeDefined();
+    const none = buttonWithLabel(flyout, "No folder");
+    expect(none).toBeDefined();
+    (none!.props!.onClick as () => void)();
+    expect(onMove).toHaveBeenCalledWith(task, null);
+    vi.unstubAllGlobals();
   });
 });

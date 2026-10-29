@@ -297,7 +297,7 @@ export function BotContextMenu({
           navigateThreadMenu(event);
         }}
         style={{ top: shown.y, left: shown.x }}
-        className={cn("fixed z-40 max-h-[calc(100dvh-16px)] w-max min-w-[180px] max-w-[calc(100vw-16px)] animate-pop-in overflow-y-auto overscroll-contain", SIMPLE_MENU)}
+        className={cn("fixed z-40 max-h-[calc(100dvh-16px)] w-max min-w-[180px] max-w-[calc(100vw-16px)] overflow-y-auto overscroll-contain", SIMPLE_MENU)}
       >
         {moreItems}
       </div>,
