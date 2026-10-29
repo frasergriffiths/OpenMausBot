@@ -30,7 +30,6 @@ import { openProviderDesktop, useComputerTakeover } from "./computer-takeover";
 import { SignInBanner } from "./SignInRequestCard";
 import { LocalScreenPreview } from "./LocalScreenPreview";
 import { LinuxLocalControl } from "./LinuxLocalControl";
-import { MacLocalControl } from "./MacLocalControl";
 import {
   busyBoatView,
   instanceSupportsLocalComputer,
@@ -1610,7 +1609,6 @@ export function ComputerPanel({
         {phase !== "team-boat" && (bot.computer !== undefined || computerStatusCurrent) && <>
           <LocalScreenPreview className={embedded ? "mt-0" : undefined} />
           <LinuxLocalControl />
-          <div className="mt-4"><MacLocalControl /></div>
         </>}
 
       </div>

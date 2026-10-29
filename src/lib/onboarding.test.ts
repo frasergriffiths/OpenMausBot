@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   aiChoices,
   aiWorks,
+  BEAT_ORDER,
   beatsFor,
   cloudSignInDue,
   companyModelCount,
@@ -239,6 +240,9 @@ describe("the first run's screens", () => {
   it("is two screens, meeting the app and then the Chief of Staff, whatever this computer has", () => {
     expect(beatsFor({})).toEqual(["meet", "chief"]);
     expect(beatsFor({ hosted: false })).toEqual(["meet", "chief"]);
+    expect(beatsFor({ allowComputer: true })).toEqual(["meet", "allowComputer", "chief"]);
+    expect(beatsFor({ allowComputer: true, hosted: true })).toEqual(["meet"]);
+    expect(BEAT_ORDER.indexOf("allowComputer")).toBe(BEAT_ORDER.indexOf("meet") + 1);
   });
 
   it("gives a hosted place's admin only the first: their team's bots and Chief are set up already", () => {

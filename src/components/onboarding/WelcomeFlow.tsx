@@ -7,6 +7,8 @@ import { CLOUD_PRO_UPDATE_NOTICE, dismissNotice } from "@/lib/notices";
 import { beatsFor, cloudBeatPossible, completionPatch, firstRunPatch, markWelcomeFinished, resumeBeat, showWelcome, type BeatId } from "@/lib/onboarding";
 import { clearWelcomeDraft, readWelcomeDraft, saveWelcomeDraft } from "@/lib/welcome-draft";
 import { api, useStore } from "@/state/store";
+import { useDesktopCapabilities } from "../DesktopCapabilities";
+import { AllowComputerBeat } from "./AllowComputerBeat";
 import { ChiefIntro } from "./ChiefIntro";
 import { MeetScreen } from "./MeetScreen";
 import { localDesktopPage } from "./WelcomeGate";
@@ -74,7 +76,11 @@ export function WelcomeFlow({
   // A first run keeps its screen in this browser, so a reload resumes it; a replay starts over. A hosted place's
   // browser may hold another person's draft.
   const keepsDraft = !replay && !embedded && !hosted;
-  const beats = beatsFor({ hosted });
+  const { capabilities, ready } = useDesktopCapabilities();
+  const allowComputer = ready && capabilities.host.platform === "darwin" &&
+    !capabilities.localComputer.available && capabilities.localComputer.reasonCode !== "remote-server";
+  const beats = beatsFor({ hosted, allowComputer })
+    .filter((id) => id !== "chief" || chiefStepFits(state.bots, maus));
   const [beat, setBeat] = useState<BeatId>(() => resumeBeat(beats, initialBeat ?? (keepsDraft ? readWelcomeDraft()?.beat : undefined)));
   const root = useRef<HTMLDivElement>(null);
   const finishing = useRef(false);
@@ -117,20 +123,21 @@ export function WelcomeFlow({
     [beat, dispatch, onDone, replay, embedded, keepsDraft, hosted],
   );
 
-  // The first screen fades away before the Chief step comes up; a timer moves on, since a hidden window runs no
-  // animation to its end.
-  const toChief = beats.includes("chief") && chiefStepFits(state.bots, maus);
+  // Each screen fades away before the next comes up; a timer moves on, since a hidden window runs no animation to
+  // its end.
+  const nextBeat = beats[beats.indexOf(beat) + 1];
   const leaving = useRef(false);
   const next = useCallback(() => {
     if (finishing.current || leaving.current) return;
-    if (!toChief) return void finish("completed", null);
+    if (!nextBeat) return void finish("completed", null);
     leaving.current = true;
     root.current?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: LEAVE_MS, easing: "ease-in", fill: "forwards" });
     setTimeout(() => {
       root.current?.getAnimations().forEach((animation) => animation.cancel());
-      setBeat("chief");
+      leaving.current = false;
+      setBeat(nextBeat);
     }, LEAVE_MS);
-  }, [toChief, finish]);
+  }, [nextBeat, finish]);
 
   const chief = beat === "chief";
   useEffect(() => {
@@ -181,6 +188,8 @@ export function WelcomeFlow({
     >
       {chief ? (
         <ChiefIntro replay={replay} onLeave={fadeScrim} onDone={(botId) => void finish("completed", botId)} />
+      ) : beat === "allowComputer" ? (
+        <AllowComputerBeat onNext={next} onSkip={() => void finish("skipped", null)} />
       ) : (
         <MeetScreen hosted={hosted} onNext={next} />
       )}

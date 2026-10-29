@@ -95,15 +95,17 @@ export function hintSeenPatch(
 }
 
 
-export type BeatId = "meet" | "chief";
+export type BeatId = "meet" | "allowComputer" | "chief";
 
 /** Every screen the first run can show, in the order it shows them. */
-export const BEAT_ORDER: readonly BeatId[] = ["meet", "chief"];
+export const BEAT_ORDER: readonly BeatId[] = ["meet", "allowComputer", "chief"];
 
-/** Two screens, then the chat: meeting the app (and connecting an AI when none works), then the Chief of Staff. A hosted
- * place's admin only meets the app: their team's bots and Chief are already set up. */
-export function beatsFor(options: { hosted?: boolean }): BeatId[] {
-  return options.hosted ? ["meet"] : ["meet", "chief"];
+/** Three screens, then the chat: meeting the app (and connecting an AI when none works), asking for the Mac's two
+ * permissions when the local computer cannot be driven without them, then the Chief of Staff. A hosted place's admin
+ * only meets the app: their team's bots and Chief are already set up. */
+export function beatsFor(options: { hosted?: boolean; allowComputer?: boolean }): BeatId[] {
+  if (options.hosted) return ["meet"];
+  return options.allowComputer ? ["meet", "allowComputer", "chief"] : ["meet", "chief"];
 }
 
 /** Where a reloaded first run opens: the saved screen while it is offered, else the first. */

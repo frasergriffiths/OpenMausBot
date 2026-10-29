@@ -26,7 +26,7 @@ const PRIMARY = "inline-flex h-8 w-full max-w-[18rem] items-center justify-cente
 
 /** The permission card's one look. `MacLocalControl` mounts it in the panel and Settings; ChatView mounts it
  * directly in a failed turn so a setup step is not painted as a crash. */
-export function MacCuaPermissionCard({ permissions, logReason }: { permissions: MacCuaPermission[]; logReason?: string }) {
+export function MacCuaPermissionCard({ permissions, logReason, showCheckAgain = false, onSkip }: { permissions: MacCuaPermission[]; logReason?: string; showCheckAgain?: boolean; onSkip?: () => void }) {
 
   const permissionsKey = permissions.join(",");
   const known = permissions.length > 0;
@@ -192,6 +192,20 @@ export function MacCuaPermissionCard({ permissions, logReason }: { permissions: 
             {pending && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {primaryLabel}
           </button>
+          {(showCheckAgain || onSkip) && (
+            <div className="mt-2 flex items-center justify-center gap-3 text-[13px] leading-[18px]">
+              {showCheckAgain && (
+                <button type="button" onClick={() => void retry()} disabled={pending} className="rounded-lg px-2.5 py-1 font-medium text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50">
+                  {t("common.checkAgain")}
+                </button>
+              )}
+              {onSkip && (
+                <button type="button" onClick={onSkip} className="rounded-lg px-2.5 py-1 text-ink-tertiary hover:bg-control hover:text-ink">
+                  {t("cloudIntent.skip")}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </section>
     </Card>
