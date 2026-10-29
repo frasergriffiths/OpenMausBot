@@ -1424,7 +1424,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           </button>
           <div className="relative flex">{plusControl}</div>
         </div>}
-        {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center pl-1">
+        {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center justify-end pr-2 pt-3">
           <div data-sidebar-top-switcher className="flex min-w-0 items-center">
             <DesktopWorkspaceSwitcher inline pill cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "desktopWorkspaces" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />
           </div>
