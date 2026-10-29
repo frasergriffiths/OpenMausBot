@@ -5,7 +5,11 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const f = vi.hoisted(() => ({ dispatch: vi.fn(), open: vi.fn(), state: {} as Record<string, unknown> }));
-vi.mock("@/state/store", () => ({ useStore: () => ({ state: f.state, dispatch: f.dispatch }), openBotThread: f.open }));
+vi.mock("@/state/store", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@/state/store")>(),
+  useStore: () => ({ state: f.state, dispatch: f.dispatch }),
+  openBotThread: f.open,
+}));
 
 const { ChatThreadTabs } = await import("./ChatThreadTabs");
 
@@ -29,7 +33,7 @@ const draw = (bot: Parameters<typeof ChatThreadTabs>[0]["bot"]) => act(() => roo
 beforeEach(() => {
   f.dispatch.mockReset();
   f.open.mockReset();
-  f.state = {};
+  f.state = { pendingQueued: {} };
   host = document.createElement("div");
   document.body.append(host);
   root = createRoot(host);
@@ -84,6 +88,23 @@ describe("the switcher's tabs", () => {
     draw(makeBot());
     expect(host.querySelector('[data-thread-tab-box="a"]')!.textContent).toContain("2");
     expect(tab("a")!.getAttribute("aria-label")).toMatch(/queued/i);
+  });
+
+  it("draws exactly one New thread control, and it opens a conversation", () => {
+    draw(makeBot());
+    const buttons = [...host.querySelectorAll<HTMLButtonElement>("[data-thread-new]")];
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0]!.getAttribute("aria-label")).toBe("New thread");
+    act(() => buttons[0]!.click());
+    expect(f.dispatch).toHaveBeenCalledWith({ type: "newTask", botId: "pepper" });
+  });
+
+  it("keeps one New thread control with the archived list open", () => {
+    draw(makeBot());
+    act(() => host.querySelector<HTMLButtonElement>("[data-thread-archived]")!.click());
+    expect(document.querySelector("[data-thread-switcher]")).not.toBeNull();
+    expect(document.querySelector("[data-thread-switcher]")!.querySelector("[data-thread-new]")).toBeNull();
+    expect(document.querySelectorAll("[data-thread-new]")).toHaveLength(1);
   });
 
   it("archives with Delete on the focused tab, and arrows move the selection", () => {

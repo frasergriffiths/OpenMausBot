@@ -1023,7 +1023,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
         <div data-chathead-row className={cn("flex items-center justify-between", phone ? "gap-2" : "@max-[30rem]/chathead:flex-wrap @max-[30rem]/chathead:gap-y-1 @min-[30rem]/chathead:grid @min-[30rem]/chathead:grid-cols-[minmax(0,1fr)_minmax(0,auto)_minmax(max-content,1fr)]")}>
         {threadChipVisible && (
           <div data-chathead-tabbar className="flex min-w-0 @min-[30rem]/chathead:w-full @min-[30rem]/chathead:col-start-1 @min-[30rem]/chathead:justify-self-start">
-            {threadChipStyle === "tabs" ? <ChatThreadTabs bot={profile} /> : <ChatThreadChip bot={profile} />}
+            {threadChipStyle === "tabs" ? <ChatThreadTabs bot={profile} /> : <ChatThreadChip bot={profile} noDragStyle={headerNoDragStyle} />}
           </div>
         )}
         <div data-chathead-identity className={cn("flex min-w-0 items-center gap-2", phone ? "flex-1" : "@max-[30rem]/chathead:basis-full @min-[30rem]/chathead:col-start-2 @min-[30rem]/chathead:justify-self-center", simpleHead && phone && "justify-center")} style={headerNoDragStyle}>

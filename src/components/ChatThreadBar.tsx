@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { Clock, Loader2, MessageSquare } from "lucide-react";
+import { useRef, useState, type CSSProperties, type Ref } from "react";
+import { Clock, Loader2, MessageSquare, Plus } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -31,8 +31,30 @@ export function chatThreadChipShown(bot: Bot): boolean {
   return Boolean(active && !active.routineRunId);
 }
 
-/** The one current-thread pill: names the conversation and opens the switcher. */
-export function ChatThreadChip({ bot }: { bot: Bot }) {
+/** The strip's icon-button look, shared so the pill's New thread button is pixel-identical to the tabs "+". */
+export const THREAD_ICON_BUTTON = "flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus";
+
+/** New thread, drawn once for both title-bar styles: the tabs strip's pinned "+" and the pill's own button. */
+export function ThreadNewButton({ bot, ref, style }: { bot: Bot; ref?: Ref<HTMLButtonElement>; style?: CSSProperties }) {
+  const { dispatch } = useStore();
+  return (
+    <button
+      ref={ref}
+      type="button"
+      data-thread-new=""
+      aria-label={t("task.newShort")}
+      title={t("task.newShort")}
+      onClick={() => dispatch({ type: "newTask", botId: bot.id })}
+      className={THREAD_ICON_BUTTON}
+      style={style}
+    >
+      <Plus size={16} aria-hidden="true" />
+    </button>
+  );
+}
+
+/** The one current-thread pill: names the conversation, opens the switcher, and offers New thread beside it. */
+export function ChatThreadChip({ bot, noDragStyle }: { bot: Bot; noDragStyle?: CSSProperties }) {
   const { state } = useStore();
   const chipRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
@@ -48,39 +70,43 @@ export function ChatThreadChip({ bot }: { bot: Bot }) {
 
   return (
     <>
-      <button
-        ref={chipRef}
-        type="button"
-        data-thread-chip-bar
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls={open ? "thread-switcher" : undefined}
-        title={status ? `${title} · ${status}` : title}
-        onClick={() => setOpen((value) => !value)}
-        onKeyDown={(event) => {
-          if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
-          event.preventDefault();
-          setOpen(true);
-        }}
-        className={cn(
-          "group flex h-8 min-w-[8rem] w-fit max-w-[min(12.5rem,100%)] items-center gap-1.5 rounded-full pl-2.5 pr-2 text-[13px] leading-[18px] text-ink",
-          ELEVATED_FLOAT,
-          ELEVATED_HOVER,
-          SIMPLE_ROW_FOCUS,
-        )}
-      >
-        <span className="flex size-3.5 shrink-0 items-center justify-center" aria-hidden="true">
-          {waiting
-            ? <Clock size={14} className="text-warning" />
-            : working
-              ? <Loader2 size={14} className="animate-spin" style={{ color: spinnerColor(bot.color) }} />
-              : <MessageSquare size={14} className="text-ink-tertiary" />}
-        </span>
-        <span dir="auto" className="min-w-0 flex-1 truncate">{title}</span>
-        {status && <span className="sr-only">{status}</span>}
-        {archived && <span className="sr-only">{t("task.unarchive")}</span>}
-        <Chevron kind="menu" open={open} size="inline" className="text-ink-tertiary" />
-      </button>
+      {/* One no-drag row so the 4px between chip and button does not drag the window, and the header keeps the rest. */}
+      <div data-thread-chip-row className="flex w-fit min-w-0 max-w-full items-center gap-1" style={noDragStyle}>
+        <button
+          ref={chipRef}
+          type="button"
+          data-thread-chip-bar
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          aria-controls={open ? "thread-switcher" : undefined}
+          title={status ? `${title} · ${status}` : title}
+          onClick={() => setOpen((value) => !value)}
+          onKeyDown={(event) => {
+            if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+            event.preventDefault();
+            setOpen(true);
+          }}
+          className={cn(
+            "group flex h-8 min-w-[8rem] w-fit max-w-[min(12.5rem,100%)] items-center gap-1.5 rounded-full pl-2.5 pr-2 text-[13px] leading-[18px] text-ink",
+            ELEVATED_FLOAT,
+            ELEVATED_HOVER,
+            SIMPLE_ROW_FOCUS,
+          )}
+        >
+          <span className="flex size-3.5 shrink-0 items-center justify-center" aria-hidden="true">
+            {waiting
+              ? <Clock size={14} className="text-warning" />
+              : working
+                ? <Loader2 size={14} className="animate-spin" style={{ color: spinnerColor(bot.color) }} />
+                : <MessageSquare size={14} className="text-ink-tertiary" />}
+          </span>
+          <span dir="auto" className="min-w-0 flex-1 truncate">{title}</span>
+          {status && <span className="sr-only">{status}</span>}
+          {archived && <span className="sr-only">{t("task.unarchive")}</span>}
+          <Chevron kind="menu" open={open} size="inline" className="text-ink-tertiary" />
+        </button>
+        <ThreadNewButton bot={bot} />
+      </div>
       <ThreadSwitcher open={open} anchorRef={chipRef} bot={bot} onClose={(refocus) => {
         setOpen(false);
         if (refocus) requestAnimationFrame(() => chipRef.current?.focus());

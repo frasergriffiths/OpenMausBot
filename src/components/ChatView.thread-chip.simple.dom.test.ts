@@ -89,6 +89,13 @@ afterAll(() => {
 const chip = () => document.querySelector<HTMLButtonElement>("[data-thread-chip-bar]");
 const sheet = () => document.querySelector<HTMLElement>("[data-thread-switcher]");
 const rows = () => [...document.querySelectorAll<HTMLButtonElement>("[data-thread-row]")];
+const settle = async () => { await new Promise((resolve) => setTimeout(resolve, 260)); };
+/** React keeps the chip's open state across draw(), so a test that needs the switcher closed says so first. */
+const closeSheet = async () => {
+  if (chip()?.getAttribute("aria-expanded") === "true") flushSync(() => chip()!.click());
+  await settle();
+  expect(sheet()).toBeNull();
+};
 
 describe("the thread chip in Simple mode", () => {
   it("names the open thread in the chat header even though Simple mode hides the conversations panel", () => {
@@ -121,8 +128,6 @@ describe("the thread chip in Simple mode", () => {
     expect(rows().filter((row) => row.getAttribute("aria-current") === "true")).toHaveLength(1);
     expect(rows()[0]!.getAttribute("aria-current")).toBe("true");
   });
-
-  const settle = async () => { await new Promise((resolve) => setTimeout(resolve, 260)); };
 
   it("switches to the chosen thread and closes the switcher", async () => {
     draw();
@@ -160,17 +165,55 @@ describe("the thread chip in Simple mode", () => {
     expect(document.activeElement).toBe(chip());
   });
 
-  it("puts no New thread button in the header, and none at the end of the switcher", () => {
+  it("puts one New thread button in the header, and none at the end of the switcher", async () => {
+    state = { ...state, bots: [bot] };
     fixture.advanced = false;
     fixture.threadsShown = false;
     fixture.threadsWanted = true;
     draw();
+    await closeSheet();
 
-    expect(document.querySelector("[data-chathead-new-thread]")).toBeNull();
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>("[data-thread-new]")];
+    expect(buttons).toHaveLength(1);
+    expect(buttons[0]!.getAttribute("aria-label")).toBe("New thread");
+    expect(buttons[0]!.title).toBe("New thread");
+    expect(document.querySelector("[data-chathead-tabbar]")!.contains(buttons[0]!)).toBe(true);
     flushSync(() => chip()!.click());
+    expect(sheet()!.querySelector("[data-thread-new]")).toBeNull();
     expect(sheet()!.querySelector('[data-switcher-focus="new"]')).toBeNull();
-    expect(sheet()!.textContent).not.toContain("New thread");
     expect(sheet()!.querySelector('[role="separator"]')).toBeNull();
+    // Leave nothing open for the tests after this one.
+    flushSync(() => chip()!.click());
+    await settle();
+    expect(sheet()).toBeNull();
+  });
+
+  it("creates a conversation from that header button", async () => {
+    state = { ...state, bots: [bot] };
+    draw();
+    await closeSheet();
+    actions.length = 0;
+    flushSync(() => document.querySelector<HTMLButtonElement>("[data-thread-new]")!.click());
+    expect(actions.filter((action) => action.type === "newTask")).toHaveLength(1);
+    expect(actions.find((action) => action.type === "newTask")).toMatchObject({ botId: bot.id });
+  });
+
+  it("keeps exactly one New thread control when the header draws tabs instead of the pill", async () => {
+    const { setThreadChipStyle } = await import("@/lib/sidebar-preferences");
+    state = { ...state, bots: [bot] };
+    fixture.threadsWanted = true;
+    await closeSheet();
+    try {
+      flushSync(() => setThreadChipStyle("tabs"));
+      draw();
+      expect(chip()).toBeNull();
+      const buttons = [...document.querySelectorAll<HTMLButtonElement>("[data-thread-new]")];
+      expect(buttons).toHaveLength(1);
+      expect(document.querySelector("[data-chathead-tabbar]")!.contains(buttons[0]!)).toBe(true);
+    } finally {
+      flushSync(() => setThreadChipStyle("pill"));
+      draw();
+    }
   });
 
   it("opens a row's three-dot menu over the switcher, not clipped inside it", () => {
@@ -188,6 +231,7 @@ describe("the thread chip in Simple mode", () => {
   it("gives the delete dialog its own lifetime inside the switcher", async () => {
     fixture.threadsWanted = true;
     draw();
+    await closeSheet();
     flushSync(() => chip()!.click());
     const openDelete = () => {
       const kebab = sheet()!.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;

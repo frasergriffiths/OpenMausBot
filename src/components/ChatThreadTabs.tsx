@@ -1,21 +1,20 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { Archive, Clock, Loader2, MessageSquare, Plus, X } from "lucide-react";
+import { Archive, Clock, Loader2, MessageSquare, X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { spinnerColor } from "@/lib/mascot";
 import { openBotThread, useStore, type Bot } from "@/state/store";
-import { chipStatus, displayTitle } from "./ChatThreadBar";
+import { chipStatus, displayTitle, THREAD_ICON_BUTTON, ThreadNewButton } from "./ChatThreadBar";
 import { isArchived, isWorking } from "./SidebarThreadRow";
 import { ThreadSwitcher } from "./ThreadSwitcher";
 
 const TAB_BOX = "group relative flex h-8 min-w-[8rem] max-w-52 shrink-0 items-center gap-1 rounded-xl pl-2 pr-0.5 text-[12px] leading-4 text-ink-secondary";
 const NO_DRAG = { WebkitAppRegion: "no-drag" } as CSSProperties;
 const FOCUS = "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus";
-const ICON_BUTTON = "flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus";
 
 /** The title-bar switcher as browser tabs: one tab per conversation, a pinned "+" and the archived list. It only
- *  draws when the appearance setting is "tabs"; the pill is ChatThreadChip and is untouched. */
+ *  draws when the appearance setting is "tabs"; the pill style is ChatThreadChip and draws the same "+" beside it. */
 export function ChatThreadTabs({ bot }: { bot: Bot }) {
   const { state, dispatch } = useStore();
   // The pill's rule: an archived thread is not a tab unless it is the one open.
@@ -138,18 +137,7 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
         })}
         <span role="status" className="sr-only">{activeStatus}</span>
       </div>
-      <button
-        ref={plusRef}
-        type="button"
-        data-thread-new=""
-        aria-label={t("task.newShort")}
-        title={t("task.newShort")}
-        onClick={() => dispatch({ type: "newTask", botId: bot.id })}
-        className={ICON_BUTTON}
-        style={NO_DRAG}
-      >
-        <Plus size={16} aria-hidden="true" />
-      </button>
+      <ThreadNewButton bot={bot} ref={plusRef} style={NO_DRAG} />
       <button
         ref={archivedRef}
         type="button"
@@ -159,7 +147,7 @@ export function ChatThreadTabs({ bot }: { bot: Bot }) {
         aria-label={t("task.archived")}
         title={t("task.archived")}
         onClick={() => setArchivedOpen((open) => !open)}
-        className={ICON_BUTTON}
+        className={THREAD_ICON_BUTTON}
         style={NO_DRAG}
       >
         <Archive size={15} aria-hidden="true" />
