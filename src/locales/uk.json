@@ -2889,7 +2889,5 @@
   "botPanel.tab.library": "Бібліотека",
   "botPanel.tab.computer": "Комп'ютер",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Треди",
-  "botPanel.page.browser": "Браузер",
-  "botPanel.library.data": "Дані"
+  "botPanel.page.browser": "Браузер"
 }

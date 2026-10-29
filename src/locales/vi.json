@@ -3465,8 +3465,6 @@
   "computer.tab.android": "Android",
   "computer.browserSwitch.title": "Cho phép {name} sử dụng trình duyệt",
   "computer.tab.browser": "Trình duyệt",
-  "computer.tab.data": "Dữ liệu",
-  "computer.tab.files": "Tệp",
   "computer.tabsAria": "Chế độ xem bảng bot",
   "computer.fullScreen": "Toàn màn hình",
   "computer.browserOff.title": "Trình duyệt đang tắt",
@@ -4870,7 +4868,5 @@
   "botPanel.tab.library": "Thư viện",
   "botPanel.tab.computer": "Máy tính",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Chuỗi",
-  "botPanel.page.browser": "Trình duyệt",
-  "botPanel.library.data": "Dữ liệu"
+  "botPanel.page.browser": "Trình duyệt"
 }

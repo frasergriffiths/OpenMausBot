@@ -122,7 +122,7 @@ const { LibraryTab } = await import("./bot-panel/LibraryTab");
 const { ApprovalChip } = await import("./ComposerPlusMenu");
 const { callMode, setCallMode } = await import("@/lib/call-mode");
 const { ComputerTab } = await import("./bot-panel/ComputerTab");
-const { PageBody, AppsPage, RoutinesPage, MemoryPage, SkillsPage, FolderPage, BrowserLivePage, SitesPage } = await import("./bot-panel/pages");
+const { PageBody, AppsPage, RoutinesPage, MemoryPage, SkillsPage, FolderPage, BrowserLivePage } = await import("./bot-panel/pages");
 const { BrowserLogins } = await import("./bot-panel/browser-logins");
 const { PAGES, sectionTarget } = await import("./bot-panel/page-registry");
 const { openBotSettings } = await import("./bot-panel/panel-link");
@@ -305,8 +305,8 @@ describe("the bot panel in Simple mode", () => {
     click(find(panel(bot), "data-panel-back"));
 
     click(find(panel(bot), "data-panel-tab", "computer"));
-    (ofType(panel(bot), ComputerTab)!.props.onOpen as (page: string) => void)("sites");
-    expect(panel(bot).html).toContain(">Signed-in sites<");
+    (ofType(panel(bot), ComputerTab)!.props.onOpen as (page: string) => void)("browser");
+    expect(panel(bot).html).toContain(">Browser<");
   });
 
   it("keeps one header layout and the close button in the same fixed slot on the root and a page", () => {
@@ -570,14 +570,10 @@ describe("the avatar editor", () => {
 
 
 describe("the Details tab", () => {
-  it("holds the model and the conversations, with no thread list and no switch or Thinking row", () => {
+  it("holds the model, with no thread list and no switch or Thinking row", () => {
     const rendered = botTab(makeBot());
     expect(ofType(rendered, ModelPicker)!.props).toMatchObject({ bot: expect.objectContaining({ id: "scout" }), threadId: "thread-scout", contained: true });
-    const order = ['data-panel-row="model"', 'data-panel-page="threads"']
-      .map((marker) => rendered.html.indexOf(marker));
-    expect(order.every((index) => index > -1)).toBe(true);
-    expect([...order].sort((a, b) => a - b)).toEqual(order);
-    for (const wanted of ['data-panel-edit="soul"', 'data-panel-row="approval"', 'data-panel-row="busy-send"', 'data-panel-row="call-mode"', 'data-panel-page="apps"', 'data-panel-page="threads"']) {
+    for (const wanted of ['data-panel-edit="soul"', 'data-panel-row="approval"', 'data-panel-row="busy-send"', 'data-panel-row="call-mode"', 'data-panel-page="apps"']) {
       expect(rendered.html, wanted).toContain(wanted);
     }
     for (const gone of ["data-conversation", "data-panel-item", "data-conversations-new", 'data-panel-row="thinking"']) {
@@ -841,7 +837,7 @@ describe("the Computer tab", () => {
 
 describe("the drill-in pages", () => {
   const PAGE = {
-    apps: AppsPage, routines: RoutinesPage, memory: MemoryPage, skills: SkillsPage, folder: FolderPage, browser: BrowserLivePage, sites: SitesPage,
+    apps: AppsPage, routines: RoutinesPage, memory: MemoryPage, skills: SkillsPage, folder: FolderPage, browser: BrowserLivePage,
   } as const;
   // The walker reads only what a component returns, so each page is called as the function PageBody picks.
   const body = (page: keyof typeof PAGE, bot = makeBot()) => capture(() => PAGE[page]({ bot, derived: derived() }) as ReactNode);
@@ -1023,21 +1019,19 @@ describe("the drill-in pages", () => {
     expect(fixture.api).toHaveBeenLastCalledWith("/api/bots/scout", { method: "PATCH", body: JSON.stringify({ cwd: "/tmp/work" }) });
   });
 
-  it("shows only the signed-in sites on the browser page, with no browser or record-steps switch", () => {
+  it("shows the signed-in sites inline on the browser page, with no browser or record-steps switch", () => {
     fixture.ownerOrAdmin = true;
-    const page = body("sites");
+    const page = body("browser");
     expect(ofType(page, BrowserLogins)!.props).toMatchObject({ bot: expect.objectContaining({ id: "scout" }), browserEnabled: true });
     const rendered = capture(() => BrowserLogins({ bot: makeBot(), browserEnabled: true, onOpenBrowser: vi.fn() }));
     expect(ofType(rendered, SignedInSites)!.props).toMatchObject({ bare: true, target: { bot: "scout" }, sharedBy: ["Scout"], disabled: false });
     expect(switches(rendered.html)).toBe(0);
     expect(rendered.html).not.toContain("Record");
-    expect(rendered.html).not.toContain(">Logins<");
     const onOpenBrowser = vi.fn();
     click(find(capture(() => BrowserLogins({ bot: makeBot(), browserEnabled: true, onOpenBrowser })), "data-panel-action", "add-login"));
     expect(onOpenBrowser).toHaveBeenCalled();
     fixture.derived.browserEnabled = false;
-    expect(ofType(body("sites"), BrowserLogins)!.props.browserEnabled).toBe(false);
-    expect(capture(() => BrowserLogins({ bot: makeBot(), browserEnabled: false, onOpenBrowser: vi.fn() })).html).toContain("Scout&#x27;s browser is off.");
+    expect(body("browser").html).toContain("has no browser");
   });
 });
 

@@ -153,8 +153,9 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
               </>
             )}
           </div>
-          {/* 8px above the pills and 8px below them: the same step, so the tab row does not look bottom-heavy. */}
-          <div className="flex h-[38px] shrink-0 items-center px-3 pt-2">
+          {/* The tab row owns its own strip: opaque, with 8px above and below, so scrolled content never shows
+              through it or touches it. */}
+          <div className="relative z-10 flex h-[38px] shrink-0 items-center border-b border-hairline/40 bg-panel px-3 pb-2 pt-2">
             <div role="tablist" aria-label={t("botSettings.simple.tabs")} className={cn(PILL_TABS, "hidden w-full @[270px]:flex")} onKeyDown={onTabKeyDown}>
               {PANEL_TABS.map((id, index) => (
                 <button
@@ -209,7 +210,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           "min-h-0 flex-1",
           page === "computer"
             ? "flex flex-col overflow-hidden px-3 pb-3 pt-2"
-            : page === "browser" || page === "data" || page === "files"
+            : page === "browser" || page === "files"
               ? "flex flex-col overflow-hidden p-3"
             : page === null
               ? "overflow-y-auto px-4 pb-6 pt-2"
@@ -228,9 +229,9 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
             {tab === "computer" && <ComputerTab bot={bot} derived={derived} onOpen={openPage} />}
           </div>
         ) : (
-          <div data-panel-page-view={page} className={cn((page === "browser" || page === "data" || page === "files" || page === "computer") && "flex min-h-0 flex-1 flex-col")}>
+          <div data-panel-page-view={page} className={cn((page === "browser" || page === "files" || page === "computer") && "flex min-h-0 flex-1 flex-col")}>
             <span id="bot-settings-title" className="sr-only">{bot.name}</span>
-            <div className={cn(pageSurfaceCls, (page === "browser" || page === "data" || page === "files" || page === "computer") && "min-h-0 flex-1")}>
+            <div className={cn(pageSurfaceCls, (page === "browser" || page === "files" || page === "computer") && "min-h-0 flex-1")}>
               <PageBody
                 page={page}
                 bot={bot}

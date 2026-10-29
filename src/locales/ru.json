@@ -4381,8 +4381,6 @@
   "computer.tab.android": "Android",
   "computer.browserSwitch.title": "Разрешить {name} пользоваться браузером",
   "computer.tab.browser": "Браузер",
-  "computer.tab.data": "Данные",
-  "computer.tab.files": "Файлы",
   "computer.tabsAria": "Панель бота",
   "computer.fullScreen": "Полный экран",
   "computer.browserOff.title": "Браузер выключен",
@@ -6314,7 +6312,5 @@
   "botPanel.tab.profile": "Профиль",
   "botPanel.tab.library": "Библиотека",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Треды",
-  "botPanel.page.browser": "Браузер",
-  "botPanel.library.data": "Данные"
+  "botPanel.page.browser": "Браузер"
 }

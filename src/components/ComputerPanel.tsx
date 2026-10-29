@@ -8,7 +8,6 @@ import { waitForLocalVmReady } from "@/lib/local-vm-readiness";
 import { Columns2, Globe, Hand, Loader2, Maximize2, Monitor, Moon, Power, Settings, X } from "lucide-react";
 import { api, ApiError, currentTaskBot, useStore, type Bot, type ConfigStatus } from "@/state/store";
 import { setAdvancedMode, useAdvancedMode } from "@/lib/interface-mode";
-import { ComputerFilesPane } from "./ComputerFilesPane";
 import { effectivePlace, isComputerPlace, placeOffered } from "@/lib/place";
 import type { CloudBackend } from "../../shared/wire";
 import { ApiKeyRow } from "./ApiKeys";
@@ -22,7 +21,6 @@ import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { AndroidDevicePanel, useAndroidUsbDevices } from "./AndroidDevicePanel";
 import { BrowserPanel } from "./BrowserPanel";
 import { usePanelPage, type PanelPage } from "@/lib/page-open";
-const DataPanel = lazy(() => import("./data/DataPanel").then((module) => ({ default: module.DataPanel })));
 const loadLiveDesktop = () => import("./LiveDesktop").then((module) => ({ default: module.LiveDesktop }));
 const LiveDesktop = lazy(loadLiveDesktop);
 import { browserAvailable, browserUnavailableReason, builtInBrowserEnabled } from "@/lib/feature-flags";
@@ -251,8 +249,6 @@ export function ComputerPanel({
   const errorText = panelErrorText(error);
   const advanced = useAdvancedMode();
   const [storedPanelView, setPanelView] = useState<ComputerPanelView>(() => readComputerPanelView(bot.id));
-  const requestedDataResult = state.dataResultFocus?.botId === bot.id ? state.dataResultFocus : undefined;
-  const [dataRequest, setDataRequest] = useState<{ id: string; requestId: number }>();
   const androidStatus = useAndroidUsbDevices();
   const androidConnected = androidStatus.devices.length > 0;
   const panelTabs = computerPanelTabs({ advanced, androidConnected });
@@ -311,15 +307,6 @@ export function ComputerPanel({
     setPanelView(bot.computer === "browser" && browserEnabled ? "browser"
       : previous === null ? readComputerPanelView(bot.id) : "computer");
   }, [panelTargetKey, bot.id, bot.computer, browserEnabled]);
-
-  useEffect(() => {
-    if (!requestedDataResult || requestedDataResult.consumed) return;
-    explicitPanelView.current = true;
-    setDataRequest(requestedDataResult);
-    setPanelView("data");
-    writeComputerPanelView(bot.id, "data");
-    dispatch({ type: "dataResultFocusConsumed", requestId: requestedDataResult.requestId });
-  }, [bot.id, dispatch, requestedDataResult]);
 
   const requestedSignIn = state.signInFocus?.botId === bot.id ? state.signInFocus : undefined;
   const [signInRequest, setSignInRequest] = useState<{ url: string; site: string; nonce: number }>();
@@ -1245,16 +1232,6 @@ export function ComputerPanel({
               </div>
             )}
           </div>
-        </div>
-      ) : panelView === "data" ? (
-        <div {...tabPanelProps("data")} className={cn("flex min-h-0 flex-1 flex-col overflow-hidden", TAB_PANEL_FOCUS)}>
-          <Suspense fallback={<div className="flex flex-1 items-center justify-center text-[13px] text-ink-secondary" role="status">{t("data.loading")}</div>}>
-            <DataPanel key={bot.id} bot={bot} requestedCard={dataRequest} />
-          </Suspense>
-        </div>
-      ) : panelView === "files" ? (
-        <div {...tabPanelProps("files")} className={cn("flex min-h-0 flex-1 flex-col", TAB_PANEL_FOCUS)}>
-          <ComputerFilesPane bot={bot} />
         </div>
       ) : panelView === "android" && androidConnected ? (
         <div {...tabPanelProps("android")} className={cn("flex-1 overflow-y-auto px-4 pt-2", TAB_PANEL_FOCUS)}>

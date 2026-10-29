@@ -1,14 +1,13 @@
-import { lazy, Suspense, useState, type ReactNode } from "react";
-import { FolderOpen, MessageSquare, Plus } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { FolderOpen, Plus } from "lucide-react";
 
 import { appSwitchPatch } from "@/lib/bot-app-access";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/cn";
 import { MEMORY_INDEX, saveMemoryDoc } from "@/lib/memory";
 import { openExternalLink } from "@/lib/app-links";
 import { shortPath } from "@/lib/short-path";
-import { currentTaskBot, useStore, type Bot } from "@/state/store";
+import { useStore, type Bot } from "@/state/store";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
 import { ServiceIcon } from "../PluginsPanel";
 import { useWorkingFolder } from "../bot-settings/AccessSection";
@@ -23,8 +22,8 @@ import { ComputerPanel } from "../ComputerPanel";
 import { AndroidDevicePanel, useAndroidUsbDevices } from "../AndroidDevicePanel";
 import { ActivityPanel } from "../ActivityPanel";
 import { InspectorPanel } from "../InspectorPanel";
-import { ComputerFilesPane } from "../ComputerFilesPane";
 import { UsageSection } from "../bot-settings/UsageSection";
+import { ComputerFilesPane } from "../ComputerFilesPane";
 import { useOpenComputer } from "./ComputerTab";
 import { memoryNotes, withMemoryNote, withoutMemoryNote } from "./memory-notes";
 import type { SimplePageId } from "./page-registry";
@@ -42,7 +41,6 @@ export interface PageContext {
 export const pageSurfaceCls = "flex flex-col gap-3";
 
 const SKILLS_SITE = "https://skills.sh";
-const DataPanel = lazy(() => import("../data/DataPanel").then((module) => ({ default: module.DataPanel })));
 
 function errorText(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -370,39 +368,6 @@ export function BrowserPage({ bot, derived }: PageContext) {
   return <BrowserLogins bot={bot} browserEnabled={derived.browserEnabled} onOpenBrowser={() => openComputer("browser")} />;
 }
 
-export function ThreadsPage({ bot }: PageContext) {
-  const { dispatch } = useStore();
-  const tasks = bot.tasks ?? [{ threadId: bot.threadId, title: t("task.newShort"), createdAt: 0 }];
-  return (
-    <>
-      <Card>
-        {tasks.map((task) => {
-          const thread = currentTaskBot(bot, task.threadId);
-          const current = task.threadId === bot.threadId;
-          return (
-            <button
-              key={task.threadId}
-              type="button"
-              data-panel-thread={task.threadId}
-              onClick={() => dispatch({ type: "switchTask", botId: bot.id, threadId: task.threadId })}
-              className={cn(rowCls, "w-full text-left", current && "bg-ink/[0.04]")}
-            >
-              <MessageSquare size={15} className="shrink-0 text-ink-secondary" aria-hidden="true" />
-              <span className="min-w-0 flex-1 truncate text-[14px] text-ink">{task.title || t("task.newShort")}</span>
-              {thread.busy && <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-success" />}
-            </button>
-          );
-        })}
-      </Card>
-      <Card>
-        <LinkRow data-panel-action="new-thread" icon={Plus} onClick={() => dispatch({ type: "newTask", botId: bot.id })}>
-          {t("task.newShort")}
-        </LinkRow>
-      </Card>
-    </>
-  );
-}
-
 export function ActivityPage({ bot }: PageContext) {
   return <ActivityPanel bot={bot} embedded />;
 }
@@ -411,24 +376,20 @@ export function RunLogPage({ bot }: PageContext) {
   return <InspectorPanel bot={bot} embedded />;
 }
 
+export function BrowserLivePage({ bot, derived, onOpen }: PageContext & { onOpen?: (page: SimplePageId) => void }) {
+  if (!derived.browserEnabled) return <Card><NoteRow>{t("botAccess.browser.off")}</NoteRow></Card>;
+  return <>
+    <BrowserLogins bot={bot} browserEnabled onOpenBrowser={() => onOpen?.("browser")} />
+    <BrowserPanel bot={bot} />
+  </>;
+}
+
 export function FilesPage({ bot }: PageContext) {
   return <ComputerFilesPane bot={bot} />;
 }
 
-export function DataPage({ bot }: PageContext) {
-  return <Suspense fallback={<p className="px-1 py-3 text-[13px] text-ink-secondary">{t("common.checking")}</p>}><DataPanel bot={bot} /></Suspense>;
-}
-
-export function BrowserLivePage({ bot, derived }: PageContext) {
-  return derived.browserEnabled ? <BrowserPanel bot={bot} /> : <Card><NoteRow>{t("botAccess.browser.off")}</NoteRow></Card>;
-}
-
 export function ComputerPage({ bot }: PageContext) {
   return <ComputerPanel bot={bot} embedded />;
-}
-
-export function SitesPage({ bot, derived, onOpen }: PageContext & { onOpen?: (page: SimplePageId) => void }) {
-  return <BrowserLogins bot={bot} browserEnabled={derived.browserEnabled} onOpenBrowser={() => onOpen?.("browser")} />;
 }
 
 export function AndroidPage() {
@@ -457,24 +418,18 @@ export function PageBody({ page, onOpen, editingInstructions, onEditInstructions
       return <MemoryPage {...context} />;
     case "skills":
       return <SkillsPage {...context} />;
+    case "files":
+      return <FilesPage {...context} />;
     case "folder":
       return <FolderPage {...context} />;
     case "browser":
       return <BrowserLivePage {...context} />;
     case "computer":
       return <ComputerPage {...context} />;
-    case "sites":
-      return <SitesPage {...context} onOpen={onOpen} />;
-    case "threads":
-      return <ThreadsPage {...context} />;
     case "activity":
       return <ActivityPage {...context} />;
     case "runlog":
       return <RunLogPage {...context} />;
-    case "files":
-      return <FilesPage {...context} />;
-    case "data":
-      return <DataPage {...context} />;
     case "android":
       return <AndroidPage />;
     case "usage":

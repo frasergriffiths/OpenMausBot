@@ -3930,8 +3930,6 @@
   "computer.tab.android": "Android",
   "computer.browserSwitch.title": "Permitir que {name} use un navegador",
   "computer.tab.browser": "Navegador",
-  "computer.tab.data": "Datos",
-  "computer.tab.files": "Archivos",
   "computer.tabsAria": "Vista del panel del bot",
   "computer.fullScreen": "Pantalla completa",
   "computer.browserOff.title": "El navegador está desactivado",
@@ -5382,7 +5380,5 @@
   "botPanel.tab.library": "Biblioteca",
   "botPanel.tab.computer": "Ordenador",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Hilos",
-  "botPanel.page.browser": "Navegador",
-  "botPanel.library.data": "Datos"
+  "botPanel.page.browser": "Navegador"
 }

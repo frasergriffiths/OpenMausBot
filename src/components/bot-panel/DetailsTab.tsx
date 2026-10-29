@@ -1,4 +1,4 @@
-import { Calendar, Gauge, ListChecks, MessagesSquare, Sparkles } from "lucide-react";
+import { Calendar, Gauge, ListChecks, Sparkles } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 import type { Bot } from "@/state/store";
@@ -19,7 +19,6 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
   onEditInstructions?: (open: boolean) => void;
 }) {
   const routinesOn = derived.botRoutines.filter((routine) => routine.enabled).length;
-  const threads = bot.tasks?.length ?? 1;
 
   return (
     <div data-panel-tabpanel="details">
@@ -35,10 +34,6 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
       </Card>
 
       <SettingsPage bot={bot} derived={derived} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} embedded />
-
-      <Card anchor="conversations">
-        <NavRow data-panel-page="threads" icon={MessagesSquare} title={t("botPanel.page.threads")} value={threads} onClick={() => onOpen("threads")} />
-      </Card>
 
       {derived.botRoutines.length > 0 && (
         <Card label={t("botSettings.simple.routines")} anchor="routines">

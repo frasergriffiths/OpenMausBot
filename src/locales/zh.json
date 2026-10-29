@@ -3258,7 +3258,5 @@
   "botPanel.tab.library": "资料库",
   "botPanel.tab.computer": "电脑",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "对话",
-  "botPanel.page.browser": "浏览器",
-  "botPanel.library.data": "数据"
+  "botPanel.page.browser": "浏览器"
 }

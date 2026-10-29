@@ -2464,7 +2464,5 @@
   "botPanel.tab.library": "Bibliothek",
   "botPanel.tab.computer": "Computer",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Threads",
-  "botPanel.page.browser": "Browser",
-  "botPanel.library.data": "Daten"
+  "botPanel.page.browser": "Browser"
 }
