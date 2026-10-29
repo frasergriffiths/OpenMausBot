@@ -91,11 +91,6 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
     ask(index < choices.length ? choices[index] : undefined);
   };
   const byLetter = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Enter" && event.target === event.currentTarget) {
-      event.preventDefault();
-      submit(selected);
-      return;
-    }
     const index = LETTERS.indexOf(event.key.toUpperCase());
     if (event.key.length !== 1 || index < 0 || index >= labels.length || event.metaKey || event.ctrlKey || event.altKey) {
       moveChoiceFocus(event);
@@ -145,7 +140,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
       </div>}
       {!settled && !pending && <SetupPlaceQuestion bot={bot} />}
       {!settled && !pending && (
-        <div className="px-1 pb-1 pt-3">
+        <div className="px-0 pb-1 pt-3">
           <button type="button" data-setup-submit="" disabled={selected === null || busy} onClick={() => submit(selected)}
             style={(() => { const colour = bot.color && Object.hasOwn(MAUS_COLORS, bot.color) ? bot.color : "purple"; return { backgroundColor: MAUS_COLORS[colour], color: mascotInk(colour) }; })()}
             className="flex h-10 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-45">
