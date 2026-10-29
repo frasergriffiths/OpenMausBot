@@ -12,6 +12,7 @@ import { screenFramePreview } from "../ScreenFrame";
 import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
 import type { SimplePageId } from "./page-registry";
 import { PlaceControl } from "./PlaceControl";
+import { CloudBackendPicker } from "../CloudBackendPicker";
 import { Card, NavRow } from "./rows";
 
 type Derived = ReturnType<typeof useBotSettingsDerived>;
@@ -85,6 +86,9 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
       <Card anchor="where">
         <div className="p-3">
           <PlaceControl bot={bot} patch={derived.patch} approvalMode={derived.approvalMode} dataAttr="data-panel-where" />
+          {bot.computer === "cloud" && (
+            <CloudBackendPicker compact value={bot.cloudBackend ?? "box"} onChange={(backend) => derived.patch({ cloudBackend: backend })} />
+          )}
         </div>
         <NavRow
           data-panel-page="browser"

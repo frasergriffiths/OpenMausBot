@@ -803,6 +803,11 @@ describe("the Computer tab", () => {
     expect(computer(makeBot({ busy: true })).html).toContain("Working on a task.");
   });
 
+  it("offers the cloud backend under the place control only while the bot works on the cloud", () => {
+    expect(computer(makeBot({ computer: "cloud" })).html).toContain("Cloud provider");
+    expect(computer(makeBot({ computer: undefined })).html).not.toContain("Cloud provider");
+  });
+
   it("names the chosen place in the control, and says where it works right now when that differs", () => {
     expect(computer(makeBot({ computer: "cloud" })).html).toContain("Cloud desktop");
     expect(computer(makeBot({ computer: "vm" })).html).toContain("Private desktop");
