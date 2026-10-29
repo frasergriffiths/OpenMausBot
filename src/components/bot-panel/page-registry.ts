@@ -11,7 +11,7 @@ export const TAB_LABEL: Record<PanelTab, LocaleKey> = {
 };
 
 export type PageId =
-  | "settings" | "where"
+  | "settings"
   | "setup" | "model" | "instructions" | "approvals" | "always" | "routines" | "apps"
   | "memory" | "skills" | "threads" | "activity" | "runlog" | "files" | "data" | "sites" | "usage"
   | "browser" | "computer" | "folder" | "android"
@@ -19,7 +19,7 @@ export type PageId =
   | "overview" | "prompt" | "history";
 
 /** The pages Simple mode draws; a link to any other page lands where its section does. */
-export const SIMPLE_PAGES = ["apps", "routines", "memory", "skills", "folder", "browser", "computer", "where", "settings", "threads", "activity", "runlog", "files", "data", "sites", "android", "usage"] as const satisfies readonly PageId[];
+export const SIMPLE_PAGES = ["apps", "routines", "memory", "skills", "folder", "browser", "computer", "settings", "threads", "activity", "runlog", "files", "data", "sites", "android", "usage"] as const satisfies readonly PageId[];
 export type SimplePageId = (typeof SIMPLE_PAGES)[number];
 
 export function isSimplePage(page: PageId): page is SimplePageId {
@@ -34,7 +34,6 @@ export interface PageMeta {
 
 export const PAGES: Record<PageId, PageMeta> = {
   settings: { title: "botPanel.page.settings", home: "profile" },
-  where: { title: "computer.simple.whereWorks", home: "computer" },
   setup: { title: "botSetup.ideas", home: "profile" },
   model: { title: "model.simple.model", home: "profile" },
   instructions: { title: "botSettings.simple.instructions", home: "profile" },

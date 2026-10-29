@@ -6,7 +6,7 @@ import { useMenuMotion } from "./MenuMotion";
 import { popoverClosesOnKey, usePopoverDismiss } from "@/hooks/use-popover-dismiss";
 import { submenuIntent, type Point, type SubmenuIntent } from "@/lib/submenu-intent";
 import { useAdvancedMode } from "@/lib/interface-mode";
-import { MENU_ROW } from "./menu-recipe";
+import { MENU_ROW, SIMPLE_MENU_ROW } from "./menu-recipe";
 import { t } from "@/lib/i18n";
 
 export interface SidebarMenuItem {
@@ -87,7 +87,7 @@ export function nextMenuIndex(key: string, current: number, count: number): numb
 
 type MenuLook = "roomy" | "compact" | "plain";
 
-function MenuRows({
+export function MenuRows({
   items,
   look,
   openSubmenu,
@@ -126,7 +126,7 @@ function MenuRows({
               look === "roomy"
                 ? "min-h-10 gap-3 rounded-lg px-3 py-2 text-[15px] font-medium leading-5 focus-visible:bg-menu-hover"
                 : look === "compact"
-                  ? MENU_ROW
+                  ? item.subtitle || item.note ? cn(SIMPLE_MENU_ROW, "items-start") : MENU_ROW
                   : "gap-3 px-3.5 py-2 text-[14px] focus-visible:bg-menu-hover",
               item.danger ? "text-danger" : "text-ink",
               item.active ? "bg-menu-active text-ink" : item.submenu && openSubmenu === item.key && engaged ? cn(look === "compact" ? "bg-menu-active" : "bg-menu-hover", "text-ink") : "hover:bg-menu-hover",
@@ -136,6 +136,7 @@ function MenuRows({
               <span
                 className={cn(
                   "flex shrink-0 items-center justify-center",
+                  look === "compact" && (item.subtitle || item.note) && "mt-0.5 self-start",
                   look === "compact" ? "size-4 [&>svg]:size-4" : "size-5",
                   item.danger ? "text-danger" : item.active ? "text-accent" : look === "roomy" ? "text-ink" : "text-ink-secondary",
                 )}
@@ -147,7 +148,7 @@ function MenuRows({
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="truncate">{item.label}</span>
                 {item.subtitle && <span className="truncate text-[12px] font-normal leading-4 text-ink-secondary">{item.subtitle}</span>}
-                {item.note && <span className="text-[12px] font-normal leading-snug text-ink-tertiary">{item.note}</span>}
+                {item.note && <span className="line-clamp-2 text-[12px] font-normal leading-snug text-ink-tertiary">{item.note}</span>}
               </span>
             ) : (
               <span className="flex-1 truncate">{item.label}</span>

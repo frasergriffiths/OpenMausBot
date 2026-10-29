@@ -207,8 +207,10 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
         data-bot-panel-body
         className={cn(
           "min-h-0 flex-1",
-          page === "browser" || page === "data" || page === "files" || page === "computer"
-            ? "flex flex-col overflow-hidden p-3"
+          page === "computer"
+            ? "flex flex-col overflow-hidden px-3 pb-3 pt-2"
+            : page === "browser" || page === "data" || page === "files"
+              ? "flex flex-col overflow-hidden p-3"
             : page === null
               ? "overflow-y-auto px-4 pb-6 pt-2"
               : "overflow-y-auto px-4 pb-6 pt-4",

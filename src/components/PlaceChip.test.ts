@@ -91,16 +91,19 @@ describe("the menu's first row", () => {
 
   it("is Auto itself for a bot on Auto, selected while the conversation has no pin", () => {
     const { html, rows: menu } = rows({ bot: { ...bot, computer: undefined } });
-    expect(menu[0]).toEqual({ checked: true, text: "Auto Picks the right place for each task" });
+    expect(menu[0]!.checked).toBe(true);
+    expect(menu[0]!.text).toContain("Automatic");
+    expect(menu[0]!.text).toContain("Picks the right place for each task");
     expect(html).not.toContain("Follow this bot");
-    expect(html).toContain('aria-label="Where this conversation works: Auto"');
+    expect(html).toContain('aria-label="Where this conversation works: Automatic"');
     expect(menu).toHaveLength(5);
-    expect(menu.filter((row) => row.text.startsWith("Auto"))).toHaveLength(1);
+    expect(menu.filter((row) => row.text.startsWith("Automatic"))).toHaveLength(1);
   });
 
   it("stays Auto, unchecked, when the conversation is pinned elsewhere", () => {
     const { html, rows: menu } = rows({ bot: { ...bot, computer: undefined }, task: { surface: "vm" } });
-    expect(menu[0]).toEqual({ checked: false, text: "Auto Picks the right place for each task" });
+    expect(menu[0]!.checked).toBe(false);
+    expect(menu[0]!.text).toContain("Automatic");
     expect(menu.find((row) => row.checked)?.text).toBe("Private desktop Isolated local desktop");
     expect(html).toContain('aria-label="Where this conversation works: Private desktop"');
   });

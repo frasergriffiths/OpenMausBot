@@ -24,6 +24,7 @@ import { t } from "@/lib/i18n";
 import { useAdvancedMode } from "@/lib/interface-mode";
 import { BotPanel } from "./bot-panel/PanelShell";
 import { BOT_PANEL_ID, sidePanelCls } from "./bot-panel/side-panel";
+import { SidePanelResizeHandle, useSidePanelWidth } from "./bot-panel/side-panel-size";
 import { HistoryRollbackDialog, useBotHistory, useBotOverview } from "./bot-settings/useBotOverview";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 
@@ -48,6 +49,7 @@ export function BotSettingsDialog({ bot, overlay = false }: {
   const q = query.trim().toLowerCase();
   const advanced = useAdvancedMode();
   const simpleView = !advanced;
+  const sizing = useSidePanelWidth({ simple: simpleView, active: !overlay });
   const linkedSection = !collapsed && !state.botSettingsExpandRemembered ? section : null;
   const slackUrl = useSlackManagementUrl(bot.id);
   const ownerOrAdmin = useOwnerOrAdmin();
@@ -173,8 +175,10 @@ export function BotSettingsDialog({ bot, overlay = false }: {
         role="dialog"
         aria-labelledby="bot-settings-title"
         tabIndex={-1}
+        style={overlay ? undefined : ({ "--side-panel-width": `${sizing.width}px` } as React.CSSProperties)}
         className={sidePanelCls(overlay, simpleView)}
       >
+        {!overlay && <SidePanelResizeHandle sizing={sizing} />}
         {simpleView ? (
           <BotPanel
             bot={bot}

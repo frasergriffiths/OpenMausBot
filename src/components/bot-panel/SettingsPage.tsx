@@ -124,7 +124,13 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
         <ColRow data-panel-row="approval">
           <div className="flex items-center gap-2.5">
             <RowIcon icon={ShieldCheck} />
-            <RowText title={t("botSettings.simple.beforeActs", { name })} hint={bot.busy ? t("approvalMode.whileWorking") : undefined} />
+            <RowText
+          title={t("botSettings.simple.beforeActs", { name })}
+          hint={<>
+            <span>{`${ACTS_LABEL.ask()} ${t("botSettings.simple.askHint").toLowerCase()}. ${ACTS_LABEL.full()} ${t("botSettings.simple.fullHint").toLowerCase()}.`}</span>
+            {bot.busy && <span className="mt-0.5 block">{t("approvalMode.whileWorking")}</span>}
+          </>}
+        />
           </div>
           <div className="pl-[38px]">
             <Segmented
@@ -136,9 +142,9 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
             />
           </div>
           {approval.choice && (
-            <div data-panel-row="thread-approval" className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 pl-[38px]">
-              <span className="text-[13px] text-ink-secondary">{t("botPanel.thisConversation")}</span>
-              <span className="ms-auto flex">
+            <div data-panel-row="thread-approval" className="flex min-w-0 items-start gap-x-2 pl-[38px]">
+              <RowText title={t("botPanel.thisConversation")} hint={t("botPanel.thisConversationHint")} />
+              <span className="flex shrink-0 pt-0.5">
                 <ApprovalChip choice={approval.choice} />
               </span>
             </div>
@@ -171,7 +177,10 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
         <ColRow data-panel-row="call-mode">
           <div className="flex items-center gap-2.5">
             <RowIcon icon={AudioLines} />
-            <RowText title={t("call.mode.menu")} />
+            <RowText
+              title={t("call.mode.menu")}
+              hint={`${t("call.mode.turns")}: ${t("call.mode.turnsHint")} ${t("call.mode.live")}: ${t("call.mode.liveHint")}`}
+            />
           </div>
           <div className="pl-[38px]">
             <Segmented attr="data-call-mode" label={t("call.mode.menu")} value={callMode} onChange={setCallMode} options={callOptions} />

@@ -1,9 +1,18 @@
 import { cn } from "@/lib/cn";
-import { useCallback, useLayoutEffect, useRef, type RefObject, type TextareaHTMLAttributes } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, type RefObject, type TextareaHTMLAttributes } from "react";
 import { type MentionPeer } from "@/lib/mentions";
 import { MentionText } from "./MentionText";
 
-export function MentionTextarea({ inputRef, peers, everyone = false, wrapperClassName, matchInputStyle = false, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement> & {
+/** Every metric that decides where a glyph lands. The mirror paints the text; if it misses one, the painted words
+ *  drift from the native caret. */
+export const GLYPH_METRICS = [
+  "font-family", "font-size", "font-weight", "font-style", "font-stretch",
+  "letter-spacing", "word-spacing", "line-height", "text-indent", "text-transform", "tab-size",
+  "padding-top", "padding-right", "padding-bottom", "padding-left",
+  "border-top-width", "border-right-width", "border-bottom-width", "border-left-width",
+] as const;
+
+export function MentionTextarea({ inputRef, peers, everyone = false, wrapperClassName, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement> & {
   wrapperClassName?: string;
   inputRef: RefObject<HTMLTextAreaElement | null>;
   peers: readonly MentionPeer[];
@@ -23,18 +32,10 @@ export function MentionTextarea({ inputRef, peers, everyone = false, wrapperClas
   const matchStyle = useCallback(() => {
     const input = inputRef.current;
     const mirror = mirrorRef.current;
-    if (!mirror) return;
-    if (!matchInputStyle || !input) {
-      mirror.style.fontSize = "";
-      mirror.style.lineHeight = "";
-      mirror.style.padding = "";
-      return;
-    }
+    if (!input || !mirror) return;
     const style = getComputedStyle(input);
-    mirror.style.fontSize = style.fontSize;
-    mirror.style.lineHeight = style.lineHeight;
-    mirror.style.padding = style.padding;
-  }, [inputRef, matchInputStyle]);
+    for (const metric of GLYPH_METRICS) mirror.style.setProperty(metric, style.getPropertyValue(metric));
+  }, [inputRef]);
   const resize = useCallback(() => {
     const input = inputRef.current;
     if (!input) return;
@@ -47,6 +48,12 @@ export function MentionTextarea({ inputRef, peers, everyone = false, wrapperClas
     sync();
   }, [inputRef, matchStyle, sync]);
   useLayoutEffect(resize, [props.value, resize]);
+  // A webfont that arrives after the first paint changes every glyph width; re-copy and re-measure once it settles.
+  useEffect(() => {
+    let live = true;
+    void document.fonts?.ready.then(() => { if (live) resize(); });
+    return () => { live = false; };
+  }, [resize]);
   useLayoutEffect(() => {
     let width = inputRef.current?.clientWidth;
     const observer = new ResizeObserver(() => {

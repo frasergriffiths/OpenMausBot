@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
-// Simple mode sizes the composer away from the stylesheet, so the mention mirror must copy the textarea's metrics.
-// Advanced mode keeps the stylesheet's metrics and must not receive the flag.
+// The mention mirror paints the composer's text while a transparent textarea carries the native caret. Every metric
+// that decides where a glyph lands must be copied, in both interface modes, or the paint drifts from the caret.
 import { createElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
@@ -10,7 +10,6 @@ import { restoreComposerDraft } from "@/lib/drafts";
 
 const fixture = vi.hoisted(() => ({
   advanced: false,
-  matchInputStyle: undefined as boolean | undefined,
   bot: {
     id: "atlas", threadId: "atlas-thread", name: "Atlas", title: "", description: "",
     color: "purple", notifications: false, unread: false, busy: false, messages: [], approvalMode: "ask",
@@ -31,14 +30,8 @@ vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => true }));
 vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => fixture.advanced, setAdvancedMode: vi.fn() }));
 vi.mock("./CallView", () => ({ CallButton: () => null }));
 vi.mock("./GroupCallView", () => ({ GroupCallButton: () => null }));
-vi.mock("./MentionTextarea", () => ({
-  MentionTextarea: (props: { matchInputStyle?: boolean }) => {
-    fixture.matchInputStyle = props.matchInputStyle;
-    return null;
-  },
-}));
-
 import { Composer } from "./Composer";
+import { GLYPH_METRICS } from "./MentionTextarea";
 
 const bot = fixture.bot;
 
@@ -48,7 +41,6 @@ const render = () => flushSync(() => root.render(createElement(Composer, { bot }
 
 beforeEach(() => {
   fixture.advanced = false;
-  fixture.matchInputStyle = undefined;
   restoreComposerDraft(`bot:${bot.id}:${bot.threadId}`, { text: "", attachments: [] });
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
   container = document.createElement("div");
@@ -63,12 +55,47 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const field = () => {
+  const input = container.querySelector("textarea")!;
+  const mirror = container.querySelector<HTMLElement>(".mention-editor-mirror")!;
+  return { input, mirror };
+};
+
+const expectSameMetrics = () => {
+  const { input, mirror } = field();
+  for (const metric of GLYPH_METRICS) {
+    expect(mirror.style.getPropertyValue(metric), metric).toBe(getComputedStyle(input).getPropertyValue(metric));
+  }
+};
+
+/** React reads a textarea's value through its own tracker, so set it the way the platform does. */
+const type = (input: HTMLTextAreaElement, value: string) => {
+  Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value")!.set!.call(input, value);
+  flushSync(() => input.dispatchEvent(new Event("input", { bubbles: true })));
+};
+
 describe("the composer's mirror metrics", () => {
-  it("passes matchInputStyle to the mention field in Simple mode and withholds it in Advanced", () => {
+  it("copies every glyph metric from the textarea in Simple mode", () => {
     render();
-    expect(fixture.matchInputStyle).toBe(true);
+    expectSameMetrics();
+    const { input, mirror } = field();
+    input.style.fontFamily = "Georgia";
+    input.style.letterSpacing = "0.7px";
+    input.style.paddingLeft = "9px";
+    type(input, "hello");
+    expectSameMetrics();
+    expect(mirror.style.getPropertyValue("letter-spacing")).toBe("0.7px");
+    expect(mirror.style.getPropertyValue("padding-left")).toBe("9px");
+  });
+
+  it("copies them in Advanced mode too", () => {
     fixture.advanced = true;
     render();
-    expect(fixture.matchInputStyle).toBe(false);
+    expectSameMetrics();
+    const { input, mirror } = field();
+    input.style.fontWeight = "600";
+    type(input, "hello");
+    expectSameMetrics();
+    expect(mirror.style.getPropertyValue("font-weight")).toBe("600");
   });
 });

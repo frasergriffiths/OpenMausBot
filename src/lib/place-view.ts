@@ -156,12 +156,13 @@ export function openPlaceAction(
   }
 }
 
+/** One naming table for every surface: the composer chip, the panel control, Access and the New bot step. */
 export const SIMPLE_PLACE_LABEL = {
-  auto: "vm.dest.auto",
+  auto: "place.auto",
   cloud: "place.cloud",
-  vm: "vm.dest.vm",
-  browser: "vm.dest.browser",
-  off: "vm.dest.off",
+  vm: "place.vm",
+  browser: "place.browser",
+  off: "place.off",
 } as const satisfies Record<string, LocaleKey>;
 
 export function worksOnSimpleLabel(computer: Bot["computer"], platform: DesktopCapabilities["host"]["platform"]): string {
