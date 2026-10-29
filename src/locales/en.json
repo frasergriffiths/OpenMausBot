@@ -3518,6 +3518,7 @@
   "botPanel.library.files": "Files",
   "botPanel.library.scope": "From this conversation",
   "botPanel.thisConversation": "In this conversation",
+  "botPanel.thisConversationHint": "Applies to this conversation only.",
   "botPanel.acts.custom": "Custom",
   "botPanel.acts.customHint": "Change this in Advanced mode",
   "botPanel.section.settings": "Settings",
