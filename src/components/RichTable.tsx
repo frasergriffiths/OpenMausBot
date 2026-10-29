@@ -1,4 +1,4 @@
-import { useCallback, useDeferredValue, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useDeferredValue, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ArrowDown, ArrowUp, Check, Copy, Download, Maximize2, Search, WrapText, X } from "lucide-react";
@@ -157,9 +157,13 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
   const natural = useMemo(() => cardColumnWidths(columns.map((column) => column.text), rows.map((row) => row.map((cell) => cell.text))), [columns, rows]);
   const [available, setAvailable] = useState<number | null>(null);
   const [edges, setEdges] = useState({ left: false, right: false, vertical: false });
-  useEffect(() => {
+  // Measured before the first paint: a fit table must not paint its scrolled widths and jump when the observer
+  // reports one frame later.
+  useLayoutEffect(() => {
     const element = scroll.current;
-    if (!element || typeof ResizeObserver === "undefined") return;
+    if (!element) return;
+    setAvailable(element.clientWidth || null);
+    if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(() => setAvailable(element.clientWidth || null));
     observer.observe(element);
     return () => observer.disconnect();
@@ -177,7 +181,9 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
     const vertical = element.scrollHeight > element.clientHeight + 1;
     setEdges(direction === "rtl" ? { left: !atEnd, right: !atStart, vertical } : { left: !atStart, right: !atEnd, vertical });
   }, [direction]);
-  useEffect(() => {
+  // Also before paint: the first frame must already show the edge that has content behind it. The observer and
+  // onScroll handle every later change.
+  useLayoutEffect(() => {
     measureEdges();
     const element = scroll.current;
     if (!element || typeof ResizeObserver === "undefined") return;
@@ -205,8 +211,8 @@ function TableViewport({ columns, rows, order, name, wrap, large, sort, onSort, 
   const arrow = (index: number, className?: string) => sort?.column === index && sort.descending ? <ArrowDown size={12} className={className} /> : <ArrowUp size={12} className={cn(className, sort?.column !== index && !card && "opacity-35")} />;
   return <div className="relative">
     {card && <>
-      <div data-table-fade="left" aria-hidden="true" className={cn("pointer-events-none absolute top-0 bottom-1 z-10 w-14 bg-gradient-to-r from-composer to-transparent transition-opacity", direction === "rtl" && edges.vertical ? "left-2" : "left-0", edges.left ? "opacity-100" : "opacity-0")} />
-      <div data-table-fade="right" aria-hidden="true" className={cn("pointer-events-none absolute top-0 bottom-1 z-10 w-14 bg-gradient-to-l from-composer to-transparent transition-opacity", direction === "rtl" || !edges.vertical ? "right-0" : "right-2", edges.right ? "opacity-100" : "opacity-0")} />
+      <div data-table-fade="left" aria-hidden="true" className={cn("pointer-events-none absolute top-0 bottom-1 z-10 w-14 bg-gradient-to-r from-composer to-transparent", direction === "rtl" && edges.vertical ? "left-2" : "left-0", edges.left ? "opacity-100" : "opacity-0")} />
+      <div data-table-fade="right" aria-hidden="true" className={cn("pointer-events-none absolute top-0 bottom-1 z-10 w-14 bg-gradient-to-l from-composer to-transparent", direction === "rtl" || !edges.vertical ? "right-0" : "right-2", edges.right ? "opacity-100" : "opacity-0")} />
     </>}
     <div ref={scroll} tabIndex={0} role="region" aria-label={name} onScroll={card ? measureEdges : undefined}
       className={cn("overflow-auto overscroll-x-contain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/60", card && "table-card-scroll")}
