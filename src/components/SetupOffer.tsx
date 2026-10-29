@@ -143,7 +143,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
         <div className="px-0 pb-1 pt-3">
           <button type="button" data-setup-submit="" disabled={selected === null || busy} onClick={() => submit(selected)}
             style={(() => { const colour = bot.color && Object.hasOwn(MAUS_COLORS, bot.color) ? bot.color : "purple"; return { backgroundColor: MAUS_COLORS[colour], color: mascotInk(colour) }; })()}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-45">
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60">
             {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {t("chat.setupCard.submit", { name: bot.name })}
           </button>
