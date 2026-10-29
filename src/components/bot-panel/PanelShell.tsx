@@ -11,7 +11,6 @@ import { Select } from "@/components/Select";
 import { MAUS_COLORS, mascotInk } from "@/lib/mascot";
 import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
 import { AvatarEditorCard } from "./AvatarEditorCard";
-import { ComputerTab } from "./ComputerTab";
 import { DetailsTab } from "./DetailsTab";
 import { LibraryTab } from "./LibraryTab";
 import { PANEL_TABS, PAGES, TAB_LABEL, type PanelTarget, type SimplePageId } from "./page-registry";
@@ -148,13 +147,14 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
             </div>
             {editorOpen && (
               <>
-                <div className="fixed inset-0 z-40" aria-hidden="true" data-panel-scrim onClick={() => setEditorOpen(false)} />
+                <div className="fixed inset-0 z-20" aria-hidden="true" data-panel-scrim onClick={() => setEditorOpen(false)} />
                 <AvatarEditorCard bot={bot} activeState={derived.activeState} onPatch={derived.patch} onClose={() => setEditorOpen(false)} />
               </>
             )}
           </div>
-          {/* 8px above the pills and 8px below them: the same step, so the tab row does not look bottom-heavy. */}
-          <div className="flex h-[38px] shrink-0 items-center px-3 pt-2">
+          {/* Sized by its pills, never a fixed height: a 38px row around a 36px track spilled 6px into the
+              scrolling body, so content slid up behind the tabs. */}
+          <div className="flex shrink-0 items-center px-3 pb-1 pt-2">
             <div role="tablist" aria-label={t("botSettings.simple.tabs")} className={cn(PILL_TABS, "hidden w-full @[270px]:flex")} onKeyDown={onTabKeyDown}>
               {PANEL_TABS.map((id, index) => (
                 <button
@@ -225,7 +225,6 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           >
             {tab === "profile" && <DetailsTab bot={bot} derived={derived} onOpen={openPage} editingInstructions={editingInstructions} onEditInstructions={setEditingInstructions} />}
             {tab === "library" && <LibraryTab bot={bot} onOpen={openPage} />}
-            {tab === "computer" && <ComputerTab bot={bot} derived={derived} onOpen={openPage} />}
           </div>
         ) : (
           <div data-panel-page-view={page} className={cn((page === "browser" || page === "data" || page === "files" || page === "computer") && "flex min-h-0 flex-1 flex-col")}>

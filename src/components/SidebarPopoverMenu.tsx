@@ -449,7 +449,7 @@ export function SidebarPopoverMenu({
         data-tour={triggerTour}
         onClick={(event) => {
           clearTimers();
-          if (open && (pinned || !openOnHover)) close();
+          if (open) close(true);
           else {
             // event.detail is 0 for a click from Enter or Space: land on the first item.
             focusFirst.current = anchored && event.detail === 0;

@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-import { Globe2, KeyRound, Monitor, Smartphone } from "lucide-react";
+import { Globe2, Monitor, Smartphone } from "lucide-react";
 
 import { writeComputerPanelView, type ComputerPanelView } from "@/lib/computer-panel-view";
 import { t } from "@/lib/i18n";
-import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { useAdvancedMode } from "@/lib/interface-mode";
-import { api, useStore, type Bot } from "@/state/store";
+import { useStore, type Bot } from "@/state/store";
 import { BotAvatar } from "../Avatar";
 import { LinuxLocalControl } from "../LinuxLocalControl";
 import { useAndroidUsbDevices } from "../AndroidDevicePanel";
@@ -27,24 +25,9 @@ export function useOpenComputer(bot: Pick<Bot, "id">) {
   };
 }
 
-/** How many sites the bot's own browser is signed in to; null until read, and never asked for by a non-owner. */
-function useSignedInCount(bot: Pick<Bot, "id">, enabled: boolean): number | null {
-  const [count, setCount] = useState<{ botId: string; count: number } | null>(null);
-  useEffect(() => {
-    if (!enabled) return;
-    let cancelled = false;
-    void api(`/api/browser-sites?bot=${encodeURIComponent(bot.id)}`)
-      .then((answer: { sites?: unknown[] }) => { if (!cancelled) setCount({ botId: bot.id, count: answer.sites?.length ?? 0 }); })
-      .catch(() => {});
-    return () => { cancelled = true; };
-  }, [bot.id, enabled]);
-  return count?.botId === bot.id ? count.count : null;
-}
-
-export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
-  const ownerOrAdmin = useOwnerOrAdmin();
-  const { browserEnabled } = derived;
-  const signedIn = useSignedInCount(bot, browserEnabled && bot.computer !== "off" && ownerOrAdmin !== false);
+/** Where the bot works, as part of its profile: its screen, the place control every surface shares, and the browser and
+ *  signed-in sites behind it. There is no separate Computer tab and no second control. */
+export function WhereItWorks({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
   const screenOf = t("computer.screenOf", { name: bot.name });
   const android = useAndroidUsbDevices();
   const openComputer = useOpenComputer(bot);
@@ -54,7 +37,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
 
   return (
-    <div data-panel-tabpanel="computer" className="[&>*:first-child]:mt-0">
+    <div data-panel-where-section="">
       <LinuxLocalControl />
       <button
         type="button"
@@ -86,7 +69,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
       </button>
       <div className="mt-3 text-center text-[13px] text-ink-tertiary">{screenOf}</div>
 
-      <Card anchor="where">
+      <Card label={t("computer.simple.whereWorks", { name: bot.name })} anchor="where">
         <div className="p-3">
           <PlaceControl bot={bot} patch={derived.patch} approvalMode={derived.approvalMode} dataAttr="data-panel-where" />
           {bot.computer === "cloud" && (
@@ -98,13 +81,6 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
           icon={Globe2}
           title={t("botPanel.page.browser")}
           onClick={() => onOpen("browser")}
-        />
-        <NavRow
-          data-panel-page="sites"
-          icon={KeyRound}
-          title={t("settings.sites.title")}
-          value={signedIn ?? undefined}
-          onClick={() => onOpen("sites")}
         />
         {android.devices.length > 0 && (
           <NavRow

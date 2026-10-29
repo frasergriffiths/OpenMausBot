@@ -1401,7 +1401,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
         data-sidebar-top-row
         className={cn(
           "flex items-center",
-          density === "icons" ? "flex-col gap-1 px-2 pt-3.5 pb-1" : simpleDesk ? "relative h-[60px] items-start pl-4 pr-4 pt-3" : "relative pl-4 pr-2",
+          density === "icons" ? "flex-col gap-1 px-2 pt-3.5 pb-1" : simpleDesk ? "relative h-[60px] items-center gap-2 pl-4 pr-4" : "relative pl-4 pr-2",
           density !== "icons" && !macInset && !simpleDesk && "h-12 max-md:h-16",
         )}
         style={density !== "icons" && macInset && !simpleDesk ? { ...windowDragStyle, height: MAC_TRAFFIC_LIGHT_CENTER_Y * 2 } : windowDragStyle}
@@ -1424,7 +1424,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           </button>
           <div className="relative flex">{plusControl}</div>
         </div>}
-        {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center justify-end pr-2 pt-3">
+        {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center justify-end">
           <div data-sidebar-top-switcher className="flex min-w-0 items-center">
             <DesktopWorkspaceSwitcher inline pill cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "computer" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />
           </div>

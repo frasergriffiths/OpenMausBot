@@ -4868,7 +4868,6 @@
   "templates.invalidJson": "Bu yedek veya ekip dosyası geçerli bir JSON değil.",
   "botPanel.tab.profile": "Profil",
   "botPanel.tab.library": "Kitaplık",
-  "botPanel.tab.computer": "Bilgisayar",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Konular",
   "botPanel.page.browser": "Tarayıcı",

@@ -95,7 +95,7 @@ describe("U1: one line and at most one action for every state", () => {
       line: "Cloud desktops from your plan work for Cloud bots for now.", action: { id: "open-my-cloud", label: "Open the Cloud" },
     });
     expect(placeViewOf("auto", {}, { role: "admin", server: "mac" }).line)
-      .toBe("Uses the built-in browser, a private desktop on this computer, or this computer's screen, whichever the task needs.");
+      .toBe("Uses the built-in browser. It starts a desktop only when a task needs one.");
     expect(placeViewOf("cc-provider", { bot: "Scout", words: "Start the $20/month Boat plan." }, admin))
       .toMatchObject({ short: "Couldn't start", line: "Your Boat account couldn't start Scout's cloud desktop: Start the $20/month Boat plan." });
   });

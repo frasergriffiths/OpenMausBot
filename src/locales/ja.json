@@ -3338,7 +3338,6 @@
   "botPanel.screen.idle": "待機中",
   "botPanel.screen.working": "タスクを実行中です。画面はまもなくここに表示されます。ライブで見るにはフルビューを開いてください。",
   "botPanel.none": "なし",
-  "botPanel.tab.computer": "コンピューター",
   "botPanel.instructionsHint": "{name} に仕事の進め方を伝えます",
   "botSettings.simple.justDoIt": "お任せ",
   "botPanel.appsRow": "使用できるアプリ",

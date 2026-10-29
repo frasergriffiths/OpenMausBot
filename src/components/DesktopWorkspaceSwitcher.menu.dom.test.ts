@@ -56,6 +56,12 @@ async function mount({ saved = true, activeId = "local", confirm = true, props =
 }
 
 describe("the Simple computer switcher", () => {
+  it("is a 36px pill, the height of the + beside it", async () => {
+    await mount();
+    expect(trigger().className).toContain("h-9");
+    expect(trigger().className).not.toContain("h-8");
+  });
+
   it("opens a themed menu on <body> with the saved computers and a checked current one", async () => {
     await mount();
     expect(trigger().getAttribute("aria-label")).toBe("Switch server: This computer");

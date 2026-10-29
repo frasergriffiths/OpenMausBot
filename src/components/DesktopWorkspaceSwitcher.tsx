@@ -263,7 +263,7 @@ export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill
       <Cloud size={18} aria-hidden="true" />
     </div>;
     if (inline) return <div data-cloud-home-indicator data-workspace-switcher="inline" title={label}
-      className={pill ? "flex h-8 min-w-0 items-center gap-1 rounded-full bg-raised/50 px-3 text-[13px] font-medium text-ink" : "flex min-w-0 items-center gap-1.5 px-1.5 text-[13px] font-medium text-ink"}>
+      className={pill ? "flex h-9 min-w-0 items-center gap-1 rounded-full bg-raised/50 px-3 text-[13px] font-medium text-ink" : "flex min-w-0 items-center gap-1.5 px-1.5 text-[13px] font-medium text-ink"}>
       <Cloud size={pill ? 15 : 14} aria-hidden="true" className="shrink-0 text-ink-secondary" />
       <span className={pill ? "min-w-0 truncate @max-[136px]/sidebar-top:hidden" : "min-w-0 truncate"}>{t("cloudSetup.myCloud")}</span>
       {(onLine || whose) && <span className="sr-only">{onLine ? ` · ${onLine}` : ""}{whose ? ` · ${whose}` : ""}</span>}
@@ -284,7 +284,7 @@ export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill
   const menu = <WorkspaceMenu open={open} anchor={anchor} saved={saved} switching={switching} onPick={pick} onForget={(id) => void forget(id)} onConnect={onConnectServer} onAddCloud={onAddCloud} onClose={closeMenu} />;
   if (rail) return <div data-workspace-switcher="rail" className="relative">
     <button type="button" aria-label={label} aria-haspopup="menu" aria-expanded={open} data-cloud-home-indicator={cloudHome || undefined}
-      data-tour="server-switcher" title={title} onClick={(event) => openMenu(event.currentTarget.getBoundingClientRect())} className={cn(SIMPLE_RAIL_BUTTON, "aria-expanded:bg-raised")}
+      data-tour="server-switcher" title={title} onClick={(event) => (open ? closeMenu() : openMenu(event.currentTarget.getBoundingClientRect()))} className={cn(SIMPLE_RAIL_BUTTON, "aria-expanded:bg-raised")}
       style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}>
       {cloudColor(current?.color) ? <CloudTile color={current?.color} size={18} /> : <Icon size={18} aria-hidden="true" />}
     </button>
@@ -294,9 +294,9 @@ export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill
   </div>;
   if (inline) return <div data-workspace-switcher="inline" className="flex min-w-0">
     <button type="button" aria-label={label} aria-haspopup="menu" aria-expanded={open} data-cloud-home-indicator={cloudHome || undefined}
-      data-tour="server-switcher" title={title} onClick={(event) => openMenu(event.currentTarget.getBoundingClientRect())}
+      data-tour="server-switcher" title={title} onClick={(event) => (open ? closeMenu() : openMenu(event.currentTarget.getBoundingClientRect()))}
       className={pill
-        ? "flex h-8 min-w-0 max-w-full items-center gap-1 overflow-hidden rounded-full bg-raised/50 pl-2.5 pr-1.5 text-left text-[13px] font-medium text-ink hover:bg-raised aria-expanded:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        ? "flex h-9 min-w-0 max-w-full items-center gap-1 overflow-hidden rounded-full bg-raised/50 pl-2.5 pr-1.5 text-left text-[13px] font-medium text-ink hover:bg-raised aria-expanded:bg-raised focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         : "flex h-7 min-w-0 max-w-full items-center gap-1.5 overflow-hidden rounded-md px-1.5 text-left text-[13px] font-medium text-ink hover:bg-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"}
       style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}>
       {cloudColor(current?.color) ? <CloudTile color={current?.color} size={16} /> : <Icon size={pill ? 15 : 14} aria-hidden="true" data-switcher-icon className="shrink-0 text-ink-secondary" />}
@@ -310,7 +310,7 @@ export function DesktopWorkspaceSwitcher({ compact = false, inline = false, pill
   return <div className={cn("py-1.5", compact ? "px-2" : "px-3")}>
     <button type="button" aria-label={label} aria-haspopup="menu" aria-expanded={open} data-cloud-home-indicator={cloudHome || undefined}
       data-tour="server-switcher" title={title}
-      onClick={(event) => openMenu(event.currentTarget.getBoundingClientRect())}
+      onClick={(event) => (open ? closeMenu() : openMenu(event.currentTarget.getBoundingClientRect()))}
       className={cn("flex w-full items-center gap-2 rounded-lg py-2 text-left text-[13px] font-medium text-ink hover:bg-control focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus", compact ? "justify-center px-1" : "px-2")}
       style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}>
       {cloudColor(current?.color) ? <CloudTile color={current?.color} size={20} /> : <Icon size={16} className="shrink-0 text-ink-secondary" />}

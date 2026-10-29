@@ -1,4 +1,4 @@
-import { Calendar, Gauge, ListChecks, MessagesSquare, Sparkles } from "lucide-react";
+import { Calendar, Gauge, ListChecks, Sparkles } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 import type { Bot } from "@/state/store";
@@ -7,6 +7,7 @@ import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerive
 import type { SimplePageId } from "./page-registry";
 import { SettingsPage } from "./SettingsPage";
 import { TryAsking } from "./TryAsking";
+import { WhereItWorks } from "./WhereItWorks";
 import { Card, NavRow, RowIcon, rowCls, RowText } from "./rows";
 
 type Derived = ReturnType<typeof useBotSettingsDerived>;
@@ -19,10 +20,9 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
   onEditInstructions?: (open: boolean) => void;
 }) {
   const routinesOn = derived.botRoutines.filter((routine) => routine.enabled).length;
-  const threads = bot.tasks?.length ?? 1;
 
   return (
-    <div data-panel-tabpanel="details">
+    <div data-panel-tabpanel="profile">
       <Card anchor="model">
         <div data-panel-row="model" className={rowCls}>
           <ModelPicker
@@ -36,9 +36,7 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
 
       <SettingsPage bot={bot} derived={derived} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} embedded />
 
-      <Card anchor="conversations">
-        <NavRow data-panel-page="threads" icon={MessagesSquare} title={t("botPanel.page.threads")} value={threads} onClick={() => onOpen("threads")} />
-      </Card>
+      <WhereItWorks bot={bot} derived={derived} onOpen={onOpen} />
 
       {derived.botRoutines.length > 0 && (
         <Card label={t("botSettings.simple.routines")} anchor="routines">

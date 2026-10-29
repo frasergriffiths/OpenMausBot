@@ -1,25 +1,24 @@
 import type { LocaleKey } from "@/locales";
 import type { BotSettingsSection } from "@/state/store";
 
-export const PANEL_TABS = ["profile", "library", "computer"] as const;
+export const PANEL_TABS = ["profile", "library"] as const;
 export type PanelTab = (typeof PANEL_TABS)[number];
 
 export const TAB_LABEL: Record<PanelTab, LocaleKey> = {
   profile: "botPanel.tab.profile",
   library: "botPanel.tab.library",
-  computer: "botPanel.tab.computer",
 };
 
 export type PageId =
   | "settings"
   | "setup" | "model" | "instructions" | "approvals" | "always" | "routines" | "apps"
-  | "memory" | "skills" | "threads" | "activity" | "runlog" | "files" | "data" | "sites" | "usage"
+  | "memory" | "skills" | "activity" | "runlog" | "files" | "data" | "usage"
   | "browser" | "computer" | "folder" | "android"
   | "voice" | "blurb" | "team" | "chiefteams" | "mcp" | "tools" | "webhooks" | "visibility" | "slack"
   | "overview" | "prompt" | "history";
 
 /** The pages Simple mode draws; a link to any other page lands where its section does. */
-export const SIMPLE_PAGES = ["apps", "routines", "memory", "skills", "folder", "browser", "computer", "settings", "threads", "activity", "runlog", "files", "data", "sites", "android", "usage"] as const satisfies readonly PageId[];
+export const SIMPLE_PAGES = ["apps", "routines", "memory", "skills", "folder", "browser", "computer", "settings", "activity", "runlog", "files", "data", "android", "usage"] as const satisfies readonly PageId[];
 export type SimplePageId = (typeof SIMPLE_PAGES)[number];
 
 export function isSimplePage(page: PageId): page is SimplePageId {
@@ -42,17 +41,15 @@ export const PAGES: Record<PageId, PageMeta> = {
   apps: { title: "botPanel.appsRow", home: "profile", intro: "botPanel.apps.intro" },
   memory: { title: "botPanel.memoryRow", home: "library", intro: "botPanel.memory.intro" },
   skills: { title: "botSettings.simple.skills", home: "library", intro: "botSettings.simple.skillsHint" },
-  threads: { title: "botPanel.page.threads", home: "profile" },
   activity: { title: "activity.panel.title", home: "profile" },
   runlog: { title: "botPanel.page.runLog", home: "profile" },
   usage: { title: "settings.section.usage", home: "profile" },
   files: { title: "botPanel.library.files", home: "library" },
   data: { title: "botPanel.library.data", home: "library" },
-  sites: { title: "settings.sites.title", home: "computer" },
-  browser: { title: "botPanel.page.browser", home: "computer" },
-  computer: { title: "botPanel.tab.computer", home: "computer" },
+  browser: { title: "botPanel.page.browser", home: "profile" },
+  computer: { title: "computer.tab.computer", home: "profile" },
   folder: { title: "computer.files.folder", home: "library", intro: "botPanel.folder.intro" },
-  android: { title: "botPanel.page.android", home: "computer" },
+  android: { title: "botPanel.page.android", home: "profile" },
   voice: { title: "botPanel.page.voice", home: "profile" },
   blurb: { title: "botPanel.page.blurb", home: "profile" },
   team: { title: "botPanel.page.team", home: "profile" },
@@ -85,7 +82,7 @@ const SECTION_TARGET: Record<BotSettingsSection, PanelTarget> = {
   soul: { tab: "profile", page: "settings", anchor: "instructions", editInstructions: true },
   skills: { tab: "library", page: "skills" },
   memory: { tab: "library", page: "memory" },
-  access: { tab: "computer" },
+  access: { tab: "profile", anchor: "where" },
   model: { tab: "profile", anchor: "model" },
   permissions: { tab: "profile", page: "settings", anchor: "approval" },
   voice: { tab: "profile" },
