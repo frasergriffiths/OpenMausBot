@@ -1728,6 +1728,12 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       {rail ? <SimpleRailFooter
         owner={cloudOwner}
         archived={archivedEntry}
+        places={{
+          teamMapOpen: state.activeView === "team-map",
+          onOpenTeamMap: () => dispatch({ type: "showTeamMap" }),
+          templatesOpen: teamLibraryOpen,
+          onOpenTemplates: () => setTeamLibraryOpen(true),
+        }}
       /> : phone ? <SidebarPhoneBar query={query} onQuery={setQuery} /> : <SidebarFooter density={density} simple={simpleDesk} owner={cloudOwner} archived={archivedEntry} toolsCollapsed={sectionCollapsed(TOOLS_SECTION_ID)} onToggleTools={layoutInteractive ? () => toggleSection(TOOLS_SECTION_ID) : undefined} places={{
         teamMapOpen: state.activeView === "team-map",
         onOpenTeamMap: () => dispatch({ type: "showTeamMap" }),

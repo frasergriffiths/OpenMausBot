@@ -2444,5 +2444,13 @@
   "botPanel.page.browser": "ब्राउज़र",
   "botPanel.tab.computer": "कंप्यूटर",
   "settings.sites.logOutBrowser": "ब्राउज़र से साइन आउट करें",
-  "chat.setupCard.submit": "Set up {name}"
+  "chat.setupCard.submit": "Set up {name}",
+  "settings.threadChip.title": "Conversation switcher",
+  "settings.threadChip.subtitle": "One pill is the current look. Browser tabs show every conversation across the top of the chat.",
+  "settings.threadChip.aria": "Conversation switcher style",
+  "settings.threadChip.pill": "One pill",
+  "settings.threadChip.tabs": "Browser tabs",
+  "composer.placeholder.steerUnavailable": "{name} is working — {key} stops this turn and sends this message now",
+  "composer.send.steerUnavailable": "Stop this turn and send",
+  "composer.notice.steerQueued": "Still working — queued this message instead"
 }

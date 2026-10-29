@@ -36,7 +36,7 @@ import { LicenseExpiryBanner } from "./LicenseExpiryBanner";
 import { WorkspacesSection, workspacesAvailable } from "./WorkspacesSection";
 import { SkinPicker } from "./SkinPicker";
 import { ThemeRow } from "./ThemeRow";
-import { ChatWidthRow, FontRow, SidebarToolsLayoutRow } from "./AppearanceSelectRows";
+import { ChatWidthRow, FontRow, SidebarToolsLayoutRow, ThreadChipStyleRow } from "./AppearanceSelectRows";
 import { RoomTurnTimeoutSettings } from "./RoomTurnTimeoutSettings";
 import { McpCallTimeoutSettings } from "./McpCallTimeoutSettings";
 import { ProfileFields } from "./ProfileSettings";
@@ -351,6 +351,7 @@ export function SettingsModal() {
             <SidebarDensityRow />
             <SidebarToolsLayoutRow />
             <ShowThreadsRow />
+            <ThreadChipStyleRow />
             <PinnedCirclesRow />
             <UniversalPinsRow />
             <NotificationRows />

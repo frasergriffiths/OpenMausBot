@@ -68,6 +68,8 @@ export function SidebarFooter({ density, simple = false, owner = null, archived,
       <SidebarFooterNav density={density} collapsed={toolsCollapsed} onToggleCollapsed={onToggleTools} />
       {density === "icons" ? (
         <>
+          <SidebarTeamMapButton open={placeButtons.teamMapOpen} onOpen={placeButtons.onOpenTeamMap} />
+          <SidebarTemplatesButton open={placeButtons.templatesOpen} onOpen={placeButtons.onOpenTemplates} />
           <SidebarPhoneButton density={density} onOpen={() => dispatch(phoneSettingsAction())} />
           <div className="flex flex-col items-center justify-center gap-1">
             <UpdateIndicator />

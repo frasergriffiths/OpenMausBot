@@ -18,11 +18,13 @@ import { displayTitle, chipStatus } from "./ChatThreadBar";
 type RowTask = Task & { queued?: boolean };
 
 /** The current thread's switcher: a two-line list of every thread in this conversation, with its actions one layer down. */
-export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
+export function ThreadSwitcher({ open, anchorRef, bot, onClose, scope = "all" }: {
   open: boolean;
   anchorRef: RefObject<HTMLButtonElement | null>;
   bot: Bot;
   onClose: (refocus: boolean) => void;
+  /** "archived" lists only archived threads that are not the open one: the tab strip draws the rest. */
+  scope?: "all" | "archived";
 }) {
   const { state, dispatch } = useStore();
   const generatedTitles = llmThreadTitlesEnabled(state.config);
@@ -30,7 +32,7 @@ export function ThreadSwitcher({ open, anchorRef, bot, onClose }: {
   const threads: RowTask[] = useMemo(() => {
     const openThread = currentTaskBot(bot);
     return orderedThreadList(
-      (bot.tasks ?? []).filter((task) => !task.routineRunId && (!isArchived(task) || task.threadId === bot.threadId)),
+      (bot.tasks ?? []).filter((task) => !task.routineRunId && (scope === "archived" ? isArchived(task) && task.threadId !== bot.threadId : !isArchived(task) || task.threadId === bot.threadId)),
     ).map((task) => {
       const live = task.threadId === bot.threadId ? openThread : null;
       return {

@@ -95,7 +95,9 @@ import { RenameTitle } from "./RenameTitle"; import { ChatHeadRole, chiefOfStaff
 import { BotActivityPicker } from "./TaskPicker"; import { ChatHeadPill } from "./ChatHeadPill";
 import { ELEVATED_FLOAT, ELEVATED_HOVER } from "./elevated";
 import { ModelPicker } from "./ModelPicker";
-import { ChatHeaderMenu, ChatMoreMenu } from "./ChatMoreMenu"; import { ChatThreadChip, chatThreadChipShown } from "./ChatThreadBar"; import { TeamPrivateFirstLine, TeamPrivateHeader, TeamSharedHeader } from "./TeamPrivateChatsLine";
+import { ChatHeaderMenu, ChatMoreMenu } from "./ChatMoreMenu"; import { ChatThreadChip, chatThreadChipShown } from "./ChatThreadBar";
+import { ChatThreadTabs } from "./ChatThreadTabs";
+import { useThreadChipStyle } from "@/lib/sidebar-preferences"; import { TeamPrivateFirstLine, TeamPrivateHeader, TeamSharedHeader } from "./TeamPrivateChatsLine";
 import { useChatFindRequests } from "@/lib/chat-find";
 import { SpeakButton } from "./SpeakButton";
 import { CallOverlay } from "./CallView";
@@ -826,6 +828,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
   const phone = useMediaQuery(PHONE_LAYOUT);
   const phoneMenu = phone && !remoteClient;
   const threadChipVisible = threadsWanted && !phone && chatThreadChipShown(profile);
+  const threadChipStyle = useThreadChipStyle();
   // A strip hidden by the header's container query has zero width; only a measured, visible strip may label the panel.
   const simpleHead = !advanced && !remoteClient;
   const canWrite = useCanWriteIn(bot.threadId);
@@ -1020,7 +1023,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
         <div data-chathead-row className={cn("flex items-center justify-between", phone ? "gap-2" : "@max-[30rem]/chathead:flex-wrap @max-[30rem]/chathead:gap-y-1 @min-[30rem]/chathead:grid @min-[30rem]/chathead:grid-cols-[minmax(0,1fr)_minmax(0,auto)_minmax(max-content,1fr)]")}>
         {threadChipVisible && (
           <div data-chathead-tabbar className="flex min-w-0 @min-[30rem]/chathead:w-full @min-[30rem]/chathead:col-start-1 @min-[30rem]/chathead:justify-self-start">
-            <ChatThreadChip bot={profile} />
+            {threadChipStyle === "tabs" ? <ChatThreadTabs bot={profile} /> : <ChatThreadChip bot={profile} />}
           </div>
         )}
         <div data-chathead-identity className={cn("flex min-w-0 items-center gap-2", phone ? "flex-1" : "@max-[30rem]/chathead:basis-full @min-[30rem]/chathead:col-start-2 @min-[30rem]/chathead:justify-self-center", simpleHead && phone && "justify-center")} style={headerNoDragStyle}>
