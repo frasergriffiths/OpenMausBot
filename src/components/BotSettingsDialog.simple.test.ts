@@ -571,7 +571,7 @@ describe("the avatar editor", () => {
 
 
 describe("the Details tab", () => {
-  it("holds the model and the conversations, with no thread list and no switch or Thinking row", () => {
+  it("holds the model, with no thread list and no switch or Thinking row", () => {
     const rendered = botTab(makeBot());
     expect(ofType(rendered, ModelPicker)!.props).toMatchObject({ bot: expect.objectContaining({ id: "scout" }), threadId: "thread-scout", contained: true });
     const model = rendered.html.indexOf('data-panel-row="model"');

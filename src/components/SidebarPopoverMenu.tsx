@@ -118,7 +118,14 @@ export function MenuRows({
             disabled={item.disabled}
             aria-haspopup={item.submenu ? "menu" : undefined}
             aria-expanded={item.submenu ? openSubmenu === item.key : undefined}
-            onClick={(event) => onItem(item, event.currentTarget, event.detail === 0)}
+            onPointerDown={(event) => {
+              if (event.button !== 0) return;
+              event.preventDefault();
+              onItem(item, event.currentTarget, false);
+            }}
+            onClick={(event) => {
+              if (event.detail === 0) onItem(item, event.currentTarget, true);
+            }}
             onPointerEnter={(event) => onRowEnter?.(item, event.currentTarget, { x: event.clientX, y: event.clientY })}
             onPointerLeave={() => onRowLeave?.(item)}
             className={cn(
@@ -449,13 +456,14 @@ export function SidebarPopoverMenu({
         data-tour={triggerTour}
         onClick={(event) => {
           clearTimers();
-          if (open) close(true);
-          else {
-            // event.detail is 0 for a click from Enter or Space: land on the first item.
-            focusFirst.current = anchored && event.detail === 0;
-            setPinned(true);
-            setOpen(true);
+          if (open) {
+            close();
+            return;
           }
+          // event.detail is 0 for a click from Enter or Space: land on the first item.
+          focusFirst.current = anchored && event.detail === 0;
+          setPinned(true);
+          setOpen(true);
         }}
         onKeyDown={(event) => {
           if (open && closesOnEscape(event)) {

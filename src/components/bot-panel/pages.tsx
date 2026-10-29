@@ -22,8 +22,8 @@ import { ComputerPanel } from "../ComputerPanel";
 import { AndroidDevicePanel, useAndroidUsbDevices } from "../AndroidDevicePanel";
 import { ActivityPanel } from "../ActivityPanel";
 import { InspectorPanel } from "../InspectorPanel";
-import { ComputerFilesPane } from "../ComputerFilesPane";
 import { UsageSection } from "../bot-settings/UsageSection";
+import { ComputerFilesPane } from "../ComputerFilesPane";
 import { useOpenComputer } from "./WhereItWorks";
 import { memoryNotes, withMemoryNote, withoutMemoryNote } from "./memory-notes";
 import type { SimplePageId } from "./page-registry";
@@ -376,17 +376,16 @@ export function RunLogPage({ bot }: PageContext) {
   return <InspectorPanel bot={bot} embedded />;
 }
 
-export function FilesPage({ bot }: PageContext) {
-  return <ComputerFilesPane bot={bot} />;
-}
-
 export function BrowserLivePage({ bot, derived, onOpen }: PageContext & { onOpen?: (page: SimplePageId) => void }) {
   if (!derived.browserEnabled) return <Card><NoteRow>{t("botAccess.browser.off")}</NoteRow></Card>;
-  // The signed-in sites live here, under the browser that uses them, rather than on a page of their own.
   return <>
     <BrowserLogins bot={bot} browserEnabled onOpenBrowser={() => onOpen?.("browser")} />
     <BrowserPanel bot={bot} />
   </>;
+}
+
+export function FilesPage({ bot }: PageContext) {
+  return <ComputerFilesPane bot={bot} />;
 }
 
 export function ComputerPage({ bot }: PageContext) {
@@ -419,6 +418,8 @@ export function PageBody({ page, onOpen, editingInstructions, onEditInstructions
       return <MemoryPage {...context} />;
     case "skills":
       return <SkillsPage {...context} />;
+    case "files":
+      return <FilesPage {...context} />;
     case "folder":
       return <FolderPage {...context} />;
     case "browser":
@@ -429,8 +430,6 @@ export function PageBody({ page, onOpen, editingInstructions, onEditInstructions
       return <ActivityPage {...context} />;
     case "runlog":
       return <RunLogPage {...context} />;
-    case "files":
-      return <FilesPage {...context} />;
     case "android":
       return <AndroidPage />;
     case "usage":

@@ -154,7 +154,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           </div>
           {/* Sized by its pills, never a fixed height: a 38px row around a 36px track spilled 6px into the
               scrolling body, so content slid up behind the tabs. */}
-          <div className="flex shrink-0 items-center px-3 pb-1 pt-2">
+          <div className="relative z-10 flex shrink-0 items-center bg-panel px-3 pb-1 pt-2">
             <div role="tablist" aria-label={t("botSettings.simple.tabs")} className={cn(PILL_TABS, "hidden w-full @[270px]:flex")} onKeyDown={onTabKeyDown}>
               {PANEL_TABS.map((id, index) => (
                 <button

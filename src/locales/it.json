@@ -4234,8 +4234,6 @@
   "routines.botCountMany": "{count} bot",
   "routines.group": "Gruppo",
   "computer.browserSwitch.title": "Lascia che {name} usi un browser",
-  "computer.tab.data": "Dati",
-  "computer.tab.files": "File",
   "computer.tabsAria": "Vista del pannello del bot",
   "computer.fullScreen": "Schermo intero",
   "computer.browserOff.title": "Il browser è spento",
@@ -6108,6 +6106,5 @@
   "botPanel.tab.profile": "Profilo",
   "botPanel.tab.library": "Libreria",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Thread",
   "botPanel.page.browser": "Browser"
 }

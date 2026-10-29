@@ -1,7 +1,8 @@
 // Duty-cycled: a spinner repaints every vsync, so these dots hold opacity steps and the timer writes its own text node
 // once a second instead of committing through React.
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { cn } from "@/lib/cn";
+import { useVisibleInterval } from "@/hooks/use-visible-interval";
 import { formatElapsed } from "@/lib/working-time";
 
 export function WorkingDots({ size = 4, className }: { size?: number; className?: string }) {
@@ -20,13 +21,8 @@ export function WorkingDots({ size = 4, className }: { size?: number; className?
 
 export function WorkingTimer({ since, className, format = formatElapsed }: { since: number; className?: string; format?: (elapsedMs: number) => string }) {
   const node = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const tick = () => {
-      if (node.current) node.current.textContent = format(Date.now() - since);
-    };
-    tick();
-    const timer = setInterval(tick, 1000);
-    return () => clearInterval(timer);
-  }, [since, format]);
+  useVisibleInterval(() => {
+    if (node.current) node.current.textContent = format(Date.now() - since);
+  }, 1000);
   return <span ref={node} className={cn("tabular-nums", className)} />;
 }

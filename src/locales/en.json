@@ -3512,7 +3512,6 @@
   "botPanel.library.empty": "Pages, files, and apps this bot makes show up here",
   "botPanel.library.pages": "Pages",
   "botPanel.library.apps": "Apps",
-  "botPanel.library.files": "Files",
   "botPanel.library.scope": "From this conversation",
   "botPanel.thisConversation": "In this conversation",
   "botPanel.thisConversationHint": "Applies to this conversation only.",
@@ -4614,8 +4613,6 @@
   "computer.tab.android": "Android",
   "computer.browserSwitch.title": "Let {name} use a browser",
   "computer.tab.browser": "Browser",
-  "computer.tab.data": "Data",
-  "computer.tab.files": "Files",
   "computer.tabsAria": "Bot panel view",
   "computer.fullScreen": "Full screen",
   "computer.browserOff.title": "The browser is off",
@@ -6628,7 +6625,6 @@
   "settings.simple.busySendSteer": "Steer",
   "botPanel.tab.profile": "Profile",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Threads",
   "botPanel.page.browser": "Browser",
   "sidebar.switchServerAddCloud": "Add a Cloud…",
   "sidebar.switchServerConnect": "Connect to another computer…",
@@ -6653,5 +6649,7 @@
   "newBot.place.handoff": "You can change this any time in the bot's Screen tab.",
   "computer.simple.placeAria": "Where {name} works. Currently {place}.",
   "computer.simple.placeChange": "Change where {name} works",
-  "botPanel.page.browser.open": "Open the browser"
+  "botPanel.page.browser.open": "Open the browser",
+  "botPanel.library.files": "Files",
+  "computer.tab.files": "Files"
 }

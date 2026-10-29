@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useVisibleInterval } from "@/hooks/use-visible-interval";
 import { Check, Crown, X } from "lucide-react";
 import type { CloudAccountState, CloudPlanSnapshot } from "../../electron/cloud-account.mjs";
 import type { CloudOffer } from "../../electron/cloud-home.mjs";
@@ -118,11 +119,7 @@ export function otherDialogOpen(): boolean {
 
 export function useOtherDialogOpen(watch: boolean): boolean {
   const [, setOpen] = useState(false);
-  useEffect(() => {
-    if (!watch) return;
-    const timer = setInterval(() => setOpen(otherDialogOpen()), 1_000);
-    return () => clearInterval(timer);
-  }, [watch]);
+  useVisibleInterval(() => setOpen(otherDialogOpen()), 1_000, watch);
   return watch && otherDialogOpen();
 }
 

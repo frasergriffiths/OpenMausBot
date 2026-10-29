@@ -38,6 +38,7 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
 
       <WhereItWorks bot={bot} derived={derived} onOpen={onOpen} />
 
+
       {derived.botRoutines.length > 0 && (
         <Card label={t("botSettings.simple.routines")} anchor="routines">
           <NavRow

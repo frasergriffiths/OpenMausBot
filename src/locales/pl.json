@@ -4317,8 +4317,6 @@
   "computer.tab.android": "Android",
   "computer.browserSwitch.title": "Pozwól botowi {name} używać przeglądarki",
   "computer.tab.browser": "Przeglądarka",
-  "computer.tab.data": "Dane",
-  "computer.tab.files": "Pliki",
   "computer.tabsAria": "Widok panelu bota",
   "computer.fullScreen": "Pełny ekran",
   "computer.browserOff.title": "Przeglądarka jest wyłączona",
@@ -6223,6 +6221,5 @@
   "botPanel.tab.profile": "Profil",
   "botPanel.tab.library": "Biblioteka",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "Wątki",
   "botPanel.page.browser": "Przeglądarka"
 }

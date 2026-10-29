@@ -48,6 +48,7 @@ import { WorkspaceBackupSettings } from "./WorkspaceBackupSettings";
 import { CompanyBackupSettings } from "./CompanyBackupSettings";
 import { ImportSettings } from "./ImportSettings";
 import { cn } from "@/lib/cn";
+import { Notice } from "./Notice";
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useAdvancedMode } from "@/lib/interface-mode";
@@ -367,9 +368,7 @@ export function SettingsModal() {
           >
             <div className="flex flex-col gap-4">
               {state.config?.composio.mode === "managed" ? (
-                <div className="rounded-lg border border-success/25 bg-success/10 px-3 py-2 text-[13px] text-success">
-                  {t("settings.connections.ready")}
-                </div>
+                <Notice tone="ready">{t("settings.connections.ready")}</Notice>
               ) : null}
               <div className="text-[12px] font-medium uppercase tracking-wide text-ink-secondary">{t("keys.providers.title")}</div>
               <p className="-mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("keys.providers.subtitle")}</p>

@@ -4405,8 +4405,6 @@
   "computer.tab.android": "Android",
   "computer.browserSwitch.title": "{name} にブラウザーの使用を許可",
   "computer.tab.browser": "ブラウザー",
-  "computer.tab.data": "データ",
-  "computer.tab.files": "ファイル",
   "computer.tabsAria": "ボットパネルの表示",
   "computer.fullScreen": "フルスクリーン",
   "computer.browserOff.title": "ブラウザーはオフです",
@@ -6329,6 +6327,5 @@
   "botPanel.tab.profile": "プロフィール",
   "botPanel.tab.library": "ライブラリ",
   "botPanel.page.runLog": "Run log",
-  "botPanel.page.threads": "スレッド",
   "botPanel.page.browser": "ブラウザー"
 }
