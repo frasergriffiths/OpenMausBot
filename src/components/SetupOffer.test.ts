@@ -131,13 +131,13 @@ describe("the setup card under a new bot's greeting", () => {
     expect(renderOffer(offered).submit!.props.disabled).toBe(false);
   });
 
-  it("submits on Enter from a focused row", async () => {
+  it("selects on Enter from a focused row without sending anything", async () => {
     const view = renderOffer(offered);
-    const enter = { key: "Enter", preventDefault: vi.fn() };
-    (view.choices[0]!.props.onKeyDown as (event: unknown) => void)(enter);
+    expect(view.choices[0]!.props.onKeyDown).toBeUndefined();
+    press(view.choices[0]);
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(enter.preventDefault).toHaveBeenCalled();
-    expect(fixture.api).toHaveBeenCalledWith("/api/bots/b1/setup-request", { method: "POST", body: JSON.stringify({ threadId: "t1", text: "Plan my trips" }) });
+    expect(renderOffer(offered).choices[0]!.props["aria-checked"]).toBe(true);
+    expect(fixture.api).not.toHaveBeenCalled();
   });
 
   it("asks for Something else without words, and shows the bot's line from that answer even if the live update never comes", async () => {

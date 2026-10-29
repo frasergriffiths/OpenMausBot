@@ -128,12 +128,6 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
             return (
               <button key={label} type="button" role="radio" aria-checked={chosen} data-ask-choice="" data-selected={chosen || undefined}
                 disabled={settled || busy} onClick={() => setSelected(index)}
-                onKeyDown={(event) => {
-                  if (event.key !== "Enter") return;
-                  event.preventDefault();
-                  setSelected(index);
-                  submit(index);
-                }}
                 className={cn("group flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-start",
                   settled ? "cursor-default"
                     : chosen ? "bg-accent/10 text-ink ring-1 ring-inset ring-accent/30"
@@ -153,7 +147,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
       {!settled && !pending && (
         <div className="px-1 pb-1 pt-3">
           <button type="button" data-setup-submit="" disabled={selected === null || busy} onClick={() => submit(selected)}
-            style={(() => { const colour = bot.color && bot.color in MAUS_COLORS ? bot.color : "purple"; return { backgroundColor: MAUS_COLORS[colour], color: mascotInk(colour) }; })()}
+            style={(() => { const colour = bot.color && Object.hasOwn(MAUS_COLORS, bot.color) ? bot.color : "purple"; return { backgroundColor: MAUS_COLORS[colour], color: mascotInk(colour) }; })()}
             className="flex h-10 w-full items-center justify-center gap-2 rounded-full text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-45">
             {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {t("chat.setupCard.submit", { name: bot.name })}
