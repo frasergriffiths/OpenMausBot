@@ -1355,7 +1355,9 @@ export function ComputerPanel({
                       : t("computer.capturingLocal")
                     : vmResumable
                       ? t(pending === "vm-start" ? "vm.setup.starting" : "computer.phase.vmStopped")
-                      : emptyState[phase]}
+                      : phase === "browser"
+                        ? null
+                        : emptyState[phase]}
               </span>
               {currentTeamComputer && placeActionButton(autoView)}
               {bot.computer === "cloud" && (phase === "unconfigured" || phase === "error") && cloudView.action?.id !== "add-boat-key" && placeActionButton(cloudView)}
@@ -1365,14 +1367,6 @@ export function ComputerPanel({
                   className="mt-1 rounded-lg bg-control px-3 py-1.5 text-[12px] text-ink hover:bg-raised-hover"
                 >
                   {t("computer.openSettings")}
-                </button>
-              )}
-              {phase === "browser" && browserEnabled && (
-                <button
-                  onClick={() => selectPanelView("browser")}
-                  className="mt-1 rounded-lg bg-control px-3 py-1.5 text-[12px] text-ink hover:bg-raised-hover"
-                >
-                  {t("computer.openBrowserTab")}
                 </button>
               )}
               {(phase === "show-ready-boat" || phase === "show-sleeping-boat" || phase === "show-pending-boat") && (
