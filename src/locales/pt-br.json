@@ -6083,6 +6083,5 @@
   "botPanel.tab.library": "Biblioteca",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Conversas",
-  "botPanel.page.browser": "Navegador",
-  "botPanel.library.data": "Dados"
+  "botPanel.page.browser": "Navegador"
 }

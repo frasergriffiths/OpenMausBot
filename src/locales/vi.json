@@ -4870,6 +4870,5 @@
   "botPanel.tab.library": "Thư viện",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Chuỗi",
-  "botPanel.page.browser": "Trình duyệt",
-  "botPanel.library.data": "Dữ liệu"
+  "botPanel.page.browser": "Trình duyệt"
 }

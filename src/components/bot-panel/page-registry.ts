@@ -12,13 +12,13 @@ export const TAB_LABEL: Record<PanelTab, LocaleKey> = {
 export type PageId =
   | "settings"
   | "setup" | "model" | "instructions" | "approvals" | "always" | "routines" | "apps"
-  | "memory" | "skills" | "activity" | "runlog" | "files" | "data" | "usage"
+  | "memory" | "skills" | "activity" | "runlog" | "files" | "usage"
   | "browser" | "computer" | "folder" | "android"
   | "voice" | "blurb" | "team" | "chiefteams" | "mcp" | "tools" | "webhooks" | "visibility" | "slack"
   | "overview" | "prompt" | "history";
 
 /** The pages Simple mode draws; a link to any other page lands where its section does. */
-export const SIMPLE_PAGES = ["apps", "routines", "memory", "skills", "folder", "browser", "computer", "settings", "activity", "runlog", "files", "data", "android", "usage"] as const satisfies readonly PageId[];
+export const SIMPLE_PAGES = ["apps", "routines", "memory", "skills", "folder", "browser", "computer", "settings", "activity", "runlog", "files", "android", "usage"] as const satisfies readonly PageId[];
 export type SimplePageId = (typeof SIMPLE_PAGES)[number];
 
 export function isSimplePage(page: PageId): page is SimplePageId {
@@ -45,7 +45,6 @@ export const PAGES: Record<PageId, PageMeta> = {
   runlog: { title: "botPanel.page.runLog", home: "profile" },
   usage: { title: "settings.section.usage", home: "profile" },
   files: { title: "botPanel.library.files", home: "library" },
-  data: { title: "botPanel.library.data", home: "library" },
   browser: { title: "botPanel.page.browser", home: "profile" },
   computer: { title: "computer.tab.computer", home: "profile" },
   folder: { title: "computer.files.folder", home: "library", intro: "botPanel.folder.intro" },

@@ -209,7 +209,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
           "min-h-0 flex-1",
           page === "computer"
             ? "flex flex-col overflow-hidden px-3 pb-3 pt-2"
-            : page === "browser" || page === "data" || page === "files"
+            : page === "browser" || page === "files"
               ? "flex flex-col overflow-hidden p-3"
             : page === null
               ? "overflow-y-auto px-4 pb-6 pt-2"
@@ -227,9 +227,9 @@ export function BotPanel({ bot, derived, linkedSection, onClose }: {
             {tab === "library" && <LibraryTab bot={bot} onOpen={openPage} />}
           </div>
         ) : (
-          <div data-panel-page-view={page} className={cn((page === "browser" || page === "data" || page === "files" || page === "computer") && "flex min-h-0 flex-1 flex-col")}>
+          <div data-panel-page-view={page} className={cn((page === "browser" || page === "files" || page === "computer") && "flex min-h-0 flex-1 flex-col")}>
             <span id="bot-settings-title" className="sr-only">{bot.name}</span>
-            <div className={cn(pageSurfaceCls, (page === "browser" || page === "data" || page === "files" || page === "computer") && "min-h-0 flex-1")}>
+            <div className={cn(pageSurfaceCls, (page === "browser" || page === "files" || page === "computer") && "min-h-0 flex-1")}>
               <PageBody
                 page={page}
                 bot={bot}

@@ -2446,6 +2446,5 @@
   "botPanel.tab.library": "Bibliothèque",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Fils",
-  "botPanel.page.browser": "Navigateur",
-  "botPanel.library.data": "Données"
+  "botPanel.page.browser": "Navigateur"
 }

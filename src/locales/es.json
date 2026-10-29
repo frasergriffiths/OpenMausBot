@@ -5382,6 +5382,5 @@
   "botPanel.tab.library": "Biblioteca",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Hilos",
-  "botPanel.page.browser": "Navegador",
-  "botPanel.library.data": "Datos"
+  "botPanel.page.browser": "Navegador"
 }

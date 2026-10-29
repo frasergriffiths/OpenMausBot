@@ -6330,6 +6330,5 @@
   "botPanel.tab.library": "ライブラリ",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "スレッド",
-  "botPanel.page.browser": "ブラウザー",
-  "botPanel.library.data": "データ"
+  "botPanel.page.browser": "ブラウザー"
 }

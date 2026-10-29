@@ -4253,6 +4253,5 @@
   "botPanel.tab.library": "資料庫",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "對話",
-  "botPanel.page.browser": "瀏覽器",
-  "botPanel.library.data": "資料"
+  "botPanel.page.browser": "瀏覽器"
 }

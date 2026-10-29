@@ -6224,6 +6224,5 @@
   "botPanel.tab.library": "Biblioteka",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Wątki",
-  "botPanel.page.browser": "Przeglądarka",
-  "botPanel.library.data": "Dane"
+  "botPanel.page.browser": "Przeglądarka"
 }

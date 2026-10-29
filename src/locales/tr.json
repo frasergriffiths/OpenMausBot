@@ -4870,6 +4870,5 @@
   "botPanel.tab.library": "Kitaplık",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Konular",
-  "botPanel.page.browser": "Tarayıcı",
-  "botPanel.library.data": "Veriler"
+  "botPanel.page.browser": "Tarayıcı"
 }

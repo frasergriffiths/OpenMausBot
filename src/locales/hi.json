@@ -2446,6 +2446,5 @@
   "botPanel.tab.library": "लाइब्रेरी",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "थ्रेड्स",
-  "botPanel.page.browser": "ब्राउज़र",
-  "botPanel.library.data": "डेटा"
+  "botPanel.page.browser": "ब्राउज़र"
 }

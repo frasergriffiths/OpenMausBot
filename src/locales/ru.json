@@ -6314,6 +6314,5 @@
   "botPanel.tab.library": "Библиотека",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Треды",
-  "botPanel.page.browser": "Браузер",
-  "botPanel.library.data": "Данные"
+  "botPanel.page.browser": "Браузер"
 }

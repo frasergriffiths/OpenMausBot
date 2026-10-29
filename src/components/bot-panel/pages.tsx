@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { FolderOpen, Plus } from "lucide-react";
 
 import { appSwitchPatch } from "@/lib/bot-app-access";
@@ -41,7 +41,6 @@ export interface PageContext {
 export const pageSurfaceCls = "flex flex-col gap-3";
 
 const SKILLS_SITE = "https://skills.sh";
-const DataPanel = lazy(() => import("../data/DataPanel").then((module) => ({ default: module.DataPanel })));
 
 function errorText(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback;
@@ -381,10 +380,6 @@ export function FilesPage({ bot }: PageContext) {
   return <ComputerFilesPane bot={bot} />;
 }
 
-export function DataPage({ bot }: PageContext) {
-  return <Suspense fallback={<p className="px-1 py-3 text-[13px] text-ink-secondary">{t("common.checking")}</p>}><DataPanel bot={bot} /></Suspense>;
-}
-
 export function BrowserLivePage({ bot, derived, onOpen }: PageContext & { onOpen?: (page: SimplePageId) => void }) {
   if (!derived.browserEnabled) return <Card><NoteRow>{t("botAccess.browser.off")}</NoteRow></Card>;
   // The signed-in sites live here, under the browser that uses them, rather than on a page of their own.
@@ -436,8 +431,6 @@ export function PageBody({ page, onOpen, editingInstructions, onEditInstructions
       return <RunLogPage {...context} />;
     case "files":
       return <FilesPage {...context} />;
-    case "data":
-      return <DataPage {...context} />;
     case "android":
       return <AndroidPage />;
     case "usage":

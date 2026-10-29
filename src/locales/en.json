@@ -6630,7 +6630,6 @@
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Threads",
   "botPanel.page.browser": "Browser",
-  "botPanel.library.data": "Data",
   "sidebar.switchServerAddCloud": "Add a Cloud…",
   "sidebar.switchServerConnect": "Connect to another computer…",
   "sidebar.switchServerForget": "Forget “{name}”…",

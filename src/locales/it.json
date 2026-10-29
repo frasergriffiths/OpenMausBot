@@ -6109,6 +6109,5 @@
   "botPanel.tab.library": "Libreria",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.threads": "Thread",
-  "botPanel.page.browser": "Browser",
-  "botPanel.library.data": "Dati"
+  "botPanel.page.browser": "Browser"
 }

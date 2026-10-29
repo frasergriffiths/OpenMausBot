@@ -32,12 +32,6 @@ describe("computer panel view persistence", () => {
     expect(readComputerPanelView("other", storage)).toBe("computer");
   });
 
-  it("round-trips the Data tab", () => {
-    const values = new Map<string, string>();
-    const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value); } };
-    writeComputerPanelView("scout", "data", storage);
-    expect(readComputerPanelView("scout", storage)).toBe("data");
-  });
 });
 
 describe("computer panel view availability", () => {
@@ -53,7 +47,7 @@ describe("computer panel view availability", () => {
   });
 
   it("keeps a view whose trigger is on the row", () => {
-    for (const view of ["computer", "browser", "data"] as const) {
+    for (const view of ["computer", "browser"] as const) {
       expect(resolveComputerPanelView(view, { advanced: true, androidConnected: true })).toBe(view);
       expect(resolveComputerPanelView(view, { advanced: false, androidConnected: false })).toBe(view);
     }

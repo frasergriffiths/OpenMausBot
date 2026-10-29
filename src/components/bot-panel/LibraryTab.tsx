@@ -1,4 +1,4 @@
-import { AppWindow, Brain, Database, FileText, Folder, Globe, Zap } from "lucide-react";
+import { AppWindow, Brain, FileText, Folder, Globe, Zap } from "lucide-react";
 import { useMemo } from "react";
 
 import { t } from "@/lib/i18n";
@@ -87,12 +87,6 @@ export function LibraryTab({ bot, onOpen }: { bot: Bot; onOpen: (page: SimplePag
         title={t("botPanel.library.files")}
         value={shared.length + unshared.length || undefined}
         onClick={() => onOpen("files")}
-      />
-      <NavRow
-        data-panel-page="data"
-        icon={Database}
-        title={t("botPanel.library.data")}
-        onClick={() => onOpen("data")}
       />
     </Card>
   );

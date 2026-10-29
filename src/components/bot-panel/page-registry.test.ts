@@ -32,12 +32,12 @@ describe("the bot panel's page registry", () => {
   it("draws the Simple pages on their tabs: settings and where it works on Profile, what it keeps on Library", () => {
     expect(SIMPLE_PAGES).toEqual([
       "apps", "routines", "memory", "skills", "folder", "browser", "computer", "settings",
-      "activity", "runlog", "files", "data", "android", "usage",
+      "activity", "runlog", "files", "android", "usage",
     ]);
     const home = Object.fromEntries(SIMPLE_PAGES.map((page) => [page, PAGES[page].home]));
     expect(home).toEqual({
       apps: "profile", routines: "profile", settings: "profile", activity: "profile", runlog: "profile", usage: "profile",
-      memory: "library", skills: "library", folder: "library", files: "library", data: "library",
+      memory: "library", skills: "library", folder: "library", files: "library",
       browser: "profile", computer: "profile", android: "profile",
     });
     expect(isSimplePage("mcp")).toBe(false);
