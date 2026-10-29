@@ -146,10 +146,10 @@ describe("sidebar top row", () => {
     desktop();
     const html = render();
     const row = topRow(html);
-    expect(row).toMatch(/^data-sidebar-top-row="true" class="[^"]*\bh-\[60px\][^"]*\bitems-start\b[^"]*" style="-webkit-app-region:drag"/);
-    expect(classesOf(row, "data-sidebar-top-row")).toEqual(expect.arrayContaining(["pl-4", "pr-4", "pt-3"]));
+    expect(row).toMatch(/^data-sidebar-top-row="true" class="[^"]*\bh-\[60px\][^"]*\bitems-center\b[^"]*" style="-webkit-app-region:drag"/);
+    expect(classesOf(row, "data-sidebar-top-row")).toEqual(expect.arrayContaining(["pl-4", "pr-4", "items-center"]));
     expect(row).toContain("data-workspace-switcher");
-    expect(row).toMatch(/aria-label="Switch server: Servers"[^>]*class="[^"]*\bh-8\b[^"]*\brounded-full\b/);
+    expect(row).toMatch(/aria-label="Switch server: Servers"[^>]*class="[^"]*\bh-9\b[^"]*\brounded-full\b/);
     expect(html.match(/Switch server:/g)).toHaveLength(1);
     const { lights, slot, buttons } = order(row);
     expect(lights).toBeGreaterThan(-1);
@@ -260,7 +260,7 @@ describe("sidebar glass head and foot", () => {
       const search = at('aria-label="Search bots and messages"');
       const list = at('class="glass-scroller ');
       const foot = at('data-glass-bar="bottom"');
-      const places = at('data-sidebar-nav="team-map"');
+      const places = at('data-sidebar-nav="apps"');
       expect(head).toBeLessThan(topRow);
       expect(topRow).toBeLessThan(search);
       expect(search).toBeLessThan(list);
@@ -274,17 +274,18 @@ describe("sidebar glass head and foot", () => {
 });
 
 describe("sidebar foot in Simple mode", () => {
-  it.each(["comfortable", "compact"] as const)("puts the account avatar then the Connect apps pill in the foot, with Automations and Team map in the account menu (%s)", (density) => {
+  it.each(["comfortable", "compact"] as const)("puts the account avatar, Connect apps, Team map and Templates in the foot, with Files and Archived in the account menu (%s)", (density) => {
     fixture.advanced = false;
     fixture.density = density;
     const html = render();
     const foot = html.slice(html.indexOf('data-glass-bar="bottom"'));
     expect(foot).toContain('data-sidebar-footer="simple"');
     expect(html).not.toContain('data-sidebar-nav="automations"');
-    expect(html).not.toContain('data-sidebar-nav="team-map"');
     expect(html.match(/data-sidebar-nav="apps"/g)).toHaveLength(1);
     expect(foot.indexOf("data-sidebar-account")).toBeGreaterThan(-1);
     expect(foot.indexOf("data-sidebar-account")).toBeLessThan(foot.indexOf('data-sidebar-nav="apps"'));
+    expect(foot.indexOf('data-sidebar-nav="apps"')).toBeLessThan(foot.indexOf('data-sidebar-nav="team-map"'));
+    expect(foot.indexOf('data-sidebar-nav="team-map"')).toBeLessThan(foot.indexOf('data-sidebar-nav="templates"'));
     expect(foot).toMatch(/data-tour="nav-apps" data-sidebar-nav="apps"[^>]*>(<[^>]*>)*Connect apps</);
     expect(foot.match(/data-app-face="/g)).toHaveLength(3);
   });

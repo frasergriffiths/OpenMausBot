@@ -25,7 +25,7 @@ vi.mock("./CloudUsageMeter", () => ({ CloudUsageCard: () => null }));
 vi.mock("./DesktopWorkspaceSwitcher", () => ({ endCloudHowTo: vi.fn(), useWorkspacePlace: () => ({ error: null, waking: null }) }));
 vi.mock("./SidebarProfileMenu", () => ({ SidebarProfileMenu: () => null, useSimpleAccount: () => ({}) }));
 vi.mock("./UpdateIndicator", () => ({ UpdateIndicator: () => null }));
-vi.mock("./SidebarFooterNav", () => ({ SidebarBottomButtons: () => null, SidebarFooterNav: () => null }));
+vi.mock("./SidebarFooterNav", () => ({ SidebarBottomButtons: () => null, SidebarFooterNav: () => null, SidebarTeamMapButton: () => null, SidebarTemplatesButton: () => null }));
 vi.mock("./SidebarPhoneButton", () => ({ SidebarPhoneButton: () => null, phoneSettingsAction: () => ({ type: "phone-settings" }) }));
 vi.mock("./PluginsPanel", () => ({ preloadConnectedApps: () => Promise.resolve(fixture.inventory) }));
 vi.mock("./bot-settings/useBotApps", () => ({ loadAppCatalogue: () => Promise.resolve(fixture.catalogue) }));

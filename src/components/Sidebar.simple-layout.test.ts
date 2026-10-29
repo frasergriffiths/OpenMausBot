@@ -47,6 +47,7 @@ import { SIDEBAR_COLLAPSED_SECTIONS_KEY, SIDEBAR_DENSITY_KEY, SIDEBAR_SECTION_OR
 import { Sidebar, TeamMenuItems } from "./Sidebar";
 import { PinnedBotRoster } from "./PinnedCircleThreads";
 import { SidebarFooter } from "./SidebarFooter";
+import { TeamLibraryPanel } from "./TeamLibraryPanel";
 import { SidebarResizeHandle } from "./SidebarResizeHandle";
 import { SidebarTileGrid } from "./SidebarTiles";
 import { GlassBar, GlassScrollFrame, GlassScroller } from "./GlassScrollFrame";
@@ -328,13 +329,13 @@ describe("Simple-mode sidebar layout", () => {
     expect(item("New chat"), "a new conversation starts from the bot panel").toBeUndefined();
     expect(item("New bot")).toBeDefined();
     expect(item("New group chat")).toBeDefined();
-    expect(item("Templates")).toBeDefined();
+    expect(item("Templates"), "Templates lives in the desktop footer, not the + menu").toBeUndefined();
     (render().tree.find((node) => node.type === SidebarEdgeToggle)!.props as Parameters<typeof SidebarEdgeToggle>[0]).onToggle();
     expect(fixture.storage.get(SIDEBAR_DENSITY_KEY)).toBe("comfortable");
     expect(render().tree.some((node) => node.type === SimpleRailFooter)).toBe(false);
   });
 
-  it("New Bot makes a bot at once in both modes, Chief of Staff or not; Advanced keeps Create department and Templates", () => {
+  it("New Bot makes a bot at once in both modes, Chief of Staff or not; Advanced keeps Create department and Templates stays in the footer", () => {
     fixture.state = { ...fixture.state, bots: [bot("atlas", { chiefOfStaff: true }), bot("bea")] };
     const openMenu = () => {
       const plus = () => render().tree.find((node) => node.type === "button" && node.props["aria-label"] === "New or share")!;
@@ -349,7 +350,7 @@ describe("Simple-mode sidebar layout", () => {
     fixture.advanced = true;
     const item = openMenu();
     expect(item("Create department")).toBeDefined();
-    expect(item("Templates")).toBeDefined();
+    expect(item("Templates")).toBeUndefined();
     (item("New Bot")!.props.onClick as () => void)();
     expect(fixture.dispatch.mock.calls.map(([action]) => action)).toEqual([{ type: "newBot" }]);
   });
@@ -373,5 +374,44 @@ describe("Simple-mode sidebar layout", () => {
     search();
     expect(opened).toHaveBeenCalledOnce();
     expect(render(true).tree.some((node) => node.type === SimpleRailFooter)).toBe(true);
+  });
+});
+
+describe("the footer's places", () => {
+  const footer = (tree: ReactElement<Props>[]) => tree.find((node) => node.type === SidebarFooter)!;
+  const places = (tree: ReactElement<Props>[]) => footer(tree).props.places as NonNullable<Parameters<typeof SidebarFooter>[0]["places"]>;
+
+  it("offers Team map and Templates from the Simple footer and opens each", () => {
+    const shared = places(render().tree);
+    expect(shared).toMatchObject({ teamMapOpen: false, templatesOpen: false });
+    shared.onOpenTeamMap!();
+    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "showTeamMap" });
+    fixture.dispatch.mockClear();
+    shared.onOpenTemplates!();
+    expect(render().tree.some((node) => node.type === TeamLibraryPanel)).toBe(true);
+  });
+
+  it("offers the same two places from Advanced's footer", () => {
+    fixture.advanced = true;
+    const shared = places(render().tree);
+    expect(footer(render().tree).props.simple).toBe(false);
+    shared.onOpenTeamMap!();
+    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "showTeamMap" });
+    shared.onOpenTemplates!();
+    expect(render().tree.some((node) => node.type === TeamLibraryPanel)).toBe(true);
+  });
+
+  it("keeps Templates and Team map out of the + menu in both modes", () => {
+    for (const advanced of [false, true]) {
+      fixture.advanced = advanced;
+      fixture.values = [];
+      const plus = render().tree.find((node) => node.type === "button" && node.props["aria-label"] === "New or share")!;
+      (plus.props.onClick as () => void)();
+      const labels = nodes(render().tree.find((node) => node.props.role === "menu")!.props.children)
+        .filter((node) => node.type === "button")
+        .map((node) => Children.toArray(node.props.children).filter((part) => typeof part === "string"));
+      expect(labels.flat(), `advanced: ${advanced}`).not.toContain("Templates");
+      expect(labels.flat(), `advanced: ${advanced}`).not.toContain("Team map");
+    }
   });
 });

@@ -1344,14 +1344,14 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             <FolderPlus size={16} className="text-ink-secondary" /> {t("team.create")}
           </button>}
           {!remoteClient && <>
-          <button
+          {phone && <button
             onClick={() => { setPlusOpen(false); setTeamLibraryOpen(true); }}
             role="menuitem"
             className={plusItem}
           >
             <Library size={16} className="text-ink-secondary" />
             {t("sidebar.teamLibrary")}
-          </button>
+          </button>}
           {advanced && archivedBots.length > 0 && (
             <button
               onClick={() => {
@@ -1728,7 +1728,12 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       {rail ? <SimpleRailFooter
         owner={cloudOwner}
         archived={archivedEntry}
-      /> : phone ? <SidebarPhoneBar query={query} onQuery={setQuery} /> : <SidebarFooter density={density} simple={simpleDesk} owner={cloudOwner} archived={archivedEntry} toolsCollapsed={sectionCollapsed(TOOLS_SECTION_ID)} onToggleTools={layoutInteractive ? () => toggleSection(TOOLS_SECTION_ID) : undefined} />}
+      /> : phone ? <SidebarPhoneBar query={query} onQuery={setQuery} /> : <SidebarFooter density={density} simple={simpleDesk} owner={cloudOwner} archived={archivedEntry} toolsCollapsed={sectionCollapsed(TOOLS_SECTION_ID)} onToggleTools={layoutInteractive ? () => toggleSection(TOOLS_SECTION_ID) : undefined} places={{
+        teamMapOpen: state.activeView === "team-map",
+        onOpenTeamMap: () => dispatch({ type: "showTeamMap" }),
+        templatesOpen: teamLibraryOpen,
+        onOpenTemplates: () => setTeamLibraryOpen(true),
+      }} />}
       </GlassBar>
       </GlassScrollFrame>
 

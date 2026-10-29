@@ -407,7 +407,7 @@ describe("profileMenuItems", () => {
 
 describe("Simple mode's account menu", () => {
   const noop = () => {};
-  const tools = toolMenuItems({ activeView: "team-map", onTeamMap: noop });
+  const tools = toolMenuItems({ activeView: "files", onFiles: noop });
   const place = (patch: Partial<Parameters<typeof placeMenuItems>[0]> = {}) => ({
     bridge: { state: async () => ({ local: true, name: "This computer" }), menu: async () => {} },
     current: { local: true, name: "This computer" },
@@ -432,11 +432,11 @@ describe("Simple mode's account menu", () => {
     return all;
   }, []);
 
-  it("leads with usage, the phone app, support and Settings, then Team map, then where this window is and Cloud", () => {
+  it("leads with usage, the phone app, support and Settings, then Files, then where this window is and Cloud", () => {
     const items = build();
     expect(groups(items)).toEqual([
       ["usage", "phone-app", "support", "settings"],
-      ["team-map"],
+      ["files"],
       ["place", "switch-place", "account"],
     ]);
     expect(items.find((item) => item.key === "support")!.submenu!.map((item) => item.key)).toEqual(["help", "feedback", "shortcuts", "about", "update"]);
@@ -476,13 +476,13 @@ describe("Simple mode's account menu", () => {
     expect(items[0]!.chevron).toBeUndefined();
   });
 
-  it("adds Files once My Cloud's files are ready and Archived bots while there are any, after Team map", () => {
+  it("adds Archived bots while there are any, after Files", () => {
     const open = vi.fn();
-    const items = toolMenuItems({ activeView: "files", onTeamMap: noop, onFiles: noop, archived: { count: 3, open } });
-    expect(items.map((item) => [item.key, item.active, item.value])).toEqual([["team-map", false, undefined], ["files", true, undefined], ["archived", undefined, "3"]]);
-    items[2]!.onSelect();
+    const items = toolMenuItems({ activeView: "files", onFiles: noop, archived: { count: 3, open } });
+    expect(items.map((item) => [item.key, item.active, item.value])).toEqual([["files", true, undefined], ["archived", undefined, "3"]]);
+    items[1]!.onSelect();
     expect(open).toHaveBeenCalledOnce();
-    expect(toolMenuItems({ activeView: "chat", onTeamMap: noop, archived: { count: 0, open } }).map((item) => item.key)).toEqual(["team-map"]);
+    expect(toolMenuItems({ activeView: "chat", archived: { count: 0, open } }).map((item) => item.key)).toEqual([]);
   });
 
   it("names the account button after the person and whatever its dot is raised for", () => {
@@ -499,8 +499,15 @@ describe("Simple mode's account menu", () => {
     expect(renderToStaticMarkup(createElement(InitialsAvatar, { initials: "AL", size: 50 }))).toContain("font-size:19px");
   });
 
-  it("offers Team map alone in the tools group", () => {
-    expect(tools.map((item) => [item.key, item.active, item.attention])).toEqual([["team-map", true, undefined]]);
+  it("offers Files alone in the tools group", () => {
+    expect(tools.map((item) => [item.key, item.active, item.attention])).toEqual([["files", true, undefined]]);
+  });
+
+  it("has no Team map or Templates row left in the account menu", () => {
+    const items = build();
+    expect(items.map((item) => item.key)).not.toContain("team-map");
+    expect(items.map((item) => item.label)).not.toContain("Team map");
+    expect(items.map((item) => item.label)).not.toContain("Templates");
   });
 
   it("ticks the current place and switches through the same native menu as the server pill", () => {

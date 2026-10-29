@@ -73,12 +73,11 @@ it("keeps Files while signed out or offline, so the page can say what to do", as
   expect(row()).toBeTruthy();
 });
 
-it("in Advanced mode, Files is a row under Tools after Team map, highlighted while open", async () => {
+it("in Advanced mode, Files is the only row under Tools, highlighted while open", async () => {
   mode.advanced = true;
   bridge("idle");
   await render("comfortable", { activeView: "files" });
-  const html = host.innerHTML;
-  expect(html.indexOf('data-sidebar-nav="team-map"')).toBeLessThan(html.indexOf('data-sidebar-nav="files"'));
+  expect(host.querySelector('[data-sidebar-nav="team-map"]')).toBeNull();
   expect(row()!.getAttribute("aria-current")).toBe("page");
   act(() => root.unmount());
   expect(off).toHaveBeenCalledOnce();

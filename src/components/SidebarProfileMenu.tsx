@@ -19,7 +19,6 @@ import {
   Settings as SettingsIcon,
   Smartphone,
   UserRound,
-  UsersRound,
 } from "lucide-react";
 
 import { InitialsAvatar } from "./Avatar";
@@ -329,15 +328,13 @@ export function phoneMenuItems({
   ];
 }
 
-export function toolMenuItems({ activeView, onTeamMap, onFiles, archived }: {
+export function toolMenuItems({ activeView, onFiles, archived }: {
   activeView: string;
-  onTeamMap: () => void;
   /** set once My Cloud's files are ready to open */
   onFiles?: () => void;
   archived?: ArchivedBots;
 }): SidebarMenuItem[] {
   return [
-    { key: "team-map", label: t("sidebar.nav.teamMap"), icon: <UsersRound size={16} />, active: activeView === "team-map", onSelect: onTeamMap },
     ...(onFiles ? [{ key: "files", label: t("sidebar.nav.files"), icon: <FolderOpen size={16} />, active: activeView === "files", onSelect: onFiles }] : []),
     ...(archived?.count ? [{ key: "archived", label: t("sidebar.archived.title"), icon: <Archive size={16} />, value: String(archived.count), onSelect: archived.open }] : []),
   ];
@@ -566,7 +563,6 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
     ...(account ? { simple: {
       tools: toolMenuItems({
         activeView: state.activeView,
-        onTeamMap: () => dispatch({ type: "showTeamMap" }),
         onFiles: filesReady ? () => dispatch({ type: "showFiles" }) : undefined,
         archived: account.archived,
       }),
