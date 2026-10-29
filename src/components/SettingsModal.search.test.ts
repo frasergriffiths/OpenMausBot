@@ -15,7 +15,6 @@ vi.mock("@/state/store", async (importOriginal) => ({
     refreshInstances: vi.fn(),
   }),
 }));
-vi.mock("@/lib/interface-mode", () => ({ useAdvancedMode: () => false, setAdvancedMode: vi.fn() }));
 vi.mock("@/lib/analytics", () => ({ analyticsEnabled: () => false, setAnalyticsEnabled: vi.fn() }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => null }));
 vi.mock("./DesktopCapabilities", () => ({ useDesktopCapabilities: () => ({ capabilities: { host: {} } }) }));
@@ -56,10 +55,6 @@ afterEach(() => {
 
 const dialog = () => host.querySelector<HTMLElement>('[role="dialog"]')!;
 const search = () => host.querySelector<HTMLInputElement>("[data-settings-search]")!;
-const type = (value: string) => {
-  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(search(), value);
-  flushSync(() => search().dispatchEvent(new Event("input", { bubbles: true })));
-};
 
 describe("Settings search in Simple mode", () => {
   it("opens on the dialog itself, and a typed letter moves into search", () => {
@@ -69,13 +64,4 @@ describe("Settings search in Simple mode", () => {
     expect(search().value).toBe("f");
   });
 
-  it("lists a builder control as Advanced and, when chosen, opens General at the Advanced mode row", () => {
-    type("font");
-    const result = host.querySelector<HTMLButtonElement>('[data-settings-advanced-only="settings.font.title"]')!;
-    expect(result.textContent).toBe("Interface font · Advanced");
-    flushSync(() => result.click());
-    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "toggleAppSettings", open: true, section: "general" });
-    expect(scrolled.map((element) => element.getAttribute("data-settings-block"))).toContain("advanced-mode");
-    expect(search().value).toBe("");
-  });
 });

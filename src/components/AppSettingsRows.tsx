@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { api, useStore, type ConfigStatus } from "@/state/store";
-import { builtInBrowserEnabled, showToolCallsEnabled, skillAuthoringEnabled } from "@/lib/feature-flags";
+import { builtInBrowserEnabled, skillAuthoringEnabled } from "@/lib/feature-flags";
 import { localeChoices, type LocaleKey } from "@/locales";
 import { activeLocale, t } from "@/lib/i18n";
 import { withTourReset } from "@/lib/guided-tour";
@@ -15,9 +15,7 @@ import { effortLabel } from "./ModelPicker";
 import { EFFORT_LEVELS, isEffortLevel } from "../../shared/wire";
 import { setColorUserBubbles, useColorUserBubbles } from "@/lib/user-bubble-preference";
 import { setShowThreads, useShowThreadsChoice } from "@/lib/thread-preferences";
-import { setAdvancedMode, useAdvancedMode } from "@/lib/interface-mode";
 import { parseSidebarDensity, setPinnedCircles, setSidebarDensity, setUniversalPins, SIDEBAR_DENSITIES, usePinnedCircles, useSidebarDensity, useUniversalPins, type SidebarDensity } from "@/lib/sidebar-preferences";
-import { setShowRunCard, useShowRunCard } from "@/lib/run-card-preferences";
 import { parseSendKey, SEND_KEYS, sendKeyLabel, setSendKey, useSendKey } from "@/lib/send-key";
 import { effectiveLanguage, setLanguageChoice, useLanguageChoice } from "@/lib/language-preference";
 import { Select } from "./Select";
@@ -258,20 +256,6 @@ export function ColorUserBubblesRow({ simple = false }: { simple?: boolean }) {
   );
 }
 
-export function AdvancedModeRow({ simple = false }: { simple?: boolean }) {
-  const enabled = useAdvancedMode();
-  return (
-    <SettingRow className={simple ? undefined : "rounded-2xl border border-accent-border/40 bg-raised-hover/40 py-4"} title={t("settings.advancedMode.title")}
-      subtitle={t(simple ? "settings.simple.advancedMode" : "settings.advancedMode.subtitle")}>
-      <Switch
-        checked={enabled}
-        aria-label={t("settings.advancedMode.title")}
-        onClick={() => setAdvancedMode(!enabled)}
-      />
-    </SettingRow>
-  );
-}
-
 export function ShowThreadsRow() {
   const enabled = useShowThreadsChoice();
   return (
@@ -321,19 +305,6 @@ export function SidebarDensityRow() {
   );
 }
 
-export function RunCardRow() {
-  const enabled = useShowRunCard();
-  return (
-    <SettingRow title={t("settings.runCard.title")} subtitle={t("settings.runCard.subtitle")}>
-      <Switch
-        checked={enabled}
-        aria-label={t("settings.runCard.show")}
-        onClick={() => setShowRunCard(!enabled)}
-      />
-    </SettingRow>
-  );
-}
-
 export function UniversalPinsRow() {
   const enabled = useUniversalPins();
   return (
@@ -342,46 +313,6 @@ export function UniversalPinsRow() {
         checked={enabled}
         aria-label={t("settings.universalPins.title")}
         onClick={() => setUniversalPins(!enabled)}
-      />
-    </SettingRow>
-  );
-}
-
-export function ToolCallsRow() {
-  const { state, dispatch } = useStore();
-  const enabled = showToolCallsEnabled(state.config);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-
-  const toggle = async () => {
-    if (saving) return;
-    setSaving(true);
-    setError("");
-    try {
-      const config: ConfigStatus = await api("/api/config", {
-        method: "PATCH",
-        body: JSON.stringify({ features: { showToolCalls: !enabled } }),
-      });
-      dispatch({ type: "configStatus", config });
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("settings.toolCalls.error"));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <SettingRow
-      title={t("settings.toolCalls.title")}
-      subtitle={<>{t("settings.toolCalls.subtitle")} {t("settings.toolCalls.detail")}</>}
-      message={error ? <p role="alert" className="text-danger">{error}</p> : null}
-    >
-      <Switch
-        checked={enabled}
-        aria-label={t("settings.toolCalls.aria")}
-        disabled={saving}
-        onClick={() => void toggle()}
-        className="disabled:cursor-wait disabled:opacity-50"
       />
     </SettingRow>
   );
