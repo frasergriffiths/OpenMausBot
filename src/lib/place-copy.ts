@@ -27,6 +27,12 @@ const FALLBACK_LINE: Partial<Record<EffectivePlace, string>> = {
   off: "place.view.off.line",
 };
 
+/** The place as a live line names it: short, because the line says what is running now, not which setting was chosen.
+ *  "Browser" reads as the browser; "Built-in browser" reads as a choice in a list. */
+export function livePlaceLabel(place: EffectivePlace, platform: DesktopCapabilities["host"]["platform"]): string {
+  return place === "browser" ? t("place.live.browser") : worksOnSimpleLabel(place as Bot["computer"], platform);
+}
+
 /** One place's four layers, derived from the view the product already computes. */
 export function placeCopy(value: EffectivePlace, view: PlaceView | undefined, platform: DesktopCapabilities["host"]["platform"]): PlaceCopy {
   const blocked = value === "local" ? view?.state === "local-unavailable" : value === "browser" ? view?.state === "browser-off" || view?.state === "browser-cannot" : view ? placeBlocked(view) : false;

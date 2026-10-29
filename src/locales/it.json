@@ -6105,7 +6105,6 @@
   "computer.problem.localMac": "I bot non possono ancora usare questo Mac. Controlla che OpenMausBot sia consentito in Registrazione schermo e Accessibilità, in Impostazioni di Sistema → Privacy e sicurezza, poi riavvialo.",
   "botPanel.tab.profile": "Profilo",
   "botPanel.tab.library": "Libreria",
-  "botPanel.tab.computer": "Computer",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Browser"
 }

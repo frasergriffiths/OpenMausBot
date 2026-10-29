@@ -2445,7 +2445,6 @@
       "sidebar.people.mention": "3367c9dc49343c4480f793b1b609c524c60b849a25739c016b7f3ed94f97892e",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.requiredOne": "11347f3d7234005004bc65065b3dd587b9b6e5c77948ee6fdc3f364a9f9baaff",
       "computer.mac.permission.requiredBoth": "582eecb6ad67d238948a8ff09c321fbbee1aeb7f3d1f2880d4d5c0c37e5bb9c8",
@@ -2467,9 +2466,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "es": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -6342,8 +6339,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -7839,7 +7834,6 @@
       "contextWarning.threadRow": "5b8bc8f71ea31eca82a6f9c82d3c3d02093c1401193cd81f4cea93521537ba2d",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.allowControl": "81f53f6380ec5b96eddb2f3b12c778dd2020fe51fd676881609c7302b9aef6c8",
       "computer.mac.permission.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
@@ -7855,9 +7849,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "fr": {
       "highlevel.unavailable": "87b8ac7f7610e6dd69f520bc59058fd92f307b9f4bcf804075f25d08bcaa7533",
@@ -10285,7 +10277,6 @@
       "sidebar.people.mention": "3367c9dc49343c4480f793b1b609c524c60b849a25739c016b7f3ed94f97892e",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.requiredOne": "11347f3d7234005004bc65065b3dd587b9b6e5c77948ee6fdc3f364a9f9baaff",
       "computer.mac.permission.requiredBoth": "582eecb6ad67d238948a8ff09c321fbbee1aeb7f3d1f2880d4d5c0c37e5bb9c8",
@@ -10307,9 +10298,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "hi": {
       "highlevel.unavailable": "87b8ac7f7610e6dd69f520bc59058fd92f307b9f4bcf804075f25d08bcaa7533",
@@ -12737,7 +12726,6 @@
       "sidebar.people.mention": "3367c9dc49343c4480f793b1b609c524c60b849a25739c016b7f3ed94f97892e",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.requiredOne": "11347f3d7234005004bc65065b3dd587b9b6e5c77948ee6fdc3f364a9f9baaff",
       "computer.mac.permission.requiredBoth": "582eecb6ad67d238948a8ff09c321fbbee1aeb7f3d1f2880d4d5c0c37e5bb9c8",
@@ -12759,9 +12747,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "ja": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -16062,7 +16048,6 @@
       "botPanel.screen.idle": "ab0171ca0494d441cb6fe96e2efbe1c2a129f1d87cd6c17f03613cfd111149dd",
       "botPanel.screen.working": "0b6e8350ea8578752bda54321b7ef5dbede0e2c002e86ca7c98d331922e9839d",
       "botPanel.none": "dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.instructionsHint": "b52ea7534f1c00607418200f59b29f6c9e9fe14ff01f6435b2548d146b50d357",
       "botSettings.simple.justDoIt": "6a0b4ef27e630ef6a692b98b33ae575166973d7a27bdbdc448b852926de22123",
       "botPanel.appsRow": "c6d3b8dc143ce30eb9414c5c600cb601175a684c474f3ee1d063e1196684cf01",
@@ -17110,8 +17095,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -19095,9 +19078,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "pt-br": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -23200,8 +23181,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -25168,7 +25147,6 @@
       "contextWarning.threadRow": "5b8bc8f71ea31eca82a6f9c82d3c3d02093c1401193cd81f4cea93521537ba2d",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.allowControl": "81f53f6380ec5b96eddb2f3b12c778dd2020fe51fd676881609c7302b9aef6c8",
       "computer.mac.permission.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
@@ -25184,9 +25162,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "zh": {
       "highlevel.unavailable": "87b8ac7f7610e6dd69f520bc59058fd92f307b9f4bcf804075f25d08bcaa7533",
@@ -28426,7 +28402,6 @@
       "sidebar.people.mention": "3367c9dc49343c4480f793b1b609c524c60b849a25739c016b7f3ed94f97892e",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.requiredOne": "11347f3d7234005004bc65065b3dd587b9b6e5c77948ee6fdc3f364a9f9baaff",
       "computer.mac.permission.requiredBoth": "582eecb6ad67d238948a8ff09c321fbbee1aeb7f3d1f2880d4d5c0c37e5bb9c8",
@@ -28448,9 +28423,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "zh-tw": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -31367,7 +31340,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -32691,7 +32663,6 @@
       "sidebar.people.mention": "3367c9dc49343c4480f793b1b609c524c60b849a25739c016b7f3ed94f97892e",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.allowControl": "81f53f6380ec5b96eddb2f3b12c778dd2020fe51fd676881609c7302b9aef6c8",
       "computer.mac.permission.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
@@ -32707,9 +32678,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "uk": {
       "highlevel.unavailable": "87b8ac7f7610e6dd69f520bc59058fd92f307b9f4bcf804075f25d08bcaa7533",
@@ -35580,7 +35549,6 @@
       "sidebar.people.mention": "3367c9dc49343c4480f793b1b609c524c60b849a25739c016b7f3ed94f97892e",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.requiredOne": "11347f3d7234005004bc65065b3dd587b9b6e5c77948ee6fdc3f364a9f9baaff",
       "computer.mac.permission.requiredBoth": "582eecb6ad67d238948a8ff09c321fbbee1aeb7f3d1f2880d4d5c0c37e5bb9c8",
@@ -35602,9 +35570,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "vi": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -39013,8 +38979,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -40462,7 +40426,6 @@
       "contextWarning.threadRow": "5b8bc8f71ea31eca82a6f9c82d3c3d02093c1401193cd81f4cea93521537ba2d",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.allowControl": "81f53f6380ec5b96eddb2f3b12c778dd2020fe51fd676881609c7302b9aef6c8",
       "computer.mac.permission.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
@@ -40478,9 +40441,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "tr": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -43889,8 +43850,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -45338,7 +45297,6 @@
       "contextWarning.threadRow": "5b8bc8f71ea31eca82a6f9c82d3c3d02093c1401193cd81f4cea93521537ba2d",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.allowControl": "81f53f6380ec5b96eddb2f3b12c778dd2020fe51fd676881609c7302b9aef6c8",
       "computer.mac.permission.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
@@ -45354,9 +45312,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "pl": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -48586,7 +48542,6 @@
       "botPanel.screen.idle": "ab0171ca0494d441cb6fe96e2efbe1c2a129f1d87cd6c17f03613cfd111149dd",
       "botPanel.screen.working": "0b6e8350ea8578752bda54321b7ef5dbede0e2c002e86ca7c98d331922e9839d",
       "botPanel.none": "dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.instructionsHint": "b52ea7534f1c00607418200f59b29f6c9e9fe14ff01f6435b2548d146b50d357",
       "botSettings.simple.justDoIt": "6a0b4ef27e630ef6a692b98b33ae575166973d7a27bdbdc448b852926de22123",
       "botPanel.appsRow": "c6d3b8dc143ce30eb9414c5c600cb601175a684c474f3ee1d063e1196684cf01",
@@ -49633,8 +49588,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -51584,9 +51537,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "ru": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -54887,7 +54838,6 @@
       "botPanel.screen.idle": "ab0171ca0494d441cb6fe96e2efbe1c2a129f1d87cd6c17f03613cfd111149dd",
       "botPanel.screen.working": "0b6e8350ea8578752bda54321b7ef5dbede0e2c002e86ca7c98d331922e9839d",
       "botPanel.none": "dc937b59892604f5a86ac96936cd7ff09e25f18ae6b758e8014a24c7fa039e91",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.instructionsHint": "b52ea7534f1c00607418200f59b29f6c9e9fe14ff01f6435b2548d146b50d357",
       "botSettings.simple.justDoIt": "6a0b4ef27e630ef6a692b98b33ae575166973d7a27bdbdc448b852926de22123",
       "botPanel.appsRow": "c6d3b8dc143ce30eb9414c5c600cb601175a684c474f3ee1d063e1196684cf01",
@@ -55942,8 +55892,6 @@
       "computer.tab.android": "6d612a86bee4b0a659b8b3affd6f1fbcad15c4cbbbbdc4996c6c01c786711a21",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
       "computer.tab.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -57904,9 +57852,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     },
     "it": {
       "whop.description": "1a07cf04ef17029448d3781415cbac16d54e66b821907a40d94e0e6349710e70",
@@ -62130,8 +62076,6 @@
       "routines.botCountMany": "fc1da572d3f0b2c7e2cdfa7f85a2c1f6b2aceb1969b9cac6ec4391422887a64b",
       "routines.group": "34ca0e76608842ff3e7d924a455a396a82f471052c15e3f2ed7f090ac702e5c1",
       "computer.browserSwitch.title": "eb74b89a9444a2a0f17721ce6f47e4798e98eab0e0cbc9ca69c1220e27fbceae",
-      "computer.tab.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528",
-      "computer.tab.files": "abc7e9892806b047b4d4786b3685285543f76ca314c4c76246d5f6544c7856c9",
       "computer.tabsAria": "b692d7e0e7ee63b5bf916a919904d13281b3061065e21fa63475d96f99f92471",
       "computer.fullScreen": "674fe2acd0d5f47b46180dd66e26e349cd9c9db215046f5e86ea2f5728d18117",
       "computer.browserOff.title": "69560b5a2fa6653d61e011754788b8606e4a3e04a3cf4157040bec936d7d033d",
@@ -64003,7 +63947,6 @@
       "contextWarning.threadRow": "5b8bc8f71ea31eca82a6f9c82d3c3d02093c1401193cd81f4cea93521537ba2d",
       "thread.menu.delete": "e2d0a54968ead24efc0dffa6ac78fc606dceec34a0f586177a74a54cc2272cf8",
       "permissions.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
-      "botPanel.tab.computer": "76ed42d22129dc354362704eb4b54208041b68736f976932aada43bc0035f7c0",
       "botPanel.tab.library": "dc20b3d5d2cddf82fad332821ca5e9a4efdcede4a273aa193d2b495bdcc92825",
       "computer.mac.permission.allowControl": "81f53f6380ec5b96eddb2f3b12c778dd2020fe51fd676881609c7302b9aef6c8",
       "computer.mac.permission.openSystemSettings": "18196b39b44de54ac56110e77207ad61e1d8bb3198c1649d36c3ae12f8df6768",
@@ -64019,9 +63962,7 @@
       "templates.invalidJson": "c9fdbe17179c95bc8df2fde1087aca82080d8ccf44ce4804eb63ab6ba915ba0a",
       "botPanel.tab.profile": "d696a35bdd1883da07a8d6c41bb7a3153381b23aa197629ee273479a6eaa5a9c",
       "botPanel.page.runLog": "22ae6e9aa73ddd8eaa8529ef420628a68c57aa44036a4ce9f3138a80aa38efbc",
-      "botPanel.page.threads": "3e42e385075b9b569620eb6d652cff77b19eab567ee2927d6e1bf901f51d8246",
-      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc",
-      "botPanel.library.data": "cec3a9b89b2e391393d0f68e4bc12a9fa6cf358b3cdf79496dc442d52b8dd528"
+      "botPanel.page.browser": "d31de1a5c5c8ba2a210a167cf0d0dc2425c57ea7525f4b73a4b7ab934af79dfc"
     }
   }
 }

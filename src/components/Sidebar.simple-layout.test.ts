@@ -118,6 +118,22 @@ describe("the computer switcher's Connect row", () => {
 });
 
 describe("Simple-mode sidebar layout", () => {
+  it("puts the machine switcher and the + on one centred row, both 36px, one gap apart", () => {
+    const { tree } = render();
+    const row = tree.find((node) => node.props["data-sidebar-top-row"] !== undefined)!;
+    expect(row.props.className).toEqual(expect.stringContaining("items-center"));
+    expect(row.props.className).toEqual(expect.stringContaining("h-[60px]"));
+    expect(row.props.className).not.toContain("items-start");
+    const slot = tree.find((node) => node.props["data-sidebar-top-slot"] !== undefined)!;
+    expect(slot.props.className).toEqual(expect.stringContaining("justify-end"));
+    expect(slot.props.className).not.toContain("pt-3");
+    expect(slot.props.className).not.toContain("pr-2");
+    const buttons = tree.find((node) => node.props["data-sidebar-top-buttons"] !== undefined)!;
+    expect(buttons.props.className).toEqual(expect.stringContaining("gap-2"));
+    const plus = nodes(buttons.props.children).find((node) => node.type === "button" && node.props["aria-label"] === "New or share")!;
+    expect(plus.props.className).toEqual(expect.stringContaining("size-9"));
+  });
+
   it("lists the bots with no heading, then gives group chats and a person's own departments a quiet heading with a count", () => {
     const { tree } = render();
     expect(sectionOrder(tree)).toEqual([BOTS_SECTION_ID, CHANNELS_SECTION_ID, userSectionId("Work")]);

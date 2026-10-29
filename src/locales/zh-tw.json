@@ -4250,7 +4250,6 @@
   "templates.invalidJson": "此備份或團隊檔案不是有效的 JSON。",
   "botPanel.tab.profile": "個人資料",
   "botPanel.tab.library": "資料庫",
-  "botPanel.tab.computer": "電腦",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "瀏覽器"
 }

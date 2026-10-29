@@ -4866,7 +4866,6 @@
   "templates.invalidJson": "Tệp sao lưu hoặc tệp nhóm này không phải JSON hợp lệ.",
   "botPanel.tab.profile": "Hồ sơ",
   "botPanel.tab.library": "Thư viện",
-  "botPanel.tab.computer": "Máy tính",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Trình duyệt"
 }

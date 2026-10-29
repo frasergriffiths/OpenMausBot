@@ -5,8 +5,8 @@ import { BOT_SECTIONS } from "../bot-settings/sections";
 import { isSimplePage, PAGE_IDS, PAGES, PANEL_TABS, sectionTarget, SIMPLE_PAGES, TAB_LABEL } from "./page-registry";
 
 describe("the bot panel's page registry", () => {
-  it("has three tabs: Profile, Library and Computer", () => {
-    expect(PANEL_TABS).toEqual(["profile", "library", "computer"]);
+  it("has two tabs, Profile and Library: where it works is part of the profile", () => {
+    expect(PANEL_TABS).toEqual(["profile", "library"]);
   });
 
   it("lands every settings section on a tab, and on a Simple page that lives on that tab", () => {
@@ -23,13 +23,13 @@ describe("the bot panel's page registry", () => {
   it.each([
     ["overview", { tab: "profile" }], ["identity", { tab: "profile" }],
     ["soul", { tab: "profile", page: "settings", anchor: "instructions", editInstructions: true }],
-    ["skills", { tab: "library", page: "skills" }], ["memory", { tab: "library", page: "memory" }],     ["access", { tab: "computer" }], ["model", { tab: "profile", anchor: "model" }], ["permissions", { tab: "profile", page: "settings", anchor: "approval" }],
+    ["skills", { tab: "library", page: "skills" }], ["memory", { tab: "library", page: "memory" }],     ["access", { tab: "profile", anchor: "where" }], ["model", { tab: "profile", anchor: "model" }], ["permissions", { tab: "profile", page: "settings", anchor: "approval" }],
     ["voice", { tab: "profile" }], ["visibility", { tab: "profile" }], ["history", { tab: "profile" }], ["usage", { tab: "profile" }], ["slack", { tab: "profile" }],
   ] as const)("sends a %s link to %o", (section, target) => {
     expect(sectionTarget(section)).toEqual(target);
   });
 
-  it("draws the Simple pages on their tabs: settings on Profile, what it keeps on Library, where it works on Computer", () => {
+  it("draws the Simple pages on their tabs: settings and where it works on Profile, what it keeps on Library", () => {
     expect(SIMPLE_PAGES).toEqual([
       "apps", "routines", "memory", "skills", "folder", "browser", "computer", "settings",
       "activity", "runlog", "files", "android", "usage",
@@ -38,7 +38,7 @@ describe("the bot panel's page registry", () => {
     expect(home).toEqual({
       apps: "profile", routines: "profile", settings: "profile", activity: "profile", runlog: "profile", usage: "profile",
       memory: "library", skills: "library", folder: "library", files: "library",
-      browser: "computer", computer: "computer", android: "computer",
+      browser: "profile", computer: "profile", android: "profile",
     });
     expect(isSimplePage("mcp")).toBe(false);
   });
@@ -50,7 +50,7 @@ describe("the bot panel's page registry", () => {
       if (PAGES[id].intro) expect(keys[PAGES[id].intro], id).toBeTruthy();
     }
     for (const tab of PANEL_TABS) expect(keys[TAB_LABEL[tab]]).toBeTruthy();
-    expect(PANEL_TABS.map((tab) => keys[TAB_LABEL[tab]])).toEqual(["Profile", "Library", "Computer"]);
+    expect(PANEL_TABS.map((tab) => keys[TAB_LABEL[tab]])).toEqual(["Profile", "Library"]);
     expect(keys[PAGES.settings.title]).toBe("Bot settings");
   });
 });

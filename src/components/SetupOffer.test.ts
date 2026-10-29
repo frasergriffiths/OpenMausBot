@@ -108,30 +108,22 @@ describe("the setup card under a new bot's greeting", () => {
     expect(fixture.dispatch).toHaveBeenCalledWith({ type: "messageAdded", threadId: "t1", message: CANNED });
   });
 
-  const answeredLine = { id: "u1", role: "user", kind: "text", at: 2, text: "Neither, let me explain", setupRequest: true } as Message;
-  const renderPlace = (onSkip = vi.fn()) => {
+  const renderPlace = () => {
     let tree: ReactNode = null;
-    function Capture() { fixture.index = 0; tree = SetupPlaceQuestion({ bot: bot(), onSkip }); return tree; }
-    return { html: renderToStaticMarkup(createElement(Capture)), all: nodes(tree), onSkip };
+    function Capture() { fixture.index = 0; tree = SetupPlaceQuestion({ bot: bot() }); return tree; }
+    return { html: renderToStaticMarkup(createElement(Capture)), all: nodes(tree) };
   };
 
-  it("asks where the bot works once the first answer is given, with the panel's six places", () => {
-    const view = renderOffer(offered, [offered, answeredLine]);
+  it("asks where the new bot works at the same time as what to help with, with the profile's own control", () => {
+    const view = renderOffer(offered);
+    expect(view.html).toContain("What should I help you with first?");
     expect(view.html).toContain("Where Ava works");
-    expect(view.html).toContain("Automatic");
-    expect(view.html).toContain("No computer");
+    expect(view.html).toContain("Where Ava works. Currently Automatic");
+    expect(view.html).toContain("data-setup-place");
     const place = renderPlace();
-    expect(place.all.filter((node) => node.props.role === "radio")).toHaveLength(6);
-    const browser = place.all.find((node) => label(node).startsWith("Built-in browser"))!;
-    press(browser);
-    expect(fixture.dispatch).toHaveBeenCalledExactlyOnceWith({ type: "updateBot", botId: "b1", patch: { computer: "browser", browser: true } });
-  });
-
-  it("lets the x skip the place question without writing a place", () => {
-    const place = renderPlace();
-    press(place.all.find((node) => node.props["aria-label"] === "Close"));
-    expect(place.onSkip).toHaveBeenCalled();
-    expect(fixture.dispatch).not.toHaveBeenCalled();
+    expect(place.html).toContain("Where Ava works");
+    expect(place.html).toContain("Automatic");
+    expect(place.html).toContain("Uses the built-in browser. It starts a desktop only when a task needs one.");
   });
 
   it("does not ask where it works on a card settled by an ordinary line", () => {

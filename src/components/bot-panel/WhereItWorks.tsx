@@ -25,7 +25,9 @@ export function useOpenComputer(bot: Pick<Bot, "id">) {
   };
 }
 
-export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
+/** Where the bot works, as part of its profile: its screen, the place control every surface shares, and the browser and
+ *  signed-in sites behind it. There is no separate Computer tab and no second control. */
+export function WhereItWorks({ bot, derived, onOpen }: { bot: Bot; derived: Derived; onOpen: (page: SimplePageId) => void }) {
   const screenOf = t("computer.screenOf", { name: bot.name });
   const android = useAndroidUsbDevices();
   const openComputer = useOpenComputer(bot);
@@ -35,7 +37,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
 
   return (
-    <div data-panel-tabpanel="computer" className="[&>*:first-child]:mt-0">
+    <div data-panel-where-section="">
       <LinuxLocalControl />
       <button
         type="button"
@@ -67,7 +69,7 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
       </button>
       <div className="mt-3 text-center text-[13px] text-ink-tertiary">{screenOf}</div>
 
-      <Card anchor="where">
+      <Card label={t("computer.simple.whereWorks", { name: bot.name })} anchor="where">
         <div className="p-3">
           <PlaceControl bot={bot} patch={derived.patch} approvalMode={derived.approvalMode} dataAttr="data-panel-where" />
           {bot.computer === "cloud" && (

@@ -3314,7 +3314,6 @@
   "botPanel.screen.idle": "В простое",
   "botPanel.screen.working": "Работает над задачей. Его экран скоро появится здесь; откройте полный вид, чтобы смотреть в реальном времени.",
   "botPanel.none": "Нет",
-  "botPanel.tab.computer": "Компьютер",
   "botPanel.instructionsHint": "Объясните {name}, как работать для вас",
   "botSettings.simple.justDoIt": "Просто сделать",
   "botPanel.appsRow": "Доступные приложения",

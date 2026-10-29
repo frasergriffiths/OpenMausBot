@@ -7,6 +7,7 @@ import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerive
 import type { SimplePageId } from "./page-registry";
 import { SettingsPage } from "./SettingsPage";
 import { TryAsking } from "./TryAsking";
+import { WhereItWorks } from "./WhereItWorks";
 import { Card, NavRow, RowIcon, rowCls, RowText } from "./rows";
 
 type Derived = ReturnType<typeof useBotSettingsDerived>;
@@ -21,7 +22,7 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
   const routinesOn = derived.botRoutines.filter((routine) => routine.enabled).length;
 
   return (
-    <div data-panel-tabpanel="details">
+    <div data-panel-tabpanel="profile">
       <Card anchor="model">
         <div data-panel-row="model" className={rowCls}>
           <ModelPicker
@@ -34,6 +35,9 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
       </Card>
 
       <SettingsPage bot={bot} derived={derived} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} embedded />
+
+      <WhereItWorks bot={bot} derived={derived} onOpen={onOpen} />
+
 
       {derived.botRoutines.length > 0 && (
         <Card label={t("botSettings.simple.routines")} anchor="routines">

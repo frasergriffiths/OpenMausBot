@@ -3251,7 +3251,6 @@
   "botPanel.screen.idle": "Bezczynny",
   "botPanel.screen.working": "Pracuje nad zadaniem. Jego ekran pojawi się tu wkrótce; otwórz pełny widok, aby obserwować go na żywo.",
   "botPanel.none": "Brak",
-  "botPanel.tab.computer": "Komputer",
   "botPanel.instructionsHint": "Powiedz {name}, jak ma dla ciebie pracować",
   "botSettings.simple.justDoIt": "Po prostu to zrób",
   "botPanel.appsRow": "Aplikacje, których może używać",

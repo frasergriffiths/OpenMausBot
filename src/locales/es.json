@@ -5378,7 +5378,6 @@
   "templates.invalidJson": "Ese archivo de copia de seguridad o de equipo no es un JSON válido.",
   "botPanel.tab.profile": "Perfil",
   "botPanel.tab.library": "Biblioteca",
-  "botPanel.tab.computer": "Ordenador",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Navegador"
 }

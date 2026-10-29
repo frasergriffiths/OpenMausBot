@@ -3,7 +3,7 @@
 // answered by the bot's own line, and the next thing the person types is what the bot sets itself up for. While it
 // waits, a chip above the message box says so and its x stops it. Once answered, the card stays, quiet, with the answer.
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { Check, Sparkles, X } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 
 import { currentReactor, useReactor } from "@/lib/cloud-guest";
 import { cn } from "@/lib/cn";
@@ -11,10 +11,7 @@ import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { api, useStore, type Bot, type Message } from "@/state/store";
 import { moveChoiceFocus, returnFocusToComposer } from "./AskCard";
-import { PLACE_ORDER, placeCopy } from "@/lib/place-copy";
-import { usePlaceViews } from "./PlaceChip";
-import { useDesktopCapabilities } from "./DesktopCapabilities";
-import type { EffectivePlace } from "@/lib/place";
+import { PlaceControl } from "./bot-panel/PlaceControl";
 
 const blank = (bot: Pick<Bot, "soul" | "description">): boolean => !bot.soul?.trim() && !bot.description?.trim();
 const LETTERS = "ABCDEFGH";
@@ -36,7 +33,6 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
   const [closed, setClosed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [waitedOut, setWaitedOut] = useState(false);
-  const [placeSkipped, setPlaceSkipped] = useState(false);
   // A double click lands before the disabled buttons are drawn.
   const sending = useRef(false);
   // The first list the card shows stays, so a letter key always picks the job on screen.
@@ -126,9 +122,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
           </button>
         ))}
       </div>}
-      {answer && !placeSkipped && (
-        <SetupPlaceQuestion bot={bot} onSkip={() => setPlaceSkipped(true)} />
-      )}
+      {!settled && !pending && <SetupPlaceQuestion bot={bot} />}
       {settled && answer && (
         <div data-setup-answer="" className="mx-3 mb-1 mt-1.5 border-t border-hairline/40 pt-2.5">
           <div className="text-[12px] leading-4 text-ink-tertiary">{t("chat.setupCard.answer")}</div>
@@ -140,61 +134,19 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
   );
 }
 
-/** The card's second question, after the first is answered: where the new bot works. The six rows are the panel's
- *  place control's own copy, and a pick writes the same bot fields that control writes. The x skips it, leaving
- *  Automatic. It never calls the server and never runs a turn. */
-export function SetupPlaceQuestion({ bot, onSkip }: { bot: Bot; onSkip: () => void }) {
+/** The card's place question, shown with the first so both are on screen at once: the profile's own place control, so
+ *  the words, the states and the menu are the ones every other surface draws. A pick writes the same bot fields that
+ *  control writes; the card's job pick is what sends the setup request. */
+export function SetupPlaceQuestion({ bot }: { bot: Bot }) {
   const { dispatch } = useStore();
-  const views = usePlaceViews(bot);
-  const { capabilities } = useDesktopCapabilities();
-  const platform = capabilities.host?.platform ?? "other";
-  const current = (bot.computer ?? "auto") as EffectivePlace;
-  const options = PLACE_ORDER.map((value) => {
-    const policy = value === "auto" || value === "off" ? true
-      : value === "local" ? views.local.policy
-      : value === "browser" ? views.browser.policy
-      : value === "cloud" ? views.cloud.policy
-      : views.vm.policy;
-    if (!policy && value !== current) return null;
-    const view = value === "auto" || value === "off" ? undefined : views[value].view;
-    const copy = placeCopy(value, view, platform);
-    const reachable = value === "auto" || value === "off" ? true : views[value].reachable;
-    return { value, copy, disabled: !reachable, reason: copy.needs };
-  }).filter((option) => option !== null);
-  const choose = (value: EffectivePlace) => {
-    if (value === current) return;
-    dispatch({
-      type: "updateBot",
-      botId: bot.id,
-      patch: value === "browser" ? { computer: "browser", browser: true } : { computer: value === "auto" ? null : value },
-    });
-  };
   return (
     <div data-setup-place="" className="mx-3 mb-1 mt-2 border-t border-hairline/40 pt-2.5">
-      <div className="flex items-start justify-between gap-2">
-        <h4 dir="auto" className="py-px text-[13px] font-medium leading-[18px] text-ink">{t("computer.simple.whereWorks", { name: bot.name })}</h4>
-        <button type="button" onClick={onSkip} aria-label={t("common.close")} title={t("common.close")}
-          className="-mt-1 flex size-6 shrink-0 items-center justify-center rounded-full text-ink-tertiary hover:bg-ink/[0.07] hover:text-ink-secondary">
-          <X size={13} aria-hidden="true" />
-        </button>
-      </div>
-      <div role="radiogroup" aria-label={t("computer.simple.whereWorks", { name: bot.name })} className="mt-1 flex flex-col">
-        {options.map((option) => (
-          <button key={option.value} type="button" role="radio" aria-checked={current === option.value} disabled={option.disabled}
-            title={option.disabled ? option.reason : option.copy.line} onClick={() => choose(option.value)}
-            className={cn("group flex min-h-10 items-center gap-3 rounded-xl px-3 py-1.5 text-start",
-              option.disabled ? "cursor-not-allowed opacity-45" : "hover:bg-ink/[0.05]")}>
-            <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-md",
-              current === option.value ? "bg-accent/15 text-accent" : "bg-ink/[0.05] text-ink-tertiary")}>
-              {current === option.value ? <Check size={13} aria-hidden="true" /> : <span className="size-1.5 rounded-full bg-ink/25" aria-hidden="true" />}
-            </span>
-            <span className="min-w-0 flex-1">
-              <span dir="auto" className="block truncate text-[14px] leading-5 text-ink">{option.copy.name}</span>
-              <span className="block truncate text-[12px] leading-4 text-ink-secondary">{option.copy.line}</span>
-            </span>
-          </button>
-        ))}
-      </div>
+      <h4 dir="auto" className="mb-1.5 py-px text-[13px] font-medium leading-[18px] text-ink">{t("computer.simple.whereWorks", { name: bot.name })}</h4>
+      <PlaceControl
+        bot={bot}
+        approvalMode={bot.approvalMode}
+        patch={(value) => dispatch({ type: "updateBot", botId: bot.id, patch: value })}
+      />
     </div>
   );
 }

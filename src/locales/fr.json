@@ -2444,7 +2444,6 @@
   "permissions.openSystemSettings": "Ouvrir les Réglages Système",
   "botPanel.tab.profile": "Profil",
   "botPanel.tab.library": "Bibliothèque",
-  "botPanel.tab.computer": "Ordinateur",
   "botPanel.page.runLog": "Run log",
   "botPanel.page.browser": "Navigateur"
 }
