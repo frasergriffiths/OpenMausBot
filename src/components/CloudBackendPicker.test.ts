@@ -21,14 +21,15 @@ describe("CloudBackendPicker", () => {
     expect(picker()).toContain("Self-hosted VPS");
   });
 
-  it("uses the side-view pill tabs for the two providers", () => {
+  it("uses the shared pressed-button choice for the two providers", () => {
     fixture.config = { cloudHome: false };
     const markup = picker("vps");
-    expect(markup).toContain('role="tablist"');
+    expect(markup).toContain('role="group"');
     expect(markup).toContain('aria-label="Cloud backend"');
-    expect(markup.match(/role="tab"/g)).toHaveLength(2);
-    expect(markup).toMatch(/role="tab" aria-selected="true"[^>]*>Self-hosted VPS/);
-    expect(markup).toMatch(/role="tab" aria-selected="false"[^>]*>Boat/);
+    expect(markup.match(/data-cloud-backend="/g)).toHaveLength(2);
+    expect(markup).toMatch(/data-cloud-backend="vps" aria-pressed="true"[^>]*>Self-hosted VPS/);
+    expect(markup).toMatch(/data-cloud-backend="box" aria-pressed="false"[^>]*>Boat/);
+    expect(markup).not.toContain('role="tab"');
   });
 
   it("names the compact picker's tabs by provider", () => {
