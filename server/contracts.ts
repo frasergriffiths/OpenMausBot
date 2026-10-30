@@ -66,7 +66,7 @@ export class TurnUsageLimitRefusedError extends TurnNotStartedError {
 /** Variants are opaque provider IDs, not the cross-engine effort enum. */
 export function isModelVariant(value: unknown): value is string {
   return typeof value === "string" && value.length > 0 && value.length <= 256 &&
-    value.trim() === value && !/\p{Cc}/u.test(value);
+    value.trim() === value && !/[\p{Cc}\p{Cf}]/u.test(value);
 }
 
 /** An image already admitted to the private attachment store; drivers get this, never a host path in the prompt. */

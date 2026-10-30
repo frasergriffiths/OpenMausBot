@@ -1088,7 +1088,7 @@ describe("OpenCode session variants", () => {
     expect(f.prompted()).toBe(true);
     expect(f.calls()).toEqual([]);
     expect(events).toContainEqual(expect.objectContaining({
-      type: "runtime.notice", message: expect.stringContaining("does not offer variant " + variant),
+      type: "runtime.notice", message: expect.stringContaining("does not offer the " + variant + " reasoning variant"),
     }));
   });
 
@@ -1101,7 +1101,7 @@ describe("OpenCode session variants", () => {
     expect(second.done).toMatchObject({ ok: true });
     expect(f.prompted()).toBe(true);
     expect(second.events).toContainEqual(expect.objectContaining({
-      type: "runtime.notice", message: expect.stringContaining("does not offer variant high"),
+      type: "runtime.notice", message: expect.stringContaining("does not offer the high reasoning variant"),
     }));
   });
 
@@ -1153,7 +1153,7 @@ describe("OpenCode session variants", () => {
     expect(f.prompted()).toBe(true);
     if (flag === "FAKE_ACP_VARIANT_STICKS") {
       expect(events).toContainEqual(expect.objectContaining({
-        type: "runtime.notice", message: expect.stringContaining("did not apply variant high"),
+        type: "runtime.notice", message: expect.stringContaining("could not apply the high reasoning variant"),
       }));
     } else {
       expect(events.filter((event) => event.type === "runtime.notice")).toEqual([]);
@@ -1202,7 +1202,7 @@ describe("OpenCode session variants", () => {
     expect(done).toMatchObject({ ok: true });
     expect(f.prompted()).toBe(true);
     expect(events).toContainEqual(expect.objectContaining({
-      type: "runtime.notice", message: expect.stringContaining("changed variant before the prompt"),
+      type: "runtime.notice", message: expect.stringContaining("changed the high reasoning variant before the prompt"),
     }));
   });
 

@@ -12,6 +12,27 @@ export interface AcpModelSelection {
 /** A variant setter may acknowledge before its config update arrives. */
 export type VariantConfirmation = "applied" | "mismatch" | "unconfirmed";
 
+export interface VariantConfirmationHandle {
+  /** Resolves when the agent's config state applies, contradicts or never reports the value. */
+  outcome: Promise<VariantConfirmation>;
+  /** Starts the confirmation clock. Call once the setter request has settled. */
+  arm(timeoutMs: number): void;
+  /** Stops waiting without a result; used when the setter itself failed. */
+  cancel(): void;
+}
+
+interface VariantWaiter {
+  value: string;
+  resolve: (result: VariantConfirmation) => void;
+  armed: boolean;
+  mismatch: boolean;
+  settled: boolean;
+  timer?: ReturnType<typeof setTimeout>;
+}
+
+/** How long a contradictory setter response waits for a later update before it is reported as a mismatch. */
+const VARIANT_ECHO_GRACE_MS = 250;
+
 interface ModelControlsInput {
   selection?: AcpModelSelection;
   variants: boolean;
@@ -28,11 +49,7 @@ type Request = (method: string, params: unknown, timeoutMs: number, receive?: (r
 export class SessionModelControls {
   private revision = 0;
   private readonly input: ModelControlsInput;
-  private readonly variantWaiters = new Set<{
-    value: string;
-    resolve: (result: VariantConfirmation) => void;
-    timer: ReturnType<typeof setTimeout>;
-  }>();
+  private readonly variantWaiters = new Set<VariantWaiter>();
   constructor(input: ModelControlsInput) { this.input = input; }
 
   usesAgentDefault(): boolean {
@@ -74,34 +91,54 @@ export class SessionModelControls {
     return option;
   }
 
-  /** Waits for the agent's own config state, because an acknowledgement may carry no options. */
-  confirmVariant(value: string, timeoutMs: number): Promise<VariantConfirmation> {
-    if (acpVariantOption(this.input.state())?.currentValue === value) return Promise.resolve("applied");
-    return new Promise((resolve) => {
-      const waiter = {
-        value,
-        resolve,
-        timer: setTimeout(() => {
-          this.variantWaiters.delete(waiter);
-          resolve("unconfirmed");
-        }, timeoutMs),
-      };
-      waiter.timer.unref?.();
-      this.variantWaiters.add(waiter);
-    });
+  /** Registers before the setter request, because a config update can arrive before it settles. */
+  confirmVariant(value: string): VariantConfirmationHandle {
+    if (acpVariantOption(this.input.state())?.currentValue === value) {
+      return { outcome: Promise.resolve("applied"), arm: () => {}, cancel: () => {} };
+    }
+    let resolve!: (result: VariantConfirmation) => void;
+    const outcome = new Promise<VariantConfirmation>((done) => { resolve = done; });
+    const waiter: VariantWaiter = { value, resolve, armed: false, mismatch: false, settled: false };
+    this.variantWaiters.add(waiter);
+    return {
+      outcome,
+      arm: (timeoutMs) => {
+        if (waiter.settled) return;
+        waiter.armed = true;
+        // A response that reports a different value may be an echo sent before the agent's own update.
+        const delayMs = waiter.mismatch ? Math.min(timeoutMs, VARIANT_ECHO_GRACE_MS) : timeoutMs;
+        if (waiter.timer) clearTimeout(waiter.timer);
+        waiter.timer = setTimeout(() => this.finishVariantWaiter(waiter, waiter.mismatch ? "mismatch" : "unconfirmed"), delayMs);
+        waiter.timer.unref?.();
+      },
+      cancel: () => this.finishVariantWaiter(waiter, "unconfirmed"),
+    };
   }
 
   private settleVariantWaiters(): void {
     if (!this.variantWaiters.size) return;
     const option = acpVariantOption(this.input.state());
     for (const waiter of this.variantWaiters) {
-      const applied = option?.currentValue === waiter.value;
-      const changed = !option || option.currentValue !== undefined;
-      if (!applied && !changed) continue;
-      clearTimeout(waiter.timer);
-      this.variantWaiters.delete(waiter);
-      waiter.resolve(applied ? "applied" : "mismatch");
+      if (option?.currentValue === waiter.value) {
+        this.finishVariantWaiter(waiter, "applied");
+        continue;
+      }
+      if (!option || option.currentValue !== undefined) {
+        waiter.mismatch = true;
+        if (!waiter.armed) continue;
+        if (waiter.timer) clearTimeout(waiter.timer);
+        waiter.timer = setTimeout(() => this.finishVariantWaiter(waiter, "mismatch"), VARIANT_ECHO_GRACE_MS);
+        waiter.timer.unref?.();
+      }
     }
+  }
+
+  private finishVariantWaiter(waiter: VariantWaiter, result: VariantConfirmation): void {
+    if (waiter.settled) return;
+    waiter.settled = true;
+    if (waiter.timer) clearTimeout(waiter.timer);
+    this.variantWaiters.delete(waiter);
+    waiter.resolve(result);
   }
 
   async select(request: Request, sessionId: string, timeoutMs: number): Promise<string | null> {

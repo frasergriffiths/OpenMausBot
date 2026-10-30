@@ -7,6 +7,8 @@ describe("memberTurnSelection", () => {
     expect(() => assertModelVariantSupported({ variant: "low" }, {})).toThrow("saved model variant");
     expect(() => assertModelVariantSupported({ variant: "" }, { modelVariants: true })).toThrow("saved model variant");
     expect(() => assertModelVariantSupported({ variant: "low", effort: "high" }, { modelVariants: true })).toThrow("saved model variant");
+    // A right-to-left override would be echoed into a persisted activity row; format characters are not provider ids.
+    expect(() => assertModelVariantSupported({ variant: "low\u202Elow" }, { modelVariants: true })).toThrow("saved model variant");
     expect(() => assertModelVariantSupported({}, {})).not.toThrow();
     // The runtime ACP allowlist, not a global effort enum, governs these IDs.
     for (const variant of ["none", "minimal", "custom/Deep_mode"]) {
