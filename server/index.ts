@@ -426,6 +426,7 @@ import { createLocalVmUpdater, LOCAL_VM_UPDATING_PROBLEM, recoverLocalVms, VPS_O
 import { localVmStopReason, recordLocalVmIdleStop } from "./local-vm-stop-reason.ts";
 import { ComputerIdleTimer } from "./computer-idle.ts";
 import { createCloudComputerPower } from "./host/cloud-computer-power.ts";
+import { createCloudComputerPurge } from "./cloud-computer-purge.ts";
 import { LocalVmLease, LocalVmLeasePool } from "./local-vm-lease.ts";
 import { LocalVmSeatPool, type LocalVmSeatHolder } from "./local-vm-seat-pool.ts";
 import { createLoopGuard, loopGuardSettings } from "./host/loop-guard.ts";
@@ -5794,6 +5795,10 @@ const cloudComputerPower = createCloudComputerPower({
   routineComputer: routine => { const bot = store.bot(routine.botId); return bot && turnProvider(bot, routine.runOn) === "box" ? botComputerControlKey(bot) : null; },
   busy: owner => computerProviderConfigTransitions.has("box") || boatLifecycleBusyBots.has(owner) || managedBoatOwners().some(entry => entry.botId === owner && entry.inUse),
   claim: owner => { const team = teamComputers.list().find(entry => teamComputerOwner(entry.id) === owner); return team ? claimTeamComputerLifecycle(team) : claimBotComputerLifecycle(owner); },
+});
+
+const cloudComputerPurge = createCloudComputerPurge({
+  cfg, owners: managedBoatOwners, log: line => console.warn(line),
 });
 
 function inheritedTeamComputer(bot: Pick<BotRecord, "section" | "computer" | "cloudBackend">): TeamComputerRecord | undefined {
@@ -16024,6 +16029,7 @@ server.listen(PORT, "127.0.0.1", async () => {
   drainQueuedSends();
   drainQueuedChannelSends();
   void cloudComputerPower.armRunning();
+  cloudComputerPurge.start();
   startUpkeep({ bots: () => store.bots, retentionDays: () => threadEventLogRetentionDays(cfg), busy: threadBusy, openDirectHandoff: (threadId) => coordinator.activeDirect(threadId) });
   if (enginesRead) {
     await enginesRead;
@@ -16089,6 +16095,7 @@ const gracefulShutdown = createGracefulShutdown({
       upgrades.close();
       for (const idle of localVmIdles.values()) idle.cancel();
       cloudComputerPower.close();
+      cloudComputerPurge.close();
       vps.closeAllVpsDesktopTunnels();
       watchdog.stop();
       routines?.close(); void appTriggers.stop();
