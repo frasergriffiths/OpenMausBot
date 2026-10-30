@@ -29,7 +29,7 @@ const bot: Bot = {
     { threadId: "unread", title: "Finished reply", createdAt: 6, unread: true },
   ],
 };
-const densities: SidebarDensity[] = ["compact", "icons"];
+const densities: SidebarDensity[] = ["expanded", "compact", "icons"];
 const botRow = (BotListItem as MemoExoticComponent<(props: BotRowProps) => ReactNode>).type;
 const pinnedCircle = (PinnedBotCircle as MemoExoticComponent<(props: BotRowProps) => ReactNode>).type;
 const rowProps = (density: SidebarDensity, candidate: Bot = bot, query = "") =>
@@ -73,8 +73,10 @@ describe("bot-first sidebar", () => {
   });
 
   it.each([
+    { enabled: false, density: "expanded", size: 36, spacing: ["gap-2", "rounded-[10px]", "py-2", "pl-2", "pr-2", "md:h-[54px]"] },
     { enabled: false, density: "compact", size: 36, spacing: ["gap-2.5", "py-1.5", "pl-2", "pr-2"] },
     { enabled: false, density: "icons", size: 36, spacing: ["h-[54px]", "justify-center"] },
+    { enabled: true, density: "expanded", size: 36, spacing: ["gap-2", "rounded-[10px]", "py-2", "pl-6", "pr-9", "md:h-[54px]"] },
   ] as const)("sizes bot portraits and row spacing in $density density with threads $enabled $density", ({ enabled, density, size, spacing }) => {
     fixture.showThreads = enabled;
     for (const avatar of [{}, { avatarUrl: "/api/attachments/portrait.png", avatarCrop: "circle" as const }]) {
@@ -113,8 +115,18 @@ describe("bot-first sidebar", () => {
     fixture.showThreads = false;
     const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("compact", { ...bot, tasks: [], projects: [] })));
     const name = markup.match(/<span class="flex min-w-0 grow items-center gap-1\.5 truncate text-ink ([^"]*)"/)?.[1];
-    expect(name).toBe("text-[15px] font-semibold leading-5");
+    expect(name).toBe("text-[15px] font-semibold");
     expect(markup).toContain("truncate text-[13px] leading-[18px]");
+  });
+
+  it("uses a 14px medium name and a 13px preview in the expanded row", () => {
+    fixture.showThreads = false;
+    const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("expanded", { ...bot, tasks: [], projects: [] })));
+    const name = markup.match(/<span class="flex min-w-0 grow items-center gap-1\.5 truncate text-ink ([^"]*)"/)?.[1];
+    expect(name).toBe("text-[14px] font-medium");
+    expect(markup).toContain("truncate text-[13px] leading-[18px]");
+    expect(markup).toContain("md:h-[54px]");
+    expect(markup).toContain('width="36px" height="36px"');
   });
 
   it("puts one trailing cluster of the engine mark then three dots after the text block, with the unread dot still in the name line", () => {
@@ -227,6 +239,7 @@ describe("bot-first sidebar", () => {
   });
 
   it.each([
+    { density: "expanded", face: 36, spacing: ["gap-2", "rounded-[10px]", "py-2", "pl-2", "pr-9", "md:h-[54px]"], name: "font-medium", preview: "text-[13px]" },
     { density: "icons", face: 36, spacing: ["h-[54px]", "justify-center"], name: "font-semibold", preview: "text-[11px]" },
     { density: "compact", face: 26, spacing: ["gap-1.5", "py-1", "pl-6", "pr-9"], name: "font-semibold", preview: "text-[11px]" },
   ] as const)("sizes group chat rows in $density density", ({ density, face, spacing, name, preview }) => {

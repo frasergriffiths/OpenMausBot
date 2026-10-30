@@ -279,7 +279,7 @@ describe("Simple-mode sidebar layout", () => {
     expect(item("New group chat")).toBeDefined();
     expect(item("Templates"), "Templates lives in the desktop footer, not the + menu").toBeUndefined();
     (render().tree.find((node) => node.type === SidebarEdgeToggle)!.props as Parameters<typeof SidebarEdgeToggle>[0]).onToggle();
-    expect(fixture.storage.get(SIDEBAR_DENSITY_KEY)).toBe("compact");
+    expect(fixture.storage.get(SIDEBAR_DENSITY_KEY)).toBe("expanded");
     expect(render().tree.some((node) => node.type === SimpleRailFooter)).toBe(false);
   });
 

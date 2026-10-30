@@ -157,6 +157,7 @@ export function GroupListItem({
   }, [selected]);
   const hasThreadList = (group.tasks?.length ?? 1) > 1 || Boolean(query);
   const expanded = !group.dm && threadsOpen && density !== "icons" && hasThreadList;
+  const expandedRow = density === "expanded";
   const railTile: boolean = density === "icons";
   const groupStatus = Boolean(group.busyBotId) || Boolean(group.working);
   const roomBusy = groupStatus;
@@ -183,20 +184,22 @@ export function GroupListItem({
       }}
       className={cn(
         "relative flex w-full items-center rounded-md text-left", SIMPLE_ROW_FOCUS,
-        density === "icons" ? (railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5") : "gap-1.5 py-1 pl-6 pr-9",
+        density === "icons" ? (railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5")
+          : expandedRow ? cn("gap-2 rounded-[10px] py-2 pr-9 md:h-[54px] md:py-0", !group.dm && hasThreadList ? "pl-6" : "pl-2")
+          : "gap-1.5 py-1 pl-6 pr-9",
         selected && !expanded ? "bg-raised" : "hover:bg-raised/50",
       )}
       title={density === "icons" ? group.name : undefined}
       aria-label={density === "icons" ? group.name : undefined}
     >
-      <StackedMauses members={members} density={density} tile={railTile} />
+      <StackedMauses members={members} density={density} tile={railTile || expandedRow} />
       <div className={cn("min-w-0 flex-1", density === "icons" && "hidden")}>
         <div className="flex items-baseline justify-between gap-2">
-          <span className="truncate text-[14px] text-ink font-semibold">{group.name}</span>
+          <span className={cn("truncate text-[14px] text-ink", expandedRow ? "font-medium" : "font-semibold")}>{group.name}</span>
           {(expanded || (quiet && !groupStatus)) && group.unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
         </div>
         {!expanded && (!quiet || groupStatus) && <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-ink-secondary text-[11px]">{group.description || groupPreview(group, state.bots, state.instances)}</span>
+          <span className={cn("truncate text-ink-secondary", expandedRow ? "text-[13px] leading-[18px]" : "text-[11px]")}>{group.description || groupPreview(group, state.bots, state.instances)}</span>
           {group.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
         </div>}
       </div>
@@ -714,7 +717,8 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
   useEffect(() => { if (iconOnly) setRenaming(false); }, [iconOnly]);
   const simpleList = !iconOnly;
   const railTile = iconOnly;
-  const avatarSize = iconOnly ? (railTile ? 36 : 44) : (showThreads ? 26 : 36);
+  const expandedRow = density === "expanded";
+  const avatarSize = iconOnly ? (railTile ? 36 : 44) : expandedRow ? 36 : (showThreads ? 26 : 36);
   const tooltip = simpleList ? botTooltip(bot, instances) : undefined;
   const visible = useVisibleMessages(bot);
   const last = lastNonReceipt(visible);
@@ -724,7 +728,9 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
     "flex w-full items-center rounded-xl text-left transition-colors duration-150", SIMPLE_ROW_FOCUS,
     iconOnly
       ? railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5"
-      : cn(showThreads ? "gap-1.5 py-1" : "gap-2.5 py-1.5", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-2"),
+      : expandedRow
+        ? cn("gap-2 rounded-[10px] py-2", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-2", "md:h-[54px] md:py-0")
+        : cn(showThreads ? "gap-1.5 py-1" : "gap-2.5 py-1.5", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-2"),
     !iconOnly && "max-md:rounded-2xl max-md:py-2.5",
     selected ? "bg-raised" : "hover:bg-raised/50",
   );
@@ -776,7 +782,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
       </span>
       <div className={cn("min-w-0 flex-1", iconOnly && "hidden")}>
         <div data-sidebar-bot-title="" className="flex items-baseline justify-between gap-2">
-          <span className="flex min-w-0 grow items-center gap-1.5 truncate text-ink text-[15px] font-semibold leading-5">
+          <span className={cn("flex min-w-0 grow items-center gap-1.5 truncate text-ink leading-5", expandedRow ? "text-[14px] font-medium" : "text-[15px] font-semibold")}>
             {!simpleList && bot.pinned && <Pin size={12} className="shrink-0 text-ink-secondary" />}
             <RenameTitle
               key={iconOnly ? "icons" : "expanded"}
@@ -794,7 +800,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
               }}
               onEditingChange={setRenaming}
               className="truncate"
-              inputClassName="w-full rounded bg-inset px-1 py-0.5 text-[15px] font-semibold"
+              inputClassName={cn("w-full rounded bg-inset px-1 py-0.5", expandedRow ? "text-[14px] font-medium" : "text-[15px] font-semibold")}
             />
             {!simpleList && bot.chiefOfStaff && !renaming && (
               <Crown size={13} strokeWidth={2.25} fill="currentColor" className="shrink-0 text-accent" role="img" aria-label={t("sidebar.bot.chiefOfStaff")} data-testid="chief-crown">
@@ -1005,7 +1011,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   /** Simple mode keeps the field on screen; the toggle and the close button are gone. */
   const clearSearch = () => setQuery("");
   const [lastExpandedDensity, setLastExpandedDensity] = useState<Exclude<SidebarDensity, "icons">>(
-    () => density === "icons" ? "compact" : density,
+    () => density === "icons" ? "expanded" : density,
   );
   const pinnedCircles = usePinnedCircles();
   const universalPins = useUniversalPins();
@@ -1313,7 +1319,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
         "relative flex h-full shrink-0 flex-col border-r border-ink/[0.04] bg-panel max-md:[--scroll-fade-surface:var(--color-app)]",
         sizing.resizing ? "transition-none" : "transition-[width] duration-200",
         density === "icons" ? rail ? "w-[92px]" : "w-[80px]" : "w-[272px] md:w-[var(--sidebar-width)]",
-        sidePanelOpen ? "md:max-w-[272px]" : "md:max-w-[calc(100vw-320px)]",
+        sidePanelOpen ? density === "compact" ? "md:max-w-[272px]" : "md:max-w-[280px]" : "md:max-w-[calc(100vw-320px)]",
         // max-md: rather than an md: cancel: Tailwind v4 emits the native `translate`, and any value but `none` makes
         // this a containing block for its `fixed` descendants.
         "max-md:absolute max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:w-full max-md:bg-app",
