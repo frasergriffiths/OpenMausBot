@@ -32,8 +32,8 @@ export function CloudBackendPicker({
           value={value}
           onChange={onChange}
           options={[
-            { value: "box", label: t("botAccess.cloud.boat") },
-            { value: "vps", label: t("botAccess.cloud.selfHostedVps") },
+            { value: "box", label: t("botAccess.cloud.boat"), tooltip: t("botAccess.cloud.boat") },
+            { value: "vps", label: t("botAccess.cloud.selfHostedVps"), tooltip: t("botAccess.cloud.selfHostedVps") },
           ]}
         />
       </div>

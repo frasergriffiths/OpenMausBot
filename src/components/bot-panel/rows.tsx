@@ -206,7 +206,7 @@ export function Segmented<V extends string>({ options, value, onChange, label, a
           {...{ [attr]: option.value }}
           aria-pressed={value === option.value}
           disabled={option.disabled}
-          title={option.tooltip ?? option.label}
+          title={option.tooltip}
           onClick={() => onChange(option.value)}
           style={{ flexShrink: 1 }}
           className={cn(PILL_TAB, "flex-auto truncate", value === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
