@@ -10,6 +10,7 @@ import { DATA_DIR, type AppConfig } from "./config.ts";
 import { redactSecretsInText } from "./redact.ts";
 
 export const BOAT_PURGE_STATE_FILE = join(DATA_DIR, "cloud-computer-purge.json");
+const BOTS_FILE = join(DATA_DIR, "bots.json");
 /** A box unowned for this long has finished with its work; shorter risks deleting one a person still means to use. */
 export const CLOUD_COMPUTER_PURGE_GRACE_MS = (() => {
   const days = Number(process.env.OMB_CLOUD_COMPUTER_PURGE_DAYS ?? 7);
@@ -70,6 +71,25 @@ export interface CloudComputerPurgeDeps {
   cfg: AppConfig;
   owners(): boat.ManagedBoatOwner[];
   log(line: string): void;
+  /** Where the bot registry lives; tests point it at a fixture. */
+  botsFile?: string;
+}
+
+/** The running store holds no bots either because there are none or because bots.json did not load. A sweep may only
+ * proceed in the first case: otherwise every managed box looks orphaned. Re-read the registry and require every bot it
+ * lists to be one the running store knows, so a repaired file cannot hide a store that started without it. */
+export function registryMatchesOwners(owners: readonly boat.ManagedBoatOwner[], file = BOTS_FILE): boolean {
+  try {
+    const parsed: unknown = JSON.parse(readFileSync(file, "utf8"));
+    if (!Array.isArray(parsed)) return false;
+    const known = new Set(owners.map((owner) => owner.botId));
+    return parsed.every((bot) => {
+      const id = (bot as { id?: unknown } | null)?.id;
+      return typeof id === "string" && known.has(id);
+    });
+  } catch {
+    return false;
+  }
 }
 
 function readSeen(): Record<string, number> {
@@ -101,10 +121,15 @@ export function createCloudComputerPurge(deps: CloudComputerPurgeDeps) {
 
   async function sweep(): Promise<number> {
     if (closed || !boat.boatConfigured(cfg)) return 0;
-    const inventory = await boat.listManagedBoats(cfg, deps.owners(), { adoptLegacy: false }).catch(() => null);
+    const owners = deps.owners();
+    if (!registryMatchesOwners(owners, deps.botsFile)) {
+      deps.log("cloud computers: not reclaiming any this hour, because bots.json does not match the running bot list and no box can be proven orphaned");
+      return 0;
+    }
+    const inventory = await boat.listManagedBoats(cfg, owners, { adoptLegacy: false }).catch(() => null);
     if (closed) return 0;
     if (!inventory?.available) {
-      deps.log(`cloud computers: could not list them to reclaim unused ones, retrying in ${Math.ceil(retryInMs / 60_000)} min: ${inventory?.problem ?? "listing failed"}`);
+      deps.log(`cloud computers: could not list them to reclaim unused ones, retrying in ${Math.ceil(retryInMs / 60_000)} min: ${redactSecretsInText(inventory?.problem ?? "listing failed")}`);
       retryInMs = Math.min(retryInMs * 2, MAX_LISTING_RETRY_MS);
       return 0;
     }
