@@ -33,7 +33,7 @@ describe.skipIf(!available)(`the real box (${detection.box === "bwrap" ? "bubble
     const expected: Record<string, string[]> = {
       "bind-data": ["messages-db-hidden", "config-hidden", "data-dir-empty", "other-bot-folder-hidden", "other-task-folder-hidden", "secret-not-on-disk"],
       "share-pid": ["other-pid-hidden", "server-pid-hidden"],
-      "share-net": ["host-loopback-unreachable", "no-direct-internet"],
+      "share-net": ["harness-other-refused"],
       "env-all": ["secret-not-in-env"],
       "tmp-shared": ["tmp-private"],
       "engines-rw": ["engine-read-only"],
@@ -43,7 +43,15 @@ describe.skipIf(!available)(`the real box (${detection.box === "bwrap" ? "bubble
       const result = await runBoxSelfCheck({ ...options(), mutate: new Set([mutation as never]) });
       expect(result.error, mutation).toBeUndefined();
       for (const id of checks) expect(result.failed, `${mutation} should fail ${id}`).toContain(id);
-      // share-net drops the two isolated-network checks instead of failing them; everything else holds.
+      if (mutation === "share-net") {
+        // Sharing the host's network also takes the bridges with the net namespace, so the egress checks fail too. The
+        // isolation checks are not run at all rather than failed. The gate check still catches the mutation: the box
+        // reaches the server's real port, where /api/bots answers 401 rather than the gate's 403.
+        const ids = result.results.map((check) => check.id);
+        expect(ids).not.toContain("host-loopback-unreachable");
+        expect(ids).not.toContain("no-direct-internet");
+        continue;
+      }
       const other = result.failed.filter((id) => !checks.includes(id));
       expect(other, `${mutation} broke more than it should`).toEqual([]);
     }
