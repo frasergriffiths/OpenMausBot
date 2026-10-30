@@ -79,6 +79,15 @@ export function captionChrome(windowChrome: DesktopCapabilities["windowChrome"] 
   };
 }
 
+/** The pane's left edge, where the sidebar's edge bump hangs 14px over the pane. Blink resolves drag regions in DOM
+ * order, so a no-drag rect after the pane's header keeps the bump clickable under that header's drag region; a button's
+ * own no-drag cannot win, because the header comes later in the document. */
+export function SidebarEdgeNotch() {
+  const { dragProps, noDragStyle } = useCaptionChrome();
+  if (!dragProps.style) return null;
+  return <span aria-hidden data-sidebar-edge-notch style={noDragStyle} className="pointer-events-none absolute left-0 top-0 h-[52px] w-3.5" />;
+}
+
 export function WindowDragStrip() {
   const { dragProps } = useCaptionChrome();
   if (!dragProps.style) return null;

@@ -26,7 +26,6 @@ export function useSidebarWidth({ density, sidePanelOpen, sidebarRef }: {
   const maxWidth = sidePanelOpen ? defaultWidth : Math.min(cap, window.innerWidth - 320);
   const [savedWidth, setSavedWidth] = useState<number | null>(() => loadSidebarWidth(undefined, key));
   const widthRef = useRef(savedWidth);
-  const [resizing, setResizing] = useState(false);
   useEffect(() => {
     const width = loadSidebarWidth(undefined, key);
     widthRef.current = width;
@@ -44,16 +43,13 @@ export function useSidebarWidth({ density, sidePanelOpen, sidebarRef }: {
     saveSidebarWidth(width, undefined, key);
   };
   const finishResize = () => {
-    setResizing(false);
     if (widthRef.current !== null) save(widthRef.current);
   };
   return {
     width: Math.min(widthRef.current ?? defaultWidth, cap),
     defaultWidth,
     maxWidth,
-    resizing,
     valueNow: Math.min(savedWidth ?? defaultWidth, maxWidth),
-    startResize: () => setResizing(true),
     resizeTo,
     finishResize,
     stepResize: (step: number) => {
@@ -84,7 +80,6 @@ export function SidebarResizeHandle({ sizing, sidebarRef, style }: {
         if (event.button !== 0) return;
         event.preventDefault();
         event.currentTarget.setPointerCapture(event.pointerId);
-        sizing.startResize();
       }}
       onPointerMove={(event) => {
         if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;

@@ -1317,7 +1317,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       style={{ "--sidebar-width": `${sizing.width}px` } as CSSProperties}
       className={cn(
         "relative flex h-full shrink-0 flex-col border-r border-ink/[0.04] bg-panel max-md:[--scroll-fade-surface:var(--color-app)]",
-        sizing.resizing ? "transition-none" : "transition-[width] duration-200",
         density === "icons" ? rail ? "w-[92px]" : "w-[80px]" : "w-[272px] md:w-[var(--sidebar-width)]",
         sidePanelOpen ? density === "compact" ? "md:max-w-[272px]" : "md:max-w-[280px]" : "md:max-w-[calc(100vw-320px)]",
         // max-md: rather than an md: cancel: Tailwind v4 emits the native `translate`, and any value but `none` makes
@@ -1450,7 +1449,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       </GlassBar>
 
       {density !== "icons" && <SidebarResizeHandle sizing={sizing} sidebarRef={sidebarRef} style={windowNoDragStyle} />}
-      {!collapseToIcons && <SidebarEdgeToggle collapsed={rail} shown={rail || edgeShown} onHover={showEdge} onToggle={toggleCollapsed} style={windowNoDragStyle} anchorRef={sidebarRef} />}
+      {!collapseToIcons && <SidebarEdgeToggle collapsed={rail} shown={rail || edgeShown} onHover={showEdge} onToggle={toggleCollapsed} style={windowNoDragStyle} />}
 
       <GlassScroller className={rail ? "[scrollbar-gutter:stable_both-edges]" : simpleDesk ? "px-3" : "px-2"}>
         <div className={cn("flex flex-col", simpleDesk ? cn("gap-0.5 pb-2", !tiles && "pt-2") : "gap-1 pb-2 pt-2")}>
