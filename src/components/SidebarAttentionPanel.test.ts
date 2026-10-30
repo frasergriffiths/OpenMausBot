@@ -34,7 +34,7 @@ function renderPanel(
   function Capture() {
     tree = SidebarAttentionPanel({
       entries,
-      density: "comfortable",
+      density: "compact",
       onUnpin,
       onJump,
       collapsed: options.collapsed ?? false,
@@ -106,7 +106,7 @@ describe("pinned attention panel", () => {
 
   it("disables collapse when search prevents layout changes", () => {
     const markup = renderToStaticMarkup(createElement(SidebarAttentionPanel, {
-      entries: [entry], density: "comfortable", onUnpin: vi.fn(), onJump: vi.fn(), collapsed: false,
+      entries: [entry], density: "compact", onUnpin: vi.fn(), onJump: vi.fn(), collapsed: false,
     }));
     expect(markup).toMatch(/<button[^>]+disabled=""[^>]+aria-expanded="true"/);
     expect(markup).toContain("Review permission");

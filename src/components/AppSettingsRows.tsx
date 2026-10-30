@@ -283,7 +283,6 @@ export function PinnedCirclesRow() {
 }
 
 const SIDEBAR_DENSITY_LABEL_KEYS: Record<SidebarDensity, LocaleKey> = {
-  comfortable: "sidebar.density.comfortable",
   compact: "sidebar.density.compact",
   icons: "sidebar.density.iconsOnly",
 };

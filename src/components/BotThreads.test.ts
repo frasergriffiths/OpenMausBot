@@ -22,7 +22,7 @@ const bot: Bot = {
 };
 
 const threadList = (candidate: Bot, query = "") => createElement(BotThreadList, {
-  ...botRowProps(initialState, vi.fn(), candidate, { density: "comfortable", quiet: false, query, onMenu: vi.fn() }),
+  ...botRowProps(initialState, vi.fn(), candidate, { density: "compact", quiet: false, query, onMenu: vi.fn() }),
   selected: true,
 });
 

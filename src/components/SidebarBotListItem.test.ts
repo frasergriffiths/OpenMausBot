@@ -29,7 +29,7 @@ const bot = (overrides: Partial<Bot> = {}): Bot => ({
   ...overrides,
 });
 
-function renderRow(candidate: Bot, quiet = false, density: "comfortable" | "icons" = "comfortable") {
+function renderRow(candidate: Bot, quiet = false, density: "compact" | "icons" = "compact") {
   return renderToStaticMarkup(createElement(BotListItem, botRowProps(initialState, vi.fn(), candidate, { density, quiet, query: "", onMenu: vi.fn() })));
 }
 
@@ -127,7 +127,7 @@ describe("BotListItem", () => {
     const spoken = { id: "u1", role: "user", kind: "text", text: "what is the weather", at: at(0), via: "call", callId: "c1" };
     const draw = (candidate: Bot, { selected = false, query = "" } = {}) => renderToStaticMarkup(createElement(BotListItem, botRowProps(
       selected ? { ...initialState, activeView: "chat", selectedId: candidate.id } : initialState,
-      vi.fn(), candidate, { density: "comfortable", quiet: false, query, onMenu: vi.fn() },
+      vi.fn(), candidate, { density: "compact", quiet: false, query, onMenu: vi.fn() },
     )));
 
     it("previews the last reply, not the record that follows it", () => {

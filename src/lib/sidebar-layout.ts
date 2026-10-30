@@ -14,7 +14,7 @@ const USER_SECTION_PREFIX = "section:";
 
 export type SidebarSectionId = string;
 export type SectionDropPlace = "before" | "after";
-export type SidebarDensityMode = "comfortable" | "compact" | "icons";
+export type SidebarDensityMode = "compact" | "icons";
 
 const GOAL_RUN_PREVIEW_LABEL = {
   working: "Working",

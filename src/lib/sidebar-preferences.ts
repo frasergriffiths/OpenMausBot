@@ -1,10 +1,10 @@
 import { useSyncExternalStore } from "react";
 import { z } from "zod";
 
-export type SidebarDensity = "comfortable" | "compact" | "icons";
+export type SidebarDensity = "compact" | "icons";
 export type SidebarToolsLayout = "rows" | "toolbar";
 
-export const SIDEBAR_DENSITIES: readonly SidebarDensity[] = ["comfortable", "compact", "icons"];
+export const SIDEBAR_DENSITIES: readonly SidebarDensity[] = ["compact", "icons"];
 export const SIDEBAR_TOOLS_LAYOUTS: readonly SidebarToolsLayout[] = ["rows", "toolbar"];
 
 export const SIDEBAR_DENSITY_KEY = "openmausbot.sidebarDensity";
@@ -18,14 +18,14 @@ export const PINNED_CIRCLES_KEY = "openmausbot.pinnedCircles";
 export const UNIVERSAL_PINS_KEY = "openmausbot.universalPins";
 export const PINNED_CIRCLE_ORDER_KEY = "openmausbot.pinnedCircleOrder.v1";
 
+/** A value stored by the removed Comfortable option reads as compact. */
 export function parseSidebarDensity(value: string | null): SidebarDensity {
   switch (value) {
-    case "comfortable":
     case "compact":
     case "icons":
       return value;
     default:
-      return "comfortable";
+      return "compact";
   }
 }
 
@@ -34,7 +34,7 @@ export function loadSidebarDensity(storage?: Pick<Storage, "getItem"> | null): S
     const target = storage === undefined ? (globalThis.localStorage ?? null) : storage;
     return parseSidebarDensity(target?.getItem(SIDEBAR_DENSITY_KEY) ?? null);
   } catch {
-    return "comfortable";
+    return "compact";
   }
 }
 
@@ -121,7 +121,7 @@ export function setSidebarDensity(density: SidebarDensity): void {
 }
 
 export function useSidebarDensity(): SidebarDensity {
-  return useSyncExternalStore(subscribeDensity, currentSidebarDensity, () => "comfortable");
+  return useSyncExternalStore(subscribeDensity, currentSidebarDensity, () => "compact");
 }
 
 let toolsLayoutSessionChoice: SidebarToolsLayout | undefined;

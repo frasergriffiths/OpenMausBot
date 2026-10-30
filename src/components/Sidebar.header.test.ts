@@ -8,7 +8,7 @@ import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { StoreProvider } from "@/state/store";
 
 const fixture = vi.hoisted(() => ({
-  density: "comfortable" as SidebarDensity,
+  density: "compact" as SidebarDensity,
   windowChrome: undefined as "mac-inset" | "win-caption" | "native" | undefined,
   hostLabel: undefined as string | undefined,
 }));
@@ -33,7 +33,7 @@ const render = () => renderToStaticMarkup(
 );
 
 beforeEach(() => {
-  fixture.density = "comfortable";
+  fixture.density = "compact";
   fixture.windowChrome = undefined;
   fixture.hostLabel = undefined;
   vi.stubGlobal("window", { innerWidth: 1280, location: { protocol: "http:", search: "" } });
@@ -46,7 +46,7 @@ afterEach(() => {
 });
 
 describe("sidebar header", () => {
-  it.each(["comfortable", "compact", "icons"] as const)(
+  it.each(["compact", "icons"] as const)(
     "keeps collapse and add but no density menu at %s density in Simple mode",
     (density) => {
       fixture.density = density;
@@ -59,7 +59,7 @@ describe("sidebar header", () => {
     },
   );
 
-  it.each(["comfortable", "compact"] as const)("keeps collapse and add but no activity menu in Simple mode at %s density", (density) => {
+  it.each(["compact"] as const)("keeps collapse and add but no activity menu in Simple mode at %s density", (density) => {
     fixture.density = density;
     const html = render();
     expect(html).toContain('aria-label="Collapse sidebar to avatars"');
@@ -227,7 +227,7 @@ describe("sidebar top row", () => {
 });
 
 describe("sidebar glass head and foot", () => {
-  it.each(["comfortable", "compact", "icons"] as const)(
+  it.each(["compact", "icons"] as const)(
     "puts the top row and search in the glass head, the places in the glass foot, and the list between at %s density",
     (density) => {
       fixture.density = density;
@@ -256,7 +256,7 @@ describe("sidebar glass head and foot", () => {
 });
 
 describe("sidebar foot in Simple mode", () => {
-  it.each(["comfortable", "compact"] as const)("puts the account avatar, Apps, Team map and Templates in the foot, with Files and Archived in the account menu (%s)", (density) => {
+  it.each(["compact"] as const)("puts the account avatar, Apps, Team map and Templates in the foot, with Files and Archived in the account menu (%s)", (density) => {
     fixture.density = density;
     const html = render();
     const foot = html.slice(html.indexOf('data-glass-bar="bottom"'));

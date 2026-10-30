@@ -45,12 +45,12 @@ import {
 import { userSectionId } from "./sidebar-layout";
 
 describe("sidebar density preferences", () => {
-  it("accepts the three supported layouts and rejects stale values", () => {
-    expect(parseSidebarDensity("comfortable")).toBe("comfortable");
+  it("accepts the two supported layouts, reads the removed Comfortable value as compact and rejects stale values", () => {
+    expect(parseSidebarDensity("comfortable")).toBe("compact");
     expect(parseSidebarDensity("compact")).toBe("compact");
     expect(parseSidebarDensity("icons")).toBe("icons");
-    expect(parseSidebarDensity("tiny")).toBe("comfortable");
-    expect(parseSidebarDensity(null)).toBe("comfortable");
+    expect(parseSidebarDensity("tiny")).toBe("compact");
+    expect(parseSidebarDensity(null)).toBe("compact");
   });
 
   it("loads and saves without making storage availability a launch dependency", () => {
@@ -58,7 +58,7 @@ describe("sidebar density preferences", () => {
     saveSidebarDensity("icons", { setItem });
     expect(setItem).toHaveBeenCalledWith(SIDEBAR_DENSITY_KEY, "icons");
     expect(loadSidebarDensity({ getItem: () => "compact" })).toBe("compact");
-    expect(loadSidebarDensity({ getItem: () => { throw new Error("blocked"); } })).toBe("comfortable");
+    expect(loadSidebarDensity({ getItem: () => { throw new Error("blocked"); } })).toBe("compact");
   });
 });
 

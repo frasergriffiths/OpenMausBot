@@ -46,7 +46,7 @@ const frame = (markup: string) => {
 };
 
 const row = (candidate: Bot, selectedId = initialState.selectedId) =>
-  botRowProps({ ...initialState, selectedId, activeView: "chat" }, vi.fn(), candidate, { density: "comfortable", quiet: false, query: "", onMenu: vi.fn() });
+  botRowProps({ ...initialState, selectedId, activeView: "chat" }, vi.fn(), candidate, { density: "compact", quiet: false, query: "", onMenu: vi.fn() });
 
 function renderCircle(candidate: Bot, selected = false) {
   return renderToStaticMarkup(createElement(PinnedBotCircle, row(candidate, selected ? candidate.id : initialState.selectedId)));
@@ -156,7 +156,7 @@ describe("pinned circle order", () => {
   const beacon = bot({ id: "beacon", threadId: "thread-beacon", name: "Beacon" });
   const comet = bot({ id: "comet", threadId: "thread-comet", name: "Comet" });
   const names = (markup: string) => ["Atlas", "Beacon", "Comet"].sort((a, b) => markup.indexOf(`title="${a}"`) - markup.indexOf(`title="${b}"`));
-  const roster = (circles: boolean) => createElement(PinnedBotRoster, { bots: [atlas, beacon, comet], density: "comfortable", circles, row: (candidate) => row(candidate), listItem: BotListItem });
+  const roster = (circles: boolean) => createElement(PinnedBotRoster, { bots: [atlas, beacon, comet], density: "compact", circles, row: (candidate) => row(candidate), listItem: BotListItem });
   type Props = { children?: ReactNode; [key: string]: unknown };
   const find = (tree: ReactNode, match: (props: Props) => boolean): ReactElement<Props> | undefined => {
     for (const child of Children.toArray(tree)) {
