@@ -83,7 +83,7 @@ What each first-run surface depends on, and how it was checked:
 | Hosted workspace opened inside the desktop app (reduced bridge, no `remoteClient`) | Treated like a browser: the server is asked | `src/components/onboarding/WelcomeGate.test.ts` |
 | Packaged desktop with the organization bridge | An optional "Using OpenMausBot at work?" row under Other ways in Connect an AI; a signed-in Company engine counts as ready | `src/components/onboarding/beats/OrganisationRow.test.ts`, `src/components/onboarding/ConnectAi.test.ts` (fake bridge) |
 | Browser, admin of a hosted workspace | The first screen only, with the shared-workspace line, then the chat | `src/components/onboarding/WelcomeGate.test.ts`, `src/components/onboarding/WelcomeFlow.test.ts`, `src/lib/onboarding.test.ts` |
-| Browser, hosted member (no admin scope) | No welcome flow; one dismissible note kept in browser storage; no first-conversation spotlights | `src/components/onboarding/WelcomeGate.test.ts`, `` |
+| Browser, hosted member (no admin scope) | No welcome flow; one dismissible note kept in browser storage; no first-conversation spotlights | `src/components/onboarding/WelcomeGate.test.ts` |
 | Browser, client-scope session on a server that is not hosted | Nothing new: the flow does not open itself (it could not be saved); Settings replay and spotlights as before | `src/components/onboarding/WelcomeGate.test.ts`, `src/lib/onboarding.test.ts` |
 
 `GET /api/auth/session` adds `hosted: true` for a session on a hosted
@@ -189,8 +189,7 @@ pnpm exec vitest run src/lib/onboarding.test.ts src/lib/welcome-draft.test.ts sr
   staged arrival.
 - `src/lib/corner-popup.test.ts` and `src/components/AppNotices.test.ts` keep
   every corner notice out of the first conversation until a reply;
-  `` keeps its
-  spotlights off; `src/components/MausBotWelcome.gate.test.ts` keeps MausBot's
+  `src/components/MausBotWelcome.gate.test.ts` keeps MausBot's
   first-launch card for older installs only.
 - `src/components/onboarding/GuidedTour.test.ts` and
   `src/components/onboarding/WelcomeGate.test.ts` check the app tour never
