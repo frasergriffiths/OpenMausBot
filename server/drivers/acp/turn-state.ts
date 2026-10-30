@@ -60,5 +60,7 @@ export interface AcpSession {
   readonly stderr: string;
   current: AcpTurn | null;
   fallbackNotice?: string;
+  /** Last variant notice, so a stuck variant does not repeat its row every turn. */
+  variantNotice?: string;
   launchModel?: string;
 }

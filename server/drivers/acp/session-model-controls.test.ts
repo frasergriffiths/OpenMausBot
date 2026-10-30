@@ -88,4 +88,52 @@ describe("ACP session model controls", () => {
     expect(controls.modelOf(state())).toBeNull();
     expect(() => controls.variant("low")).toThrow("does not advertise variant");
   });
+
+  it("confirms a variant through a later config update", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    const waiting = controls.confirmVariant("max");
+    waiting.arm(1_000);
+    controls.receive({ configOptions: [thought("max")] });
+    await expect(waiting.outcome).resolves.toBe("applied");
+  });
+
+  it("reports a variant the agent kept as a mismatch", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    const waiting = controls.confirmVariant("max");
+    controls.receive({ configOptions: [thought("low")] });
+    waiting.arm(20);
+    await expect(waiting.outcome).resolves.toBe("mismatch");
+  });
+
+  it("lets a later update correct a setter response that echoed the old value", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    const waiting = controls.confirmVariant("max");
+    controls.receive({ configOptions: [thought("low")] });
+    waiting.arm(1_000);
+    controls.receive({ configOptions: [thought("max")] });
+    await expect(waiting.outcome).resolves.toBe("applied");
+  });
+
+  it("does not start the confirmation clock before the setter settles", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    const waiting = controls.confirmVariant("max");
+    let settled = false;
+    void waiting.outcome.then(() => { settled = true; });
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(settled).toBe(false);
+    waiting.arm(10);
+    await expect(waiting.outcome).resolves.toBe("unconfirmed");
+  });
+
+  it("leaves an acknowledgement with no config update unconfirmed", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    const waiting = controls.confirmVariant("max");
+    waiting.arm(10);
+    await expect(waiting.outcome).resolves.toBe("unconfirmed");
+  });
 });

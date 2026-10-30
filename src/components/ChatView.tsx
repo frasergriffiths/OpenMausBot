@@ -971,6 +971,15 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
     }
   }, [lastUserMessage, bot.busy, bot.id, bot.threadId, dispatch]);
 
+  // Retry re-sends the last message and drops everything after it. Never offer it once a completed reply
+  // already answered that message, or the retry would throw the reply away.
+  const canRetryLast = useMemo(() => {
+    if (bot.busy || !lastUserMessage) return false;
+    const at = messages.findIndex((message) => message.id === lastUserMessage.id);
+    return at < 0 || !messages.slice(at + 1).some((message) =>
+      message.role === "bot" && message.kind === "text" && message.turnSucceeded === true);
+  }, [bot.busy, lastUserMessage, messages]);
+
   const currentLink = profile.tasks?.find((task) => task.threadId === bot.threadId)?.link;
   const threadLink = useMemo(() => canWrite !== false
     ? { link: currentLink, assign: (link: string | null) => dispatch({ type: "updateTask", botId: bot.id, threadId: bot.threadId, patch: { link } }) }
@@ -1144,7 +1153,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
               editingId={editingId}
               lastBotTextId={lastBotTextId}
               emergingId={popping}
-              canRetryLast={!bot.busy && Boolean(lastUserMessage)}
+              canRetryLast={canRetryLast}
               engine={state.instances.find((i) => i.instanceId === bot.modelSelection.instanceId)}
               unreadDividerId={unreadDivider.messageId}
               unreadDividerFading={unreadDivider.fading}

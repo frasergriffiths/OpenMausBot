@@ -250,6 +250,8 @@ export interface AcpSupport {
 const envOr = (key: string, fallback: number): number => Number(process.env[key] ?? fallback);
 const INIT_TIMEOUT = 300_000;
 const SESSION_CONFIG_TIMEOUT = 300_000;
+/** A variant acknowledgement can arrive before its config update; wait briefly for the agent to say what it applied. */
+const VARIANT_CONFIRM_TIMEOUT = 1_500;
 const NEW_SESSION_TIMEOUT = 300_000;
 const LOAD_SESSION_TIMEOUT = 120_000;
 const ACP_STUCK_AFTER_MS = 180_000;
@@ -1179,6 +1181,18 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
         });
         const receiveModelVariants = (result: any, replace = false) => modelControls.receive(result, replace);
         const requestedVariantOption = () => modelControls.variant(variant);
+        const variantLabel = (id: string) => {
+          try {
+            return requestedVariantOption().options.find((entry) => entry.id === id)?.label ?? id;
+          } catch {
+            return id;
+          }
+        };
+        const variantNotice = (message: string) => {
+          if (session.variantNotice === message) return;
+          session.variantNotice = message;
+          emit({ ...base(threadId, turnId), type: "runtime.notice", message });
+        };
 
         const flushAssistantText = () => {
           const raw = state.text;
@@ -1433,15 +1447,46 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
                 if (!selectedModel && cliTurn.model) selectedModel = cliTurn.model;
               }
               if (variant !== undefined) {
-                const option = requestedVariantOption();
-                await request(
-                  "session/set_config_option",
-                  { sessionId, configId: option.configId, value: variant },
-                  SESSION_CONFIG_TIMEOUT,
-                  receiveModelVariants,
-                );
-                if (requestedVariantOption().currentValue !== variant) {
-                  throw new Error(`${support.displayName} did not apply variant ${variant}`);
+                const wanted = variant;
+                const label = variantLabel(wanted);
+                const settingAdvice = " Pick a different variant, or clear it, in this bot's model settings.";
+                let option: ReturnType<typeof requestedVariantOption> | undefined;
+                try {
+                  option = requestedVariantOption();
+                } catch {
+                  option = undefined;
+                }
+                if (!option) {
+                  variant = undefined;
+                  variantNotice(support.displayName + " does not offer the " + label + " reasoning variant for this model,"
+                    + " so this reply uses the session's current setting." + settingAdvice);
+                } else {
+                  // Register before the request: a response or notification can arrive before it resolves.
+                  const confirmation = modelControls.confirmVariant(wanted);
+                  try {
+                    await request(
+                      "session/set_config_option",
+                      { sessionId, configId: option.configId, value: wanted },
+                      SESSION_CONFIG_TIMEOUT,
+                      receiveModelVariants,
+                    );
+                    confirmation.arm(VARIANT_CONFIRM_TIMEOUT);
+                    const outcome = await confirmation.outcome;
+                    if (outcome === "mismatch") {
+                      variant = undefined;
+                      variantNotice(support.displayName + " could not apply the " + label + " reasoning variant,"
+                        + " so this reply uses the session's current setting." + settingAdvice);
+                    } else if (outcome === "unconfirmed") {
+                      // The setter succeeded but the agent sent no config state. Trust the acknowledgement rather than
+                      // reading a stale option and failing a working turn.
+                      variant = undefined;
+                    }
+                  } catch {
+                    confirmation.cancel();
+                    variant = undefined;
+                    variantNotice(support.displayName + " could not set the " + label + " reasoning variant,"
+                      + " so this reply uses the session's current setting." + settingAdvice);
+                  }
                 }
               }
             } catch (error) {
@@ -1479,8 +1524,21 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
             if (support.modelVariants && cliTurn.model && !modelControls.usesAgentDefault() && modelControls.modelOf(session.sessionConfigResult) !== cliTurn.model) {
               throw new Error(`${support.displayName} changed model before the prompt`);
             }
-            if (variant !== undefined && requestedVariantOption().currentValue !== variant) {
-              throw new Error(`${support.displayName} changed variant before the prompt`);
+            if (variant !== undefined) {
+              const wanted = variant;
+              let current: string | undefined;
+              try {
+                current = requestedVariantOption().currentValue;
+              } catch {
+                current = undefined;
+              }
+              if (current !== wanted) {
+                const label = variantLabel(wanted);
+                variant = undefined;
+                variantNotice(support.displayName + " changed the " + label + " reasoning variant before the prompt,"
+                  + " so this reply uses the session's current setting. Pick a different variant, or clear it,"
+                  + " in this bot's model settings.");
+              }
             }
             if (state.settled || state.stopped || session.closing) throw new Error("turn stopped");
             state.promptSent = true;

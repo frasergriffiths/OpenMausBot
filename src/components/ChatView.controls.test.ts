@@ -316,6 +316,15 @@ describe("thread control placement", () => {
     messages.push({ id: "next", role: "user", kind: "text", at: 4, text: "A different request" });
     expect(render()).not.toContain("Retry</button>");
   });
+  it("does not offer Retry after a completed reply already answered the last message", () => {
+    const messages: Bot["messages"] = [
+      { id: "ask", role: "user", kind: "text", at: 1, text: "Try the new model" },
+      { id: "reply", role: "bot", kind: "text", at: 2, text: "It works", turnSucceeded: true },
+      { id: "error", role: "bot", kind: "activity", at: 3, tool: { name: "error: OpenCode did not apply variant low", ok: false } },
+    ];
+    const markup = renderToStaticMarkup(createElement(ChatView, { bot: { ...bot, busy: false, messages } }));
+    expect(markup).not.toContain("Retry</button>");
+  });
   it("keeps Retry on a failed turn after hanging up, when the call's record is the last row", () => {
     const messages: Bot["messages"] = [
       { id: "ask", role: "user", kind: "text", at: 1, text: "Try the new model", via: "call", callId: "c1" },
