@@ -5,7 +5,7 @@ import { listOf } from "@/lib/cloud-send";
 import { t } from "@/lib/i18n";
 import { CARD, CARD_IDLE, CARD_PICKED, CardIcon, Footer, PRIMARY, StepHeading } from "./parts";
 
-export type BringOutcome = "team" | "here" | "skipped";
+export type BringOutcome = "here" | "skipped";
 
 export function WelcomeBring({ name, desktop, older = false, cloudHasWork, sent = null, team = false, headingRef, onFinish }: {
   name: string;

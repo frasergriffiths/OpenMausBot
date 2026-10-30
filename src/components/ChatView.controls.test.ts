@@ -76,15 +76,19 @@ describe("the header's right side", () => {
     return { markup, controls: markup.slice(markup.indexOf("data-chathead-controls"), markup.indexOf("role=\"log\"")) };
   };
 
-  it("keeps the model picker in view in Simple mode, leaving the computer to the bot panel", () => {
+  it("keeps the model picker and the More menu in view in Simple mode, leaving the computer to the bot panel", () => {
     fixture.advanced = false;
     try {
       const { markup, controls } = header();
       expect(controls).toContain("data-test-model-control");
       expect(fixture.model).toMatchObject({ threadId: "selected" });
       expect(controls).not.toContain('data-tour="computer"');
-      expect(markup).not.toContain('data-testid="chat-more"');
-      expect(fixture.menus.find((menu) => menu.ariaLabel === "More")).toBeUndefined();
+      // The bot's computer moved to the panel's Computer tab; find, export, usage, activity and the run log
+      // stay in the header's More menu.
+      expect(markup).toContain('data-testid="chat-more"');
+      const more = fixture.menus.find((menu) => menu.ariaLabel === "More");
+      expect(more).toBeDefined();
+      expect(more!.items.map((item) => item.key)).toEqual(expect.arrayContaining(["find", "copy", "download", "activity", "runlog"]));
       expect(markup).toContain("data-chathead-pill");
     } finally {
       fixture.advanced = true;

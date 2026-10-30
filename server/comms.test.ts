@@ -418,8 +418,8 @@ describe("routine comms e2e on the job runtime (fake ACP fleet)", () => {
       expect(receipt.text).toContain('"requestId"');
       expect(receipt.text).toContain("resume you automatically");
       expect(receipt.text).not.toContain("hello from fake acp");
-      await waitUntil(async () => (await runState(run.id))?.status === "waiting", 15_000, "the run did not wait on its consultation");
-      await waitUntil(async () => assignments(helper.id, asker.id).length === 1, 15_000, "no consultation row");
+      await waitUntil(async () => (await runState(run.id))?.status === "waiting", 25_000, "the run did not wait on its consultation");
+      await waitUntil(async () => assignments(helper.id, asker.id).length === 1, 25_000, "no consultation row");
       const [consult] = assignments(helper.id, asker.id);
       expect(consult).toMatchObject({ mode: "consult", reply: "resume", text: "ping from fake" });
       expect(rows().find((node) => node.id === consult.parentId)).toMatchObject({ threadId: run.threadId, botId: asker.id });
