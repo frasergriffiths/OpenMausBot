@@ -33,6 +33,8 @@ it("retains empty teams, moves existing bots, and keeps legacy imports additive 
     const transcript = await messages();
     await api("/api/sidebar-sections", "POST", { name: "Delivery" });
     await api("/api/sidebar-sections", "POST", { name: "Untouched empty", botIds: [] });
+    await api("/api/sidebar-sections", "POST", { name: "General" }, 409);
+    await api("/api/sidebar-sections?section=Delivery", "PATCH", { name: "general" }, 409);
     expect((await api("/api/bots?messages=0")).sections).toEqual(expect.arrayContaining(["Research", "Engineering", "Delivery", "Untouched empty"]));
     await api("/api/section-context?section=Delivery", "PUT", { text: "Finish research before engineering." });
     const moved = await api("/api/sidebar-sections", "POST", { name: "Delivery", botIds: [a.id, b.id] });

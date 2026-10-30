@@ -34,6 +34,7 @@ export function createSidebarSectionRoutes(deps: SidebarSectionRouteDeps): Route
         const parsed = z.object({ name: z.string().trim().min(1).max(60) }).strict().safeParse(await readBody(req));
         if (!parsed.success) return json(res, 400, { error: "Department name must be 1 to 60 characters" });
         nextName = parsed.data.name;
+        if (nextName.toLowerCase() === "general") return json(res, 409, { error: "General is reserved for bots without a department" });
       }
       const error = nextName === null ? store.deleteSection(section) : store.renameSection(section, nextName, teamComputers);
       if (error) return json(res, error === "No such department" ? 404 : 409, { error });
@@ -64,6 +65,7 @@ export function createSidebarSectionRoutes(deps: SidebarSectionRouteDeps): Route
         return json(res, 400, { error: "Provide a department name and up to 100 valid botIds" });
       }
       const name = parsed.data.name.trim();
+      if (name.toLowerCase() === "general") return json(res, 409, { error: "General is reserved for bots without a department" });
       if (name.length > 60) {
         return json(res, 400, { error: "name must be at most 60 characters" });
       }
