@@ -852,6 +852,8 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
     hiddenCount,
     laterCount,
     olderPending,
+    showEarlier,
+    loadOlder,
     showLater,
     jumpToLatest,
     scrollHandlers,
@@ -1121,7 +1123,14 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
               <span>{t("chat.loadingEarlier")}</span>
             </div>
           ) : hiddenCount > 0 || bot.hasMore ? (
-            <div ref={topSentinelRef} className="h-2 w-full pointer-events-none" aria-hidden="true" />
+            <>
+              <div ref={topSentinelRef} className="h-2 w-full pointer-events-none" aria-hidden="true" />
+              <div className="flex justify-center py-1">
+                <button type="button" className="ui-pill" onClick={() => (bot.hasMore ? loadOlder() : showEarlier())}>
+                  {bot.hasMore ? t("chat.loadEarlier") : t("chat.showEarlier", { count: hiddenCount })}
+                </button>
+              </div>
+            </>
           ) : null}
           {windowedMessages.length === 0 && !bot.busy && <EmptyChat bot={bot} />}
           <ChatRowsContext.Provider value={rows}>

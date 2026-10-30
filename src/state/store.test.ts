@@ -2107,7 +2107,43 @@ describe("scrollback pages", () => {
     expect(landed.loadingOlder).toEqual({});
   });
 
+  it("keeps every loaded page when the thread already on screen is opened again", () => {
+    const open = {
+      ...bot,
+      messages: [message("m1", 1), message("m2", 2), message("m3", 3), message("m4", 4)],
+      hasMore: false,
+    } as never as Bot;
+    const reopened = reducer({ ...initialState, bots: [open] }, {
+      type: "taskSwitched",
+      bot: { ...open, messages: [message("m3", 3), message("m4", 4)], hasMore: true } as never,
+    });
+    expect(reopened.bots[0].messages.map((m) => m.id)).toEqual(["m1", "m2", "m3", "m4"]);
+    expect(reopened.bots[0].hasMore).toBe(true);
+  });
+
+  it("still replaces the transcript when the switch lands on another thread", () => {
+    const open = { ...bot, messages: [message("m3", 3), message("m4", 4)] } as never as Bot;
+    const switched = reducer({ ...initialState, bots: [open] }, {
+      type: "taskSwitched",
+      bot: { ...open, threadId: "thread-2", messages: [message("n1", 1)] } as never,
+    });
+    expect(switched.bots[0].threadId).toBe("thread-2");
+    expect(switched.bots[0].messages.map((m) => m.id)).toEqual(["n1"]);
+  });
+
+  it("takes the server's newer copy of a row without duplicating it", () => {
+    const open = { ...bot, messages: [message("m1", 1), message("m2", 2)], hasMore: true } as never as Bot;
+    const patched = { ...message("m2", 2), text: "edited" } as never as Message;
+    const reopened = reducer({ ...initialState, bots: [open] }, {
+      type: "taskSwitched",
+      bot: { ...open, messages: [patched] } as never,
+    });
+    expect(reopened.bots[0].messages.map((m) => m.id)).toEqual(["m1", "m2"]);
+    expect(reopened.bots[0].messages[1].text).toBe("edited");
+  });
+
   it("keeps the open transcript's scrollback answer when a bot frame does not switch it", () => {
+
     const open = { ...bot, tasks: [{ threadId: "thread-1", title: "Long", createdAt: 1 }] } as never as Bot;
     const opened = reducer({ ...initialState, bots: [open] }, {
       type: "botPatched",

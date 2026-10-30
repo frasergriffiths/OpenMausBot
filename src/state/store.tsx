@@ -21,7 +21,7 @@ import { isNotificationFeedAction, reduceNotificationFeed, type NotificationFeed
 import { bumpThreadUpdatedAt, mergeTaskStamps, rewindThreadUpdatedAt } from "./thread-stamps";
 import { botOpensTo, openBot, openNotificationTarget, visibleNotificationThread } from "./thread-navigation";
 import { patchGroupTask } from "./thread-edits";
-import { optimisticMessageId, optimisticUserMessage } from "./optimistic-send";
+import { isOptimisticMessageId, optimisticMessageId, optimisticUserMessage } from "./optimistic-send";
 import { patchedGroups, roomAnswers, snapshotPatch } from "./room-frames";
 import { savedStateAction, type SavedOwner, type SavedSnapshot } from "./saved-state";
 export { awayFromMainThread, botOpensTo, openBot, openBotThread, openNotificationTarget, openThread, visibleNotificationThread, type ThreadTarget } from "./thread-navigation";
@@ -418,6 +418,16 @@ function openedUnreadDivider(state: AppState, threadId: string, unread: boolean,
   if (!unread) return state.unreadDivider?.threadId === threadId ? state.unreadDivider : null;
   const messageId = firstUnreadMessageId(messages, lastReadMessageId);
   return messageId ? { threadId, messageId } : null;
+}
+
+/** A page or a snapshot is a window on a thread, never the whole of what this client already holds.
+ * Merging keeps every loaded row, lets the newer copy of a row win, and stays in transcript order. */
+export function mergeHeldMessages(held: readonly Message[], incoming: readonly Message[]): Message[] {
+  if (!incoming.length) return held as Message[];
+  const fresh = new Map(incoming.map((message) => [message.id, message]));
+  const older = held.filter((message) => !fresh.has(message.id));
+  // Array.prototype.sort is stable, so rows stamped in the same millisecond keep the order they arrived in.
+  return [...older, ...incoming].sort((a, b) => a.at - b.at);
 }
 
 export function visibleMessages(bot: Pick<Bot, "messages" | "activeLeafId">): Message[] {
@@ -1787,14 +1797,18 @@ export function reducer(state: AppState, action: Action): AppState {
       if (!action.dm) return patchGroupTask(state, action.groupId, action.threadId, { turnTimeoutMinutes: action.minutes ?? undefined });
       return { ...state, groups: state.groups.map((group) => group.id === action.groupId ? { ...group, turnTimeoutMinutes: action.minutes ?? undefined } : group) };
     case "taskSwitched": {
-      let switched = updateBot(bumpTranscriptGeneration(state, action.bot.threadId), action.bot.id, (bot) => ({
+      const sameThread = state.bots.find((candidate) => candidate.id === action.bot.id)?.threadId === action.bot.threadId;
+      const incoming = action.bot.messages ?? [];
+      let switched = updateBot(sameThread ? state : bumpTranscriptGeneration(state, action.bot.threadId), action.bot.id, (bot) => ({
         ...bot,
         ...action.bot,
         computer: action.bot.computer,
         toolScope: action.bot.toolScope, managedSections: action.bot.managedSections,
         vpsAlias: action.bot.vpsAlias,
-        messages: action.bot.messages ?? [],
-        hasMore: action.bot.hasMore,
+        // Re-opening the thread already on screen answers with a bounded page: keep the pages already loaded
+        // rather than replacing them, so a thread can never lose history just by being opened again.
+        messages: sameThread ? mergeHeldMessages(bot.messages, incoming) : incoming,
+        hasMore: sameThread ? Boolean(bot.hasMore || action.bot.hasMore) : action.bot.hasMore,
         awaitingThreadSnapshot: false,
         switchingTo: undefined,
       }));
@@ -2376,7 +2390,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           olderPagesInFlight.add(action.threadId);
           const current = stateRef.current;
           const owner = [...current.bots, ...current.groups].find((candidate) => candidate.threadId === action.threadId);
-          const before = owner?.messages[0]?.id;
+          const before = owner?.messages.find((message) => !isOptimisticMessageId(message.id))?.id;
           const generation = current.transcriptGeneration[action.threadId] ?? 0;
           if (!before) {
             olderPagesInFlight.delete(action.threadId);
@@ -2874,6 +2888,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           break;
         case "newTask":
         case "switchTask": {
+          if (action.type === "switchTask" && !action.whole) {
+            const open = stateRef.current.bots.find((bot) => bot.id === action.botId);
+            // Already showing that thread: keep the transcript and every page loaded above it. Refetching would
+            // answer with a shorter tail and throw the older rows away for no gain; live frames keep it current.
+            if (open?.threadId === action.threadId) {
+              rawDispatch({ type: "switchTaskFailed", botId: action.botId, threadId: action.threadId });
+              break;
+            }
+          }
           const revision = (navigation.get(action.botId) ?? 0) + 1;
           navigation.set(action.botId, revision);
           const selectedAtStart = selectionRevision;
