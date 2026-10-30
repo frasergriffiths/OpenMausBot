@@ -17,12 +17,6 @@ export const SHORTCUT_GROUPS: readonly ShortcutGroup[] = [
     category: "Navigation",
     items: [
       {
-        id: "command-palette",
-        description: "Open command palette (switcher & transcript search)",
-        macKeys: ["⌘", "K"],
-        winKeys: ["Ctrl", "K"],
-      },
-      {
         id: "new-bot",
         description: "Create a new bot",
         macKeys: ["⌘", "N"],

@@ -306,19 +306,14 @@ describe("Simple-mode sidebar layout", () => {
     setSidebarDensity("icons");
     expect(render().tree.some((node) => node.type === SidebarSearchPill)).toBe(false);
     railSearch(render().tree)();
-    const { tree } = render();
-    expect(tree.some((node) => node.type === SimpleRailFooter)).toBe(false);
-    expect(tree.some((node) => node.type === SidebarSearchPill)).toBe(true);
+    expect(fixture.storage.get(SIDEBAR_DENSITY_KEY)).toBe("expanded");
   });
 
-  it("opens the command palette instead when a side panel holds the sidebar collapsed", () => {
-    const opened = vi.fn();
-    window.addEventListener("omb:open-command-palette", opened);
-    const search = railSearch(render(true).tree);
-    expect(render(true).tree.some((node) => node.type === SidebarEdgeToggle)).toBe(false);
-    search();
-    expect(opened).toHaveBeenCalledOnce();
-    expect(render(true).tree.some((node) => node.type === SimpleRailFooter)).toBe(true);
+  it("keeps the search button out of the way when a side panel holds the sidebar collapsed", () => {
+    const tree = render(true).tree;
+    expect(tree.some((node) => node.type === SidebarEdgeToggle)).toBe(false);
+    expect(tree.some((node) => node.type === "button" && node.props["aria-label"] === "Search bots and messages")).toBe(false);
+    expect(tree.some((node) => node.type === SimpleRailFooter)).toBe(true);
   });
 });
 

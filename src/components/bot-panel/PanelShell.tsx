@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { ArrowLeft, Crown, Pencil, X } from "lucide-react";
 
 import { cn } from "@/lib/cn";
-import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "@/components/pill-tabs";
 import { t } from "@/lib/i18n";
 import type { Bot, BotSettingsSection } from "@/state/store";
 import { ChatShareMenu } from "@/components/ChatMoreMenu";
@@ -56,7 +55,6 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
   const [editingInstructions, setEditingInstructions] = useState(Boolean(start.editInstructions));
   const bodyRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const page = stack.at(-1) ?? null;
 
   const scrollTop = () => bodyRef.current?.scrollTo({ top: 0 });
@@ -102,12 +100,6 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
     setAnchor(null);
   }, [anchor, page, tab]);
 
-  useEffect(() => {
-    if (page) return;
-    const index = PANEL_TABS.indexOf(tab);
-    tabRefs.current[index]?.focus({ preventScroll: true });
-  }, [page, tab]);
-
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Escape" || event.defaultPrevented) return;
     const target = event.target as Partial<Element> | null;
@@ -119,16 +111,6 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
     if (editorOpen) closeEditor();
     else if (stack.length > 0) back();
     else onClose();
-  };
-
-  const onTabKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
-    event.preventDefault();
-    const current = PANEL_TABS.indexOf(tab);
-    const next = event.key === "ArrowRight" ? (current + 1) % PANEL_TABS.length
-      : event.key === "ArrowLeft" ? (current + PANEL_TABS.length - 1) % PANEL_TABS.length
-        : event.key === "Home" ? 0 : PANEL_TABS.length - 1;
-    openTab(PANEL_TABS[next]!);
   };
 
   const backLabel = stack.length > 1 ? t(PAGES[stack[stack.length - 2]!].title, { name: bot.name }) : t(TAB_LABEL[tab]);
@@ -177,30 +159,9 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
               </>
             )}
           </div>
-          {/* Sized by its pills, never a fixed height: a 38px row around a 36px track spilled 6px into the
-              scrolling body, so content slid up behind the tabs. */}
           <div className="relative z-10 flex shrink-0 items-center bg-panel px-3 pb-1 pt-2">
-            <div role="tablist" aria-label={t("botSettings.simple.tabs")} className={cn(PILL_TABS, "hidden w-full @[270px]:flex")} onKeyDown={onTabKeyDown}>
-              {PANEL_TABS.map((id, index) => (
-                <button
-                  key={id}
-                  ref={(node) => { tabRefs.current[index] = node; }}
-                  type="button"
-                  role="tab"
-                  id={`bot-panel-tab-${id}`}
-                  aria-selected={tab === id}
-                  aria-controls="bot-panel-tabpanel"
-                  tabIndex={tab === id ? 0 : -1}
-                  data-panel-tab={id}
-                  onClick={() => openTab(id)}
-                  className={cn(PILL_TAB, "flex-auto", tab === id ? PILL_TAB_ON : PILL_TAB_OFF)}
-                >
-                  {t(TAB_LABEL[id])}
-                </button>
-              ))}
-            </div>
-            <div className="@[270px]:hidden w-full">
             <Select
+              className="w-full"
               size="sm"
               value={tab}
               aria-label={t("botSettings.simple.tabs")}
@@ -208,7 +169,6 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
             >
               {PANEL_TABS.map((id) => <option key={id} value={id}>{t(TAB_LABEL[id])}</option>)}
             </Select>
-            </div>
           </div>
         </>
       ) : (

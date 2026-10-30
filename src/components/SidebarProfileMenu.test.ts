@@ -422,7 +422,7 @@ describe("Simple mode's account menu", () => {
     usage: true,
     update: { key: "update", label: "Check for updates", onSelect: noop },
     account: "MausBot Cloud",
-    simple: { tools, places: placeMenuItems(place(), { owner: null, onCloudSettings: noop }) },
+    simple: { tools },
     onUsage: noop, onSettings: noop, onShortcuts: noop, onAbout: noop, onHelp: noop, onFeedback: noop, onAccount: noop,
     ...patch,
   });
@@ -437,7 +437,7 @@ describe("Simple mode's account menu", () => {
     expect(groups(items)).toEqual([
       ["usage", "phone-app", "support", "settings"],
       ["files"],
-      ["place", "switch-place", "account"],
+      ["account"],
     ]);
     expect(items.find((item) => item.key === "support")!.submenu!.map((item) => item.key)).toEqual(["help", "feedback", "shortcuts", "about", "update"]);
   });

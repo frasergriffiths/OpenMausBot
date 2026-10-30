@@ -444,7 +444,7 @@ export function profileMenuItems({
   update: SidebarMenuItem | null;
   updateTop?: { label: string; action: string } | null;
   account: string | null;
-  simple?: { tools: SidebarMenuItem[]; places: SidebarMenuItem[] };
+  simple?: { tools: SidebarMenuItem[] };
   onUsage: () => void;
   onSettings: () => void;
   onShortcuts: () => void;
@@ -490,7 +490,7 @@ export function profileMenuItems({
     present(raised),
     [...present(usageItem), ...phone, { ...support, submenu: raised ? help : [...help, ...present(update)] }, settings],
     simple.tools,
-    [...simple.places, ...present(accountItem)],
+    present(accountItem),
   ].filter((group) => group.length > 0);
   return groups.flatMap((group, at) => group.map((item, index) => (at > 0 && index === 0 ? { ...item, separatorBefore: true } : item)));
 }
@@ -566,7 +566,6 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
         onFiles: filesReady ? () => dispatch({ type: "showFiles" }) : undefined,
         archived: account.archived,
       }),
-      places: placeMenuItems(account.place, { owner: account.owner, onCloudSettings: () => dispatch({ type: "toggleAppSettings", open: true, section: "cloudAccount" }) }),
     } } : {}),
     onUsage: () => dispatch({ type: "toggleAppSettings", open: true, section: "usage" }),
     onSettings: () => dispatch({ type: "toggleAppSettings" }),
