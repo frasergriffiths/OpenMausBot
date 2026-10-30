@@ -365,8 +365,8 @@ export function SettingsModal() {
         <span id="app-settings-title" className="sr-only">{t("settings.title")}</span>
         <nav aria-label={t("settings.title")} className="glass-rail hidden min-h-0 w-[198px] shrink-0 flex-col gap-0.5 overflow-y-auto px-3 py-4 sm:flex">
           {searchField(
-            "ui-field mb-2 flex h-8 shrink-0 items-center gap-2 text-[13px]",
-            "w-full min-w-0 bg-transparent text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none",
+            "mb-2 flex h-8 shrink-0 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1 text-ink-secondary focus-within:ring-1 focus-within:ring-accent",
+            "w-full min-w-0 bg-transparent text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none",
           )}
           {visiblePages.length === 0 && (
             <div className="px-[9px] py-3 text-[13px] leading-[18px] text-ink-secondary">{t("settings.noMatch", { query: query.trim() })}</div>

@@ -1400,7 +1400,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       {density === "icons" && !rail && <DesktopWorkspaceSwitcher compact cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "computer" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />}
       <OrganizationIdentity compact={density === "icons"} />
       {phone ? null : simple ? <SidebarSearchPill query={query} onQuery={setQuery} onClear={clearSearch} /> : <div className={cn("pt-1 pb-3", density === "icons" ? "hidden" : "px-3")}>
-        <div className="flex items-center gap-2 rounded-md border border-hairline/40 bg-inset/40 px-2.5 py-1.5 focus-within:border-focus">
+        <div className="flex h-8 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1 focus-within:ring-1 focus-within:ring-accent">
           <Search size={14} className="text-ink-secondary" />
           <input
             value={query}
@@ -1408,7 +1408,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             onKeyDown={(e) => e.key === "Escape" && setQuery("")}
             placeholder={t("sidebar.search")}
             aria-label={t("sidebar.searchAria")}
-            className="w-full bg-transparent text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
+            className="w-full bg-transparent text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none"
           />
         </div>
       </div>}

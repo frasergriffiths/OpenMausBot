@@ -104,6 +104,15 @@ describe("the setup card under a new bot's greeting", () => {
     expect(picked.choices.filter((row) => row.props["aria-checked"] === true)).toHaveLength(1);
   });
 
+  it("keeps the selected letter and check readable on the bot's own tint", () => {
+    fixture.bots = [bot({ color: "yellow" })];
+    press(renderOffer(offered).choices[1]);
+    const picked = renderOffer(offered);
+    const keycap = nodes(picked.choices[1]!.props.children).find((node) => node.type === "kbd")!;
+    expect(keycap.props.className).toContain("text-ink");
+    expect(picked.html).toContain("color-mix(in oklab, #D8A729 65%, var(--color-ink))");
+  });
+
   it("keeps one live place question on screen before and after settling", () => {
     const open = renderOffer(offered);
     expect(open.html.match(/data-setup-place=/g)).toHaveLength(1);
