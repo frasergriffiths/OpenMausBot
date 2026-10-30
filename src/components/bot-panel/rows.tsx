@@ -208,7 +208,8 @@ export function Segmented<V extends string>({ options, value, onChange, label, a
           disabled={option.disabled}
           title={option.tooltip}
           onClick={() => onChange(option.value)}
-          className={cn(PILL_TAB, "flex-auto", value === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
+          style={{ flexShrink: 1 }}
+          className={cn(PILL_TAB, "flex-auto truncate", value === option.value ? PILL_TAB_ON : PILL_TAB_OFF)}
         >
           {option.label}
         </button>

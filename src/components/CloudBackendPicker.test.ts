@@ -21,6 +21,26 @@ describe("CloudBackendPicker", () => {
     expect(picker()).toContain("Self-hosted VPS");
   });
 
+  it("uses the shared pressed-button choice for the two providers", () => {
+    fixture.config = { cloudHome: false };
+    const markup = picker("vps");
+    expect(markup).toContain('role="group"');
+    expect(markup).toContain('aria-label="Cloud backend"');
+    expect(markup.match(/data-cloud-backend="/g)).toHaveLength(2);
+    expect(markup).toMatch(/data-cloud-backend="vps" aria-pressed="true"[^>]*>Self-hosted VPS/);
+    expect(markup).toMatch(/data-cloud-backend="box" aria-pressed="false"[^>]*>Boat/);
+    expect(markup).not.toContain('role="tab"');
+    expect(markup).toContain("flex-auto");
+    expect(markup).not.toContain("flex-1");
+    expect(markup).toContain('title="Self-hosted VPS"');
+  });
+
+  it("names the compact picker's tabs by provider", () => {
+    fixture.config = { cloudHome: false };
+    const markup = renderToStaticMarkup(createElement(CloudBackendPicker, { value: "box", compact: true, onChange: () => {} }));
+    expect(markup).toContain('aria-label="Cloud provider"');
+  });
+
   it("is hidden on My Cloud", () => {
     fixture.config = { cloudHome: true };
     expect(picker()).toBe("");
@@ -30,7 +50,7 @@ describe("CloudBackendPicker", () => {
     const markup = picker(value);
     expect(markup).toContain("Boat");
     expect(markup).toContain("Self-hosted VPS");
-    expect(markup).not.toContain("disabled");
+    expect(markup).not.toMatch(/<button[^>]*\sdisabled(?:=|\s|>)/);
     expect(markup).not.toMatch(/ACP model provider/);
   });
 
