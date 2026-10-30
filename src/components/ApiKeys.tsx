@@ -1,6 +1,6 @@
 // Security: secrets are write-only; GET /api/config returns configured flags, never values.
 import { useEffect, useId, useRef, useState } from "react";
-import { Check, CircleHelp, ExternalLink, Loader2, TriangleAlert } from "lucide-react";
+import { Check, CircleHelp, ExternalLink, Loader2, Trash2, TriangleAlert } from "lucide-react";
 import { api, useStore, type ConfigStatus } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { useMenuMotion } from "./MenuMotion";
@@ -318,7 +318,6 @@ export function ApiKeyRow({
 
   const configured = state.config ? SECTIONS[section].flag(state.config) : false;
   const included = state.config ? SECTIONS[section].included?.(state.config) === true : false;
-  const clearing = !value.trim() && configured;
   const credential = credentialCopy(section);
 
   const test = async (): Promise<KeyResult> => {
@@ -420,18 +419,19 @@ export function ApiKeyRow({
             <Loader2 size={13} aria-hidden="true" className="absolute right-2.5 top-1/2 -translate-y-1/2 animate-spin text-ink-secondary" />
           )}
         </div>
-        {clearing && (
+        {configured && (
           <button
             type="button"
             onClick={() => save(true)}
             disabled={saving}
-            className="cursor-pointer flex w-[72px] shrink-0 items-center justify-center rounded-lg bg-control py-2 text-[13px] text-danger hover:bg-raised-hover disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={t("keys.removeKey")}
             title={t("keys.removeKey")}
+            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-control text-danger hover:bg-raised-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {t("keys.clear")}
+            <Trash2 size={15} aria-hidden="true" />
           </button>
         )}
-        {testProvider && clearing && (
+        {testProvider && configured && (
           <button
             type="button"
             onClick={() => void test()}
@@ -610,13 +610,13 @@ export function VpsConnection() {
     setAlias(state.config?.vps?.sshAlias ?? "");
   }, [state.config?.vps?.sshAlias]);
 
-  const save = () => {
-    if (saving || (!alias.trim() && !configured)) return;
+  const persist = (next: string) => {
+    if (saving) return;
     setSaving(true);
     setError(null);
     api("/api/config", {
       method: "PUT",
-      body: JSON.stringify({ vps: { sshAlias: alias.trim() } }),
+      body: JSON.stringify({ vps: { sshAlias: next } }),
     })
       .then((status: ConfigStatus) => {
         dispatch({ type: "configStatus", config: status });
@@ -625,6 +625,8 @@ export function VpsConnection() {
       .catch((e) => setError(e.message))
       .finally(() => setSaving(false));
   };
+  const save = () => { if (!alias.trim() && !configured) return; persist(alias.trim()); };
+  const remove = () => persist("");
 
   return (
     <div>
@@ -659,17 +661,28 @@ export function VpsConnection() {
           autoComplete="off"
           className="w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none"
         />
+        {configured && (
+          <button
+            type="button"
+            onClick={remove}
+            disabled={saving}
+            aria-label={t("keys.vps.removeAlias")}
+            title={t("keys.vps.removeAlias")}
+            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-control text-danger hover:bg-raised-hover disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Trash2 size={15} aria-hidden="true" />
+          </button>
+        )}
         <button
           onClick={save}
           disabled={saving || (!alias.trim() && !configured)}
           className={cn(
-            "cursor-pointer flex w-[72px] shrink-0 items-center justify-center gap-1.5 rounded-lg py-2 text-[13px]",
-            !alias.trim() && configured ? "bg-control text-danger hover:bg-raised-hover" : "bg-control text-ink hover:bg-raised-hover",
+            "cursor-pointer flex w-[72px] shrink-0 items-center justify-center gap-1.5 rounded-lg bg-control py-2 text-[13px] text-ink hover:bg-raised-hover",
             "disabled:cursor-not-allowed disabled:opacity-50",
           )}
-          title={!alias.trim() && configured ? t("keys.vps.removeAlias") : t("common.save")}
+          title={t("common.save")}
         >
-          {saving ? <Loader2 size={13} className="animate-spin" /> : !alias.trim() && configured ? t("keys.clear") : <><Check size={13} />{t("common.save")}</>}
+          {saving ? <Loader2 size={13} className="animate-spin" /> : <><Check size={13} />{t("common.save")}</>}
         </button>
       </div>
       {error && <div className="mt-1 text-[12px] text-danger">{error}</div>}

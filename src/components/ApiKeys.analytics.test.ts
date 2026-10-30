@@ -115,7 +115,7 @@ describe("a key saved in Settings → API keys", () => {
   it("reports a cleared key as removed, once, and a failed clear not at all", async () => {
     fixture.config = { anthropic: { configured: true } };
     fixture.api.mockRejectedValueOnce(new ApiError("busy", 409, { error: "busy" })).mockResolvedValueOnce({ anthropic: { configured: false } });
-    const clear = () => render({ section: "anthropic", testProvider: "anthropic" }).find((node) => node.type === "button" && JSON.stringify(node.props.children).includes("Clear"))!;
+    const clear = () => render({ section: "anthropic", testProvider: "anthropic" }).find((node) => node.type === "button" && (node.props as Record<string, unknown>)["aria-label"] === "Remove the saved key")!;
     clear().props.onClick!();
     await flush();
     expect(fixture.track).not.toHaveBeenCalled();
@@ -126,9 +126,9 @@ describe("a key saved in Settings → API keys", () => {
     expect(fixture.track.mock.calls).toEqual([["api_key_removed", { provider: "anthropic", via: "settings" }]]);
   });
 
-  it("offers Clear for a Composio project key of the person's own, and none for the managed connection", async () => {
+  it("offers Remove for a Composio project key of the person's own, and none for the managed connection", async () => {
     const row = () => render({ section: "composio" });
-    const clear = () => row().find((node) => node.type === "button" && JSON.stringify(node.props.children).includes("Clear"));
+    const clear = () => row().find((node) => node.type === "button" && (node.props as Record<string, unknown>)["aria-label"] === "Remove the saved key");
     fixture.config = { composio: { configured: true, mode: "managed" } };
     expect(clear()).toBeUndefined();
     expect(JSON.stringify(row().map((node) => node.props.children))).not.toContain("Configured");
