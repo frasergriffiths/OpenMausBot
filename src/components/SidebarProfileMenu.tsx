@@ -2,17 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import {
   Archive,
   ArrowDownToLine,
-  ArrowLeftRight,
   Check,
   CircleUserRound,
-  Cloud,
   Download,
   FolderOpen,
   Gauge,
   Info,
   HelpCircle,
   Keyboard,
-  Laptop,
   LifeBuoy,
   Loader2,
   RefreshCw,
@@ -25,7 +22,6 @@ import { InitialsAvatar } from "./Avatar";
 import { DiscordIcon } from "./DiscordIcon";
 import { AboutDialog } from "./AboutDialog";
 import { PhoneAppDialog } from "./PhoneAppDialog";
-import { CloudTile } from "./cloud-buy/parts";
 import { usageBridge } from "./CloudUsageMeter";
 import { useCloudPlanSnapshot } from "./CloudTrialNotice";
 import type { WorkspacePlace } from "./DesktopWorkspaceSwitcher";
@@ -38,7 +34,6 @@ import { serverCheckPhase, serverUpdateRow, type ServerUpdateCheck, type ServerU
 import type { CloudAccountBridge, CloudAccountState } from "../../electron/cloud-account.mjs";
 import { useUpdaterState, type UpdaterState } from "@/lib/updater";
 import { brand } from "../lib/brand";
-import { cloudColor } from "@/lib/cloud-look";
 import { cn } from "@/lib/cn";
 import { meterPercent, resetLine } from "@/lib/usage-meter";
 import type { CloudPlanSnapshot } from "../../electron/cloud-account.mjs";
@@ -345,25 +340,6 @@ export function accountLabel(name: string, { update }: { update: string | null }
   return [name, update ?? ""].filter(Boolean).join(" · ");
 }
 
-export function placeMenuItems(place: Pick<WorkspacePlace, "bridge" | "current" | "cloudHome" | "onLine" | "openMenu" | "switchable">, { owner, onCloudSettings }: {
-  owner: string | null;
-  onCloudSettings: () => void;
-}): SidebarMenuItem[] {
-  const here = <Check size={15} aria-hidden="true" className="shrink-0 text-ink-secondary" />;
-  if (!place.switchable) {
-    if (!place.cloudHome && !place.current?.home) return [];
-    const subtitle = [place.onLine, owner ? t("sidebar.cloudOwner", { email: owner }) : ""].filter(Boolean).join(" · ");
-    return [{ key: "place", label: t("cloudSetup.myCloud"), ...(subtitle ? { subtitle } : {}), icon: <Cloud size={16} />, trailing: here, onSelect: onCloudSettings }];
-  }
-  const current = place.current;
-  const icon = cloudColor(current?.color) ? <CloudTile color={current?.color} size={16} />
-    : current?.local === false || (place.cloudHome && !current) ? <Cloud size={16} /> : <Laptop size={16} />;
-  return [
-    ...(current ? [{ key: "place", label: current.name, ...(place.cloudHome && place.onLine ? { subtitle: place.onLine } : {}), icon, trailing: here, onSelect: place.openMenu }] : []),
-    { key: "switch-place", label: t("sidebar.menu.switchTo"), icon: <ArrowLeftRight size={16} />, onSelect: place.openMenu },
-  ];
-}
-
 export function simplePhoneItems({ connected, onGetApp }: { connected: boolean; onGetApp: () => void }): SidebarMenuItem[] {
   return [{
     key: "phone-app",
@@ -593,7 +569,6 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
         triggerClassName={iconOnly ? cn("shrink-0", circle || (simple && iconOnly) ? "rounded-full" : "rounded-xl") : "w-full min-w-0"}
         triggerTitle={iconOnly || simple ? label : undefined}
         triggerLabel={label}
-        triggerTour={account?.place.switchable ? "server-switcher" : undefined}
         renderTrigger={({ open }) => simple && iconOnly ? (
           <span
             ref={triggerRef}

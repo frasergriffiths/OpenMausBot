@@ -162,7 +162,7 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
           <div className="relative z-10 flex shrink-0 items-center bg-panel px-3 pb-1 pt-2">
             <Select
               className="w-full"
-              size="sm"
+              size="md"
               value={tab}
               aria-label={t("botSettings.simple.tabs")}
               onChange={(event) => openTab(event.target.value as PanelTarget["tab"])}
@@ -204,8 +204,8 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
         {page === null ? (
           <div
             id="bot-panel-tabpanel"
-            role="tabpanel"
-            aria-labelledby={`bot-panel-tab-${tab}`}
+            role="region"
+            aria-label={t(TAB_LABEL[tab])}
             data-panel-tabpanel={tab}
           >
             {tab === "profile" && <DetailsTab bot={bot} derived={derived} onOpen={openPage} editingInstructions={editingInstructions} onEditInstructions={setEditingInstructions} />}

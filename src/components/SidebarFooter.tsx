@@ -38,10 +38,12 @@ function SimpleSidebarFooter({ owner, archived, places }: { owner: string | null
       <SidebarConnectApps />
       <div className="flex items-center gap-2 not-first:mt-2">
         <div className="shrink-0"><SidebarProfileMenu iconOnly simple={account} /></div>
-        <SidebarAppsButton />
-        <SidebarTeamMapButton open={places.teamMapOpen} onOpen={places.onOpenTeamMap} />
-        <SidebarTemplatesButton open={places.templatesOpen} onOpen={places.onOpenTemplates} />
-        <UpdateIndicator />
+        <div className="ml-auto flex items-center gap-2">
+          <SidebarAppsButton />
+          <SidebarTeamMapButton open={places.teamMapOpen} onOpen={places.onOpenTeamMap} />
+          <SidebarTemplatesButton open={places.templatesOpen} onOpen={places.onOpenTemplates} />
+          <UpdateIndicator />
+        </div>
       </div>
     </div>
   );
