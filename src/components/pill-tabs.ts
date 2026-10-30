@@ -14,9 +14,10 @@ export function moveBetweenPillTabs(
 ): void {
   const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
   if (tabs.length === 0) return;
-  const current = Math.max(0, tabs.indexOf(document.activeElement as HTMLButtonElement));
+  // Focus on the row itself is not a tab: ArrowRight starts at the first, ArrowLeft at the last.
+  const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
   const next = event.key === "ArrowRight" ? (current + 1) % tabs.length
-    : event.key === "ArrowLeft" ? (current + tabs.length - 1) % tabs.length
+    : event.key === "ArrowLeft" ? (current < 0 ? tabs.length - 1 : (current + tabs.length - 1) % tabs.length)
       : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : -1;
   if (next < 0) return;
   event.preventDefault();

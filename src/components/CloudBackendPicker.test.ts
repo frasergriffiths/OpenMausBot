@@ -30,6 +30,9 @@ describe("CloudBackendPicker", () => {
     expect(markup).toMatch(/data-cloud-backend="vps" aria-pressed="true"[^>]*>Self-hosted VPS/);
     expect(markup).toMatch(/data-cloud-backend="box" aria-pressed="false"[^>]*>Boat/);
     expect(markup).not.toContain('role="tab"');
+    expect(markup).toContain("flex-auto");
+    expect(markup).not.toContain("flex-1");
+    expect(markup).toContain('title="Self-hosted VPS"');
   });
 
   it("names the compact picker's tabs by provider", () => {

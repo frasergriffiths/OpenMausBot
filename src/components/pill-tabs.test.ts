@@ -29,4 +29,16 @@ describe("a pill tab row", () => {
     expect(press(tabs, "End", "a")).toBe("c");
     expect(press(tabs, "Tab", "b")).toBe("");
   });
+
+  it("starts at the right end when the row itself has focus", () => {
+    const tabs = row();
+    (document.activeElement as HTMLElement | null)?.blur();
+    const fromRow = (key: string) => {
+      let selected = "";
+      moveBetweenPillTabs({ key, currentTarget: tabs, preventDefault: () => {} }, (tab) => { selected = tab.id; });
+      return selected;
+    };
+    expect(fromRow("ArrowRight")).toBe("a");
+    expect(fromRow("ArrowLeft")).toBe("c");
+  });
 });
