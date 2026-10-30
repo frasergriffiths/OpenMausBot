@@ -130,7 +130,7 @@ async function connect(url: string) {
     const geometry = () => evaluate(`(() => {
       const rect = element => { const r = element.getBoundingClientRect(); return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height }; };
       return { width:innerWidth, pageWidth:document.documentElement.scrollWidth, coarse:matchMedia('(pointer:coarse)').matches, hover:matchMedia('(hover:hover)').matches,
-        blocks:${blocks}.map(card => ({ ...rect(card), buttons:Array.from(card.querySelectorAll('button')).map(button=>({ ...rect(button), label:button.getAttribute('aria-label'), text:button.textContent, named:Boolean(button.getAttribute('aria-label')||button.getAttribute('title')||button.textContent?.trim()), pressed:button.getAttribute('aria-pressed') })) })) };
+        blocks:${blocks}.map(card => ({ ...rect(card), plate:rect(card.querySelector('[data-code-plate]')), pre:rect(card.querySelector('pre')), buttons:Array.from(card.querySelectorAll('button')).map(button=>({ ...rect(button), label:button.getAttribute('aria-label'), text:button.textContent, named:Boolean(button.getAttribute('aria-label')||button.getAttribute('title')||button.textContent?.trim()), pressed:button.getAttribute('aria-pressed') })) })) };
     })()`);
     const tap = async (index: number, kind: "copy" | "wrap", touch = true) => {
       const selector = "[data-code-plate] button";
@@ -169,6 +169,8 @@ async function connect(url: string) {
       for (const card of layout.blocks) {
         expect(card.left).toBeGreaterThanOrEqual(0);
         expect(card.right).toBeLessThanOrEqual(width);
+        // The always-on touch plate owns a band above the code; the first line must start below it.
+        if (touch) expect(card.plate.bottom).toBeLessThanOrEqual(card.pre.top);
         for (const button of card.buttons) {
           expect(button.left).toBeGreaterThanOrEqual(card.left);
           expect(button.right).toBeLessThanOrEqual(card.right);

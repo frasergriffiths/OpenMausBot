@@ -657,6 +657,13 @@ export function AccessSection({
   const worksOn = placeViewFor(placeFacts({
     bot, place: bot.computer ?? "auto", seat: placeSeat, config: state.config, instances: state.instances,
   }));
+  // The heading names the place; a state ("Ready", "Asleep", "Switched off") belongs to the Computer panel,
+  // which reads it live. Only Auto and Off keep their descriptive short words.
+  const worksOnLabel = worksOn.state.startsWith("cc-") ? t("place.cloud")
+    : worksOn.state === "browser" || worksOn.state === "browser-off" || worksOn.state === "browser-cannot" ? t("place.browser")
+      : worksOn.state === "local" || worksOn.state === "local-unavailable" ? t("place.local")
+        : worksOn.state === "vm" || worksOn.state === "vm-cannot" ? t("place.vm")
+          : worksOn.short;
   // The same list the Vault tab shows: Composio's connected accounts plus the native HighLevel connection.
   const apps = useBotApps(bot);
   const inventoryReady = apps.phase === "ready";
@@ -670,7 +677,7 @@ export function AccessSection({
   return (
     <div className="flex flex-col gap-4">
       {shows("worksOn") && <div className="rounded-xl bg-card p-4" data-testid="access-works-on">
-        <div className="text-[15px] font-medium text-ink">{t("access.worksOn", { name: bot.name, short: worksOn.short })}</div>
+        <div className="text-[15px] font-medium text-ink">{t("access.worksOn", { name: bot.name, short: worksOnLabel })}</div>
         <ProposalStatus bot={bot} kind="owner" />
         <button
           type="button"

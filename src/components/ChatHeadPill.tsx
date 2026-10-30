@@ -44,7 +44,7 @@ export function ChatHeadPill({ bot, avatar, privacy, onToggle }: {
       <BotAvatar bot={bot} size={24} {...avatar} />
       <span dir="auto" className="pointer-events-none min-w-0 truncate text-[14px] font-medium leading-5">{bot.name}</span>
       {privacyLabel && (
-        <span data-chathead-privacy={privacy?.kind} title={privacyLabel} className="flex shrink-0 text-ink-tertiary">
+        <span data-chathead-privacy={privacy?.kind} title={privacyLabel} className="pointer-events-auto flex shrink-0 text-ink-tertiary">
           <PrivacyIcon size={13} aria-hidden="true" />
           <span className="sr-only">{privacyLabel}</span>
         </span>

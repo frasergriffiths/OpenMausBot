@@ -246,6 +246,8 @@ export function CodeBlock({ code, lang, initialWrap = false }: CodeBlockProps) {
 
   return (
     <div dir="ltr" className="chat-code-block group/code relative my-2.5 overflow-hidden rounded-lg bg-ink/[0.04]">
+      {/* On touch the plate is always shown at 44px targets; give it a band of its own so it never covers code. */}
+      <div aria-hidden="true" className="hidden h-14 touch:block" />
       <CodePlate copied={copied} onCopy={copy} copyLabel={t("code.copyTitle")} items={[
         { key: "wrap", label: t("code.wrapLines"), icon: <WrapText size={14} aria-hidden="true" />, active: wrapLines, onSelect: () => setWrapLines((wrap) => !wrap) },
         { key: "save", label: t("code.saveAsFile"), icon: <Download size={14} aria-hidden="true" />, onSelect: download },
