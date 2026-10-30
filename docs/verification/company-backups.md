@@ -139,7 +139,7 @@ retained evidence is separate from disposable workspace data.
 
 ```sh
 node --test electron/company-backups.node-test.mjs
-pnpm exec vitest run src/components/CompanyBackupSettings.test.ts src/components/WorkspaceBackupSettings.test.ts src/components/OrganizationSettings.test.ts
+pnpm exec vitest run src/components/CompanyBackupSettings.test.ts src/components/WorkspaceBackupSettings.test.ts
 ```
 
 The native unit fixtures additionally cover bounded responses, unsafe storage

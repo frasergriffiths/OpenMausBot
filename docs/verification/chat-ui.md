@@ -148,7 +148,7 @@ screenshot; it is not one of the required checks.
 
 ```sh
 OMB_UI_E2E=1 pnpm exec vitest run scripts/testing/mobile-code-blocks-ui.e2e.test.ts
-pnpm exec vitest run src/components/ChatMarkdown.block-actions.test.ts src/components/ChatMarkdown.test.ts src/lib/copy-text.test.ts
+pnpm exec vitest run src/components/ChatMarkdown.test.ts src/lib/copy-text.test.ts
 ```
 
 The browser recipe sends a synthetic reply through a disposable fake-engine
