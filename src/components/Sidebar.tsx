@@ -1237,7 +1237,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       requestAnimationFrame(() => document.querySelector<HTMLInputElement>("[data-sidebar-search-pill] input")?.focus());
     }
   };
-  const plusItem = cn(SIMPLE_MENU_ITEM, "text-ink hover:bg-menu-hover");
+  const plusItem = cn(SIMPLE_MENU_ITEM, "[&>*]:pointer-events-none text-ink hover:bg-menu-hover");
   const plusControl = (
     <div ref={plusMenuRef} className="contents">
     <button

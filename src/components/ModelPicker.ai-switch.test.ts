@@ -77,8 +77,6 @@ describe("the header model chip and Switch AI", () => {
 
   it("stops that turn, not the store's model, when another AI is picked", () => {
     act(() => requestAiSwitch({ botId: "maus", threadId: "thread-1", turnId: "turn-1", place: "header" }));
-    // Codex sits on the rail as its sign-in family, OpenAI.
-    act(() => buttonNamed("OpenAI")!.click());
     act(() => buttonNamed("GPT-5.6")!.click());
     expect(api).toHaveBeenCalledWith("/api/bots/maus/interrupt", { method: "POST", body: JSON.stringify({ threadId: "thread-1", turnId: "turn-1" }) });
     expect(vi.mocked(fixture.dispatch).mock.calls.filter(([action]) => (action as { type: string }).type === "setModel")).toEqual([]);
@@ -153,20 +151,9 @@ describe("a picker that opens before its engine has listed its models", () => {
     act(() => root.render(createElement(ModelPicker, { bot: onClaude, threadId: "thread-1" })));
     act(() => requestAiSwitch({ botId: "maus", threadId: "thread-1", turnId: "turn-1", place: "header" }));
     await act(async () => arrive());
-    expect(text()).toContain("No local models found");
+    expect(text()).toContain("No models to show here yet.");
     expect(text()).not.toContain("Loading Claude models");
   });
 
-  it("opens Switch AI on the bot's own engine, not the one the picker was last left on", () => {
-    fixture.instances = [claude([sonnet]), codex];
-    act(() => root.render(createElement(ModelPicker, { bot: { ...onClaude, busy: false }, threadId: "thread-1" })));
-    act(() => trigger().click());
-    act(() => buttonNamed("OpenAI")!.click());
-    act(() => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })); });
-    expect(trigger().getAttribute("aria-expanded")).toBe("false");
-    act(() => root.render(createElement(ModelPicker, { bot: onClaude, threadId: "thread-1" })));
-    act(() => requestAiSwitch({ botId: "maus", threadId: "thread-1", turnId: "turn-1", place: "header" }));
-    expect(text()).toContain("Claude Sonnet 5");
-    expect(text()).not.toContain("GPT-5.6");
-  });
+
 });

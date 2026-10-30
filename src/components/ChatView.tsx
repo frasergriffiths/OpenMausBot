@@ -1076,7 +1076,7 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
           >
             <Monitor size={18} />{busy && place === "browser" && <span aria-hidden="true" className="absolute right-1 top-1 size-1.5 animate-pulse rounded-full bg-success" data-testid="computer-button-live" />}
           </button>}
-          {phoneMenu ? <ChatMoreMenu bot={bot} phoneHeader /> : remoteClient && <ChatHeaderMenu key={`menu:${bot.threadId}`} bot={bot} />}
+          {phoneMenu ? <ChatMoreMenu bot={bot} phoneHeader /> : remoteClient ? <ChatHeaderMenu key={`menu:${bot.threadId}`} bot={bot} /> : simpleHead && <ChatMoreMenu bot={bot} />}
         </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { WelcomeBring } from "./WelcomeBring";
 
 const bring = (team: boolean) => renderToStaticMarkup(createElement(WelcomeBring, { name: "Acme", desktop: true, cloudHasWork: false, team,
-  headingRef: { current: null }, onTeam: () => {}, onFinish: () => {} }));
+  headingRef: { current: null }, onFinish: () => {} }));
 
 describe("the first setup step's promise", () => {
   it("on a Team Cloud, never says the bots on this computer come here by themselves", () => {

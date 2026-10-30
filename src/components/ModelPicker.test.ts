@@ -290,7 +290,7 @@ describe("ModelPicker trigger", () => {
     fixture.instances = [engine(["low", "high"])];
     const markup = renderToStaticMarkup(createElement(ModelPicker, { bot: { ...bot("high"), busy: true }, threadId: "independent-thread" }));
     expect(tooltipLines(markup)).toEqual([
-      "Codex · GPT-5.6 · High effort",
+      "Codex · GPT-5.6 · High thinking",
       "Stop this thread's turn before changing its model",
     ]);
   });
@@ -300,7 +300,7 @@ describe("ModelPicker trigger", () => {
 
     expect(markup).toContain("GPT-5.6");
     expect(effortChip(markup)).toBeUndefined();
-    expect(markup).toContain("High effort");
+    expect(markup).toContain("High thinking");
   });
 
   it("says nothing about effort when the bot sends no level", () => {

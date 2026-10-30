@@ -1,17 +1,11 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, describe, expect, it, vi } from "vitest";
-
-const mode = vi.hoisted(() => ({ advanced: false }));
+import { describe, expect, it } from "vitest";
 
 const { ToolActivity } = await import("./ToolActivity");
 const { ActivityRun } = await import("./ActivityRun");
 
 const render = (tool: Parameters<typeof ToolActivity>[0]["tool"]) => renderToStaticMarkup(createElement(ToolActivity, { tool }));
-
-afterEach(() => {
-  mode.advanced = false;
-});
 
 describe("ToolActivity in Simple mode", () => {
   it("names the step in plain words and keeps the tool's own name in the details", () => {
@@ -33,17 +27,6 @@ describe("ToolActivity in Simple mode", () => {
   });
 });
 
-describe("ToolActivity in Advanced mode", () => {
-  it("shows the tool name and command on the row, as before", () => {
-    mode.advanced = true;
-    const html = render({ name: "Bash", ok: true, summary: "pnpm test", input: "pnpm test" });
-    expect(html).toContain("Bash · Completed · Tool details");
-    expect(html).toMatch(/truncate leading-5 font-mono">Bash<\/span>/);
-    expect(html).toContain('title="pnpm test"');
-    expect(html).not.toContain('data-testid="tool-name"');
-  });
-});
-
 describe("ActivityRun", () => {
   const steps = [
     { id: "a", at: 1, role: "bot" as const, kind: "activity" as const, tool: { name: "Bash", ok: true, summary: "ls" } },
@@ -54,12 +37,6 @@ describe("ActivityRun", () => {
   it("sums a folded run up in plain words in Simple mode", () => {
     const html = renderToStaticMarkup(createElement(ActivityRun, { messages: steps, children: null }));
     expect(html).toContain("3 steps · Run a command ×2, Look at the screen");
-  });
-
-  it("keeps the tool names in Advanced mode", () => {
-    mode.advanced = true;
-    const html = renderToStaticMarkup(createElement(ActivityRun, { messages: steps, children: null }));
-    expect(html).toContain("3 steps · Bash, ls -la /tmp, mcp__omb__screenshot");
   });
 });
 

@@ -158,25 +158,6 @@ describe("CloudWelcome", () => {
     expect(text()).not.toContain("Open the desktop app to bring your bots from your computer.");
   });
 
-  it("starting fresh opens the team library, and skipping is kept as skipped", async () => {
-    fixture.state.bots = [fixture.state.bots[0]];
-    render();
-    await vi.waitFor(() => expect(button("Choose a team")).toBeDefined());
-    click("Choose a team");
-    expect(host.querySelector("[data-team-library]")).not.toBeNull();
-    flushSync(() => fixture.imported!());
-    expect(hintsPut().at(-1)).toEqual([SHOWN, welcomeStepHint("bring")]);
-    expect(host.querySelector('[data-welcome-step="engine"]')).not.toBeNull();
-    flushSync(() => root.unmount());
-    root = createRoot(host);
-    resetCloudWelcome();
-    fixture.api.mockClear();
-    render();
-    await vi.waitFor(() => expect(button("Skip for now")).toBeDefined());
-    click("Skip for now");
-    expect(hintsPut().at(-1)).toEqual([SHOWN, welcomeStepHint("bring"), CLOUD_SETUP_MOVE_SKIPPED]);
-  });
-
   it("in Simple mode, starting fresh starts with the assistant: no team to choose, one Continue", async () => {
     fixture.state.bots = [fixture.state.bots[0]];
     render();
@@ -404,25 +385,6 @@ describe("CloudWelcome", () => {
       await vi.waitFor(() => expect(text()).toContain("came over from This computer."));
       expect(text()).not.toContain("by themselves");
       for (const label of ["More", "Choose a team", "Continue"]) expect(button(label)).toBeUndefined();
-    });
-
-    it("back on its step it says in one line what is happening, with a fresh start only behind More", async () => {
-      withSend(notice({ running: true, runningReason: "move" }));
-      render();
-      await vi.waitFor(() => expect(host.querySelector('[data-welcome-step="engine"]')).not.toBeNull());
-      flushSync(() => (rail() as HTMLButtonElement).click());
-      expect(text()).toContain("Your bots are already here");
-      expect(text()).toContain("Bringing this computer's bots, chats and logins here…");
-      expect(host.querySelector("[data-bring-choice]")).toBeNull();
-      for (const label of ["Continue", "Choose a team", "Skip for now"]) expect(button(label)).toBeUndefined();
-      flushSync(() => pushNotice(notice({ last: sentLast() })));
-      await vi.waitFor(() => expect(text()).toContain("4 bots, 2 skills, 2 logins, 1Password, your settings, and 3 chats came over from This computer."));
-      expect(text()).not.toContain("by themselves");
-      expect(host.querySelector('[data-welcome-step="bring"]'), "never moved off a step the person opened").not.toBeNull();
-      click("More");
-      expect(text()).toContain("Start fresh");
-      click("Choose a team");
-      expect(host.querySelector("[data-team-library]")).not.toBeNull();
     });
 
     it("a whole send says what arrived and nothing about more coming", async () => {

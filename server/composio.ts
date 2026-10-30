@@ -1,5 +1,5 @@
 import type { AppConfig } from "./config.ts";
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { SPAWNED_PROXIES } from "./proxy-paths.ts";
 import { managedConnectorUnavailableReason, managedCustomAuthReason } from "../shared/connector-availability.ts";
@@ -17,6 +17,7 @@ import {
 import { MULTI_ACCOUNT_CONFIG, authConfigRefusal, ensureProjectSession, projectApiKey, sessionForToolkit } from "./composio-session.ts";
 import { authConfigUseLine, noManagedAuthToolkit, withNoManagedAuthNote } from "./connector-auth-config-hint.ts";
 import { planAccountLink } from "../shared/connector-account-link.ts";
+import { backendFingerprint, canonicalServiceRecord, requestedServiceRecord, validAccountId } from "./composio-records.ts";
 import type { CuratedConnectorSlug } from "../shared/connector-curated.ts";
 import { CONNECTOR_TOOL_NAME_PATTERN, type ConnectorToolGrant } from "../shared/wire.ts";
 import {
@@ -92,7 +93,6 @@ const authUrlResponseSchema = z.object({ url: z.string().optional() });
 const linkResponseSchema = z.object({ redirect_url: z.string().optional() });
 
 const MAX_CONNECTED_ACCOUNT_PAGES = 100;
-const ACCOUNT_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/;
 const printableAliasSchema = z.string().min(1).max(64).refine((value) => {
   for (const character of value) {
     const codePoint = character.codePointAt(0);
@@ -119,17 +119,6 @@ interface IntegrationContext {
   as?: BrokerAccess;
 }
 
-/** Separates caches and transports per credential without keeping another plaintext copy of it. */
-function backendFingerprint(kind: string, endpoint: string, credential: string): string {
-  return createHash("sha256")
-    .update(kind)
-    .update("\0")
-    .update(endpoint)
-    .update("\0")
-    .update(credential)
-    .digest("hex");
-}
-
 const MAX_TRACKED_TRANSPORT_SESSIONS = 512;
 const transportSessionBackends = new Map<string, string>();
 
@@ -141,22 +130,6 @@ function rememberTransportSession(sessionId: string, identity: string): void {
     if (oldest === undefined) break;
     transportSessionBackends.delete(oldest);
   }
-}
-
-function canonicalServiceRecord<T>(services: Record<string, T>): Record<string, T> {
-  return Object.fromEntries(
-    Object.entries(services).map(([slug, state]) => [canonicalToolkitSlug(slug), state]),
-  );
-}
-
-function requestedServiceRecord<T>(services: Record<string, T>, requested: string[]): Record<string, T> {
-  const canonical = canonicalServiceRecord(services);
-  return Object.fromEntries(
-    requested.flatMap((slug) => {
-      const state = canonical[canonicalToolkitSlug(slug)];
-      return state === undefined ? [] : [[slug, state]];
-    }),
-  );
 }
 
 export function connectionMode(cfg: AppConfig): "managed" | "self-hosted" | "unavailable" {
@@ -226,10 +199,6 @@ export function normalizeAccountAlias(value: string | null | undefined): string 
     throw inputError("Account alias must be 1-64 printable characters");
   }
   return alias;
-}
-
-function validAccountId(value: string | undefined): value is string {
-  return Boolean(value && ACCOUNT_ID.test(value));
 }
 
 /** Composio's wording when a toolkit needs one of the project's own auth configs. */

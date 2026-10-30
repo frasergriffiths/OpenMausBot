@@ -156,7 +156,6 @@ export function CloudWelcome() {
   if (view === "bring" && asking) content = null;
   else if (view === "bring") {
     content = <WelcomeBring name={name} team={Boolean(state.config?.team)} desktop={Boolean(sendBridge)} older={older} cloudHasWork={cloudHasWork} sent={sent && { state: sent.state, arrived: sent.state === "sent" && sent.last ? countedList(sent.last.sent) : null }} headingRef={heading}
-      onTeam={() => { reanchor.current = true; }}
       onFinish={finishBring} />;
   } else if (view === "engine") content = <WelcomeEngine name={name} headingRef={heading} onFinish={() => finish("engine")} />;
   else if (view === "files") content = <WelcomeFiles name={name} headingRef={heading} onFinish={() => finish("files")} />;

@@ -641,14 +641,16 @@ export function orderedThreadList<T extends { lastThreadOrderAt?: number; create
 export const isSnoozed = (task: Pick<WireTask, "snoozedUntil">, now = Date.now()): boolean =>
   task.snoozedUntil !== undefined && (task.snoozedUntil === 0 || task.snoozedUntil > now);
 
-type OpenThreadCandidate = Pick<WireTask, "routineRunId" | "archivedAt" | "closedBy" | "openedBy" | "snoozedUntil" | "lastThreadOrderAt" | "createdAt">;
+type OpenThreadCandidate = Pick<WireTask, "routineRunId" | "archivedAt" | "closedBy" | "openedBy" | "snoozedUntil" | "lastThreadOrderAt" | "createdAt" | "pinned">;
 
 /** The top row of the bot's thread list, so deleting the open thread never pulls a hidden one into view. */
 export function nextOpenThread<T extends OpenThreadCandidate>(tasks: readonly T[], now = Date.now()): T | undefined {
   const own = tasks.filter((task) => !task.routineRunId);
   const open = own.filter((task) => task.archivedAt === undefined);
   const listed = open.filter((task) => !(task.closedBy || task.openedBy || isSnoozed(task, now)));
-  return [listed, open, own].map((candidates) => orderedThreadList(candidates)[0]).find((task) => task !== undefined);
+  // A pinned thread stays the open one when the thread that was open goes.
+  const top = (candidates: T[]) => orderedThreadList(candidates.filter((task) => task.pinned))[0] ?? orderedThreadList(candidates)[0];
+  return [listed, open, own].map(top).find((task) => task !== undefined);
 }
 
 export interface OptionCardData {

@@ -64,6 +64,8 @@ describe("Preset bots in the real renderer", () => {
     await expect.poll(snapshot, { timeout: 10_000 }).toContain('button "You"');
     await click("You");
     await click("Settings");
+    await expect.poll(snapshot, { timeout: 10_000 }).toContain('button "AI"');
+    await click("AI");
     await expect.poll(snapshot, { timeout: 10_000 }).toContain("Share as preset…");
     await click("Share as preset…");
     await expect.poll(snapshot, { timeout: 20_000 }).toContain("What's in the file");
@@ -126,11 +128,14 @@ describe("Preset bots in the real renderer", () => {
       await expect.poll(snapshot, { timeout: 20_000 }).toContain("Add Scout, Researcher");
       await click("Add Scout, Researcher");
       await expect.poll(async () => (await ui("eval", "--js", "[...document.querySelectorAll('[role=dialog] button')].find(button => button.textContent.trim() === 'Create bot')?.disabled")).result, { timeout: 20_000 }).toBe(false);
-      await expect.poll(() => evaluate("[...document.querySelectorAll('[role=dialog] select optgroup')].map(group => group.label).join(' | ')"), { timeout: 10_000 })
-        .toBe("From Acme Partners | Imported presets | Built-in roles");
-      // Native select popups do not take routed keys reliably in headless
-      // Chrome; the real select's change handler runs without the OS popup.
-      await evaluate(`(() => { const select = [...document.querySelectorAll('[role=dialog] select')].find(item => item.querySelector('optgroup')); select.value = ${JSON.stringify(value)}; select.dispatchEvent(new Event('change', { bubbles: true })); return true; })()`);
+      const groups = () => evaluate("(() => { const el = [...document.querySelectorAll('[data-select-groups]')].find(item => (item.getAttribute('data-select-groups') ?? '').includes('Built-in roles')); return el?.getAttribute('data-select-groups') ?? ''; })()");
+      await expect.poll(groups, { timeout: 10_000 }).toBe("From Acme Partners|Imported presets|Built-in roles");
+      // The Simple picker is a custom listbox, not a native select: open its trigger and click the option.
+      const presetLabel = await evaluate(`(() => { const el = [...document.querySelectorAll('[data-select-values]')].find(item => (item.getAttribute('data-select-values') ?? '').split('|').includes(${JSON.stringify(value)})); if (!el) return null; const values = el.getAttribute('data-select-values').split('|'); return el.getAttribute('data-select-labels').split('|')[values.indexOf(${JSON.stringify(value)})]; })()`);
+      expect(presetLabel).toBeTruthy();
+      await evaluate(`(() => { const el = [...document.querySelectorAll('[data-select-groups]')].find(item => (item.getAttribute('data-select-groups') ?? '').includes('Built-in roles')); el.click(); return true; })()`);
+      await expect.poll(() => evaluate("[...document.querySelectorAll('[role=option]')].map(option => option.textContent.trim()).join(' | ')"), { timeout: 5_000 }).toContain(presetLabel);
+      await evaluate(`(() => { const option = [...document.querySelectorAll('[role=option]')].find(item => item.textContent.trim() === ${JSON.stringify(presetLabel)}); option.click(); return true; })()`);
       await expect.poll(snapshot, { timeout: 10_000 }).toContain(expected);
       await ui("screenshot", "--out", evidence(shot));
       await click("Create bot");

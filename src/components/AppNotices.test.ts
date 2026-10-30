@@ -20,6 +20,8 @@ vi.mock("react", async original => ({ ...await original<typeof import("react")>(
   useState: (initial: unknown) => { const index = f.index++; if (!(index in f.values)) f.values[index] = typeof initial === "function" ? initial() : initial;
     return [f.values[index], (next: unknown) => { f.values[index] = typeof next === "function" ? (next as (value: unknown) => unknown)(f.values[index]) : next; }]; },
   useEffect: (effect: EffectCallback) => { f.effects.push(effect); },
+  // The cards are called as plain functions here, so React's dispatcher is absent: give the hooks they use real storage.
+  useRef: (initial: unknown) => ({ current: initial }),
   useSyncExternalStore: (_subscribe: unknown, snapshot: () => unknown) => snapshot(),
 }));
 vi.mock("@/state/store", () => ({ useStore: () => ({ state: f.state, dispatch: f.dispatch }), api: vi.fn().mockResolvedValue({}),
@@ -61,6 +63,14 @@ let viewer: WelcomeViewer | null;
 let bridges: { cloud: Record<string, ReturnType<typeof vi.fn>>; plan: Record<string, ReturnType<typeof vi.fn>> };
 let accountListeners: Set<(next: CloudAccountState) => void>;
 let now: number;
+
+/** A plain document stand-in: cards that watch page visibility still need the listener pair. */
+const fakeDocument = (extra: Record<string, unknown> = {}) => ({
+  activeElement: null as unknown, body: null as unknown,
+  getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],
+  addEventListener: () => {}, removeEventListener: () => {}, visibilityState: "visible",
+  ...extra,
+});
 
 const PRELOAD = readFileSync(join(process.cwd(), "electron", "preload.cjs"), "utf8").replace(/\r\n/g, "\n");
 const LOCAL_ORIGIN = "http://127.0.0.1:8799", MY_CLOUD = "https://omb-u-1.fly.dev", VPS = "https://bots.example.test";
@@ -151,7 +161,7 @@ beforeEach(() => {
     plan: { state: vi.fn(async () => { if (snapshot instanceof Error) throw snapshot; return snapshot; }), manage: vi.fn(async () => {}), noticeSeen: vi.fn(async () => {}) },
   };
   showWindow(LOCAL_ORIGIN);
-  vi.stubGlobal("document", { activeElement: null, body: null, getElementById: () => null, querySelector: () => null, querySelectorAll: () => [] });
+  vi.stubGlobal("document", fakeDocument());
 });
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); setLocale("en"); });
 
@@ -449,9 +459,9 @@ describe("the Cloud Pro popup after the update", () => {
 
   beforeEach(() => {
     fresh(); modal = false;
-    vi.stubGlobal("document", { activeElement: TITLE, body: null, getElementById: () => null,
+    vi.stubGlobal("document", fakeDocument({ activeElement: TITLE,
       querySelector: (selector: string) => selector === "[data-cloud-pro-popup]" ? DIALOG : null,
-      querySelectorAll: () => modal ? [{ closest: () => null, checkVisibility: () => true }] : [] });
+      querySelectorAll: () => modal ? [{ closest: () => null, checkVisibility: () => true }] : [] }));
   });
 
   it("every install gets it once, before every other card, as a modal dialog with the Admin's offer; Start free trial opens Add a Cloud from it", async () => {
@@ -943,8 +953,8 @@ describe("main's Use my Mac popup, once the moment is right", () => {
   };
   beforeEach(() => {
     due = true; modal = false; answer = null; asked.length = 0; wireLending(); returning(); storage.set(CLOUD_INTRO, "1");
-    vi.stubGlobal("document", { activeElement: null, body: null, getElementById: () => null, querySelector: () => null,
-      querySelectorAll: () => modal ? [{ closest: () => null, checkVisibility: () => true }] : [] });
+    vi.stubGlobal("document", fakeDocument({
+      querySelectorAll: () => modal ? [{ closest: () => null, checkVisibility: () => true }] : [] }));
   });
 
   it("asks main first, in the page's language, draws nothing itself, and nothing else shows until it is answered; then only the next launch's cards", async () => {

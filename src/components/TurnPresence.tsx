@@ -127,13 +127,16 @@ export function TurnPresence({
       >
         {avatar}
         {showWorking && simple ? (
-          <span className="turn-phrase turn-phrase-quiet relative grid text-[14px] leading-[22px] text-ink-tertiary" data-turn-status data-turn-now={now ? "" : undefined}>
-            {now ? (
-              <ShimmerPhrase key={`in:${current}`} text={current} className={previous !== null ? "turn-phrase-in" : undefined} />
-            ) : (
-              <span>{label ?? t("chat.typing")}</span>
-            )}
-          </span>
+          <>
+            <span className="turn-phrase turn-phrase-quiet relative grid text-[14px] leading-[22px] text-ink-tertiary" data-turn-status data-turn-now={now ? "" : undefined}>
+              {now ? (
+                <ShimmerPhrase key={`in:${current}`} text={current} className={previous !== null ? "turn-phrase-in" : undefined} />
+              ) : (
+                <span>{label ?? t("chat.typing")}</span>
+              )}
+            </span>
+            {since !== null && <span className="flex items-center gap-1.5 text-[12px] text-ink-tertiary"><Dot /><WorkingTimer since={since} /></span>}
+          </>
         ) : showWorking ? (
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-1 leading-none" data-turn-status>
             {now ? <span className="text-[13px] text-ink-secondary">{lead}</span> : <ShimmerPhrase text={lead} className="text-[13px]" />}

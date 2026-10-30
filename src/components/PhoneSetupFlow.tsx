@@ -66,7 +66,6 @@ import {
 } from "../lib/companion-state";
 import { ConnectionDetail } from "./ConnectionDetail";
 import { brand } from "../lib/brand";
-
 export interface PhoneDevice {
   id: string;
   name: string;

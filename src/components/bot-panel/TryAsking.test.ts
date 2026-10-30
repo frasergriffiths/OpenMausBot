@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setLocale } from "@/lib/i18n";
 import type { Bot } from "@/state/store";
 
-const f = vi.hoisted(() => ({ advanced: false, dispatch: vi.fn() }));
+const f = vi.hoisted(() => ({ dispatch: vi.fn() }));
 vi.mock("@/state/store", () => ({ useStore: () => ({ state: {}, dispatch: f.dispatch }) }));
 vi.mock("../HelperIntro", () => ({ HELPER_ASK_KEYS: ["helperIntro.ask.overview", "helperIntro.ask.inbox", "helperIntro.ask.routine", "helperIntro.ask.howto"] }));
 const { TryAsking } = await import("./TryAsking");
@@ -18,7 +18,6 @@ const show = async (target: Bot) => { await act(async () => { root.render(create
 
 beforeEach(() => {
   setLocale("en");
-  f.advanced = false;
   f.dispatch.mockReset();
   host = document.createElement("div");
   document.body.append(host);
@@ -39,11 +38,8 @@ describe("Try asking", () => {
     expect(f.dispatch).toHaveBeenCalledWith({ type: "send", botId: "maus", text: "Set up a bot for my inbox", threadId: "t" });
   });
 
-  it("is MausBot's alone, and Simple mode's", async () => {
+  it("is MausBot's alone", async () => {
     await show(bot({ defaultBot: undefined }));
-    expect(host.textContent).toBe("");
-    f.advanced = true;
-    await show(bot());
     expect(host.textContent).toBe("");
   });
 });
