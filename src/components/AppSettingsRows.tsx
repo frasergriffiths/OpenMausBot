@@ -300,6 +300,8 @@ export function SidebarDensityRow() {
         {SIDEBAR_DENSITIES.map((option) => (
           <option key={option} value={option}>{t(SIDEBAR_DENSITY_LABEL_KEYS[option])}</option>
         ))}
+        {/* Avatars only is the collapsed state, not a normal choice, but the current value must still show when open. */}
+        {density === "icons" && <option value="icons">{t(SIDEBAR_DENSITY_LABEL_KEYS.icons)}</option>}
       </Select>
     </SettingRow>
   );
