@@ -1125,9 +1125,9 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
           ) : hiddenCount > 0 || bot.hasMore ? (
             <>
               <div ref={topSentinelRef} className="h-2 w-full pointer-events-none" aria-hidden="true" />
-              <div className="flex justify-center py-1">
-                <button type="button" className="ui-pill" onClick={() => (bot.hasMore ? loadOlder() : showEarlier())}>
-                  {bot.hasMore ? t("chat.loadEarlier") : t("chat.showEarlier", { count: hiddenCount })}
+              <div className="flex justify-center">
+                <button type="button" className="ui-pill" onClick={() => (hiddenCount > 0 ? showEarlier() : loadOlder())}>
+                  {hiddenCount > 0 ? t("chat.showEarlier", { count: hiddenCount }) : t("chat.loadEarlier")}
                 </button>
               </div>
             </>
