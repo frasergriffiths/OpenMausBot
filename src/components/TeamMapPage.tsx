@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, BookOpen, Box, Loader2, Monitor, Plus, Save, Users, UsersRound, X } from "lucide-react";
+import { ArrowRight, BookOpen, Box, Brain, Loader2, Monitor, Plus, Save, Users, UsersRound, X } from "lucide-react";
 
 import { api, formatTime, openBot, openThread, useStore, type Bot } from "@/state/store";
 import {
   EMPTY_TEAM_MAP_SNAPSHOT,
   buildTeamMapEdges,
   buildTeamMapSections,
+  moveBotRequest,
   teamMapBotCount,
   type TeamMapEdge,
   type TeamMapSnapshot,
@@ -15,7 +16,7 @@ import { cn } from "@/lib/cn";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { useCaptionChrome } from "@/components/DesktopCapabilities";
 import { placeOffered } from "@/lib/place";
-import { TeamCanvas } from "./TeamCanvas";
+import { TeamBoard } from "./TeamBoard";
 import { MapModeToggle, TeamOrgChart, useMapMode } from "./TeamOrgChart";
 import { useTeamPeople } from "@/state/team-people";
 import { TeamDialog } from "./TeamDialog";
@@ -28,6 +29,9 @@ import { MapComposer } from "./MapComposer";
 import { openBotSettings } from "./bot-panel/panel-link";
 import type { TeamComputer } from "../../shared/team-computer";
 import { Chevron } from "./chevron";
+import { Switch } from "./SettingsPrimitives";
+import { MENU_LABEL, MENU_ROW } from "./menu-recipe";
+import { SIMPLE_MENU } from "./SidebarSimpleTop";
 
 export function EdgeRow({ edge, bots }: { edge: TeamMapEdge; bots: Bot[] }) {
   const { state, dispatch } = useStore();
@@ -265,6 +269,18 @@ function SectionContextDialog({ section, label, onClose }: { section: string; la
 
 /** How long a card acknowledges a message sent from the map; its border fades within this. */
 const SENT_HIGHLIGHT_MS = 1_400;
+const menuRow = cn(MENU_ROW, "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus");
+
+function moveMenuFocus(event: ReactKeyboardEvent<HTMLElement>) {
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+  const items = [...event.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]:not([disabled])')];
+  if (!items.length) return;
+  event.preventDefault();
+  const index = items.indexOf(document.activeElement as HTMLElement);
+  const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+    : event.key === "ArrowDown" ? (index + 1) % items.length : (index - 1 + items.length) % items.length;
+  items[next].focus();
+}
 
 export function TeamMapPage() {
   const { state, dispatch } = useStore();
@@ -276,7 +292,9 @@ export function TeamMapPage() {
   const [error, setError] = useState<string | null>(null);
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [contextEditor, setContextEditor] = useState<{ section: string; label: string } | null>(null);
-  const [memoryEditor, setMemoryEditor] = useState<{ section: string; label: string } | null>(null);
+  const [memoryEditor, setMemoryEditor] = useState<{ section: string; label: string; fromHeader: boolean } | null>(null);
+  const memoryTrigger = useRef<HTMLElement | null>(null);
+  const memoryMenu = useRef<HTMLDetailsElement>(null);
   const [teamEditor, setTeamEditor] = useState<{ section?: string; rename?: boolean } | null>(null);
   const [deletingTeam, setDeletingTeam] = useState<string | null>(null);
   const [computersOpen, setComputersOpen] = useState(false);
@@ -291,8 +309,10 @@ export function TeamMapPage() {
   const bots = useMemo(() => state.bots.filter((bot) => !bot.hidden), [state.bots]);
   const sections = useMemo(() => {
     const names = [...new Set([...(state.sections ?? []), ...state.groups.flatMap((group) => group.section ? [group.section] : [])])];
-    const order = (key: string) => key === "" ? -1 : names.includes(key) ? names.indexOf(key) : names.length;
-    return buildTeamMapSections(bots, names).sort((a, b) => order(a.key) - order(b.key));
+    const order = (key: string) => key === "" ? names.length : names.includes(key) ? names.indexOf(key) : names.length;
+    const namedGeneral = names.some((name) => name.trim() === "General");
+    return buildTeamMapSections(bots, names).sort((a, b) => order(a.key) - order(b.key))
+      .map((section) => section.key === "" && namedGeneral ? { ...section, name: t("canvas.generalUngrouped") } : section);
   }, [bots, state.sections, state.groups]);
   const edges = useMemo(() => buildTeamMapEdges(bots, snapshot), [bots, snapshot]);
   const anyComputer = bots.some((bot) => bot.computer === "cloud" && bot.cloudBackend !== "vps") || computers.some((computer) => computer.section !== null);
@@ -309,7 +329,7 @@ export function TeamMapPage() {
   useEffect(() => () => window.clearTimeout(sentTimer.current), []);
   const composerTeams = useMemo(() => sections.map((section) => ({ key: section.key, name: section.name, count: section.chiefs.length + section.members.length })), [sections]);
 
-  // `background`: the 3-second poll, which never wakes a Cloud home that went to sleep.
+  // The 3-second poll never wakes a Cloud home that went to sleep.
   const refresh = useCallback(async (background = false) => {
     try {
       setSnapshot(await api("/api/team-map", background ? { background } : undefined));
@@ -330,8 +350,9 @@ export function TeamMapPage() {
   const moveBot = async (bot: Bot, destination: string) => {
     setError(null);
     try {
-      const result: { sections: string[]; bots: Bot[] } = await api("/api/sidebar-sections", {
-        method: "POST", body: JSON.stringify({ name: destination, botIds: [bot.id] }),
+      const request = moveBotRequest(bot.id, destination, sections.map((section) => section.key));
+      const result: { sections: string[]; bots: Bot[] } = await api(request.path, {
+        method: request.method, body: JSON.stringify(request.body),
       });
       dispatch({ type: "sections", sections: result.sections });
       for (const patched of result.bots) dispatch({ type: "botPatched", bot: patched });
@@ -349,70 +370,132 @@ export function TeamMapPage() {
     pendingMoveRef.current?.resolve(false);
     setPendingMove(null);
   }, []);
+  const closeMemoryMenu = (restoreFocus = false) => {
+    memoryMenu.current?.removeAttribute("open");
+    if (restoreFocus) memoryTrigger.current?.focus({ preventScroll: true });
+  };
+  const openMemory = (section: string, label: string, fromHeader: boolean) => {
+    setMemoryEditor({ section, label, fromHeader });
+  };
+  const closeMemory = () => {
+    const fromHeader = memoryEditor?.fromHeader === true;
+    const section = memoryEditor?.section;
+    setMemoryEditor(null);
+    requestAnimationFrame(() => {
+      if (fromHeader) { memoryTrigger.current?.focus({ preventScroll: true }); return; }
+      const panel = [...document.querySelectorAll<HTMLElement>("[data-team-key]")].find((element) => element.dataset.teamKey === section);
+      panel?.querySelector<HTMLElement>("summary")?.focus({ preventScroll: true });
+    });
+  };
 
   return (
-    <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-app text-ink">
+    <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-app text-ink"
+      onPointerDownCapture={(event) => {
+        const target = event.target as Node;
+        if (target instanceof Element && target.closest("[data-team-menu]")) return;
+        for (const details of document.querySelectorAll<HTMLDetailsElement>("details[open]")) {
+          if (!details.contains(target)) details.removeAttribute("open");
+        }
+      }}>
       <header {...dragProps} className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-hairline/40 px-6 py-4 max-md:pl-12">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-2.5">
             <UsersRound size={18} className="text-ink-secondary" />
             <h1 className="text-[17px] font-semibold">{t("canvas.title")}</h1>
-            <span className="ml-1 text-[11px] text-ink-secondary">{teamMapBotCount(bots.length)}</span>
+            <span className="ml-1 rounded-full bg-control px-2 py-0.5 text-[12px] text-ink-secondary">{teamMapBotCount(bots.length)}</span>
           </div>
           <p className="mt-1 text-[12px] text-ink-secondary">{t("canvas.description")}</p>
         </div>
-        {teamPeople && <MapModeToggle />}
-        {!remoteClient && <div className="flex items-center gap-2">
-          <button onClick={() => setShowComputers(!showComputers)} aria-pressed={showComputers} title={t("canvas.showComputersHint")}
-            className={cn("flex items-center gap-2 rounded-lg border px-3 py-2 text-[12px] font-medium transition-colors", showComputers ? "border-accent/40 bg-accent/10 text-ink" : "border-hairline/60 bg-panel text-ink-secondary hover:bg-control hover:text-ink")}>
-            <span aria-hidden className={cn("relative h-4 w-7 shrink-0 rounded-full transition-colors", showComputers ? "bg-accent" : "bg-control")}>
-              <span className={cn("absolute top-0.5 size-3 rounded-full bg-white shadow-sm transition-[left]", showComputers ? "left-3.5" : "left-0.5")} />
-            </span>
-            {t("canvas.showComputers")}
-          </button>
-          <button onClick={() => setComputersOpen((value) => !value)} aria-label={t("canvas.computers")} aria-expanded={computersOpen} className="rounded-lg p-2 text-ink-secondary hover:bg-control hover:text-ink"><Monitor size={17} /></button>
-          <details className="relative" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.removeAttribute("open"); }} onKeyDown={(event) => {
-            if (event.key === "Escape") { event.currentTarget.removeAttribute("open"); event.currentTarget.querySelector("summary")?.focus(); }
-          }}>
-            <summary aria-label={t("canvas.addToMap")} className="flex cursor-pointer list-none items-center gap-1.5 rounded-lg border border-hairline/60 bg-panel px-3 py-2 text-[12px] font-medium hover:bg-control [&::-webkit-details-marker]:hidden"><Plus size={14} /> {t("common.add")}</summary>
-            <div className="absolute right-0 top-full z-40 mt-2 w-52 rounded-xl border border-hairline/60 bg-panel p-1.5 shadow-xl" onClick={(event) => {
-              const details = event.currentTarget.closest("details"); details?.querySelector("summary")?.focus(); details?.removeAttribute("open");
-            }}>
-              <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-[12px] hover:bg-control" onClick={() => setTeamEditor({})}><Users size={14} />{t("team.create")}</button>
-              <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-[12px] hover:bg-control" onClick={() => { setComputersOpen(true); setCreateComputerRequest((value) => value + 1); }}><Box size={14} />{t("canvas.cloudComputer")}</button>
-              {placeOffered("vm", state.config) && <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-[12px] hover:bg-control" onClick={() => dispatch({ type: "toggleAppSettings", section: "computer", open: true })}><Monitor size={14} />{t("canvas.localVm")}</button>}
-            </div>
-          </details>
-        </div>}
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          {teamPeople && <MapModeToggle />}
+          {!remoteClient && <>
+            {sections.length === 1 ? (
+              <button type="button" className="ui-button" ref={(node) => { memoryTrigger.current = node; }}
+                onClick={() => openMemory(sections[0].key, sections[0].name, true)}>
+                <Brain size={16} className="text-ink-secondary" />{t("canvas.departmentMemory")}
+              </button>
+            ) : sections.length > 1 ? (
+              <details ref={memoryMenu} className="relative" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMemoryMenu(); }}
+                onToggle={(event) => {
+                  if (!event.currentTarget.open) return;
+                  requestAnimationFrame(() => event.currentTarget.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus({ preventScroll: true }));
+                }}
+                onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); closeMemoryMenu(true); } }}>
+                <summary ref={(node) => { memoryTrigger.current = node; }} aria-haspopup="menu"
+                  className="ui-button cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <Brain size={16} className="text-ink-secondary" />{t("canvas.departmentMemory")}
+                </summary>
+                <div role="menu" aria-label={t("canvas.departmentMemory")} className={cn("absolute right-0 top-full z-40 mt-2 min-w-[220px]", SIMPLE_MENU)}
+                  onKeyDown={moveMenuFocus}>
+                  <div className={MENU_LABEL}>{t("canvas.departmentMemory")}</div>
+                  {sections.map((section) => <button key={section.key || "general"} type="button" role="menuitem" className={menuRow}
+                    onClick={() => { closeMemoryMenu(); openMemory(section.key, section.name, true); }}>{section.name}</button>)}
+                </div>
+              </details>
+            ) : null}
+            <label className="ui-button h-8 cursor-pointer select-none" title={t("canvas.showComputersHint")}>
+              <Switch checked={showComputers} onClick={() => setShowComputers(!showComputers)} aria-label={t("canvas.showComputers")} />
+              <span>{t("canvas.showComputers")}</span>
+            </label>
+            <button type="button" className="ui-button" aria-expanded={computersOpen} onClick={() => setComputersOpen((value) => !value)}>
+              <Monitor size={16} className="text-ink-secondary" />{t("canvas.computers")}
+            </button>
+            <details className="relative" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) event.currentTarget.removeAttribute("open"); }}
+              onToggle={(event) => {
+                if (!event.currentTarget.open) return;
+                requestAnimationFrame(() => event.currentTarget.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus({ preventScroll: true }));
+              }}
+              onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); event.currentTarget.removeAttribute("open"); event.currentTarget.querySelector("summary")?.focus(); } }}>
+              <summary aria-label={t("canvas.addToMap")} className="ui-button cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <Plus size={16} className="text-ink-secondary" />{t("common.add")}
+              </summary>
+              <div role="menu" aria-label={t("canvas.addToMap")} className={cn("absolute right-0 top-full z-40 mt-2 w-[220px]", SIMPLE_MENU)} onKeyDown={moveMenuFocus}>
+                <div className={MENU_LABEL}>{t("canvas.departmentGroup")}</div>
+                <button type="button" role="menuitem" className={menuRow} onClick={(event) => {
+                  event.currentTarget.closest("details")?.removeAttribute("open"); setTeamEditor({});
+                }}><Users size={16} className="text-ink-secondary" />{t("canvas.newDepartment")}</button>
+                <div className={MENU_LABEL}>{t("canvas.computers")}</div>
+                <button type="button" role="menuitem" className={menuRow} onClick={(event) => {
+                  event.currentTarget.closest("details")?.removeAttribute("open"); setComputersOpen(true); setCreateComputerRequest((value) => value + 1);
+                }}><Box size={16} className="text-ink-secondary" />{t("canvas.cloudComputer")}</button>
+                {placeOffered("vm", state.config) && <button type="button" role="menuitem" className={menuRow} onClick={(event) => {
+                  event.currentTarget.closest("details")?.removeAttribute("open"); dispatch({ type: "toggleAppSettings", section: "computer", open: true });
+                }}><Monitor size={16} className="text-ink-secondary" />{t("canvas.localVm")}</button>}
+              </div>
+            </details>
+          </>}
+        </div>
       </header>
       {(error || refreshError) && <div role="alert" className="flex shrink-0 items-center justify-between gap-3 border-b border-danger/20 bg-danger/10 px-6 py-2 text-[12px] text-danger">
         {error || refreshError}
         <button aria-label={t("common.close")} className="rounded p-1 hover:bg-danger/10" onClick={() => { setError(null); setRefreshError(null); }}><X size={14} /></button>
       </div>}
       <div className="relative flex min-h-0 flex-1">
-      <div className="relative flex min-h-0 min-w-0 flex-1">
-      {reportsChart ? <TeamOrgChart bots={bots} /> : <TeamCanvas sections={sections} canManage={!remoteClient} onMove={requestMove} taggedBotIds={taggedBotIds} sent={sent} bottomInset={bots.length ? 96 : 0}
-        connectedBotIds={state.settingsOpen ? edges.flatMap((edge) => edge.sourceBotId === state.selectedId ? [edge.targetBotId] : edge.targetBotId === state.selectedId ? [edge.sourceBotId] : []) : []}
-        onComputer={(bot) => openBotSettings(dispatch, "access", { botId: bot.id })}
-        computers={showComputers && computersChoiceLoaded && !remoteClient ? mapComputers.computers : undefined} computerFrames={mapComputers.frames}
-        onOpenComputer={(computer) => computer.kind === "team" ? setComputersOpen(true) : dispatch({ type: "toggleComputer", open: true, botId: computer.id })}
-        teamComputers={Object.fromEntries(computers.filter((computer) => computer.section !== null).map((computer) => [computer.section!, { name: computer.name, state: computer.state }]))}
-        onTeamComputer={() => setComputersOpen(true)}
-        onComputerDrop={(id, section) => { if (!remoteClient) { setComputersOpen(true); setComputerDrop({ id, section }); } }}
-        onInstructions={(section, label) => setContextEditor({ section, label })}
-        onMemory={(section, label) => setMemoryEditor({ section, label })}
-        onEditTeam={(section, rename) => setTeamEditor({ section, rename })}
-        onDeleteTeam={setDeletingTeam}
-        isEmpty={(key) => ![...state.bots, ...state.groups].some((record) => record.section?.trim() === key)} />}
-      {bots.length > 0 && <MapComposer bots={bots} teams={composerTeams} onTagged={setTaggedBotIds} onSent={acknowledgeSent} />}
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          {reportsChart ? <TeamOrgChart bots={bots} /> : (
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <TeamBoard sections={sections} canManage={!remoteClient} onMove={requestMove} taggedBotIds={taggedBotIds} sent={sent}
+                connectedBotIds={state.settingsOpen ? edges.flatMap((edge) => edge.sourceBotId === state.selectedId ? [edge.targetBotId] : edge.targetBotId === state.selectedId ? [edge.sourceBotId] : []) : []}
+                onComputer={(bot) => openBotSettings(dispatch, "access", { botId: bot.id })}
+                computers={showComputers && computersChoiceLoaded && !remoteClient ? mapComputers.computers : undefined} computerFrames={mapComputers.frames}
+                teamComputers={Object.fromEntries(computers.filter((computer) => computer.section !== null).map((computer) => [computer.section!, { name: computer.name, state: computer.state }]))}
+                onTeamComputer={() => setComputersOpen(true)}
+                onComputerDrop={(id, section) => { if (!remoteClient) { setComputersOpen(true); setComputerDrop({ id, section }); } }}
+                onInstructions={(section, label) => setContextEditor({ section, label })}
+                onEditTeam={(section, rename) => setTeamEditor({ section, rename })}
+                onDeleteTeam={setDeletingTeam}
+                onMemory={(section, label) => openMemory(section, label, false)} />
+              {edges.length > 0 && <details className="mx-auto w-full max-w-[1400px] border-t border-hairline/40 px-5 pb-4 pt-3 md:px-6">
+                <summary className="flex cursor-pointer list-none items-center gap-1.5 text-[12px] text-ink-secondary [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("canvas.handoffs")} · {edges.length}</summary>
+                <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">{edges.slice(0, 12).map((edge) => <EdgeRow key={edge.sourceBotId + ":" + edge.targetBotId} edge={edge} bots={bots} />)}</div>
+              </details>}
+            </div>
+          )}
+          {bots.length > 0 && <MapComposer bots={bots} teams={composerTeams} onTagged={setTaggedBotIds} onSent={acknowledgeSent} />}
+        </div>
+        {!remoteClient && <CanvasComputers open={computersOpen} createRequest={createComputerRequest} drop={computerDrop} sections={sections}
+          onClose={() => setComputersOpen(false)} onDropHandled={clearComputerDrop} onChange={setComputers} />}
       </div>
-      {!remoteClient && <CanvasComputers open={computersOpen} createRequest={createComputerRequest} drop={computerDrop} sections={sections}
-        onClose={() => setComputersOpen(false)} onDropHandled={clearComputerDrop} onChange={setComputers} />}
-      </div>
-      {edges.length > 0 && <details className="shrink-0 border-t border-hairline/40 bg-panel px-6 py-3">
-        <summary className="cursor-pointer text-[12px] text-ink-secondary flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("canvas.handoffs")} · {edges.length}</summary>
-        <div className="mt-3 max-h-48 space-y-2 overflow-y-auto">{edges.slice(0, 12).map((edge) => <EdgeRow key={`${edge.sourceBotId}:${edge.targetBotId}`} edge={edge} bots={bots} />)}</div>
-      </details>}
       {contextEditor && (
         <SectionContextDialog
           section={contextEditor.section}
@@ -421,7 +504,7 @@ export function TeamMapPage() {
         />
       )}
       {teamEditor && <TeamDialog {...teamEditor} onClose={() => setTeamEditor(null)} />}
-      {memoryEditor && <TeamMemoryDialog key={memoryEditor.section} {...memoryEditor} onClose={() => setMemoryEditor(null)} />}
+      {memoryEditor && <TeamMemoryDialog key={memoryEditor.section} section={memoryEditor.section} label={memoryEditor.label} onClose={closeMemory} />}
       <ConfirmDialog open={pendingMove !== null} tone="neutral" title={t("canvas.moveConfirmTitle", { name: pendingMove?.bot.name ?? t("canvas.bot"), team: pendingMove?.destination || t("settings.section.general") })}
         body={t("canvas.moveConfirmBody")}
         confirmLabel={t("canvas.moveConfirm") } onCancel={cancelMove} onConfirm={() => {
@@ -436,7 +519,7 @@ export function TeamMapPage() {
           const name = deletingTeam;
           setDeletingTeam(null);
           if (!name) return;
-          void api(`/api/sidebar-sections?section=${encodeURIComponent(name)}`, { method: "DELETE" })
+          void api("/api/sidebar-sections?section=" + encodeURIComponent(name), { method: "DELETE" })
             .then(({ sections: names }) => dispatch({ type: "sections", sections: names }))
             .catch((cause) => setError(cause instanceof Error ? cause.message : String(cause)));
         }} />

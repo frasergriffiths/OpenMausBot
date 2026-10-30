@@ -33,9 +33,9 @@ export function MapModeToggle() {
   const current = useMapMode();
   const option = (value: MapMode, label: string) => (
     <button type="button" aria-pressed={current === value} onClick={() => setMapMode(value)}
-      className={cn("rounded-md px-2.5 py-1 text-[12px] font-medium", current === value ? "bg-panel text-ink shadow-sm" : "text-ink-secondary hover:text-ink")}>{label}</button>
+      className={cn("flex h-7 items-center rounded-md px-2.5 text-[12px] font-medium", current === value ? "bg-panel text-ink shadow-sm" : "text-ink-secondary hover:text-ink")}>{label}</button>
   );
-  return <div role="group" aria-label={t("canvas.title")} className="flex items-center gap-0.5 rounded-lg bg-control p-0.5">
+  return <div role="group" aria-label={t("canvas.title")} className="flex h-8 items-center gap-0.5 rounded-lg bg-control p-0.5">
     {option("departments", t("orgChart.mode.departments"))}{option("people", t("orgChart.mode.people"))}
   </div>;
 }

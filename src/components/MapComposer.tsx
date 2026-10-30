@@ -84,8 +84,8 @@ export function MapComposer({ bots, teams, onTagged, onSent }: {
   const hint = text.trim() && !targets.botIds.length ? t("mapComposer.tagHint") : null;
 
   return <>
-    <div className="pointer-events-none absolute inset-x-0 bottom-5 z-30 flex justify-center px-4">
-      <div className="pointer-events-auto w-full max-w-[620px]">
+    <div className="shrink-0 border-t border-hairline/40 bg-app px-4 py-3">
+      <div className="mx-auto w-full max-w-[720px]">
         {sent && names.length > 0 && <p role="status" className="mb-2 flex flex-wrap items-center gap-x-1 gap-y-0.5 rounded-xl bg-panel/95 px-3 py-1.5 text-[12px] text-ink-secondary shadow-sm ring-1 ring-hairline/50">
           <span>{t("mapComposer.sentTo")}</span>
           {shownNames.map((bot, index) => <span key={bot.id}>

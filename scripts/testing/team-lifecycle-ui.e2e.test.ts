@@ -113,13 +113,13 @@ if (!enabled) console.log("skipping team lifecycle UI e2e: set OMB_UI_E2E=1 to i
     await click("Tools");
     await click("Team map");
     await manage("Delivery");
-    await click("Move bots to Delivery");
+    await click("Manage bots…");
     await click("Researcher");
     await click("Engineer");
     await click("Save");
     await expect.poll(async () => (await api("/api/bots?messages=0")).bots.filter((bot: any) => bot.section === "Delivery").length).toBe(2);
     await manage("Delivery");
-    await click("Move bots to Delivery");
+    await click("Manage bots…");
     await click("Researcher");
     // Hold only the creation response: persistence and SSE remain real, and
     // the unsaved ticks above must survive the wait.

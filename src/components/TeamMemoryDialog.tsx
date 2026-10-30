@@ -145,6 +145,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
         role="dialog"
         aria-modal="true"
         aria-labelledby="team-memory-title"
+        aria-describedby="team-memory-description"
         tabIndex={-1}
         className="flex max-h-[min(720px,calc(100dvh-2rem))] w-full max-w-[720px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel shadow-2xl shadow-black/50 outline-none"
       >
@@ -156,14 +157,14 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
                 {t("teamMemory.title", { name: label })}
               </h2>
             </div>
-            <p className="mt-1.5 max-w-[560px] text-[13px] leading-relaxed text-ink-secondary">
+            <p id="team-memory-description" className="mt-1.5 max-w-[560px] text-[13px] leading-relaxed text-ink-secondary">
               {t("teamMemory.description")}
             </p>
           </div>
           <button
             onClick={onClose}
             aria-label={t("teamMemory.close")}
-            className="flex size-9 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink"
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink"
           >
             <X size={19} />
           </button>

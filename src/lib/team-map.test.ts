@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { setLocale } from "./i18n";
-import { buildTeamMapEdges, buildTeamMapSections, teamMapBotCount, teamMapStatus, type TeamMapSnapshot } from "./team-map";
+import { buildTeamMapEdges, buildTeamMapSections, moveBotRequest, teamMapBotCount, teamMapStatus, type TeamMapSnapshot } from "./team-map";
 
 const bots = [
   { id: "chief", name: "Atlas", section: "Work", chiefOfStaff: true, busy: true },
@@ -66,6 +66,34 @@ describe("team map projection", () => {
     expect(teamMapStatus({ id: "x", name: "X", activity: "waiting-on-you" })).toEqual({
       label: "Waiting for you",
       tone: "warning",
+    });
+  });
+});
+
+describe("moving a bot between departments", () => {
+  it("edits an existing department, including a legacy General", () => {
+    for (const destination of ["Research", "General"]) {
+      expect(moveBotRequest("bot-1", destination, ["Research", "General"])).toEqual({
+        path: `/api/sidebar-sections?section=${destination}`,
+        method: "PUT",
+        body: { addBotIds: ["bot-1"], removeBotIds: [] },
+      });
+    }
+  });
+
+  it("creates only a destination that does not exist yet", () => {
+    expect(moveBotRequest("bot-1", "Delivery", ["Research"])).toEqual({
+      path: "/api/sidebar-sections",
+      method: "POST",
+      body: { name: "Delivery", botIds: ["bot-1"] },
+    });
+  });
+
+  it("moves to the ungrouped lane with an empty destination", () => {
+    expect(moveBotRequest("bot-1", "", ["Research"])).toEqual({
+      path: "/api/sidebar-sections",
+      method: "POST",
+      body: { name: "", botIds: ["bot-1"] },
     });
   });
 });
