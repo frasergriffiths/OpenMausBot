@@ -269,11 +269,12 @@ describe("sidebar foot in Simple mode", () => {
     expect(foot.indexOf('data-sidebar-nav="team-map"')).toBeLessThan(foot.indexOf('data-sidebar-nav="templates"'));
     expect(foot).toMatch(/data-tour="nav-apps" data-sidebar-nav="apps"[^>]*aria-label="Apps"[^>]*><svg[^>]*lucide-puzzle/);
     const account = foot.slice(foot.indexOf("data-sidebar-account"), foot.indexOf('data-sidebar-nav="apps"'));
-    expect(account).toContain("min-h-9");
-    expect(account).toContain("text-[13px]");
-    expect(account).toContain("width:24px");
-    expect(account).toContain("height:24px");
+    expect(account).toContain("size-9");
+    expect(account).toContain("rounded-full");
+    expect(account).toContain("width:36px");
+    expect(account).toContain("height:36px");
     expect(account).not.toContain("min-h-[46px]");
+    expect(account).not.toContain("font-medium leading-[18px]");
   });
 
   it("keeps no Automations or Routines row in Simple mode, and still one Apps", () => {
