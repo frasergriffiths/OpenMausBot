@@ -12,7 +12,7 @@ import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { api, useStore, type Bot, type Message } from "@/state/store";
 import { moveChoiceFocus, returnFocusToComposer } from "./AskCard";
-import { MAUS_COLORS, mascotInk } from "@/lib/mascot";
+import { MAUS_COLORS, mascotInk, spinnerColor } from "@/lib/mascot";
 import { PlaceControl } from "./bot-panel/PlaceControl";
 
 const blank = (bot: Pick<Bot, "soul" | "description">): boolean => !bot.soul?.trim() && !bot.description?.trim();
@@ -137,7 +137,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
                   {LETTERS[index]}
                 </kbd>
                 <span dir="auto" className={cn("min-w-0 flex-1 break-words text-[14px] leading-5", settled ? "text-ink-tertiary" : "text-ink")}>{label}</span>
-                {chosen && <Check size={14} className="shrink-0" style={{ color: accent }} aria-hidden="true" />}
+                {chosen && <Check size={14} className="shrink-0" style={{ color: spinnerColor(accentColour) }} aria-hidden="true" />}
               </button>
             );
           })}
