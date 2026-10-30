@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from "vitest";
 import {
   cloudUsageSummary,
   phoneMenuItems,
-  placeMenuItems,
   planUsageSummary,
   profileInitials,
   profileMenuItems,
@@ -408,21 +407,12 @@ describe("profileMenuItems", () => {
 describe("Simple mode's account menu", () => {
   const noop = () => {};
   const tools = toolMenuItems({ activeView: "files", onFiles: noop });
-  const place = (patch: Partial<Parameters<typeof placeMenuItems>[0]> = {}) => ({
-    bridge: { state: async () => ({ local: true, name: "This computer" }), menu: async () => {} },
-    current: { local: true, name: "This computer" },
-    cloudHome: false,
-    onLine: "",
-    openMenu: vi.fn(),
-    switchable: true,
-    ...patch,
-  });
   const build = (patch: Partial<Parameters<typeof profileMenuItems>[0]> = {}) => profileMenuItems({
     phone: simplePhoneItems({ connected: false, onGetApp: noop }),
     usage: true,
     update: { key: "update", label: "Check for updates", onSelect: noop },
     account: "MausBot Cloud",
-    simple: { tools, places: placeMenuItems(place(), { owner: null, onCloudSettings: noop }) },
+    simple: { tools },
     onUsage: noop, onSettings: noop, onShortcuts: noop, onAbout: noop, onHelp: noop, onFeedback: noop, onAccount: noop,
     ...patch,
   });
@@ -437,7 +427,7 @@ describe("Simple mode's account menu", () => {
     expect(groups(items)).toEqual([
       ["usage", "phone-app", "support", "settings"],
       ["files"],
-      ["place", "switch-place", "account"],
+      ["account"],
     ]);
     expect(items.find((item) => item.key === "support")!.submenu!.map((item) => item.key)).toEqual(["help", "feedback", "shortcuts", "about", "update"]);
   });
@@ -508,25 +498,6 @@ describe("Simple mode's account menu", () => {
     expect(items.map((item) => item.key)).not.toContain("team-map");
     expect(items.map((item) => item.label)).not.toContain("Team map");
     expect(items.map((item) => item.label)).not.toContain("Templates");
-  });
-
-  it("ticks the current place and switches through the same native menu as the server pill", () => {
-    const here = place();
-    const items = placeMenuItems(here, { owner: null, onCloudSettings: noop });
-    expect(items.map((item) => [item.key, item.label])).toEqual([["place", "This computer"], ["switch-place", "Switch to…"]]);
-    expect(items[0]!.trailing).toBeTruthy();
-    items[0]!.onSelect();
-    items[1]!.onSelect();
-    expect(here.openMenu).toHaveBeenCalledTimes(2);
-  });
-
-  it("names My Cloud and opens its settings when it is the window's only place, and offers nothing without either", () => {
-    const onCloudSettings = vi.fn();
-    const home = placeMenuItems(place({ switchable: false, cloudHome: true, onLine: "always on" }), { owner: "ada@example.test", onCloudSettings });
-    expect(home.map((item) => [item.label, item.subtitle])).toEqual([["My Cloud", "always on · ada@example.test’s Cloud"]]);
-    home[0]!.onSelect();
-    expect(onCloudSettings).toHaveBeenCalledOnce();
-    expect(placeMenuItems(place({ bridge: undefined, switchable: false }), { owner: null, onCloudSettings })).toEqual([]);
   });
 
   it("shows one Get the phone app row, dotted while this computer's phone is connected", () => {

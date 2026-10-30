@@ -46,7 +46,6 @@ import { WelcomeKeeper } from "@/components/cloud-welcome/WelcomeKeeper";
 import { EmptyChatShell } from "@/components/onboarding/EmptyChatShell";
 import { cloudFirstRun, cloudWelcomeVisible, useCloudWelcome } from "@/lib/cloud-welcome";
 import { engineReady } from "@/components/EngineLibrary";
-import { CommandPalette } from "@/components/CommandPalette";
 import { setLocale, t } from "@/lib/i18n";
 import { shouldOpenKeyboardShortcuts } from "@/lib/keyboard-shortcuts";
 import { effectiveLanguage, useLanguageChoice } from "@/lib/language-preference";
@@ -122,7 +121,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
     setLocale(language || globalThis.navigator?.language);
     setLocaleEpoch((epoch) => epoch + 1);
   }, [language]);
-  const [paletteOpen, setPaletteOpen] = useState(false);
   const [localVmWorkspaceBotId, setLocalVmWorkspaceBotId] = useState<string | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const loading = loadingLine({ connected: state.connected, hydrated: state.hydrated === true, developer: import.meta.env.DEV });
@@ -225,7 +223,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
 
   const nativeViewOverlayOpen =
     drawerOpen ||
-    paletteOpen ||
     state.settingsOpen ||
     state.computerOpen ||
     state.inspectorOpen ||
@@ -271,7 +268,7 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       <CloudAsleepStrip />
       <CloudSendStrip cloudHome={state.config?.cloudHome === true} onPairPhone={() => dispatch(phonePairingSettingsAction())} />
       <HomeLine />
-      <AppNotices quiet={paletteOpen || drawerOpen || Boolean(localVmWorkspaceBotId)} viewer={viewer} />
+      <AppNotices quiet={drawerOpen || Boolean(localVmWorkspaceBotId)} viewer={viewer} />
       <div className="relative flex min-h-0 flex-1">
       <button
         type="button"
@@ -366,8 +363,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
           onClose={() => dispatch({ type: "toggleShortcuts", open: false })}
         />
       )}
-      {/* After the modals: same z-50 tier, so DOM order keeps the palette on top. */}
-      <CommandPalette onOpenChange={setPaletteOpen} />
       {/* Blink resolves -webkit-app-region in DOM order, so this no-drag twin after the headers cuts the drawer button back out. */}
       <span
         aria-hidden

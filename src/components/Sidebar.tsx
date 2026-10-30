@@ -29,7 +29,6 @@ import { nextRename } from "@/lib/rename";
 import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { MIN_QUERY, SearchResults } from "./SearchResults";
 import { TeamLibraryPanel } from "./TeamLibraryPanel";
-import { openCommandPalette } from "./CommandPalette";
 import { ShareTeamDialog } from "./ShareTeamDialog";
 import { TeamSettingsDialog } from "./TeamSettingsDialog";
 import { TeamDialog } from "./TeamDialog";
@@ -1230,7 +1229,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const pendingBotUndo = teamFeedback?.restoreBot;
   const botRow = (bot: Bot): BotRowProps => ({ ...botRowProps(state, dispatch, bot, { density, quiet: quietRows, query: q, onMenu: setMenu, renameRequest: renameRequest?.botId === bot.id ? renameRequest.nonce : 0 }), menuOpen: menu?.botId === bot.id });
   const railSearch = () => {
-    if (collapseToIcons) return openCommandPalette();
     toggleCollapsed();
     // The field is always mounted once the sidebar is wide; put the caret in it after the rail has expanded.
     if (typeof requestAnimationFrame === "function") {
@@ -1350,9 +1348,9 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           </div>
         ) : null}
         {rail && <div data-sidebar-rail-top className="flex flex-col items-center gap-2 pt-1" style={windowNoDragStyle}>
-          <button type="button" onClick={railSearch} aria-label={t("sidebar.searchAria")} title={t("sidebar.searchAria")} className={SIMPLE_TOP_BUTTON}>
+          {!collapseToIcons && <button type="button" onClick={railSearch} aria-label={t("sidebar.searchAria")} title={t("sidebar.searchAria")} className={SIMPLE_TOP_BUTTON}>
             <Search size={18} strokeWidth={1.5} aria-hidden="true" />
-          </button>
+          </button>}
           <div className="relative flex">{plusControl}</div>
         </div>}
         {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center justify-end">
@@ -1384,9 +1382,9 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           >
             {density === "icons" ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={17} />}
           </button>}
-          {density === "icons" && <button
+          {!collapseToIcons && density === "icons" && <button
             type="button"
-            onClick={openCommandPalette}
+            onClick={railSearch}
             aria-label={t("sidebar.searchAria")}
             title={t("sidebar.searchAria")}
             className="flex size-[46px] shrink-0 items-center justify-center rounded-xl text-ink-secondary hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"

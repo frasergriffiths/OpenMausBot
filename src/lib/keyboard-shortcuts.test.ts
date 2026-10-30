@@ -55,9 +55,9 @@ describe("keyboard-shortcuts", () => {
     const all = filterShortcutGroups(SHORTCUT_GROUPS, "");
     expect(all.length).toBe(SHORTCUT_GROUPS.length);
 
-    const nav = filterShortcutGroups(SHORTCUT_GROUPS, "palette");
+    const nav = filterShortcutGroups(SHORTCUT_GROUPS, "new bot");
     expect(nav.length).toBe(1);
-    expect(nav[0]?.items[0]?.id).toBe("command-palette");
+    expect(nav[0]?.items[0]?.id).toBe("new-bot");
 
     const byKey = filterShortcutGroups(SHORTCUT_GROUPS, "Esc", true);
     expect(byKey.some((g) => g.items.some((i) => i.id === "close-panel"))).toBe(true);

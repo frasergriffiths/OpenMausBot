@@ -202,7 +202,7 @@ const key = (node: Node, name: string) => {
   return event;
 };
 const shown = (rendered: Rendered) => ({
-  tab: rendered.nodes.find((node) => node.props["data-panel-tab"] !== undefined && node.props["aria-selected"] === true)?.props["data-panel-tab"],
+  tab: rendered.nodes.find((node) => node.props["aria-label"] === "Bot settings")?.props.value,
   page: rendered.nodes.find((node) => node.type === PageBody)?.props.page,
 });
 const rowValue = (rendered: Rendered, page: string) => find(rendered, "data-panel-page", page).props.value;
@@ -265,7 +265,7 @@ describe("the bot panel in Simple mode", () => {
     click(find(rendered, "aria-label", "Close settings"));
     expect(onClose).toHaveBeenCalled();
     expect(find(rendered, "data-panel-avatar").props["aria-expanded"]).toBe(false);
-    const tabs = [...rendered.html.matchAll(/data-panel-tab="(\w+)"[^>]*>([^<]+)<\/button>/g)].map((match) => [match[1], match[2]]);
+    const tabs = Children.toArray(find(rendered, "aria-label", "Bot settings").props.children).map((option) => [(option as ReactElement<{ value: string }>).props.value, (option as ReactElement<{ children: string }>).props.children]);
     expect(tabs).toEqual([["profile", "Profile"], ["library", "Library"], ["computer", "Computer"]]);
     expect(shown(rendered)).toEqual({ tab: "profile", page: undefined });
     expect(ofType(rendered, DetailsTab)!.props.bot).toBe(bot);
@@ -275,7 +275,7 @@ describe("the bot panel in Simple mode", () => {
   it("switches tabs", () => {
     const bot = makeBot();
     for (const [tab, type] of [["library", LibraryTab], ["computer", ComputerTab], ["profile", DetailsTab]] as const) {
-      click(find(panel(bot), "data-panel-tab", tab));
+      change(find(panel(bot), "aria-label", "Bot settings"), tab);
       const rendered = panel(bot);
       expect(shown(rendered).tab).toBe(tab);
       expect(ofType(rendered, type)).toBeDefined();
@@ -285,7 +285,7 @@ describe("the bot panel in Simple mode", () => {
   it("keeps the last top-level tab when another bot takes the panel, at that tab's root", () => {
     const scout = makeBot();
     const nova = makeBot({ id: "nova", threadId: "thread-nova", name: "Nova" });
-    click(find(panel(scout), "data-panel-tab", "library"));
+    change(find(panel(scout), "aria-label", "Bot settings"), "library");
     expect(shown(panel(scout)).tab).toBe("library");
     (ofType(panel(scout), LibraryTab)!.props.onOpen as (page: string) => void)("memory");
     expect(shown(panel(scout))).toEqual({ tab: undefined, page: "memory" });
@@ -293,10 +293,10 @@ describe("the bot panel in Simple mode", () => {
     const switched = panel(nova);
     expect(shown(switched)).toEqual({ tab: "library", page: undefined });
     expect(ofType(switched, LibraryTab)).toBeDefined();
-    click(find(panel(nova), "data-panel-tab", "profile"));
+    change(find(panel(nova), "aria-label", "Bot settings"), "profile");
     fresh();
     expect(shown(panel(nova, "access")).tab).toBe("computer");
-    click(find(panel(nova), "data-panel-tab", "profile"));
+    change(find(panel(nova), "aria-label", "Bot settings"), "profile");
   });
 
   it("drills into a page with its intro and back, naming where Back goes", () => {
@@ -310,12 +310,12 @@ describe("the bot panel in Simple mode", () => {
     click(find(page, "data-panel-back"));
     expect(shown(panel(bot))).toEqual({ tab: "profile", page: undefined });
 
-    click(find(panel(bot), "data-panel-tab", "library"));
+    change(find(panel(bot), "aria-label", "Bot settings"), "library");
     (ofType(panel(bot), LibraryTab)!.props.onOpen as (page: string) => void)("memory");
     expect(panel(bot).html).toContain(">What it remembers<");
     click(find(panel(bot), "data-panel-back"));
 
-    click(find(panel(bot), "data-panel-tab", "profile"));
+    change(find(panel(bot), "aria-label", "Bot settings"), "profile");
     (ofType(panel(bot), DetailsTab)!.props.onOpen as (page: string) => void)("browser");
     expect(shown(panel(bot))).toEqual({ tab: undefined, page: "browser" });
     expect(ofType(panel(bot), DetailsTab)).toBeUndefined();
@@ -408,7 +408,7 @@ describe("the bot panel in Simple mode", () => {
     expect(switches(panel(bot).html)).toBe(0);
     expect(panel(bot).html).not.toContain('aria-label="Work until done"');
     for (const tab of ["library"]) {
-      click(find(panel(bot), "data-panel-tab", tab));
+      change(find(panel(bot), "aria-label", "Bot settings"), tab);
       const rendered = panel(bot);
       expect(switches(rendered.html), tab).toBe(0);
       for (const text of ["Memory", "Upkeep", "Record"]) expect(rendered.html).not.toContain(`>${text}<`);
@@ -829,9 +829,8 @@ describe("the Computer tab", () => {
     const bot = makeBot();
     const rendered = panel(bot);
     expect(ofType(rendered, DetailsTab)!.props.bot).toBe(bot);
-    expect(has(rendered, "data-panel-tab", "computer")).toBe(true);
-    expect(has(rendered, "data-panel-tab", "profile")).toBe(true);
-    expect(has(rendered, "data-panel-tab", "library")).toBe(true);
+    expect(rendered.html).toContain('data-select-values="profile|library|computer"');
+    expect(rendered.html).toContain('data-select-labels="Profile|Library|Computer"');
     expect(rendered.html).not.toContain("data-panel-where-section");
   });
 

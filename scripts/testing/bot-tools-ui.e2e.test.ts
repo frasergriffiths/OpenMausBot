@@ -102,7 +102,8 @@ describe("bot setup and tools in the real renderer", () => {
       .find(([, entry]) => entry.role === "button" && /Open .+ profile/.test(entry.name));
     expect(profile).toBeDefined();
     await ui("click", "--ref", `@${profile![0]}`);
-    await expect.poll(snapshot, { timeout: 10_000 }).toContain("Computer");
+    await expect.poll(() => evaluate("document.querySelector('[role=\"combobox\"][aria-label=\"Bot settings\"]')?.getAttribute('data-select-labels')"), { timeout: 10_000 })
+      .toBe("Profile|Library|Computer");
     await press("Escape");
 
     // New bot from above settings puts the new bot's chat in front: no
