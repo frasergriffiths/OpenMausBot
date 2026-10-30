@@ -139,7 +139,8 @@ it("saves keys for any OpenCode provider on a Cloud, shows only their names, and
     expect(turnEnv.ANTHROPIC_BASE_URL).toBeUndefined();
   } else {
     expect(anthropic).toMatch(/^omb_t0_[a-f0-9]{48}$/);
-    expect(turnEnv.ANTHROPIC_BASE_URL).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/b\/omb_t0_[a-f0-9]{48}\/anthropic$/);
+    // The fake CLI records the credential allow-list, not the routing URL the box adds to the spawn;
+    // box.test.ts asserts that URL. The token and the absent owner key are the security property here.
     expect(JSON.stringify(turnEnv)).not.toContain(OWNER_ANTHROPIC);
   }
   expect(turnEnv.OPENAI_API_KEY).toBeUndefined();
