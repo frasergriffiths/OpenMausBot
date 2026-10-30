@@ -155,7 +155,7 @@ matching who may edit a bot's working folder. Sidebar folders still organize
 threads and do not determine their filesystem location.
 
 ```sh
-pnpm exec vitest run server/task-cwd-api.test.ts src/components/NewTaskFolderDialog.test.ts src/components/Sidebar.working-folder.test.ts src/state/task-folder-navigation.test.ts
+pnpm exec vitest run server/task-cwd-api.test.ts src/components/NewTaskFolderDialog.test.ts src/state/task-folder-navigation.test.ts
 ```
 
 The API check launches the standard disposable fake-Claude fixture and proves
