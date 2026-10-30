@@ -6,7 +6,7 @@ tab, or its close button when the panel has no tab row — and closing from the
 panel puts focus back on the button that opened it.
 
 ```sh
-OMB_UI_E2E=1 node node_modules/vitest/vitest.mjs run scripts/testing/computer-panel-focus-ui.e2e.test.ts
+OMB_UI_E2E=1 node node_modules/vitest/vitest.mjs run
 ```
 
 The regression drives the real app through the standard isolated
