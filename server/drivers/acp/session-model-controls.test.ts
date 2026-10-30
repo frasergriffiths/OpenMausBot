@@ -88,4 +88,26 @@ describe("ACP session model controls", () => {
     expect(controls.modelOf(state())).toBeNull();
     expect(() => controls.variant("low")).toThrow("does not advertise variant");
   });
+
+  it("confirms a variant through a later config update", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    const waiting = controls.confirmVariant("max", 1_000);
+    controls.receive({ configOptions: [thought("max")] });
+    await expect(waiting).resolves.toBe("applied");
+  });
+
+  it("reports a variant the agent kept as a mismatch", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    const waiting = controls.confirmVariant("max", 1_000);
+    controls.receive({ configOptions: [thought("low")] });
+    await expect(waiting).resolves.toBe("mismatch");
+  });
+
+  it("leaves an acknowledgement with no config update unconfirmed", async () => {
+    const { controls } = fixture();
+    controls.receive(modern("two"), true);
+    await expect(controls.confirmVariant("max", 10)).resolves.toBe("unconfirmed");
+  });
 });

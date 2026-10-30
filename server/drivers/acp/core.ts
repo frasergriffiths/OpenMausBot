@@ -250,6 +250,8 @@ export interface AcpSupport {
 const envOr = (key: string, fallback: number): number => Number(process.env[key] ?? fallback);
 const INIT_TIMEOUT = 300_000;
 const SESSION_CONFIG_TIMEOUT = 300_000;
+/** A variant acknowledgement can arrive before its config update; wait briefly for the agent to say what it applied. */
+const VARIANT_CONFIRM_TIMEOUT = 1_500;
 const NEW_SESSION_TIMEOUT = 300_000;
 const LOAD_SESSION_TIMEOUT = 120_000;
 const ACP_STUCK_AFTER_MS = 180_000;
@@ -1179,6 +1181,11 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
         });
         const receiveModelVariants = (result: any, replace = false) => modelControls.receive(result, replace);
         const requestedVariantOption = () => modelControls.variant(variant);
+        const variantNotice = (message: string) => {
+          if (session.fallbackNotice === message) return;
+          session.fallbackNotice = message;
+          emit({ ...base(threadId, turnId), type: "runtime.notice", message });
+        };
 
         const flushAssistantText = () => {
           const raw = state.text;
@@ -1433,15 +1440,42 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
                 if (!selectedModel && cliTurn.model) selectedModel = cliTurn.model;
               }
               if (variant !== undefined) {
-                const option = requestedVariantOption();
-                await request(
-                  "session/set_config_option",
-                  { sessionId, configId: option.configId, value: variant },
-                  SESSION_CONFIG_TIMEOUT,
-                  receiveModelVariants,
-                );
-                if (requestedVariantOption().currentValue !== variant) {
-                  throw new Error(`${support.displayName} did not apply variant ${variant}`);
+                const wanted = variant;
+                let option: ReturnType<typeof requestedVariantOption> | undefined;
+                try {
+                  option = requestedVariantOption();
+                } catch {
+                  option = undefined;
+                }
+                if (!option) {
+                  variant = undefined;
+                  variantNotice(support.displayName + " does not offer variant " + wanted
+                    + " for this model, so this reply uses the model's default. Choose another variant for this bot to stop seeing this.");
+                } else {
+                  // Register before the request: a response or notification can arrive before it resolves.
+                  const confirmation = modelControls.confirmVariant(wanted, VARIANT_CONFIRM_TIMEOUT);
+                  try {
+                    await request(
+                      "session/set_config_option",
+                      { sessionId, configId: option.configId, value: wanted },
+                      SESSION_CONFIG_TIMEOUT,
+                      receiveModelVariants,
+                    );
+                    const outcome = await confirmation;
+                    if (outcome === "mismatch") {
+                      variant = undefined;
+                      variantNotice(support.displayName + " did not apply variant " + wanted
+                        + ", so this reply uses the model's default. Choose another variant for this bot to stop seeing this.");
+                    } else if (outcome === "unconfirmed") {
+                      // The setter succeeded but the agent sent no config state. Trust the acknowledgement rather than
+                      // reading a stale option and failing a working turn.
+                      variant = undefined;
+                    }
+                  } catch {
+                    variant = undefined;
+                    variantNotice(support.displayName + " could not set variant " + wanted
+                      + ", so this reply uses the model's default. Choose another variant for this bot to stop seeing this.");
+                  }
                 }
               }
             } catch (error) {
@@ -1479,8 +1513,17 @@ export function createAcpDriver(support: AcpSupport): ProviderDriver<AcpConfig> 
             if (support.modelVariants && cliTurn.model && !modelControls.usesAgentDefault() && modelControls.modelOf(session.sessionConfigResult) !== cliTurn.model) {
               throw new Error(`${support.displayName} changed model before the prompt`);
             }
-            if (variant !== undefined && requestedVariantOption().currentValue !== variant) {
-              throw new Error(`${support.displayName} changed variant before the prompt`);
+            if (variant !== undefined) {
+              let current: string | undefined;
+              try {
+                current = requestedVariantOption().currentValue;
+              } catch {
+                current = undefined;
+              }
+              if (current !== variant) {
+                variant = undefined;
+                variantNotice(support.displayName + " changed variant before the prompt, so this reply uses the model's default.");
+              }
             }
             if (state.settled || state.stopped || session.closing) throw new Error("turn stopped");
             state.promptSent = true;

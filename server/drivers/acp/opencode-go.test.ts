@@ -1081,20 +1081,28 @@ describe("OpenCode session variants", () => {
     expect(JSON.parse(readFileSync(`${f.dump}.selection.json`, "utf8"))).toMatchObject({ variant });
   });
 
-  it.each(["none", "default"])("rejects unadvertised %s before any prompt", async (variant) => {
+  it.each(["none", "default"])("drops unadvertised %s and still replies", async (variant) => {
     const f = await fixture({ [model]: variantConfig(["minimal", "low", "high"]) });
-    expect((await f.run({ variant })).done).toMatchObject({ ok: false });
-    expect(f.prompted()).toBe(false);
+    const { done, events } = await f.run({ variant });
+    expect(done).toMatchObject({ ok: true });
+    expect(f.prompted()).toBe(true);
     expect(f.calls()).toEqual([]);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: "runtime.notice", message: expect.stringContaining("does not offer variant " + variant),
+    }));
   });
 
-  it("allows a model without configurable reasoning, but rejects an explicit variant", async () => {
+  it("allows a model without configurable reasoning, and drops an explicit variant", async () => {
     const f = await fixture({});
     const first = await f.run();
     expect(first.done).toMatchObject({ ok: true });
     expect(first.events).toContainEqual(expect.objectContaining({ type: "session.model-variants", variants: { options: [] } }));
-    expect((await f.run({ variant: "high" })).done).toMatchObject({ ok: false });
-    expect(f.prompted()).toBe(false);
+    const second = await f.run({ variant: "high" });
+    expect(second.done).toMatchObject({ ok: true });
+    expect(f.prompted()).toBe(true);
+    expect(second.events).toContainEqual(expect.objectContaining({
+      type: "runtime.notice", message: expect.stringContaining("does not offer variant high"),
+    }));
   });
 
   it("uses model-dependent grouped options returned by the model switch", async () => {
@@ -1113,8 +1121,8 @@ describe("OpenCode session variants", () => {
     expect(events.filter((event) => event.type === "session.model-variants").at(-1)).toMatchObject({
       model: secondModel, variants: { options: [{ id: "minimal", label: "Minimal" }, { id: "custom-deep", label: "Deep" }], currentValue: "custom-deep" },
     });
-    expect((await f.run({ model: secondModel, variant: "none" })).done).toMatchObject({ ok: false });
-    expect(f.prompted()).toBe(false);
+    expect((await f.run({ model: secondModel, variant: "none" })).done).toMatchObject({ ok: true });
+    expect(f.prompted()).toBe(true);
   });
 
   it("reapplies an explicit choice on resume and targets only its native session", async () => {
@@ -1138,10 +1146,18 @@ describe("OpenCode session variants", () => {
     )));
   });
 
-  it.each(["FAKE_ACP_VARIANT_STICKS", "FAKE_ACP_EMPTY_VARIANT_ACK"])("requires confirmation when %s", async (flag) => {
+  it.each(["FAKE_ACP_VARIANT_STICKS", "FAKE_ACP_EMPTY_VARIANT_ACK"])("keeps the reply when %s", async (flag) => {
     const f = await fixture({ [model]: variantConfig(["low", "high"]) }, { [flag]: "1" });
-    expect((await f.run({ variant: "high" })).done).toMatchObject({ ok: false });
-    expect(f.prompted()).toBe(false);
+    const { done, events } = await f.run({ variant: "high" });
+    expect(done).toMatchObject({ ok: true });
+    expect(f.prompted()).toBe(true);
+    if (flag === "FAKE_ACP_VARIANT_STICKS") {
+      expect(events).toContainEqual(expect.objectContaining({
+        type: "runtime.notice", message: expect.stringContaining("did not apply variant high"),
+      }));
+    } else {
+      expect(events.filter((event) => event.type === "runtime.notice")).toEqual([]);
+    }
   });
 
   it("keeps simultaneous conversations and their selected variants separate", async () => {
@@ -1178,12 +1194,16 @@ describe("OpenCode session variants", () => {
     expect(variants.every((event) => event.threadId === "variant-thread")).toBe(true);
   });
 
-  it("does not overwrite a newer notification with the effort acknowledgement", async () => {
+  it("does not block the reply when a later update changes the effort", async () => {
     const f = await fixture({ [model]: variantConfig(["low", "high"]) }, {
       FAKE_ACP_CONFIG_UPDATES: JSON.stringify([{ after: "effort", configOptions: sessionOptions(["low"], "low") }]),
     });
-    expect((await f.run({ variant: "high" })).done).toMatchObject({ ok: false });
-    expect(f.prompted()).toBe(false);
+    const { done, events } = await f.run({ variant: "high" });
+    expect(done).toMatchObject({ ok: true });
+    expect(f.prompted()).toBe(true);
+    expect(events).toContainEqual(expect.objectContaining({
+      type: "runtime.notice", message: expect.stringContaining("changed variant before the prompt"),
+    }));
   });
 
   it.each(["opencode/x-preview-f-free", "opencode-go/ox-alpha-free"])(

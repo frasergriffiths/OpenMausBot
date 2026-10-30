@@ -9,6 +9,9 @@ export interface AcpModelSelection {
   allowLegacy?: boolean;
 }
 
+/** A variant setter may acknowledge before its config update arrives. */
+export type VariantConfirmation = "applied" | "mismatch" | "unconfirmed";
+
 interface ModelControlsInput {
   selection?: AcpModelSelection;
   variants: boolean;
@@ -25,6 +28,11 @@ type Request = (method: string, params: unknown, timeoutMs: number, receive?: (r
 export class SessionModelControls {
   private revision = 0;
   private readonly input: ModelControlsInput;
+  private readonly variantWaiters = new Set<{
+    value: string;
+    resolve: (result: VariantConfirmation) => void;
+    timer: ReturnType<typeof setTimeout>;
+  }>();
   constructor(input: ModelControlsInput) { this.input = input; }
 
   usesAgentDefault(): boolean {
@@ -54,15 +62,46 @@ export class SessionModelControls {
       options: option?.options ?? [],
       ...(option?.currentValue !== undefined ? { currentValue: option.currentValue } : {}),
     });
+    if (acpVariantOption(result)) this.settleVariantWaiters();
   }
 
   variant(value: string | undefined): NonNullable<ReturnType<typeof acpVariantOption>> {
-    if (!this.input.variants) throw new Error(`${this.input.displayName} does not support model variants`);
+    if (!this.input.variants) throw new Error(this.input.displayName + " does not support model variants");
     const option = acpVariantOption(this.input.state());
     if (!option || !option.options.some((entry) => entry.id === value)) {
-      throw new Error(`${this.input.displayName} does not advertise variant ${value} for this model`);
+      throw new Error(this.input.displayName + " does not advertise variant " + value + " for this model");
     }
     return option;
+  }
+
+  /** Waits for the agent's own config state, because an acknowledgement may carry no options. */
+  confirmVariant(value: string, timeoutMs: number): Promise<VariantConfirmation> {
+    if (acpVariantOption(this.input.state())?.currentValue === value) return Promise.resolve("applied");
+    return new Promise((resolve) => {
+      const waiter = {
+        value,
+        resolve,
+        timer: setTimeout(() => {
+          this.variantWaiters.delete(waiter);
+          resolve("unconfirmed");
+        }, timeoutMs),
+      };
+      waiter.timer.unref?.();
+      this.variantWaiters.add(waiter);
+    });
+  }
+
+  private settleVariantWaiters(): void {
+    if (!this.variantWaiters.size) return;
+    const option = acpVariantOption(this.input.state());
+    for (const waiter of this.variantWaiters) {
+      const applied = option?.currentValue === waiter.value;
+      const changed = !option || option.currentValue !== undefined;
+      if (!applied && !changed) continue;
+      clearTimeout(waiter.timer);
+      this.variantWaiters.delete(waiter);
+      waiter.resolve(applied ? "applied" : "mismatch");
+    }
   }
 
   async select(request: Request, sessionId: string, timeoutMs: number): Promise<string | null> {
@@ -73,7 +112,7 @@ export class SessionModelControls {
     const option = this.input.selection?.allowLegacy ? acpModelOption(this.input.state(), configId) : undefined;
     if (option && option.configId === undefined) {
       if (!option.options.some((entry) => entry.id === wanted)) {
-        throw new Error(`${this.input.displayName} does not advertise model ${wanted}`);
+        throw new Error(this.input.displayName + " does not advertise model " + wanted);
       }
       const before = this.revision;
       await request("session/set_model", { sessionId, modelId: wanted }, timeoutMs, (response) => {
@@ -89,7 +128,7 @@ export class SessionModelControls {
     }
     selected = this.modelOf(this.input.state());
     if (selected !== wanted) {
-      throw new Error(`${this.input.displayName} did not switch to ${wanted} (still ${selected ?? "unknown"})`);
+      throw new Error(this.input.displayName + " did not switch to " + wanted + " (still " + (selected ?? "unknown") + ")");
     }
     return selected;
   }
