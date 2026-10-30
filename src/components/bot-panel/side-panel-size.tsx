@@ -143,7 +143,7 @@ export function SidePanelResizeHandle({ sizing }: { sizing: SidePanelSizing }) {
       aria-valuenow={Math.round(sizing.width)}
       tabIndex={0}
       data-side-panel-resize
-      className="absolute inset-y-0 -start-1 z-20 hidden w-2 cursor-col-resize touch-none select-none focus-visible:bg-accent/30 focus-visible:outline-none hover:bg-accent/20 md:block"
+      className="absolute inset-y-0 -start-1 z-20 hidden w-2 cursor-col-resize touch-none select-none md:block"
     />
   );
 }
