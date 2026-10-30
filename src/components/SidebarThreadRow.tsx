@@ -336,7 +336,7 @@ export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, 
       </span>
       <button ref={actionRef} type="button" aria-label={t("task.actions", { title: displayTitle })} aria-expanded={Boolean(menu)}
         onClick={(event) => { if (menu) { closeMenu(); return; } const rect = event.currentTarget.getBoundingClientRect(); openMenu(rect.left, rect.bottom); }}
-        className={cn("mr-0.5 flex size-6 shrink-0 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 aria-expanded:opacity-100 group-hover/thread:opacity-100 max-md:opacity-70 touch:opacity-70", panel && "mt-1.5")}>
+        className={cn("mr-0.5 flex size-6 shrink-0 items-center justify-center ui-hover-action text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 aria-expanded:opacity-100 group-hover/thread:opacity-100 max-md:opacity-70 touch:opacity-70", panel && "mt-1.5")}>
         <MoreHorizontal size={13} />
       </button>
     </div>

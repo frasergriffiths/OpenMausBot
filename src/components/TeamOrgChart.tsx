@@ -53,7 +53,7 @@ function BotRow({ bot, team, onDragStart }: { bot: Bot; team: TeamPeople; onDrag
           const rect = event.currentTarget.getBoundingClientRect();
           requestOwnerPick({ botIds: [bot.id], title: t("owner.pickTitle"), current: ownerOf(bot, team)?.email ?? null, x: rect.left, y: rect.bottom + 4 });
         }}
-        className="flex size-6 shrink-0 items-center justify-center rounded text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 touch:opacity-100"><UserRound size={13} /></button>}
+        className="flex size-6 shrink-0 items-center justify-center ui-hover-action text-ink-secondary opacity-0 hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 touch:opacity-100"><UserRound size={13} /></button>}
     </div>
   );
 }
