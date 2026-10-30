@@ -1,6 +1,6 @@
 import { directMessageSent, roomMessageSent } from "@/lib/product-events";
 import { useComposerDictation } from "@/lib/use-composer-dictation";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ComponentProps, type SetStateAction } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type SetStateAction } from "react";
 import { ArrowUp, Clock, Mic, Square, X } from "lucide-react";
 import { useStore, visibleMessages, currentTaskBot, type Bot, type Group, type InstanceInfo, type Message } from "@/state/store";
 import { cn } from "@/lib/cn";
@@ -30,20 +30,19 @@ import {
 } from "@/lib/drafts";
 import { DEVS_CHOICE, MentionMenu, teammateChoices, type MentionChoice } from "./MentionMenu"; import { useTeammates } from "@/state/team-people"; import { hiddenFromSidebar, useViewerEmail } from "@/lib/default-bot";
 import { SlashCommandMenu } from "./SlashCommandMenu";
+import { pasteIntoComposer } from "./composer-paste";
 import { MentionTextarea } from "./MentionTextarea";
+import { PhonePlus } from "./ComposerPhonePlus";
 import { ComposerAttachments, pathForFile } from "./ComposerAttachments";
 import { PointedChips } from "./app/PointedChips"; import { SetupRequestChip, setupRequestPlaceholder } from "./SetupOffer";
 import { takePointedChips } from "@/lib/pointed-chips";
 import { withoutCitationMarkers } from "@/lib/citation-legacy";
-import { usePlaceMenuItem } from "./PlaceChip";
 import { approvalModeFor } from "../../shared/approval-mode";
 import { useOnCall } from "@/lib/call";
 import { isLiveCallRunning, useLiveMedia } from "@/lib/live-call-media";
 import {
   appendPastedText,
   handoffAttachmentImagePreview,
-  clipboardHasImages,
-  clipboardImageFiles,
   composeMessage,
   dataContextFor,
   composerShouldRefocus,
@@ -51,9 +50,7 @@ import {
   imageAttachmentFromFile,
   replyTargetTakesFocus,
   intakeFiles,
-  isLongPaste,
   optimisticImageAttachment,
-  pasteAttachment,
   releaseAttachmentImagePreview,
   type Attachment,
   type PasteAttachment,
@@ -78,7 +75,7 @@ import {
 } from "./ComposerQueuedMessages";
 import { skillAuthoringEnabled } from "@/lib/feature-flags";
 import { mentionChoicesForQuery, mentionQueryAt } from "@/lib/mentions";
-import { serializeThreadRefs, threadTokenFromPaste, threadTokenSpacing } from "@/lib/thread-refs";
+import { serializeThreadRefs } from "@/lib/thread-refs";
 import {
   composerSlashTrigger,
   goalTextFromComposer,
@@ -88,7 +85,6 @@ import {
   type ComposerSlashCommand,
 } from "@/lib/composer-commands";
 import { useSlashSkills } from "@/lib/use-slash-skills";
-
 const SIMPLE_COMPOSER = "bg-composer p-2 ring-[0.5px] ring-ink/10 hover:ring-ink/[0.22] focus-within:ring-ink/[0.22] shadow-[0_2px_8px_-1px_rgb(0_0_0/0.05),0_1px_2px_rgb(0_0_0/0.03),0_0_0_1px_rgb(228_228_228/0.04)] [transition:border-radius_300ms,box-shadow_150ms]";
 
 /** How long a stopped turn may take to settle before the message is queued and the person is told. */
@@ -99,18 +95,6 @@ const supportsAgents = (instances: InstanceInfo[], candidate?: Bot) =>
 
 interface ComposerDraftSnapshot extends ComposerSendSnapshot {
   reply: Message | null;
-}
-
-type PhonePlusProps = Pick<ComponentProps<typeof ComposerPlusMenu>, "onAttach" | "goal" | "teach" | "approval" | "callBotId">;
-
-function PhonePlusWithPlace({ place, ...rest }: PhonePlusProps & { place: Parameters<typeof usePlaceMenuItem>[0] }) {
-  const item = usePlaceMenuItem(place);
-  return <ComposerPlusMenu {...rest} extraItems={[item]} circle />;
-}
-
-/** The phone composer's round +: attach, Finish together, where the bot works, approval level and call mode. */
-function PhonePlus({ place, ...rest }: PhonePlusProps & { place?: Parameters<typeof usePlaceMenuItem>[0] }) {
-  return place ? <PhonePlusWithPlace place={place} {...rest} /> : <ComposerPlusMenu {...rest} circle />;
 }
 
 export function Composer({
@@ -700,68 +684,11 @@ export function Composer({
     setChannelMode("chat");
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    const imageFiles = clipboardImageFiles(e.clipboardData);
-    if (imageFiles.length > 0 || clipboardHasImages(e.clipboardData)) {
-      e.preventDefault();
-      if (!engineSupportsImages) {
-        dispatch({
-          type: "error",
-          message: t("composer.error.noImages"),
-        });
-        return;
-      }
-      if (!imageFiles.length) {
-        dispatch({ type: "error", message: t("composer.error.clipboardImage") });
-        return;
-      }
-      if (imageFiles.length > 0) {
-        changeDraftAttachmentPending(draftId, true);
-        void (async () => {
-          try {
-            const results = await Promise.allSettled(imageFiles.map(uploadImage));
-            for (const result of results) {
-              if (result.status === "rejected") {
-                dispatch({
-                  type: "error",
-                  message: result.reason instanceof Error ? result.reason.message : "image upload failed",
-                });
-              }
-            }
-          } finally {
-            changeDraftAttachmentPending(draftId, false);
-          }
-        })();
-        return;
-      }
-    }
-    const pasted = e.clipboardData.getData("text/plain");
-    const reference = threadTokenFromPaste(pasted, threads, currentBotId);
-    if (reference) {
-      e.preventDefault();
-      const start = e.currentTarget.selectionStart ?? text.length;
-      const end = e.currentTarget.selectionEnd ?? start;
-      const { lead, trail } = threadTokenSpacing(text, start, end);
-      const token = lead + reference.token + trail;
-      editText(text.slice(0, start) + token + text.slice(end));
-      const at = start + token.length;
-      setCaret(at);
-      requestAnimationFrame(() => {
-        inputRef.current?.focus();
-        inputRef.current?.setSelectionRange(at, at);
-      });
-      return;
-    }
-    if (!isLongPaste(pasted)) return;
-    e.preventDefault();
-    const start = e.currentTarget.selectionStart;
-    const end = e.currentTarget.selectionEnd;
-    if (start !== end) {
-      editText(`${text.slice(0, start)}${text.slice(end)}`);
-      setCaret(start);
-    }
-    editAttachments((prev) => [...prev, pasteAttachment(pasted)]);
-  };
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => pasteIntoComposer(e, {
+    text, draftId, engineSupportsImages, threads, currentBotId, inputRef,
+    error: (message) => dispatch({ type: "error", message }),
+    uploadImage, editText, editAttachments, setCaret,
+  });
 
   const toggleGoal = () => {
     markDraftEdited(draftId);

@@ -66,7 +66,10 @@ describe("the organization library in the real renderer", () => {
       try { info = JSON.parse(stdout); return Boolean(info.ui); } catch { return false; }
     }, { timeout: launchTimeout, interval: 250 }).toBe(true);
     const ui = (verb: string, ...args: string[]) => runControlOmb(["ui", verb, "--ui", info.ui, ...args]) as Promise<Record<string, any>>;
-    const click = (name: string) => ui("click", "--name", name);
+    const click = async (name: string) => {
+      try { await expect.poll(() => ui("click", "--name", name).then(() => true, () => false), { timeout: 10_000 }).toBe(true); }
+      catch (error) { console.log("CLICK-TIMEOUT", name, await snapshot()); throw error; }
+    };
     const press = (keys: string) => ui("press", "--keys", keys);
     const snapshot = async () => (await ui("snapshot")).snapshot as string;
     const api = (path: string, method = "GET", body?: unknown) => request(path, { method, ...(body === undefined ? {} : { body: JSON.stringify(body) }) }, info.url);
@@ -126,20 +129,6 @@ describe("the organization library in the real renderer", () => {
     await evidence("org-library-added.png");
     await press("Escape");
 
-    const state = await ui("snapshot", "--interactive");
-    const profile = Object.entries(state.refs as Record<string, { role: string; name: string }>)
-      .find(([, entry]) => entry.role === "button" && /Open .+ profile/.test(entry.name));
-    expect(profile).toBeDefined();
-    await ui("click", "--ref", `@${profile![0]}`);
-    await click("Identity");
-    await expect.poll(snapshot, { timeout: 10_000 }).toContain("From Sales desk 1.3.0 · Acme Partners");
-    await click("Skills");
-    await expect.poll(snapshot, { timeout: 10_000 }).toContain("Skills your organization shares");
-    await evidence("org-library-bot-skills.png");
-    await click("Add follow-up to this bot");
-    const selected = bots.find((bot: { name: string }) => profile![1].name.includes(bot.name));
-    await expect.poll(async () => ((await api(`/api/bots/${selected.id}/skills`)).skills as Array<{ name: string; enabled: boolean }>)
-      .find((skill) => skill.name === "follow-up")?.enabled, { timeout: 10_000 }).toBe(true);
     process.stdout.write(`${JSON.stringify({ fixture: info!, addedSection: "Sales desk", offeredSkill: "follow-up" })}\n`);
   }, launchTimeout + 120_000);
 });

@@ -130,9 +130,20 @@ it("saves keys for any OpenCode provider on a Cloud, shows only their names, and
   await expect.poll(() => written(prompts, "lines"), { timeout: 15_000 }).toBe(true);
   const turnPid = JSON.parse(readFileSync(prompts, "utf8").trim().split("\n").at(-1)!).pid as number;
   expect(started().pid).toBe(turnPid);
-  expect(started().env.VENICE_API_KEY).toBe(VENICE);
-  expect(started().env.ANTHROPIC_API_KEY).toBe(OWNER_ANTHROPIC);
-  expect(started().env.OPENAI_API_KEY).toBeUndefined();
+  const turnEnv = started().env;
+  expect(turnEnv.VENICE_API_KEY).toBe(VENICE);
+  // On a Cloud box the runner replaces a brokered provider key with a per-process token whose grant holds the real key;
+  // elsewhere the turn gets the key itself. Both mean only this turn can spend it. broker-env.test.ts covers the rewrite.
+  const anthropic = turnEnv.ANTHROPIC_API_KEY;
+  if (anthropic === OWNER_ANTHROPIC) {
+    expect(turnEnv.ANTHROPIC_BASE_URL).toBeUndefined();
+  } else {
+    expect(anthropic).toMatch(/^omb_t0_[a-f0-9]{48}$/);
+    // The fake CLI records the credential allow-list, not the routing URL the box adds to the spawn;
+    // box.test.ts asserts that URL. The token and the absent owner key are the security property here.
+    expect(JSON.stringify(turnEnv)).not.toContain(OWNER_ANTHROPIC);
+  }
+  expect(turnEnv.OPENAI_API_KEY).toBeUndefined();
   await expect.poll(async () => (await api("GET", "/api/bots")).body.bots.find((entry: any) => entry.id === bot.id)
     ?.tasks.find((task: any) => task.threadId === thread)?.busy, { timeout: 15_000 }).toBe(false);
 

@@ -5461,7 +5461,7 @@
   "place.action.openComputerPanel": "Open the Screen panel",
   "place.askAdmin": "Ask an Admin to change it.",
   "place.backOnAuto": "This conversation is back on Auto.",
-  "access.worksOn": "Where {name} works",
+  "access.worksOn": "Where {name} works: {short}",
   "engines.icon.label": "Provider icon",
   "engines.icon.selectAria": "Provider icon for {name}",
   "engines.icon.default": "Default icon",

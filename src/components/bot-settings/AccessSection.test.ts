@@ -10,11 +10,12 @@ const fixture = vi.hoisted(() => ({
   mcpError: false,
   servers: null as null | Array<{ name: string; enabled: boolean }>,
   config: null as unknown,
+  instances: null as unknown,
   apps: { phase: "loading", apps: [], connectedSlugs: [] } as import("./useBotApps").BotApps,
 }));
 vi.mock("@/state/store", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/state/store")>();
-  return { ...original, useStore: () => ({ state: { ...original.initialState, config: fixture.config ?? original.initialState.config }, dispatch: fixture.dispatch }) };
+  return { ...original, useStore: () => ({ state: { ...original.initialState, config: fixture.config ?? original.initialState.config, instances: (fixture.instances as typeof original.initialState.instances | null) ?? original.initialState.instances }, dispatch: fixture.dispatch }) };
 });
 // The connected-apps list (Composio accounts plus the native HighLevel connection) is seeded per test.
 vi.mock("./useBotApps", async (importOriginal) => ({
@@ -40,6 +41,7 @@ beforeEach(() => {
   fixture.mcpError = false;
   fixture.servers = null;
   fixture.config = null;
+  fixture.instances = null;
   fixture.apps = { phase: "loading", apps: [], connectedSlugs: [] };
 });
 afterEach(() => vi.unstubAllGlobals());
@@ -206,6 +208,34 @@ describe("AccessSection Works on", () => {
       [{ type: "toggleSettings", open: false }],
       [{ type: "toggleComputer", open: true }],
     ]);
+  });
+
+  it("names the place in every heading and never prints a place's state as its name", () => {
+    fixture.instances = [{
+      instanceId: "local",
+      driverKind: "fixture",
+      displayName: "Fixture",
+      snapshot: { state: "available", authenticated: true },
+      models: { default: "test-model", options: [{ id: "test-model", label: "Test" }] },
+      capabilities: { computerMcp: true, browserMcp: true },
+    }];
+    fixture.config = {
+      box: { configured: true, included: true },
+      features: { browser: true },
+      browserEngine: { kind: "unavailable" },
+    };
+    expect(render(makeBot({ computer: "cloud" }))).toContain("Where Scout works: Cloud desktop");
+    expect(render(makeBot({ computer: "cloud", cloudBackend: "vps" }))).toContain("Where Scout works: Your own machine");
+    expect(render(makeBot({ computer: "local" }))).toContain("Where Scout works: This computer");
+    expect(render(makeBot({ computer: "browser" }))).toContain("Where Scout works: Built-in browser");
+    expect(render(makeBot({ computer: "vm" }))).toContain("Where Scout works: Private desktop");
+
+    // Without a capable engine the cloud state is "Not with this model"; the heading still names the place.
+    fixture.instances = null;
+    fixture.config = null;
+    expect(render(makeBot({ computer: "cloud" }))).toContain("Where Scout works: Cloud desktop");
+    expect(render(makeBot({ computer: "cloud" }))).not.toContain("Where Scout works: Not with this model");
+
   });
 
   it("hides the Boat or VPS choice on My Cloud, whose cloud computers are the plan's", () => {

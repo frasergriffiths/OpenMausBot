@@ -26,7 +26,7 @@ const reply = [
   snippets[4].split("\n").map(line => `    ${line}`).join("\n"),
   "This neighboring prose must never be copied with a block.",
 ].join("\n\n");
-const blocks = `Array.from(document.querySelectorAll('.chat-md > div')).filter(element => element.querySelector('pre') && element.querySelector('button[aria-pressed]'))`;
+const blocks = `Array.from(document.querySelectorAll('.chat-md > div')).filter(element => element.querySelector('pre') && element.querySelector('[data-code-plate]'))`;
 
 async function connect(url: string) {
   const socket = new WebSocket(url);
@@ -130,10 +130,10 @@ async function connect(url: string) {
     const geometry = () => evaluate(`(() => {
       const rect = element => { const r = element.getBoundingClientRect(); return { left:r.left, right:r.right, top:r.top, bottom:r.bottom, width:r.width, height:r.height }; };
       return { width:innerWidth, pageWidth:document.documentElement.scrollWidth, coarse:matchMedia('(pointer:coarse)').matches, hover:matchMedia('(hover:hover)').matches,
-        blocks:${blocks}.map(card => ({ ...rect(card), buttons:Array.from(card.querySelectorAll('button')).map(button=>({ ...rect(button), label:button.getAttribute('aria-label'), text:button.textContent, visibleLabels:Array.from(button.querySelectorAll('span')).some(span=>span.getBoundingClientRect().width>4&&span.getBoundingClientRect().height>4&&getComputedStyle(span).visibility!=='hidden'), pressed:button.getAttribute('aria-pressed') })) })) };
+        blocks:${blocks}.map(card => ({ ...rect(card), plate:rect(card.querySelector('[data-code-plate]')), pre:rect(card.querySelector('pre')), buttons:Array.from(card.querySelectorAll('button')).map(button=>({ ...rect(button), label:button.getAttribute('aria-label'), text:button.textContent, named:Boolean(button.getAttribute('aria-label')||button.getAttribute('title')||button.textContent?.trim()), pressed:button.getAttribute('aria-pressed') })) })) };
     })()`);
     const tap = async (index: number, kind: "copy" | "wrap", touch = true) => {
-      const selector = kind === "copy" ? `button[aria-label*="clipboard"],button[title="Could not copy"]` : "button[aria-pressed]";
+      const selector = "[data-code-plate] button";
       let position: { x: number; y: number; hit: boolean };
       await expect.poll(async () => {
         position = await evaluate(`(async () => { const card=${blocks}[${index}]; const button=card.querySelector(${JSON.stringify(selector)}); if(!button) throw new Error('Missing ${kind} control'); button.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'}); await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))); const before=button.getBoundingClientRect(); await new Promise(requestAnimationFrame); const r=button.getBoundingClientRect(); const x=r.left+r.width/2,y=r.top+r.height/2; const stable=Math.abs(before.x-r.x)<0.25&&Math.abs(before.y-r.y)<0.25; return {x,y,hit:stable&&button.contains(document.elementFromPoint(x,y))}; })()`);
@@ -169,10 +169,12 @@ async function connect(url: string) {
       for (const card of layout.blocks) {
         expect(card.left).toBeGreaterThanOrEqual(0);
         expect(card.right).toBeLessThanOrEqual(width);
+        // The always-on touch plate owns a band above the code; the first line must start below it.
+        if (touch) expect(card.plate.bottom).toBeLessThanOrEqual(card.pre.top);
         for (const button of card.buttons) {
           expect(button.left).toBeGreaterThanOrEqual(card.left);
           expect(button.right).toBeLessThanOrEqual(card.right);
-          expect(button.visibleLabels).toBe(true);
+          expect(button.named).toBe(true);
           if (touch) { expect(button.width).toBeGreaterThanOrEqual(44); expect(button.height).toBeGreaterThanOrEqual(44); }
         }
       }
@@ -186,11 +188,16 @@ async function connect(url: string) {
       await expect.poll(() => evaluate("navigator.clipboard.readText()")).toBe(snippets[index]);
       receipts.copied.push({ index, text: await evaluate("navigator.clipboard.readText()") });
     }
-    const wraps = () => evaluate(`${blocks}.map(card => card.querySelector('button[aria-pressed]').getAttribute('aria-pressed'))`);
-    expect(await wraps()).toEqual(snippets.map(() => "false"));
+    const tapWrap = async (index: number) => {
+      await evaluate(`(() => { const card=${blocks}[${index}]; const buttons=card.querySelectorAll('[data-code-plate] button'); buttons[buttons.length-1].click(); return true; })()`);
+      await expect.poll(() => evaluate(`[...document.querySelectorAll('button')].some(b => b.textContent.trim().startsWith('Wrap'))`), { timeout: 5_000 }).toBe(true);
+      await evaluate(`(() => { const item=[...document.querySelectorAll('button')].find(b => b.textContent.trim().startsWith('Wrap')); item.click(); return true; })()`);
+    };
+    const wraps = () => evaluate(`${blocks}.map(card => getComputedStyle(card.querySelector('pre')).whiteSpace.includes('pre-wrap'))`);
+    expect(await wraps()).toEqual(snippets.map(() => false));
     for (const index of [1, 2]) {
-      await tap(index, "wrap");
-      await expect.poll(wraps).toEqual(snippets.map((_, at) => at === index ? "true" : "false"));
+      await tapWrap(index);
+      await expect.poll(wraps).toEqual(snippets.map((_, at) => at === index));
       const wrapped = await evaluate(`(() => { const card=${blocks}[${index}]; const pre=card.querySelector('pre'); return {whiteSpace:getComputedStyle(pre).whiteSpace,client:pre.clientWidth,scroll:pre.scrollWidth,text:pre.textContent}; })()`);
       expect(wrapped.whiteSpace).toBe("pre-wrap");
       expect(wrapped.scroll).toBeLessThanOrEqual(wrapped.client + 1);
@@ -199,10 +206,10 @@ async function connect(url: string) {
       await tap(index, "copy");
       expect(await evaluate("navigator.clipboard.readText()")).toBe(snippets[index]);
       await screenshot(`wrapped-${index}.png`);
-      await tap(index, "wrap");
-      await expect.poll(wraps).toEqual(snippets.map(() => "false"));
+      await tapWrap(index);
+      await expect.poll(wraps).toEqual(snippets.map(() => false));
     }
-    const feedbackLayout = () => evaluate(`(() => { const card=${blocks}[0]; const button=card.querySelectorAll('button')[2]; const c=card.getBoundingClientRect(), b=button.getBoundingClientRect(); return {height:c.height,buttonWidth:b.width,buttonHeight:b.height,left:b.left-c.left,top:b.top-c.top}; })()`);
+    const feedbackLayout = () => evaluate(`(() => { const card=${blocks}[0]; const button=card.querySelectorAll('[data-code-plate] button')[0]; const c=card.getBoundingClientRect(), b=button.getBoundingClientRect(); return {height:c.height,buttonWidth:b.width,buttonHeight:b.height,left:b.left-c.left,top:b.top-c.top}; })()`);
     const beforeFeedback = await feedbackLayout();
     await evaluate(`Object.defineProperty(navigator.clipboard, 'writeText', { configurable:true,value:async()=>{throw new Error('fixture denial');} }); true`);
     await tap(0, "copy");
@@ -211,19 +218,19 @@ async function connect(url: string) {
     receipts.failureFeedback = true;
     await evaluate(`Object.defineProperty(navigator.clipboard, 'writeText', { configurable:true,value:window.fixtureClipboardWrite }); true`);
     await tap(0, "copy");
-    await expect.poll(() => evaluate(`${blocks}[0].querySelector('[role="status"]')?.textContent`)).toBe("Copied!");
+    await expect.poll(() => evaluate(`${blocks}[0].querySelector('[role="status"]')?.textContent`)).toBe("Copied to clipboard");
     expect(await feedbackLayout()).toEqual(beforeFeedback);
     receipts.successFeedback = true;
-    await expect.poll(() => evaluate(`${blocks}[0].querySelector('[role="status"]')?.textContent`), { timeout: 5_000 }).toBe("Copy");
+    await expect.poll(() => evaluate(`Boolean(${blocks}[0].querySelector('[role="status"]'))`), { timeout: 5_000 }).toBe(false);
     expect(await feedbackLayout()).toEqual(beforeFeedback);
     receipts.feedbackLayoutStable = true;
     await request("Emulation.setTouchEmulationEnabled", { enabled: false });
     await request("Emulation.setDeviceMetricsOverride", { width: 1100, height: 900, deviceScaleFactor: 1, mobile: false });
-    await evaluate(`${blocks}[0].querySelector('button[aria-pressed]').focus(); true`);
+    await evaluate(`${blocks}[0].querySelector('[data-code-plate] button').focus(); true`);
     await request("Input.dispatchKeyEvent", { type:"keyDown", key:"Tab", code:"Tab", windowsVirtualKeyCode:9 });
     await request("Input.dispatchKeyEvent", { type:"keyUp", key:"Tab", code:"Tab", windowsVirtualKeyCode:9 });
     const focus = await evaluate(`(() => { const el=document.activeElement;return {label:el.getAttribute('aria-label'),visible:el.matches(':focus-visible'),outline:getComputedStyle(el).outlineStyle}; })()`);
-    expect(focus.label).toBe("Download snippet as file");
+    expect(focus.label).toBe("More");
     expect(focus.visible).toBe(true);
     expect(focus.outline).not.toBe("none");
     receipts.keyboardFocus = focus;

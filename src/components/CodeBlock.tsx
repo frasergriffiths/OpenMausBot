@@ -168,7 +168,7 @@ export interface CodeBlockProps {
   initialWrap?: boolean;
 }
 
-const PLATE_BUTTON = "inline-flex size-7 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60";
+const PLATE_BUTTON = "inline-flex size-7 touch:size-11 items-center justify-center rounded-full text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60";
 
 /** Simple mode's hover plate on a code block or diagram: Copy, and a ⋯ menu for the rest. It shows on hover, on
  * keyboard focus and always on touch screens, and stays while its menu is open. */
@@ -246,6 +246,8 @@ export function CodeBlock({ code, lang, initialWrap = false }: CodeBlockProps) {
 
   return (
     <div dir="ltr" className="chat-code-block group/code relative my-2.5 overflow-hidden rounded-lg bg-ink/[0.04]">
+      {/* On touch the plate is always shown at 44px targets; give it a band of its own so it never covers code. */}
+      <div aria-hidden="true" className="hidden h-14 touch:block" />
       <CodePlate copied={copied} onCopy={copy} copyLabel={t("code.copyTitle")} items={[
         { key: "wrap", label: t("code.wrapLines"), icon: <WrapText size={14} aria-hidden="true" />, active: wrapLines, onSelect: () => setWrapLines((wrap) => !wrap) },
         { key: "save", label: t("code.saveAsFile"), icon: <Download size={14} aria-hidden="true" />, onSelect: download },

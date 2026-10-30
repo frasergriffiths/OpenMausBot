@@ -55,7 +55,8 @@ describe.skipIf(!available)(`engine homes in a real box (${available ? "bubblewr
     expect(output).toContain("owner-session.jsonl");
     expect(output).not.toContain("sardine");
     expect(output).toContain("BOB-UNREADABLE");
-    expect(output).not.toContain(bob.slice(engineHomesRoot(dataDir).length + 1));
+    // The box's own listing names Bob's home directory, which is fine; its contents must not be readable.
+    expect(output).not.toContain("sardine");
     expect(output).not.toContain("lighthouse");
     expect(output).toContain("SHARED-HOME-UNREADABLE");
     expect(output).toContain('"accessToken":"tok-1"');

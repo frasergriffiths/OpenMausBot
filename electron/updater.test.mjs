@@ -115,13 +115,21 @@ const settle = async () => {
   for (let index = 0; index < 10; index += 1) await Promise.resolve();
 };
 
+const originalResourcesPath = process.resourcesPath;
+let testResources = null;
 beforeEach(() => {
   localOriginModule.setLocalOrigin(LOCAL);
   vi.useFakeTimers();
+  // The updater treats a package without app-update.yml as unconfigured; give every test a packaged layout.
+  testResources = mkdtempSync(join(tmpdir(), "omb-updater-resources-"));
+  writeFileSync(join(testResources, "app-update.yml"), "provider: generic\n");
+  process.resourcesPath = testResources;
 });
 afterEach(() => {
   vi.clearAllTimers();
   vi.useRealTimers();
+  process.resourcesPath = originalResourcesPath;
+  if (testResources) rmSync(testResources, { recursive: true, force: true });
 });
 
 function bridgeFor(origin, { clicked = false, rule = null } = {}) {
@@ -200,6 +208,7 @@ it("a downloaded update installs when the app quits, except a system package, wh
   const resourcesPath = process.resourcesPath;
   const appImage = process.env.APPIMAGE;
   const resources = mkdtempSync(join(tmpdir(), "omb-updater-package-"));
+  writeFileSync(join(resources, "app-update.yml"), "provider: generic\n");
   try {
     for (const [os, marker, image, installsOnQuit] of [
       ["darwin", null, null, true],
@@ -233,6 +242,7 @@ it("a downloaded update installs by itself at a quiet moment on macOS and Window
   const resourcesPath = process.resourcesPath;
   const appImage = process.env.APPIMAGE;
   const resources = mkdtempSync(join(tmpdir(), "omb-updater-quiet-"));
+  writeFileSync(join(resources, "app-update.yml"), "provider: generic\n");
   const quiet = { locked: () => true, idleMs: () => 0, typedAt: () => 0, shown: () => true, busy: () => null, work: async () => null, watch: () => {} };
   try {
     for (const [os, marker, image, installs] of [

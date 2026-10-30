@@ -77,7 +77,7 @@ describe("GroupView: computer/browser session visibility", () => {
 
   it("gives the place badge an accessible label naming the place", () => {
     const markup = render([bot({ busy: true, computer: "browser" })], group({ busyBotId: "aleta" }));
-    expect(markup).toContain('aria-label="Where this conversation works: Browser"');
+    expect(markup).toContain('aria-label="Where this conversation works: Built-in browser"');
   });
 
   it("falls back to the plain working dot when the busy member's place is Auto", () => {

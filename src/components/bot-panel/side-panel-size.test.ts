@@ -14,24 +14,27 @@ import {
 const store = (value?: string) => ({ getItem: () => value ?? null });
 
 describe("side panel sizes", () => {
-  it("uses Nova's numbers: Simple 320/280/420, Advanced 420/360/560", () => {
+  it("uses Nova's one set of numbers: 320/280/420", () => {
     expect(sidePanelWidthBounds(true)).toEqual({ default: 320, min: 280, max: 420 });
-    expect(sidePanelWidthBounds(false)).toEqual({ default: 420, min: 360, max: 560 });
+    expect(sidePanelWidthBounds(false), "the mode flag no longer changes the panel").toEqual({ default: 320, min: 280, max: 420 });
   });
 
-  it("clamps to the mode's range and to the room this window has", () => {
+  it("clamps to the panel's range and to the room this window has", () => {
     expect(clampSidePanelWidth(200, true, 420)).toBe(280);
     expect(clampSidePanelWidth(500, true, 420)).toBe(420);
     expect(clampSidePanelWidth(400, true, 360)).toBe(360);
     expect(clampSidePanelWidth(500, false, 560)).toBe(500);
-    expect(clampSidePanelWidth(300, false, 560)).toBe(360);
+    expect(clampSidePanelWidth(300, false, 560)).toBe(300);
+    expect(clampSidePanelWidth(500, false, 300)).toBe(300);
   });
 
-  it("remembers one width per mode and ignores a stored value outside the range", () => {
+  it("remembers one width and ignores a stored value outside the range", () => {
     expect(readSidePanelWidth(true, store())).toBe(320);
     expect(readSidePanelWidth(true, store("380"))).toBe(380);
+    expect(readSidePanelWidth(false, store("380"))).toBe(380);
     expect(readSidePanelWidth(true, store("900"))).toBe(320);
-    expect(readSidePanelWidth(true, store("300"))).toBe(320);
+    expect(readSidePanelWidth(true, store("300"))).toBe(300);
+    expect(readSidePanelWidth(true, store("200"))).toBe(320);
     expect(SIDE_PANEL_WIDTH_KEYS.simple).toBe("openmausbot.sidePanelWidth.simple");
   });
 

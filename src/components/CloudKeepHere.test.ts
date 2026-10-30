@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import type { CloudSendPageBridge, KeepHereState } from "../../electron/cloud-send.mjs";
 import { setLocale } from "@/lib/i18n";
-const f = vi.hoisted(() => ({ values: [] as unknown[], index: 0, effects: [] as EffectCallback[], advanced: true }));
+const f = vi.hoisted(() => ({ values: [] as unknown[], index: 0, effects: [] as EffectCallback[] }));
 vi.mock("react", async original => ({ ...await original<typeof import("react")>(),
   useState: (initial: unknown) => { const index = f.index++; if (!(index in f.values)) f.values[index] = initial; return [f.values[index], (next: unknown) => { f.values[index] = next; }]; },
   useEffect: (effect: EffectCallback) => { f.effects.push(effect); },
@@ -30,20 +30,12 @@ async function ready(state: KeepHereState) {
   render(); f.effects[0]?.(); await flush();
 }
 beforeEach(() => {
-  f.values = []; f.index = 0; f.effects = []; f.advanced = true; notify = () => {};
+  f.values = []; f.index = 0; f.effects = []; notify = () => {};
   bridge = { notice: vi.fn(), dismiss: vi.fn(), onNotice: vi.fn((listener: () => void) => { notify = listener; return () => {}; }), keepHere: vi.fn(),
     setKeepHere: vi.fn(async (on: boolean) => ({ ...moved, on, moved: false, coming: on })) } as unknown as CloudSendPageBridge;
   setLocale("en");
 });
 afterEach(() => { vi.unstubAllGlobals(); });
-
-it("is never shown in Simple mode, even to someone with a Cloud, and main is not even asked", async () => {
-  f.advanced = false;
-  vi.mocked(bridge.keepHere!).mockResolvedValue(before);
-  render(); for (const effect of f.effects) effect(); await flush();
-  expect(render().html).toBe("");
-  expect(bridge.keepHere).not.toHaveBeenCalled();
-});
 
 it("is never shown without a Cloud of one's own the move applies to, nor by a desktop that has no such switch, nor off the desktop", async () => {
   await ready({ shown: false, on: false, moved: false, coming: false });
@@ -55,7 +47,7 @@ it("is never shown without a Cloud of one's own the move applies to, nor by a de
   expect(render(undefined).html).toBe("");
 });
 
-it("in Advanced mode, before the move: one switch and one plain line; turning it on keeps this computer's bots here at once", async () => {
+it("before the move: one switch and one plain line; turning it on keeps this computer's bots here at once", async () => {
   await ready(before);
   const { html } = render();
   expect(html).toContain("Keep this computer&#x27;s bots on this computer");

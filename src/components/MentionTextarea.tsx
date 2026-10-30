@@ -17,8 +17,6 @@ export function MentionTextarea({ inputRef, peers, everyone = false, wrapperClas
   inputRef: RefObject<HTMLTextAreaElement | null>;
   peers: readonly MentionPeer[];
   everyone?: boolean;
-  /** Copy the textarea's type and padding onto the mirror, for a composer whose sizes differ from the stylesheet's. */
-  matchInputStyle?: boolean;
 }) {
   const mirrorRef = useRef<HTMLDivElement>(null);
   const sync = useCallback(() => {

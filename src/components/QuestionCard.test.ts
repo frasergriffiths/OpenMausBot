@@ -11,7 +11,7 @@ import { formatQuestionAnswers } from "../../shared/ask-question";
 const fixture = vi.hoisted(() => {
   vi.stubGlobal("window", {});
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: () => {} });
-  return { dispatch: vi.fn(), advanced: true };
+  return { dispatch: vi.fn() };
 });
 vi.mock("@/state/store", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/state/store")>()),
@@ -98,7 +98,7 @@ describe("QuestionCard", () => {
     expect(markup).toContain("Model");
     expect(markup).toContain("Style");
     expect(markup).toContain("0 of 2 answered");
-    expect(markup).toContain('placeholder="Type your own answer"');
+    expect(markup).toContain('placeholder="Something else…"');
   });
 
   it("offers no free text on an options-only question", () => {
@@ -135,55 +135,43 @@ describe("QuestionCard", () => {
   it("makes a short single question the title, in plain ink", () => {
     const single = message({ questionRequest: { version: 1, questions: [questionRequest.questions[1]!] } });
     const markup = render(single);
-    expect(markup).toMatch(/text-\[15px\] font-semibold leading-6 text-ink"><bdi dir="auto">Which style should it write in\?</);
+    expect(markup).toMatch(/text-\[16px\] font-semibold leading-\[22px\] text-ink-secondary"><bdi dir="auto">Which style should it write in\?</);
     expect(markup).not.toContain("text-accent-text\"><bdi");
   });
 
   it("puts the options in one rounded group, each keyed by a letter", () => {
     const question = { question: "Which article?", options: [{ label: "A new analytical piece on reasoning models and what they change" }, { label: "Chip race" }, { label: "Blackwell" }] };
     const markup = render(message({ questionRequest: { version: 1, questions: [question] } }));
-    expect(markup).toContain("divide-y divide-ink/[0.12] overflow-hidden rounded-2xl border border-ink/[0.12]");
+    expect(markup).not.toContain("divide-y");
+    expect(markup).toContain('class="-mx-2 flex flex-col"');
     expect(markup).toMatch(/role="radio" aria-checked="false" aria-keyshortcuts="A" class=/);
     expect(markup).toMatch(/aria-keyshortcuts="C"/);
-    expect(markup).toMatch(/rounded-md text-\[12px\] font-medium[^"]*">A</);
-    expect(markup).toMatch(/break-words text-\[15px\] leading-6 text-ink \[unicode-bidi:plaintext\]">A new analytical piece/);
+    expect(markup).toMatch(/rounded-\[7px\] text-\[12px\] font-medium[^"]*">A</);
+    expect(markup).toMatch(/break-words text-\[14px\] leading-5 \[unicode-bidi:plaintext\] block text-ink">A new analytical piece/);
     expect(markup).not.toContain("rounded-full border-");
-    expect(markup).toContain('placeholder="Type your own answer"');
+    expect(markup).toContain('placeholder="Something else…"');
   });
 
-  it("in Simple mode, lists the options as plain 40px rows, each with a 24px key-cap and a 14px label, then Something else", () => {
-    fixture.advanced = false;
-    try {
-      const question = { question: "Which article?", options: [{ label: "Chip race" }, { label: "Blackwell" }] };
-      const markup = render(message({ questionRequest: { version: 1, questions: [question] } }));
-      expect(markup).not.toContain("divide-y");
-      expect(markup).toContain('class="-mx-2 flex flex-col"');
-      expect(markup).toMatch(/aria-keyshortcuts="A" class="flex min-h-10[^"]*rounded-xl/);
-      expect(markup).toMatch(/size-6[^"]*rounded-\[7px\][^"]*">A</);
-      expect(markup).toMatch(/text-\[14px\] leading-5[^"]* text-ink">Chip race</);
-      expect(markup).toMatch(/text-\[16px\] font-semibold leading-\[22px\] text-ink-secondary"><bdi dir="auto">Which article\?</);
-      expect(markup).toContain('placeholder="Something else…"');
-      expect(markup).toContain("data-ask-something-else");
-    } finally {
-      fixture.advanced = true;
-    }
+  it("lists the options as plain 40px rows, each with a 24px key-cap and a 14px label, then Something else", () => {
+    const question = { question: "Which article?", options: [{ label: "Chip race" }, { label: "Blackwell" }] };
+    const markup = render(message({ questionRequest: { version: 1, questions: [question] } }));
+    expect(markup).not.toContain("divide-y");
+    expect(markup).toContain('class="-mx-2 flex flex-col"');
+    expect(markup).toMatch(/aria-keyshortcuts="A" class="flex min-h-10[^"]*rounded-xl/);
+    expect(markup).toMatch(/size-6[^"]*rounded-\[7px\][^"]*">A</);
+    expect(markup).toMatch(/text-\[14px\] leading-5[^"]* text-ink">Chip race</);
+    expect(markup).toMatch(/text-\[16px\] font-semibold leading-\[22px\] text-ink-secondary"><bdi dir="auto">Which article\?/);
+    expect(markup).toContain('placeholder="Something else…"');
+    expect(markup).toContain("data-ask-something-else");
   });
 
-  it("quiets its choices in Simple mode once the person writes instead, and they still answer", () => {
-    fixture.advanced = false;
-    try {
-      const question = { question: "Which article?", options: [{ label: "Chip race" }, { label: "Blackwell" }] };
-      const card = message({ questionRequest: { version: 1, questions: [question] } });
-      const quiet = renderToStaticMarkup(createElement(QuestionCard, { threadId: "t", bot: { name: "Hazelnut" }, message: card, typedPast: true }));
-      expect(quiet).toContain('data-quiet="true"');
-      expect(quiet).toMatch(/text-ink-tertiary">Chip race</);
-
-      expect(quiet).not.toMatch(/<button[^>]*data-ask-choice[^>]* disabled=""/);
-      fixture.advanced = true;
-      expect(renderToStaticMarkup(createElement(QuestionCard, { threadId: "t", bot: { name: "Hazelnut" }, message: card, typedPast: true }))).not.toContain("data-quiet");
-    } finally {
-      fixture.advanced = true;
-    }
+  it("quiets its choices once the person writes instead, and they still answer", () => {
+    const question = { question: "Which article?", options: [{ label: "Chip race" }, { label: "Blackwell" }] };
+    const card = message({ questionRequest: { version: 1, questions: [question] } });
+    const quiet = renderToStaticMarkup(createElement(QuestionCard, { threadId: "t", bot: { name: "Hazelnut" }, message: card, typedPast: true }));
+    expect(quiet).toContain('data-quiet="true"');
+    expect(quiet).toMatch(/text-ink-tertiary">Chip race</);
+    expect(quiet).not.toMatch(/<button[^>]*data-ask-choice[^>]* disabled=""/);
   });
 
   it("maps letter keys to options and ignores anything else", () => {

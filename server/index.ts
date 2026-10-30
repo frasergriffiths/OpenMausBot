@@ -31,13 +31,7 @@ import { failedTurnTool } from "../shared/failed-turn.ts";
 import { assistantTranscript, errorTranscript } from "../shared/client-cancel.ts"; import { PersonStops, stoppedTurnRow } from "./person-stops.ts"; import { LiveTurns } from "./live-turns.ts";
 import { phonePairingLink } from "../shared/pairing-link.ts";
 import { canWorkOnCloud, type CloudEngine } from "../shared/cloud-computer.ts";
-import {
-  approvalModeFor,
-  modelSwitchNeedsAsk,
-  isEmergencyApprovalDowngrade,
-  isApprovalMode, setDefaultApprovalMode,
-  type ApprovalMode,
-} from "../shared/approval-mode.ts";
+import { approvalModeFor, modelSwitchNeedsAsk, isEmergencyApprovalDowngrade, isApprovalMode, setDefaultApprovalMode, type ApprovalMode } from "../shared/approval-mode.ts";
 import { createApprovalModeSupport } from "./harness-capabilities.ts";
 import { escapeAttribute } from "../src/lib/composer-attachments.ts";
 import {
@@ -797,16 +791,11 @@ const emailSignIn = createEmailSignIn({
 let customDomainRevision = 0;
 function savedCustomDomain(): string | null {
   if (DESKTOP_MANAGED || !cfg.customDomain) return null;
-  try { return normalizeCustomDomain(cfg.customDomain); }
-  catch { return null; }
+  try { return normalizeCustomDomain(cfg.customDomain); } catch { return null; }
 }
 function publicUrl(): string | null { return savedCustomDomain() ?? FALLBACK_PUBLIC_URL; }
 function customDomainStatus() {
-  return {
-    customDomain: savedCustomDomain(), publicUrl: publicUrl(), fallbackUrl: FALLBACK_PUBLIC_URL,
-    supported: !DESKTOP_MANAGED, appPort: PORT, webhookPort: WEBHOOK_PORT,
-    serverIpv4: DESKTOP_MANAGED ? null : customDomainIpv4(),
-  };
+  return { customDomain: savedCustomDomain(), publicUrl: publicUrl(), fallbackUrl: FALLBACK_PUBLIC_URL, supported: !DESKTOP_MANAGED, appPort: PORT, webhookPort: WEBHOOK_PORT, serverIpv4: DESKTOP_MANAGED ? null : customDomainIpv4() };
 }
 const registry = new ProviderRegistry(BUILT_IN_DRIVERS, { statusFile: join(DATA_DIR, "providers", "engine-status.json") });
 const supportsApprovalMode = createApprovalModeSupport(registry);

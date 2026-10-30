@@ -39,12 +39,12 @@ export function ChatHeadPill({ bot, avatar, privacy, onToggle }: {
       aria-label={label}
       aria-expanded={open}
       aria-controls={open ? BOT_PANEL_ID : undefined}
-      className={cn("group flex min-w-0 max-w-full items-center gap-2 rounded-full py-[7.5px] pl-[7.5px] pr-[13.5px] text-ink", ELEVATED_FLOAT, ELEVATED_HOVER)}
+      className={cn("group flex min-w-0 max-w-full items-center gap-2 rounded-full py-[7.5px] pl-[7.5px] pr-[13.5px] text-ink [&>*:not([data-chathead-privacy])]:pointer-events-none", ELEVATED_FLOAT, ELEVATED_HOVER)}
     >
       <BotAvatar bot={bot} size={24} {...avatar} />
-      <span dir="auto" className="min-w-0 truncate text-[14px] font-medium leading-5">{bot.name}</span>
+      <span dir="auto" className="pointer-events-none min-w-0 truncate text-[14px] font-medium leading-5">{bot.name}</span>
       {privacyLabel && (
-        <span data-chathead-privacy={privacy?.kind} title={privacyLabel} className="flex shrink-0 text-ink-tertiary">
+        <span data-chathead-privacy={privacy?.kind} title={privacyLabel} className="pointer-events-auto flex shrink-0 text-ink-tertiary">
           <PrivacyIcon size={13} aria-hidden="true" />
           <span className="sr-only">{privacyLabel}</span>
         </span>

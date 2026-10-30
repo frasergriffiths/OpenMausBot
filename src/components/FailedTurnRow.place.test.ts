@@ -9,7 +9,7 @@ import { placeRowText, type PlaceRow } from "../../shared/place-view";
 const fixture = vi.hoisted(() => {
   vi.stubGlobal("window", {});
   vi.stubGlobal("localStorage", { getItem: () => null, setItem: () => {} });
-  return { dispatch: vi.fn(), advanced: false, ownerOrAdmin: null as boolean | null, bots: [] as Bot[], config: {} as Record<string, unknown> };
+  return { dispatch: vi.fn(), ownerOrAdmin: null as boolean | null, bots: [] as Bot[], config: {} as Record<string, unknown> };
 });
 vi.mock("@/state/store", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/state/store")>();
@@ -41,7 +41,6 @@ function show(tool: NonNullable<Message["tool"]>, onRetry?: () => void) {
 
 beforeEach(() => {
   fixture.dispatch = vi.fn();
-  fixture.advanced = false;
   fixture.ownerOrAdmin = null;
   fixture.config = {};
   fixture.bots = [{ id: "scout", name: "Scout", computer: "cloud", modelSelection: { instanceId: "claude", model: "m" } } as Bot];
@@ -64,11 +63,10 @@ describe("J11: a failed place's row", () => {
     expect(show(passing).buttons).toHaveLength(0);
   });
 
-  it("leads a person's pin back to the grid's choice in Simple, and to the composer's in Advanced", () => {
+  it("leads a person's pin back to the grid's choice", () => {
     const pinned = stored({ state: "cc-no-start", params: { bot: "Scout" }, source: "pin" });
     expect(show(pinned).buttons[0]).toContain("Use Cloud desktop");
-    fixture.advanced = true;
-    expect(show(pinned).buttons[0]).toContain("Clear this conversation&#x27;s place");
+    expect(show(pinned).buttons[0]).not.toContain("Clear this conversation&#x27;s place");
   });
 
   it("gives a User no button that changes a setting, and says who can", () => {

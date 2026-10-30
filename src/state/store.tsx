@@ -103,36 +103,6 @@ export interface OptionCardData extends Pick<WireOptionCard, "fixedOptions" | "w
   questionRequest?: QuestionRequestCardData;
 }
 
-export interface ConnectorCardData {
-  slug: string;
-  label: string;
-  description: string;
-  status: "required" | "authorizing" | "connected" | "failed";
-  resumeKey: string;
-  alias?: string;
-  error?: string;
-  dismissed?: boolean;
-  resumed?: boolean;
-  stopped?: boolean;
-}
-
-export interface SecretRequestCardData {
-  target: import("../../shared/credential-request").CredentialTargetId;
-  label: string;
-  description: string;
-  placeholder: string;
-  helpUrl: string;
-  requestKey: string;
-  provided?: boolean;
-  dismissed?: boolean;
-  superseded?: boolean;
-  resumed?: boolean;
-  error?: string;
-  stopped?: boolean;
-}
-
-export type ComputerControlState = { held: boolean; helpReason: string | null; help?: import("../../shared/wire").ComputerHelpRef | null };
-
 export interface Message extends Pick<import("../../shared/wire").WireMessage, "widget" | "app" | "fromApp" | "pointed" | "routedBy" | "quickModel" | "automation" | "publishedPage" | "sender" | "setupSuggestion" | "helperIntro" | "helperFollowup" | "setupOffer" | "setupChoices" | "setupChoicesPending" | "setupRequest" | "relay" | "inbox" | "sentDirectly" | "doneWhen" | "turnSucceeded"> {
   id: string;
   role: "bot" | "user";
@@ -285,6 +255,8 @@ export interface TaskUsage {
   lastTurn?: { input: number; output: number; cachedInput?: number; costUsd: number | null };
   context?: { tokens: number; window?: number };
 }
+
+import type { ComputerControlState, ConnectorCardData, SecretRequestCardData } from "./store-cards";
 
 export interface Bot extends DefaultBotFields {
   toolScope?: ToolScope;

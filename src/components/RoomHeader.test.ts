@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AppState, Bot, Group } from "@/state/store";
 
-const fixture = vi.hoisted(() => ({ advanced: false, state: null as Partial<AppState> | null, dispatch: vi.fn(), chrome: undefined as unknown }));
+const fixture = vi.hoisted(() => ({ state: null as Partial<AppState> | null, dispatch: vi.fn(), chrome: undefined as unknown }));
 vi.mock("@/state/store", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/state/store")>();
   return { ...original, useStore: () => ({ state: { ...original.initialState, ...fixture.state }, dispatch: fixture.dispatch }) };
@@ -65,7 +65,6 @@ const shown = (markup: string) => Object.entries(CONTROLS).filter(([, mark]) => 
 const BULLETIN = "Desk HQ: the recruiting desk&#x27;s room.";
 
 beforeEach(() => {
-  fixture.advanced = false;
   fixture.state = { bots };
   fixture.chrome = undefined;
   fixture.dispatch.mockReset();
@@ -89,14 +88,6 @@ describe("the room header in Simple mode", () => {
     const head = header(view(room({ memberIds: ["bot-0", "bot-1", "bot-2"] })));
     expect(head.match(/title="(?:Desk Manager|Vendor Bench|Job Board Sourcer)"/g)).toHaveLength(3);
     expect(head).not.toMatch(/>\+\d/);
-  });
-
-  it("keeps every control and the instructions line in Advanced mode", () => {
-    fixture.advanced = true;
-    const markup = view(room());
-    expect(shown(header(markup))).toEqual(Object.keys(CONTROLS));
-    expect(header(markup)).not.toContain("data-room-name");
-    expect(markup).toContain(BULLETIN);
   });
 
   it("keeps today's header on a remote client, which cannot open the Room panel", () => {
