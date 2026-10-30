@@ -249,7 +249,9 @@ it("has Marco's assistant answer a free/busy question itself, labelled, from bus
   expect((await messages(philipp, philippThread)).rows.find((row) => row.relay?.kind === "assistant")).toMatchObject({ role: "user",
     text: 'Marco\'s assistant answered your message ("Are you free on Thursday at 3pm?"), from what Marco shares with the team: Marco is busy for an hour that afternoon and free after it.', relay: { email: MARCO.email } });
   const [prompt] = assistantPrompts();
-  expect(prompt).toMatch(/Busy times in the next 14 days \(free at every other time\): \w{3} \d{1,2} \w{3} \d\d:\d\d–\d\d:\d\d\./u);
+  // The fixture's slot is rounded up to the next hour two days out, so one run in 24 starts at 23:00 and the window
+  // crosses midnight, which prints the day on both ends. Both renderings are correct.
+  expect(prompt).toMatch(/Busy times in the next 14 days \(free at every other time\): \w{3} \d{1,2} \w{3} \d\d:\d\d(?:–\d\d:\d\d| – \w{3} \d{1,2} \w{3} \d\d:\d\d)\./u);
   expect(prompt).not.toMatch(/Globex|Interview|hr@/u);
   expect(prompt).not.toContain(SECRET);
   const line = (await inboxLines())[before]!;
