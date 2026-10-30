@@ -228,30 +228,42 @@ describe("choosing a model with the keyboard", () => {
   });
 });
 
-describe("the full picker's search and the rows around it", () => {
-  it("goes from the search to its first result and back, and up to the row above it, so Enter picks what was searched", async () => {
-    fixture.advanced = true;
+describe("the model menu's search and the rows around it", () => {
+  it("goes from the search to its first result and back, so Enter picks what was searched", async () => {
     fixture.instances = [claude(numbered(14))];
     render(ownModelThread("model-1", "model-0"));
     await openWith("click");
     const search = document.querySelector<HTMLInputElement>("[data-menu-search]")!;
     expect(focused()).toBe(search);
     type(search, "model 5");
+    // A search hides the follow-bot-model row, so the search is the first stop above the results.
+    expect(menu()?.querySelector("[data-follow-bot-model]")).toBeNull();
     press("ArrowDown", search);
     expect(focused()?.textContent).toContain("Model 5");
     press("ArrowUp");
-    expect(focused()).toBe(search);
-    press("ArrowUp", search);
-    expect(focused()?.hasAttribute("data-follow-bot-model")).toBe(true);
-    press("ArrowDown");
     expect(focused()).toBe(search);
     press("ArrowDown", search);
     press("Enter");
     await settle();
     expect(fixture.dispatch).toHaveBeenLastCalledWith({
-      type: "setModel", botId: "scout", threadId: "thread-scout", updateBotDefault: false,
+      type: "setModel", botId: "scout", threadId: "thread-scout", updateBotDefault: true,
       selection: { instanceId: "claude", model: "model-5" },
     });
+  });
+
+  it("brings the follow-bot-model row back under the search when the search is cleared", async () => {
+    fixture.instances = [claude(numbered(14))];
+    render(ownModelThread("model-1", "model-0"));
+    await openWith("click");
+    const search = document.querySelector<HTMLInputElement>("[data-menu-search]")!;
+    type(search, "model 5");
+    expect(menu()?.querySelector("[data-follow-bot-model]")).toBeNull();
+    type(search, "");
+    expect(menu()?.querySelector("[data-follow-bot-model]")).not.toBeNull();
+    press("ArrowDown", search);
+    expect(focused()?.hasAttribute("data-current-model")).toBe(true);
+    press("ArrowDown");
+    expect(focused()?.hasAttribute("data-follow-bot-model")).toBe(true);
   });
 });
 
