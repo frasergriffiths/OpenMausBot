@@ -132,8 +132,8 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
                     : "hover:bg-ink/[0.05] disabled:cursor-default")}
                 style={chosen && !settled ? { backgroundColor: `color-mix(in srgb, ${accent} 10%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 30%, transparent)` } : undefined}>
                 <kbd className={cn("flex size-6 shrink-0 items-center justify-center rounded-md font-sans text-[12px] font-medium",
-                  settled ? "bg-ink/[0.04] text-ink-tertiary" : chosen ? "" : "bg-ink/[0.07] text-ink-secondary group-hover:bg-ink/[0.1]")}
-                  style={chosen && !settled ? { backgroundColor: `color-mix(in srgb, ${accent} 15%, transparent)`, color: accentInk } : undefined}>
+                  settled ? "bg-ink/[0.04] text-ink-tertiary" : chosen ? "text-ink" : "bg-ink/[0.07] text-ink-secondary group-hover:bg-ink/[0.1]")}
+                  style={chosen && !settled ? { backgroundColor: `color-mix(in srgb, ${accent} 15%, transparent)` } : undefined}>
                   {LETTERS[index]}
                 </kbd>
                 <span dir="auto" className={cn("min-w-0 flex-1 break-words text-[14px] leading-5", settled ? "text-ink-tertiary" : "text-ink")}>{label}</span>

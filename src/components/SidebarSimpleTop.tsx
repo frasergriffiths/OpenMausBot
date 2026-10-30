@@ -53,8 +53,6 @@ export function SidebarEdgeToggle({ collapsed, onToggle, style, shown = true, on
   );
 }
 
-export const SIMPLE_SEARCH_INPUT = "min-w-0 flex-1 bg-transparent text-[13px] leading-[18px] text-ink placeholder:text-ink-tertiary focus:outline-none";
-
 /** Simple mode's search field, always on screen: no toggle to open it and no close to put it away. Escape clears it; the
  *  field carries no visible clear control, so one is never left over that cannot do anything. */
 export function SidebarSearchPill({ query, onQuery, onClear }: { query: string; onQuery: (query: string) => void; onClear: () => void }) {
