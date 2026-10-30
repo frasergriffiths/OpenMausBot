@@ -11,7 +11,7 @@ export interface DataContext {
   draftSql?: string;
 }
 
-/** The client's record of the result the Data tab is showing. */
+/** The client's record of the result the person is looking at. */
 export interface DataViewContext extends DataContext {
   botId: string;
   threadId: string;
