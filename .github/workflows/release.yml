@@ -148,7 +148,11 @@ jobs:
   mac:
     name: macOS arm64 + x64 (sign, notarize, staple)
     needs: prepare
-    if: needs.prepare.outputs.should_release == 'true'
+    # Off until the project has an Apple Developer account: signing, notarizing
+    # and stapling cannot succeed without one. Delete this condition, restore
+    # the mac entries in assemble's required list and feed map, and add
+    # mac back to assemble's needs when signing exists.
+    if: ${{ false }}
     runs-on: macos-14
     timeout-minutes: 90
     steps:
@@ -489,7 +493,7 @@ jobs:
 
   assemble:
     name: Assemble the draft and verify every feed
-    needs: [prepare, ci, mac, windows, linux]
+    needs: [prepare, ci, windows, linux]
     if: needs.prepare.outputs.should_release == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -510,21 +514,13 @@ jobs:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           required=(
-            latest-linux.yml latest-mac.yml latest.yml
+            latest-linux.yml latest.yml
             "OpenMausBot-$VERSION-amd64.deb"
-            "OpenMausBot-$VERSION-arm64.dmg"
-            "OpenMausBot-$VERSION-arm64.dmg.blockmap"
-            "OpenMausBot-$VERSION-arm64.zip"
-            "OpenMausBot-$VERSION-arm64.zip.blockmap"
             "OpenMausBot-$VERSION-setup.exe"
             "OpenMausBot-$VERSION-setup.exe.blockmap"
-            "OpenMausBot-$VERSION-x64.dmg"
-            "OpenMausBot-$VERSION-x64.dmg.blockmap"
-            "OpenMausBot-$VERSION-x64.zip"
-            "OpenMausBot-$VERSION-x64.zip.blockmap"
             "OpenMausBot-$VERSION-x86_64.AppImage"
-            OpenMausBot-amd64.deb OpenMausBot-intel.dmg OpenMausBot-setup.exe
-            OpenMausBot.AppImage OpenMausBot.dmg SHA256SUMS-ubuntu-x64.txt
+            OpenMausBot-amd64.deb OpenMausBot-setup.exe
+            OpenMausBot.AppImage SHA256SUMS-ubuntu-x64.txt
           )
           for file in "${required[@]}"; do
             test -s "assets/$file" || { echo "::error::missing or empty release asset: $file"; exit 1; }
@@ -539,12 +535,6 @@ jobs:
           import { readFileSync, readdirSync, statSync } from "node:fs";
           const sha512 = (f) => createHash("sha512").update(readFileSync(f)).digest("base64");
           const expected = new Map([
-            ["latest-mac.yml", [
-              "OpenMausBot-${{ needs.prepare.outputs.version }}-x64.zip",
-              "OpenMausBot-${{ needs.prepare.outputs.version }}-arm64.zip",
-              "OpenMausBot-${{ needs.prepare.outputs.version }}-x64.dmg",
-              "OpenMausBot-${{ needs.prepare.outputs.version }}-arm64.dmg",
-            ]],
             ["latest.yml", ["OpenMausBot-${{ needs.prepare.outputs.version }}-setup.exe"]],
             ["latest-linux.yml", [
               "OpenMausBot-${{ needs.prepare.outputs.version }}-x86_64.AppImage",
