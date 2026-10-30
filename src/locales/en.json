@@ -5658,7 +5658,7 @@
   "settings.simple.page.data.description": "Back up or restore everything, import from other apps, and see what changed.",
   "settings.simple.page.appearance.description": "Theme, text, chat width, the sidebar, and notifications.",
   "settings.simple.page.ai.description": "The engines your bots run on, and the model that decides and extracts.",
-  "settings.simple.page.skills.description": "What your bots know how to do, how they learn it, and early features.",
+  "settings.simple.page.skills.description": "Early features you can switch on, plus what your bots know and how they learn.",
   "settings.simple.page.keys.description": "Keys and accounts that connect your bots to other services.",
   "settings.simple.page.computer.description": "Where your bots run, and how you reach them from another device.",
   "settings.simple.page.billing.description": "What you have used, and what your plan includes.",

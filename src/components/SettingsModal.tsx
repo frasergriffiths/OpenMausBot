@@ -76,7 +76,7 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
     keywords: ["backups", "restore", "export", "import", "activity", "audit", "history"] },
   { id: "ai", labelKey: "settings.group.ai", descriptionKey: "settings.simple.page.ai.description", icon: Sparkles, sections: ["engines", "decisionModel"],
     keywords: ["effort", "new bots", "decision", "keep warm", "engines", "model"] },
-  { id: "skills", labelKey: "settings.section.skills", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental"],
+  { id: "skills", labelKey: "settings.section.experimental", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental"],
     keywords: ["skills", "experimental", "early", "preview", "learn"] },
   { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
     keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },

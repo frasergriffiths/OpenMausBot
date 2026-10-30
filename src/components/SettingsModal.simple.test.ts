@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -225,6 +226,15 @@ describe("Settings, the one plain UI", () => {
     expect(placement(open("remote"), "MARKER:companion;")).toBe("shown");
     expect(placement(open("companion"), "MARKER:companion;")).toBe("folded");
     expect(SIMPLE_FOLDED).toEqual({ remote: "computer-elsewhere", desktopWorkspaces: "computer-elsewhere" });
+  });
+
+  it("names the skills page Experimental once, and leads its description with the early features", () => {
+    const html = open("skills");
+    const nav = html.slice(html.indexOf('data-settings-page="skills"'));
+    expect(nav.slice(0, nav.indexOf("</button>"))).toContain(">Experimental<");
+    expect(SIMPLE_PAGES.find((page) => page.id === "skills")?.labelKey).toBe("settings.section.experimental");
+    expect(t("settings.simple.page.skills.description")).toBe("Early features you can switch on, plus what your bots know and how they learn.");
+    expect(readFileSync(new URL("./AppSettingsRows.tsx", import.meta.url), "utf8")).not.toContain("settings.experimental.title");
   });
 
   it("lands a deep link to the skills library on Skills when the library is on", () => {
