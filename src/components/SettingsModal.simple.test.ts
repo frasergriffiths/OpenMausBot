@@ -227,6 +227,13 @@ describe("Settings, the one plain UI", () => {
     expect(SIMPLE_FOLDED).toEqual({ remote: "computer-elsewhere", desktopWorkspaces: "computer-elsewhere" });
   });
 
+  it("names the skills page Experimental, because it holds the early-feature switches too", () => {
+    const html = render();
+    const nav = html.slice(html.indexOf('data-settings-page="skills"'));
+    expect(nav.slice(0, nav.indexOf("</button>"))).toContain(">Experimental<");
+    expect(SIMPLE_PAGES.find((page) => page.id === "skills")?.labelKey).toBe("settings.section.experimental");
+  });
+
   it("lands a deep link to the skills library on Skills when the library is on", () => {
     fixture.config = { ...fixture.config, features: { browser: false, skillsLibrary: true } };
     const html = open("skills");
