@@ -60,7 +60,7 @@ export const SIMPLE_SEARCH_INPUT = "min-w-0 flex-1 bg-transparent text-[13px] le
 export function SidebarSearchPill({ query, onQuery, onClear }: { query: string; onQuery: (query: string) => void; onClear: () => void }) {
   return (
     <div data-sidebar-search-pill className="px-3 pb-2 pt-0.5">
-      <div className="ui-field flex items-center gap-2 pr-1 text-ink-secondary focus-within:ring-1 focus-within:ring-focus">
+      <div className="flex h-8 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1 text-ink-secondary focus-within:ring-1 focus-within:ring-accent">
         <Search size={15} aria-hidden="true" className="shrink-0" />
         <input
           value={query}
@@ -72,7 +72,7 @@ export function SidebarSearchPill({ query, onQuery, onClear }: { query: string; 
           }}
           placeholder={t("sidebar.searchAria")}
           aria-label={t("sidebar.searchAria")}
-          className={SIMPLE_SEARCH_INPUT}
+          className="min-w-0 flex-1 bg-transparent text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none"
         />
       </div>
     </div>

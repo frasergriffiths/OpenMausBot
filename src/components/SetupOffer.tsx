@@ -55,6 +55,9 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
   const first = transcript.find((line) => line.role === "user");
   if (first ? !first.setupRequest && !capable : !(blank(bot) && capable)) return null;
   const settled = first !== undefined;
+  const accentColour = bot.color && Object.hasOwn(MAUS_COLORS, bot.color) ? bot.color : "purple";
+  const accent = MAUS_COLORS[accentColour];
+  const accentInk = mascotInk(accentColour);
   const answer = first?.setupRequest ? first : undefined;
   const pending = waiting && !settled;
   if (pending) waitedOnce.current = true;
@@ -125,14 +128,16 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
                 disabled={settled || busy} onClick={() => setSelected(index)}
                 className={cn("group flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-start",
                   settled ? "cursor-default"
-                    : chosen ? "bg-accent/10 text-ink ring-1 ring-inset ring-accent/30"
-                    : "hover:bg-ink/[0.05] disabled:cursor-default")}>
+                    : chosen ? "text-ink"
+                    : "hover:bg-ink/[0.05] disabled:cursor-default")}
+                style={chosen && !settled ? { backgroundColor: `color-mix(in srgb, ${accent} 10%, transparent)`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${accent} 30%, transparent)` } : undefined}>
                 <kbd className={cn("flex size-6 shrink-0 items-center justify-center rounded-md font-sans text-[12px] font-medium",
-                  settled ? "bg-ink/[0.04] text-ink-tertiary" : chosen ? "bg-accent/15 text-accent-text" : "bg-ink/[0.07] text-ink-secondary group-hover:bg-ink/[0.1]")}>
+                  settled ? "bg-ink/[0.04] text-ink-tertiary" : chosen ? "" : "bg-ink/[0.07] text-ink-secondary group-hover:bg-ink/[0.1]")}
+                  style={chosen && !settled ? { backgroundColor: `color-mix(in srgb, ${accent} 15%, transparent)`, color: accentInk } : undefined}>
                   {LETTERS[index]}
                 </kbd>
                 <span dir="auto" className={cn("min-w-0 flex-1 break-words text-[14px] leading-5", settled ? "text-ink-tertiary" : "text-ink")}>{label}</span>
-                {chosen && <Check size={14} className="shrink-0 text-accent" aria-hidden="true" />}
+                {chosen && <Check size={14} className="shrink-0" style={{ color: accent }} aria-hidden="true" />}
               </button>
             );
           })}
@@ -142,7 +147,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
       {!settled && !pending && (
         <div className="flex px-3 pb-1 pt-3">
           <button type="button" data-setup-submit="" disabled={selected === null || busy} onClick={() => submit(selected)}
-            style={(() => { const colour = bot.color && Object.hasOwn(MAUS_COLORS, bot.color) ? bot.color : "purple"; return { backgroundColor: MAUS_COLORS[colour], color: mascotInk(colour) }; })()}
+            style={{ backgroundColor: accent, color: accentInk }}
             className="flex h-10 min-w-[160px] max-w-full items-center justify-center gap-2 self-start rounded-full px-5 text-[14px] font-medium transition-[filter] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:cursor-not-allowed disabled:opacity-60">
             {busy && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
             {t("chat.setupCard.submit", { name: bot.name })}
