@@ -969,6 +969,8 @@ export function GroupView({ group }: { group: Group }) {
     hiddenCount,
     laterCount,
     olderPending,
+    showEarlier,
+    loadOlder,
     showLater,
     jumpToLatest,
     scrollHandlers,
@@ -1115,7 +1117,14 @@ export function GroupView({ group }: { group: Group }) {
               <span>{t("chat.loadingEarlier")}</span>
             </div>
           ) : hiddenCount > 0 || group.hasMore ? (
-            <div ref={topSentinelRef} className="h-2 w-full pointer-events-none" aria-hidden="true" />
+            <>
+              <div ref={topSentinelRef} className="h-2 w-full pointer-events-none" aria-hidden="true" />
+              <div className="flex justify-center">
+                <button type="button" className="ui-pill" onClick={() => (hiddenCount > 0 ? showEarlier() : loadOlder())}>
+                  {hiddenCount > 0 ? t("chat.showEarlier", { count: hiddenCount }) : t("chat.loadEarlier")}
+                </button>
+              </div>
+            </>
           ) : null}
           <Transcript
             group={group}

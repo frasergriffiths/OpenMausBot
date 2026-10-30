@@ -3,6 +3,9 @@ import type { Message } from "./store";
 
 export const optimisticMessageId = (sendId: string): string => `optimistic-${sendId}`;
 
+/** An id the server has never seen: a page cursor built from one would 404 and the scrollback would stop. */
+export const isOptimisticMessageId = (id: string): boolean => id.startsWith("optimistic-");
+
 export function optimisticUserMessage(
   text: string,
   sendId: string,
