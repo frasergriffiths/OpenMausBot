@@ -270,7 +270,7 @@ export function CopyButton({ text, className }: { text: string; className?: stri
       aria-label={label}
       title={label}
       className={cn(
-        "rounded-md p-1.5 text-ink-secondary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100 touch:opacity-100",
+        "ui-hover-action p-1.5 text-ink-secondary opacity-0 transition-opacity hover:bg-raised hover:text-ink focus-visible:opacity-100 group-hover:opacity-100 group-focus-within:opacity-100 touch:opacity-100",
         state !== "idle" && "opacity-100",
         className,
       )}
