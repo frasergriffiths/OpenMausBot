@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Bug, RefreshCw, X } from "lucide-react";
 import { useStore, visibleMessages, type Bot } from "@/state/store";
 import { cn } from "@/lib/cn";
-import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "./pill-tabs";
+import { moveBetweenPillTabs, PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "./pill-tabs";
 import { useCaptionChrome } from "@/components/DesktopCapabilities";
 import { formatTime, toRows, type InspectorEntry, type InspectorPage, type InspectorRow } from "@/lib/inspector";
 import { listenLiveFrames } from "@/lib/live-events";
@@ -163,17 +163,7 @@ export function InspectorPanel({ bot, embedded = false }: { bot: Bot; embedded?:
       </div>}
 
       <div className="flex items-center gap-2 border-b border-hairline/40 px-4 pb-3">
-        <div role="tablist" aria-label={t("inspector.views")} className={PILL_TABS} onKeyDown={(event) => {
-          const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
-          const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
-          const next = event.key === "ArrowRight" ? (current + 1) % tabs.length
-            : event.key === "ArrowLeft" ? (current + tabs.length - 1) % tabs.length
-              : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : -1;
-          if (next < 0) return;
-          event.preventDefault();
-          tabs[next].focus();
-          tabs[next].click();
-        }}>
+        <div role="tablist" aria-label={t("inspector.views")} className={PILL_TABS} onKeyDown={(event) => moveBetweenPillTabs(event, (tab) => tab.click())}>
           {(["run", "events", "raw"] as const).map((l) => (
             <button
               key={l}

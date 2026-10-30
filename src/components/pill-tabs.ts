@@ -6,3 +6,20 @@ export const PILL_TAB =
 
 export const PILL_TAB_ON = "bg-ink/[0.14] text-ink";
 export const PILL_TAB_OFF = "text-ink-secondary enabled:hover:text-ink";
+
+/** Arrow keys, Home and End move between the tabs in a PILL_TABS row and select the one focused. */
+export function moveBetweenPillTabs(
+  event: { key: string; currentTarget: HTMLElement; preventDefault: () => void },
+  select: (tab: HTMLButtonElement) => void,
+): void {
+  const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+  if (tabs.length === 0) return;
+  const current = Math.max(0, tabs.indexOf(document.activeElement as HTMLButtonElement));
+  const next = event.key === "ArrowRight" ? (current + 1) % tabs.length
+    : event.key === "ArrowLeft" ? (current + tabs.length - 1) % tabs.length
+      : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : -1;
+  if (next < 0) return;
+  event.preventDefault();
+  tabs[next].focus();
+  select(tabs[next]);
+}
