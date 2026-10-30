@@ -148,7 +148,7 @@ export function setupCommandText(text: string): string {
 
 /** What the bot reads for a setup request, from the stored line, so a direct send, a queued one, a retry and an edit
  * read alike: its words as a typed /setup (the command must come first to be read as one), then what the person was
- * looking at in the Data tab. `nativeImages`: the AI takes the line's pictures as images, not as their tags. */
+ * looking at in a result. `nativeImages`: the AI takes the line's pictures as images, not as their tags. */
 export function setupTurnText(line: Message, nativeImages: boolean): string {
   const words = nativeImages ? extractTurnImages(line.text ?? "").text : line.text ?? "";
   const request = setupCommandText(words);

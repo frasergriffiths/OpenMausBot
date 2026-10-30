@@ -145,7 +145,7 @@ export function createDataRoutes(deps: DataRouteDeps): RouteHandler {
         if (!card) return replyError(ctx, { code: "card_not_found", message: `No card ${input.cardId} on the sheet.` });
         cancelCardRun(sheet, card.id);
         const cancelled = card.status === "running"
-          ? sheet.updateCard(card.id, { status: "failed", error: { code: "cancelled", message: "Cancelled from the Data tab." } })
+          ? sheet.updateCard(card.id, { status: "failed", error: { code: "cancelled", message: "Cancelled from the result view." } })
           : card;
         return ctx.json(res, 200, { card: cancelled });
       }

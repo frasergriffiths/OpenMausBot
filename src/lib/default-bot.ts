@@ -89,7 +89,7 @@ export function createChiefPatch(maus: DefaultBotFields, chief: { id: string } |
 
 export type SetupStep = "ai" | "bots" | "apps" | "phone" | "cloud";
 
-/** What MausBot's intro offers to set up in Advanced mode, each optional: only what is still to do, and on a place with
+/** What MausBot's intro offers to set up, each optional: only what is still to do, and on a place with
  * bots of the person's own only an AI, which nothing works without. On a Team Cloud the team's admins set those up. */
 export function setupSteps(input: { aiReady: boolean; ownBots: number; onCloud: boolean; team: boolean; remote: boolean }): SetupStep[] {
   if (input.team) return [];
