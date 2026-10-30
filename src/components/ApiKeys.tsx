@@ -625,7 +625,7 @@ export function VpsConnection() {
       .catch((e) => setError(e.message))
       .finally(() => setSaving(false));
   };
-  const save = () => { if (!alias.trim() && !configured) return; persist(alias.trim()); };
+  const save = () => { if (!alias.trim()) return; persist(alias.trim()); };
   const remove = () => persist("");
 
   return (
@@ -675,7 +675,7 @@ export function VpsConnection() {
         )}
         <button
           onClick={save}
-          disabled={saving || (!alias.trim() && !configured)}
+          disabled={saving || !alias.trim()}
           className={cn(
             "cursor-pointer flex w-[72px] shrink-0 items-center justify-center gap-1.5 rounded-lg bg-control py-2 text-[13px] text-ink hover:bg-raised-hover",
             "disabled:cursor-not-allowed disabled:opacity-50",
