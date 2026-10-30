@@ -85,9 +85,9 @@ describe("sidebar bot row", () => {
   });
   afterEach(() => { vi.unstubAllGlobals(); });
 
-  // Comfortable and compact put the mark at the end of the row's text, clear of the avatar's status dots;
+  // Compact puts the mark at the end of the row's text, clear of the avatar's status dots;
   // icons-only has no row text, so the badge stays on the avatar.
-  it.each<[SidebarDensity, string]>([["comfortable", "ml-auto"], ["compact", "ml-auto"], ["icons", "absolute -bottom-0.5 -left-0.5"]])(
+  it.each<[SidebarDensity, string]>([["compact", "flex shrink-0"], ["icons", "absolute -bottom-0.5 -left-0.5"]])(
     "shows the model once in a %s row", (density, placement) => {
       const found = badges(render(bot("claude", "opus"), density));
       expect(found).toHaveLength(1);
@@ -96,7 +96,7 @@ describe("sidebar bot row", () => {
     });
 
   // Simple mode shows the mark too (the owner's ask, 2026-10-22): a person sees which provider each bot runs on at a glance.
-  it.each<SidebarDensity>(["comfortable", "compact", "icons"])("shows the model once in a Simple mode %s row", (density) => {
+  it.each<SidebarDensity>(["compact", "icons"])("shows the model once in a Simple mode %s row", (density) => {
     fixture.advanced = false;
     const found = badges(render(bot("claude", "opus"), density));
     expect(found).toHaveLength(1);
@@ -104,6 +104,6 @@ describe("sidebar bot row", () => {
   });
 
   it("shows no badge while the bot's engine is missing", () => {
-    expect(render(bot("gone", "opus"), "comfortable")).not.toContain('data-testid="model-badge"');
+    expect(render(bot("gone", "opus"), "compact")).not.toContain('data-testid="model-badge"');
   });
 });

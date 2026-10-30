@@ -47,10 +47,10 @@ afterEach(() => {
 });
 
 describe("shared sidebar density store", () => {
-  it("defaults to comfortable and reads a density saved before the first render", async () => {
+  it("defaults to expanded and reads a density saved before the first render", async () => {
     const preference = await import("./sidebar-preferences");
-    expect(preference.useSidebarDensity()).toBe("comfortable");
-    expect(hook.serverSnapshot!()).toBe("comfortable");
+    expect(preference.useSidebarDensity()).toBe("expanded");
+    expect(hook.serverSnapshot!()).toBe("expanded");
     preference.saveSidebarDensity("compact");
     expect(preference.useSidebarDensity()).toBe("compact");
   });

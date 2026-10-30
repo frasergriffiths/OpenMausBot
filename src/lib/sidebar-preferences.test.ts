@@ -13,6 +13,7 @@ import {
   SIDEBAR_WIDTH_KEY,
   SIDEBAR_SECTION_ORDER_KEY,
   SIMPLE_SIDEBAR_WIDTH_KEY,
+  SIDEBAR_DENSITIES,
   clampSidebarWidth,
   loadPinnedCircles,
   loadPinnedCircleOrder,
@@ -45,12 +46,13 @@ import {
 import { userSectionId } from "./sidebar-layout";
 
 describe("sidebar density preferences", () => {
-  it("accepts the three supported layouts and rejects stale values", () => {
-    expect(parseSidebarDensity("comfortable")).toBe("comfortable");
+  it("defaults to the expanded row, keeps compact and avatars, reads the old Comfortable value as expanded and rejects stale values", () => {
+    expect(SIDEBAR_DENSITIES).toEqual(["expanded", "compact"]);
+    expect(parseSidebarDensity("comfortable")).toBe("expanded");
     expect(parseSidebarDensity("compact")).toBe("compact");
     expect(parseSidebarDensity("icons")).toBe("icons");
-    expect(parseSidebarDensity("tiny")).toBe("comfortable");
-    expect(parseSidebarDensity(null)).toBe("comfortable");
+    expect(parseSidebarDensity("tiny")).toBe("expanded");
+    expect(parseSidebarDensity(null)).toBe("expanded");
   });
 
   it("loads and saves without making storage availability a launch dependency", () => {
@@ -58,7 +60,7 @@ describe("sidebar density preferences", () => {
     saveSidebarDensity("icons", { setItem });
     expect(setItem).toHaveBeenCalledWith(SIDEBAR_DENSITY_KEY, "icons");
     expect(loadSidebarDensity({ getItem: () => "compact" })).toBe("compact");
-    expect(loadSidebarDensity({ getItem: () => { throw new Error("blocked"); } })).toBe("comfortable");
+    expect(loadSidebarDensity({ getItem: () => { throw new Error("blocked"); } })).toBe("expanded");
   });
 });
 

@@ -5,7 +5,7 @@ import { roomThreadSpeakerId, roomThreadWorking } from "@/lib/room-threads";
 import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { orderedThreadList, SidebarThreadRow, stampClock, threadRecency, useRelativeNow, useRevealedThreadRow, visibleSidebarThreads } from "./SidebarThreadRow";
 
-export function GroupThreadList({ group, selected, density = "comfortable", query = "" }: { group: Group; selected: boolean; density?: SidebarDensity; query?: string }) {
+export function GroupThreadList({ group, selected, density = "compact", query = "" }: { group: Group; selected: boolean; density?: SidebarDensity; query?: string }) {
   const { state, dispatch } = useStore();
   const now = useRelativeNow();
   const tasks = (group.tasks ?? [{ threadId: group.threadId, title: group.name, createdAt: group.createdAt }]).map((task) => {

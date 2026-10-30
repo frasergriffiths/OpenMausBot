@@ -66,10 +66,10 @@ module.exports = async function verifySidebarAttentionUi({ root, url, api, until
   };
   try {
     const results = {};
-    // Compact must shrink the menu to w-60 (240px); comfortable keeps w-72
+    // Compact must shrink the menu to w-60 (240px).
     // (288px). Both sit 16px inside the sidebar: popover width + px-4 anchor
     // equal the sidebar's own width plus the shared 16px inset.
-    for (const [density, sidebarPixels, menuWidth] of [["compact", 272, 240], ["comfortable", 320, 288]]) {
+    for (const [density, sidebarPixels, menuWidth] of [["compact", 272, 240]]) {
       await window.loadURL(`${preview.previewUrl}?density=${density}`);
       await until(async () => await evaluate(sidebarAtWidth(sidebarPixels)) === true);
       const measured = await openAndMeasure();

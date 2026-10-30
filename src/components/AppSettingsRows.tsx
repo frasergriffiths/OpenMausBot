@@ -283,7 +283,7 @@ export function PinnedCirclesRow() {
 }
 
 const SIDEBAR_DENSITY_LABEL_KEYS: Record<SidebarDensity, LocaleKey> = {
-  comfortable: "sidebar.density.comfortable",
+  expanded: "sidebar.density.expanded",
   compact: "sidebar.density.compact",
   icons: "sidebar.density.iconsOnly",
 };
@@ -300,6 +300,8 @@ export function SidebarDensityRow() {
         {SIDEBAR_DENSITIES.map((option) => (
           <option key={option} value={option}>{t(SIDEBAR_DENSITY_LABEL_KEYS[option])}</option>
         ))}
+        {/* Avatars only is the collapsed state, not a normal choice, but the current value must still show when open. */}
+        {density === "icons" && <option value="icons">{t(SIDEBAR_DENSITY_LABEL_KEYS.icons)}</option>}
       </Select>
     </SettingRow>
   );

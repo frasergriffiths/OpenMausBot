@@ -137,16 +137,16 @@ describe("sidebar virtual sections", () => {
   });
 
   it("shows pinned-circle thread rows only while the circle grid is showing", () => {
-    expect(pinnedCircleThreadListVisible(true, "comfortable", 1)).toBe(true);
+    expect(pinnedCircleThreadListVisible(true, "compact", 1)).toBe(true);
     expect(pinnedCircleThreadListVisible(true, "compact", 2)).toBe(true);
-    expect(pinnedCircleThreadListVisible(false, "comfortable", 1)).toBe(false);
+    expect(pinnedCircleThreadListVisible(false, "compact", 1)).toBe(false);
     expect(pinnedCircleThreadListVisible(true, "icons", 1)).toBe(false);
-    expect(pinnedCircleThreadListVisible(true, "comfortable", 0)).toBe(false);
+    expect(pinnedCircleThreadListVisible(true, "compact", 0)).toBe(false);
   });
 
   it("forces filtered and icon-only views open and non-reorderable", () => {
-    expect(sidebarLayoutInteractive("comfortable", "")).toBe(true);
-    expect(sidebarLayoutInteractive("comfortable", "writer")).toBe(false);
+    expect(sidebarLayoutInteractive("compact", "")).toBe(true);
+    expect(sidebarLayoutInteractive("compact", "writer")).toBe(false);
     expect(sidebarLayoutInteractive("icons", "")).toBe(false);
     expect(sidebarSectionCollapsed(PINNED_SECTION_ID, [PINNED_SECTION_ID], "compact", "")).toBe(true);
     expect(sidebarSectionCollapsed(PINNED_SECTION_ID, [PINNED_SECTION_ID], "compact", "writer")).toBe(false);

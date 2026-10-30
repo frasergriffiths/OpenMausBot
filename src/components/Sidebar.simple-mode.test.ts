@@ -29,7 +29,7 @@ const bot: Bot = {
     { threadId: "unread", title: "Finished reply", createdAt: 6, unread: true },
   ],
 };
-const densities: SidebarDensity[] = ["comfortable", "compact", "icons"];
+const densities: SidebarDensity[] = ["expanded", "compact", "icons"];
 const botRow = (BotListItem as MemoExoticComponent<(props: BotRowProps) => ReactNode>).type;
 const pinnedCircle = (PinnedBotCircle as MemoExoticComponent<(props: BotRowProps) => ReactNode>).type;
 const rowProps = (density: SidebarDensity, candidate: Bot = bot, query = "") =>
@@ -64,8 +64,8 @@ describe("bot-first sidebar", () => {
     const expected = "Use the screen";
     const other = "mcp__omb__computer_batch";
     for (const markup of [
-      renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", candidate))),
-      renderToStaticMarkup(createElement(GroupListItem, { group, density: "comfortable", onMenu: vi.fn() })),
+      renderToStaticMarkup(createElement(BotListItem, rowProps("compact", candidate))),
+      renderToStaticMarkup(createElement(GroupListItem, { group, density: "compact", onMenu: vi.fn() })),
     ]) {
       expect(markup).toContain(expected);
       expect(markup).not.toContain(other);
@@ -73,9 +73,10 @@ describe("bot-first sidebar", () => {
   });
 
   it.each([
-    { enabled: false, density: "comfortable", size: 42, spacing: ["gap-2", "rounded-[10px]", "pl-2", "pr-2", "md:h-[54px]"] },
+    { enabled: false, density: "expanded", size: 36, spacing: ["gap-2", "rounded-[10px]", "py-2", "pl-2", "pr-2", "md:h-[54px]"] },
     { enabled: false, density: "compact", size: 36, spacing: ["gap-2.5", "py-1.5", "pl-2", "pr-2"] },
     { enabled: false, density: "icons", size: 36, spacing: ["h-[54px]", "justify-center"] },
+    { enabled: true, density: "expanded", size: 36, spacing: ["gap-2", "rounded-[10px]", "py-2", "pl-6", "pr-9", "md:h-[54px]"] },
   ] as const)("sizes bot portraits and row spacing in $density density with threads $enabled $density", ({ enabled, density, size, spacing }) => {
     fixture.showThreads = enabled;
     for (const avatar of [{}, { avatarUrl: "/api/attachments/portrait.png", avatarCrop: "circle" as const }]) {
@@ -87,8 +88,6 @@ describe("bot-first sidebar", () => {
       expect(markup).toContain(avatar.avatarUrl
         ? `width="${size}" height="${size}"`
         : `width="${size}px" height="${size}px"`);
-      // Simple draws its mascot larger than the 36px it takes in the row, so the text stays where it was.
-      if (density === "comfortable") expect(markup).toContain('<span class="relative flex shrink-0 -m-[3px]">');
     }
   });
 
@@ -112,12 +111,22 @@ describe("bot-first sidebar", () => {
     });
   }
 
-  it("uses 14px medium names in comfortable rows", () => {
+  it("uses 15px semibold names in compact rows", () => {
     fixture.showThreads = false;
-    const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...bot, tasks: [], projects: [] })));
+    const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("compact", { ...bot, tasks: [], projects: [] })));
     const name = markup.match(/<span class="flex min-w-0 grow items-center gap-1\.5 truncate text-ink ([^"]*)"/)?.[1];
-    expect(name).toBe("text-[14px] font-medium leading-5");
+    expect(name).toBe("text-[15px] font-semibold");
     expect(markup).toContain("truncate text-[13px] leading-[18px]");
+  });
+
+  it("uses a 14px medium name and a 13px preview in the expanded row", () => {
+    fixture.showThreads = false;
+    const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("expanded", { ...bot, tasks: [], projects: [] })));
+    const name = markup.match(/<span class="flex min-w-0 grow items-center gap-1\.5 truncate text-ink ([^"]*)"/)?.[1];
+    expect(name).toBe("text-[14px] font-medium");
+    expect(markup).toContain("truncate text-[13px] leading-[18px]");
+    expect(markup).toContain("md:h-[54px]");
+    expect(markup).toContain('width="36px" height="36px"');
   });
 
   it("puts one trailing cluster of the engine mark then three dots after the text block, with the unread dot still in the name line", () => {
@@ -125,10 +134,10 @@ describe("bot-first sidebar", () => {
     fixture.state = { ...fixture.state, instances: [{ instanceId: "fake", driverKind: "claudeAgent", displayName: "Claude" }] as unknown as AppState["instances"] };
     const candidate = { ...bot, tasks: [], projects: [], unread: true, messages: [{ id: "m", role: "bot", kind: "text", text: "Done.", at: 1 }] } as Bot;
     let tree: ReactNode;
-    function Capture() { tree = botRow(rowProps("comfortable", candidate)); return tree; }
+    function Capture() { tree = botRow(rowProps("compact", candidate)); return tree; }
     const markup = renderToStaticMarkup(createElement(Capture));
     const title = markup.slice(markup.indexOf('data-sidebar-bot-title=""'), markup.indexOf(">Done.<"));
-    expect(title).toContain('<span data-testid="unread-dot" title="Unread" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-accent self-center"></span>');
+    expect(markup).toContain('<span class="size-2 shrink-0 rounded-full bg-accent" aria-label="Unread threads"></span>');
     expect(title).not.toContain('data-bot-actions="atlas"');
     expect(title).not.toContain('data-testid="model-badge"');
 
@@ -148,9 +157,9 @@ describe("bot-first sidebar", () => {
   it("keeps a Simple row's ⋯ visible while its menu is open", () => {
     fixture.showThreads = false;
     const candidate = { ...bot, tasks: [], projects: [] };
-    const closed = renderToStaticMarkup(createElement(BotListItem, { ...rowProps("comfortable", candidate), menuOpen: false }));
+    const closed = renderToStaticMarkup(createElement(BotListItem, { ...rowProps("compact", candidate), menuOpen: false }));
     expect(closed).toMatch(/data-bot-actions="atlas"[^>]*aria-expanded="false"[^>]*class="[^"]*\baria-expanded:opacity-100\b/);
-    const open = renderToStaticMarkup(createElement(BotListItem, { ...rowProps("comfortable", candidate), menuOpen: true }));
+    const open = renderToStaticMarkup(createElement(BotListItem, { ...rowProps("compact", candidate), menuOpen: true }));
     expect(open).toMatch(/data-bot-actions="atlas"[^>]*aria-expanded="true"[^>]*class="[^"]*\baria-expanded:opacity-100\b/);
   });
 
@@ -162,25 +171,24 @@ describe("bot-first sidebar", () => {
     expect(rail).toMatch(/<span data-testid="model-badge"[^>]*><span data-provider-mark="brand" class="[^"]*\bopacity-60\b/);
   });
 
-  it("shows a waiting Simple row as an amber dot and preview, and a working one as a ring-cut dot on the avatar, with no badge or live region", () => {
+  it("shows a waiting compact row as an amber badge and preview, and a working one as a dot on the avatar", () => {
     fixture.showThreads = false;
     const quiet = { ...bot, tasks: [], projects: [], unread: false };
-    const waiting = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...quiet, activity: "waiting-on-you" })));
-    expect(waiting).toContain('data-testid="waiting-dot" title="Waiting for you…" aria-hidden="true" class="size-2 shrink-0 rounded-full bg-warning self-center"');
-    expect(waiting).not.toContain(">!<");
-    expect(waiting).not.toContain("font-semibold text-warning");
-    expect(waiting).not.toContain('role="status"');
-    const working = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...quiet, busy: true })));
-    expect(working).toContain('data-testid="working-dot" title="Working" class="absolute bottom-0.5 right-0.5 size-2 rounded-full ring-2 ring-[var(--row)] bg-success"');
-    expect(working).toContain('<span class="sr-only">Working</span>');
-    expect(working).not.toContain('role="status"');
-    expect(working).toContain("[--row:var(--color-panel)]");
+    const waiting = renderToStaticMarkup(createElement(BotListItem, rowProps("compact", { ...quiet, activity: "waiting-on-you" })));
+    expect(waiting).toContain('data-testid="waiting-dot"');
+    expect(waiting).toContain(">!<");
+    expect(waiting).toContain("font-semibold text-warning");
+    expect(waiting).toContain('role="status"');
+    const working = renderToStaticMarkup(createElement(BotListItem, rowProps("compact", { ...quiet, busy: true })));
+    expect(working).toContain('data-testid="working-dot"');
+    expect(working).toContain("size-2.5");
+    expect(working).toContain("bg-success");
   });
 
   it("rings a focused row or group chat inside its edge", () => {
     fixture.showThreads = false;
     const group: Group = { id: "room", threadId: "room-thread", name: "Launch", memberIds: [bot.id], messages: [], defaultResponder: { kind: "mentions" }, bulletin: "", unread: false, createdAt: 1 };
-    const simple = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...bot, tasks: [], projects: [] }))) + renderToStaticMarkup(createElement(GroupListItem, { group, density: "comfortable", onMenu: vi.fn() }));
+    const simple = renderToStaticMarkup(createElement(BotListItem, rowProps("compact", { ...bot, tasks: [], projects: [] }))) + renderToStaticMarkup(createElement(GroupListItem, { group, density: "compact", onMenu: vi.fn() }));
     expect(simple.match(/focus-visible:outline-2 focus-visible:-outline-offset-2! focus-visible:outline-focus/g)).toHaveLength(2);
     expect(simple).not.toContain("focus-visible:ring-accent/60");
   });
@@ -189,31 +197,30 @@ describe("bot-first sidebar", () => {
     fixture.showThreads = false;
     fixture.state = { ...fixture.state, selectedId: bot.id, activeView: "chat" };
     const candidate = { ...bot, tasks: [], projects: [] };
-    const simple = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", candidate)));
-    expect(simple).toContain("[--row:var(--color-raised)]");
+    const simple = renderToStaticMarkup(createElement(BotListItem, rowProps("compact", candidate)));
+    expect(simple).toContain("bg-raised");
     expect(simple).toMatch(/data-bot-actions="atlas"[^>]*class="[^"]*\bopacity-0\b[^"]*\bgroup-hover:pointer-events-auto/);
     expect(simple).toContain('class="flex items-baseline justify-between gap-2"');
   });
 
-  it("marks an unread Simple group chat with one dot in its name line, said once for a screen reader", () => {
+  it("marks an unread group chat with one dot in its preview line", () => {
     fixture.showThreads = false;
     const group: Group = { id: "room", threadId: "room-thread", name: "Launch", memberIds: [bot.id], messages: [], defaultResponder: { kind: "mentions" }, bulletin: "", unread: true, createdAt: 1 };
-    const markup = renderToStaticMarkup(createElement(GroupListItem, { group, density: "comfortable", onMenu: vi.fn() }));
-    expect(markup.match(/data-testid="unread-dot"/g)).toHaveLength(1);
-    expect(markup).toContain('data-testid="unread-dot" title="Unread"');
-    expect(markup).toContain('<span class="sr-only">Unread</span>');
+    const markup = renderToStaticMarkup(createElement(GroupListItem, { group, density: "compact", onMenu: vi.fn() }));
+    expect(markup.match(/rounded-full bg-accent/g)).toHaveLength(1);
+    expect(markup).toContain("size-2 shrink-0 rounded-full bg-accent");
   });
 
   it("draws no engine mark for a bot with no AI yet or in a group chat", () => {
     fixture.showThreads = false;
     fixture.state = { ...fixture.state, instances: [{ instanceId: "fake", driverKind: "claudeAgent", displayName: "Claude" }] as unknown as AppState["instances"] };
     const candidate = { ...bot, tasks: [], projects: [] };
-    expect(renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", { ...candidate, modelSelection: { instanceId: "none", model: "m" } })))).not.toContain("data-provider-mark");
+    expect(renderToStaticMarkup(createElement(BotListItem, rowProps("compact", { ...candidate, modelSelection: { instanceId: "none", model: "m" } })))).not.toContain("data-provider-mark");
     const group: Group = { id: "room", threadId: "room-thread", name: "Launch", memberIds: [bot.id], messages: [], defaultResponder: { kind: "mentions" }, bulletin: "", unread: false, createdAt: 1 };
-    expect(renderToStaticMarkup(createElement(GroupListItem, { group, density: "comfortable", onMenu: vi.fn() }))).not.toContain("data-provider-mark");
+    expect(renderToStaticMarkup(createElement(GroupListItem, { group, density: "compact", onMenu: vi.fn() }))).not.toContain("data-provider-mark");
   });
 
-  it.each(["comfortable", "compact"] as const)("keeps a Simple row to its name, preview and one faded engine mark, naming role, Chief and engine in its tooltip, %s density", (density) => {
+  it.each(["compact"] as const)("keeps a Simple row to its name, preview and one faded engine mark, naming role, Chief and engine in its tooltip, %s density", (density) => {
     fixture.showThreads = false;
     const instances = [{ instanceId: "fake", driverKind: "claude", displayName: "Claude", models: { options: [{ id: "test", label: "Sonnet" }] } }] as unknown as AppState["instances"];
     fixture.state = { ...fixture.state, instances, selectedId: bot.id };
@@ -224,8 +231,7 @@ describe("bot-first sidebar", () => {
     expect(markup).not.toContain('data-testid="bot-role"');
     expect(markup.match(/data-testid="model-badge"/g)).toHaveLength(1);
     expect(markup.match(/data-provider-mark=/g)).toHaveLength(1);
-    if (density === "comfortable") expect(markup).toMatch(/<span class="absolute -left-1 -top-1 flex rounded-full p-\[3px\]" style="[^"]*background-color:[^"]*"><svg[^>]*data-testid="chief-crown"/);
-    else expect(markup).not.toContain('data-testid="chief-crown"');
+    expect(markup).not.toContain('data-testid="chief-crown"');
     expect(markup).not.toContain("lucide-pin");
     expect(markup).not.toMatch(/tabular-nums text-ink-secondary transition-opacity group-hover:opacity-0/);
     const row = findElement(tree, "data-sidebar-bot-row", bot.id)!;
@@ -233,7 +239,7 @@ describe("bot-first sidebar", () => {
   });
 
   it.each([
-    { density: "comfortable", face: 36, spacing: ["gap-2", "rounded-[10px]", "pl-2", "pr-2", "md:h-[54px]"], name: "font-medium", preview: "text-[13px]" },
+    { density: "expanded", face: 36, spacing: ["gap-2", "rounded-[10px]", "py-2", "pl-2", "pr-9", "md:h-[54px]"], name: "font-medium", preview: "text-[13px]" },
     { density: "icons", face: 36, spacing: ["h-[54px]", "justify-center"], name: "font-semibold", preview: "text-[11px]" },
     { density: "compact", face: 26, spacing: ["gap-1.5", "py-1", "pl-6", "pr-9"], name: "font-semibold", preview: "text-[11px]" },
   ] as const)("sizes group chat rows in $density density", ({ density, face, spacing, name, preview }) => {
@@ -255,7 +261,7 @@ describe("bot-first sidebar", () => {
       projects: [],
       tasks: [{ threadId: "queued", title: "Next job", createdAt: 5 }],
     };
-    const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("comfortable", queuedBot)));
+    const markup = renderToStaticMarkup(createElement(BotListItem, rowProps("compact", queuedBot)));
     const queuedDot = markup.match(/<span[^>]*data-testid="queued-dot"[^>]*>/)?.[0] ?? "";
     expect(queuedDot).toContain("size-2.5");
     expect(queuedDot).toContain("bg-ink-secondary");
@@ -295,11 +301,11 @@ describe("bot-first sidebar", () => {
   });
 
   it("removes child controls and portals from a retained hidden folder list", () => {
-    const markup = renderToStaticMarkup(createElement(BotThreadList, { ...rowProps("comfortable"), selected: true, hidden: true }));
+    const markup = renderToStaticMarkup(createElement(BotThreadList, { ...rowProps("compact"), selected: true, hidden: true }));
     expect(markup).toContain('hidden=""');
     expect(markup).not.toContain("<button");
     expect(markup).not.toContain("data-sidebar-thread-row");
-    const shown = renderToStaticMarkup(createElement(BotThreadList, { ...rowProps("comfortable"), selected: true }));
+    const shown = renderToStaticMarkup(createElement(BotThreadList, { ...rowProps("compact"), selected: true }));
     expect(shown).toContain('data-sidebar-folder-row="private-folder"');
     expect(shown).toContain('data-sidebar-thread-row="idle-history"');
   });

@@ -102,7 +102,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => {
-  setSidebarDensity("comfortable");
+  setSidebarDensity("compact");
   vi.unstubAllGlobals();
 });
 
@@ -233,15 +233,15 @@ describe("Simple-mode sidebar layout", () => {
     expect(listedBots(render().tree)).toEqual(["atlas", "bea", "dodo"]);
   });
 
-  it("opens at 280px and remembers its resized width", () => {
+  it("opens at 272px and remembers its resized width", () => {
     const width = () => render().root.props.style!["--sidebar-width"];
-    expect(width()).toBe("280px");
-    expect(render().root.props.className).toContain("w-[280px]");
+    expect(width()).toBe("272px");
+    expect(render().root.props.className).toContain("w-[272px]");
     fixture.storage.set(SIMPLE_SIDEBAR_WIDTH_KEY, "300");
     fixture.values = [];
     expect(width()).toBe("300px");
     const handle = render().tree.find((node) => node.type === SidebarResizeHandle)!.props as Parameters<typeof SidebarResizeHandle>[0];
-    expect(handle.sizing.defaultWidth).toBe(280);
+    expect(handle.sizing.defaultWidth).toBe(272);
     expect(handle.sizing.valueNow).toBe(300);
     fixture.storage.set(SIMPLE_SIDEBAR_WIDTH_KEY, "460");
     fixture.values = [];
@@ -279,7 +279,7 @@ describe("Simple-mode sidebar layout", () => {
     expect(item("New group chat")).toBeDefined();
     expect(item("Templates"), "Templates lives in the desktop footer, not the + menu").toBeUndefined();
     (render().tree.find((node) => node.type === SidebarEdgeToggle)!.props as Parameters<typeof SidebarEdgeToggle>[0]).onToggle();
-    expect(fixture.storage.get(SIDEBAR_DENSITY_KEY)).toBe("comfortable");
+    expect(fixture.storage.get(SIDEBAR_DENSITY_KEY)).toBe("expanded");
     expect(render().tree.some((node) => node.type === SimpleRailFooter)).toBe(false);
   });
 

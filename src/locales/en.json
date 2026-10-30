@@ -1661,7 +1661,7 @@
   "sidebar.density.collapse": "Collapse to avatars",
   "sidebar.density.chooseAria": "Choose sidebar density",
   "sidebar.density.title": "Sidebar density",
-  "sidebar.density.comfortable": "Comfortable",
+  "sidebar.density.expanded": "Expanded",
   "sidebar.density.compact": "Compact",
   "sidebar.density.iconsOnly": "Avatars only",
   "sidebar.toolsLayout.title": "Tools layout",

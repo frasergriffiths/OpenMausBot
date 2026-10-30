@@ -105,8 +105,6 @@ import { attentionJumpAction, crossBotAttentionThreads, sidebarBotActivityTasks,
 import { SidebarNoBots, SidebarTileGrid } from "./SidebarTiles";
 import { BotContextMenu } from "./SidebarBotMenu";
 export { BotContextMenu };
-import { AvatarActivityDot, RowDot, RowStatusText, rowSurface } from "./SidebarRowMarkers";
-
 
 import { SidebarAttentionPanel } from "./SidebarAttentionPanel";
 import { useLiveMedia } from "@/lib/live-call-media";
@@ -159,7 +157,7 @@ export function GroupListItem({
   }, [selected]);
   const hasThreadList = (group.tasks?.length ?? 1) > 1 || Boolean(query);
   const expanded = !group.dm && threadsOpen && density !== "icons" && hasThreadList;
-  const simpleRow: boolean = density === "comfortable";
+  const expandedRow = density === "expanded";
   const railTile: boolean = density === "icons";
   const groupStatus = Boolean(group.busyBotId) || Boolean(group.working);
   const roomBusy = groupStatus;
@@ -186,25 +184,24 @@ export function GroupListItem({
       }}
       className={cn(
         "relative flex w-full items-center rounded-md text-left", SIMPLE_ROW_FOCUS,
-        density === "icons" ? (railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5") : density === "compact" ? "gap-1.5 py-1 pl-6 pr-9" : simpleRow
-          ? cn("gap-2 rounded-[10px] py-2 pr-2 group-hover:pr-9 group-focus-within:pr-9 max-md:pr-9 touch:pr-9 md:h-[54px] md:py-0", !group.dm && hasThreadList ? "pl-6" : "pl-2") : "gap-2 py-1.5 pl-6 pr-9",
+        density === "icons" ? (railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5")
+          : expandedRow ? cn("gap-2 rounded-[10px] py-2 pr-9 md:h-[54px] md:py-0", !group.dm && hasThreadList ? "pl-6" : "pl-2")
+          : "gap-1.5 py-1 pl-6 pr-9",
         selected && !expanded ? "bg-raised" : "hover:bg-raised/50",
       )}
       title={density === "icons" ? group.name : undefined}
       aria-label={density === "icons" ? group.name : undefined}
     >
-      <StackedMauses members={members} density={railTile ? "comfortable" : density} large={simpleRow || railTile} />
+      <StackedMauses members={members} density={density} tile={railTile || expandedRow} />
       <div className={cn("min-w-0 flex-1", density === "icons" && "hidden")}>
-        <div className={cn("flex items-baseline justify-between gap-2", simpleRow && "pr-7")}>
-          <span className={cn("truncate text-[14px] text-ink", simpleRow ? "font-medium leading-5" : "font-semibold")}>{group.name}</span>
-          {!simpleRow && (expanded || (quiet && !groupStatus)) && group.unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
-          {simpleRow && !expanded && group.unread && <RowDot />}
+        <div className="flex items-baseline justify-between gap-2">
+          <span className={cn("truncate text-[14px] text-ink", expandedRow ? "font-medium" : "font-semibold")}>{group.name}</span>
+          {(expanded || (quiet && !groupStatus)) && group.unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
         </div>
         {!expanded && (!quiet || groupStatus) && <div className="flex items-center justify-between gap-2">
-          <span className={cn("truncate text-ink-secondary", simpleRow ? "text-[13px] leading-[18px]" : "text-[11px]")}>{group.description || groupPreview(group, state.bots, state.instances)}</span>
-          {!simpleRow && group.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
+          <span className={cn("truncate text-ink-secondary", expandedRow ? "text-[13px] leading-[18px]" : "text-[11px]")}>{group.description || groupPreview(group, state.bots, state.instances)}</span>
+          {group.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
         </div>}
-        {simpleRow && <RowStatusText unread={group.unread} />}
       </div>
       {density === "icons" && group.unread && (
         <span className={cn("absolute size-2 rounded-full border border-panel bg-accent", railTile ? "right-1 top-1" : "bottom-1.5 right-1.5")} />
@@ -718,10 +715,10 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
   const iconOnly = density === "icons";
   const expanded = showThreads && !iconOnly && threadsOpen && hasThreadList;
   useEffect(() => { if (iconOnly) setRenaming(false); }, [iconOnly]);
-  const simpleRow: boolean = !showThreads && density === "comfortable";
   const simpleList = !iconOnly;
   const railTile = iconOnly;
-  const avatarSize = iconOnly ? (railTile ? 36 : 44) : density === "compact" ? (showThreads ? 26 : 36) : (showThreads ? 32 : simpleRow ? 36 : 44);
+  const expandedRow = density === "expanded";
+  const avatarSize = iconOnly ? (railTile ? 36 : 44) : expandedRow ? 36 : (showThreads ? 26 : 36);
   const tooltip = simpleList ? botTooltip(bot, instances) : undefined;
   const visible = useVisibleMessages(bot);
   const last = lastNonReceipt(visible);
@@ -731,13 +728,11 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
     "flex w-full items-center rounded-xl text-left transition-colors duration-150", SIMPLE_ROW_FOCUS,
     iconOnly
       ? railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5"
-      : density === "compact"
-        ? cn(showThreads ? "gap-1.5 py-1" : "gap-2.5 py-1.5", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-2")
-        : simpleRow ? "gap-2 rounded-[10px] py-2 pl-2 pr-2 md:h-[54px] md:py-0"
-        : cn(showThreads ? "gap-2 py-2" : "gap-3 py-2", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2.5 pr-9"),
+      : expandedRow
+        ? cn("gap-2 rounded-[10px] py-2", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-2", "md:h-[54px] md:py-0")
+        : cn(showThreads ? "gap-1.5 py-1" : "gap-2.5 py-1.5", showThreads ? "pl-6 pr-9 group-hover:pr-[5.75rem] group-focus-within:pr-[5.75rem] max-md:pr-9 touch:pr-[5.75rem]" : "pl-2 pr-2"),
     !iconOnly && "max-md:rounded-2xl max-md:py-2.5",
     selected ? "bg-raised" : "hover:bg-raised/50",
-    simpleRow && rowSurface(selected),
   );
   const { waiting, working, teammateWait, queued } = sidebarBotStatus(bot, pendingQueued);
   const unread = botShowsUnread(bot);
@@ -745,18 +740,17 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
   const statusLine = deleting || working || waiting || teammateWait || queued;
   const body = (
     <>
-      <span className={cn("relative flex shrink-0", simpleRow && "-m-[3px]")} title={iconOnly || simpleList ? undefined : [bot.name, ...details].join(" · ")}>
+      <span className="relative flex shrink-0" title={iconOnly || simpleList ? undefined : [bot.name, ...details].join(" · ")}>
         <BotAvatar
           bot={bot}
           state={stateForBot({ ...bot, messages: visible })}
-          size={simpleRow ? avatarSize + 6 : avatarSize}
+          size={avatarSize}
           motion={mascotMotion?.kind ?? "none"}
           motionKey={mascotMotion?.nonce ?? 0}
           animated={working || unread || (mascotMotion?.kind ?? "none") !== "none"}
         />
         {iconOnly && <BotModelBadge bot={bot} instances={instances} avatarSize={avatarSize} subtle={railTile} />}
-        {simpleRow && <AvatarActivityDot activity={working ? "working" : teammateWait ? "teammate" : queued && !waiting ? "queued" : null} />}
-        {!simpleRow && working && (
+        {working && (
           <span
             data-testid="working-dot"
             className={cn(
@@ -765,13 +759,13 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
             )}
           />
         )}
-        {!simpleRow && waiting && <span data-testid="waiting-dot" role="status" aria-label={t("sidebar.preview.waiting")} title={t("sidebar.preview.waiting")}
+        {waiting && <span data-testid="waiting-dot" role="status" aria-label={t("sidebar.preview.waiting")} title={t("sidebar.preview.waiting")}
           className={cn("absolute -right-0.5 -bottom-0.5 flex items-center justify-center overflow-hidden rounded-full border-2 border-panel bg-warning font-black text-panel", iconOnly ? "size-5 text-[14px]" : "size-4 text-[12px]")}><span aria-hidden="true">!</span></span>}
-        {!simpleRow && teammateWait && <span data-testid="teammate-wait-dot" role="status" aria-label={t("sidebar.preview.waitingOnTeammate")} title={t("sidebar.preview.waitingOnTeammate")}
+        {teammateWait && <span data-testid="teammate-wait-dot" role="status" aria-label={t("sidebar.preview.waitingOnTeammate")} title={t("sidebar.preview.waitingOnTeammate")}
           className={cn("absolute -right-0.5 -bottom-0.5 rounded-full border-2 border-panel bg-accent", iconOnly ? "size-3" : "size-2.5")} />}
-        {!simpleRow && !teammateWait && !waiting && !working && queued && <span data-testid="queued-dot" role="status" aria-label={t("task.queued")} title={t("task.queued")}
+        {!teammateWait && !waiting && !working && queued && <span data-testid="queued-dot" role="status" aria-label={t("task.queued")} title={t("task.queued")}
           className={cn("absolute -right-0.5 -bottom-0.5 rounded-full border-2 border-panel bg-ink-secondary", iconOnly ? "size-3" : "size-2.5")} />}
-        {bot.chiefOfStaff && (iconOnly || simpleRow) && (
+        {bot.chiefOfStaff && iconOnly && (
           <span className="absolute -left-1 -top-1 flex rounded-full p-[3px]" style={{ backgroundColor: MAUS_COLORS[bot.color], color: mascotInk(bot.color) }}>
             <Crown size={11} strokeWidth={2.25} fill="currentColor" className="shrink-0" role="img" aria-label={t("sidebar.bot.chiefOfStaff")} data-testid="chief-crown">
               <title>{t("sidebar.bot.chiefOfStaff")}</title>
@@ -788,7 +782,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
       </span>
       <div className={cn("min-w-0 flex-1", iconOnly && "hidden")}>
         <div data-sidebar-bot-title="" className="flex items-baseline justify-between gap-2">
-          <span className={cn("flex min-w-0 grow items-center gap-1.5 truncate text-ink", simpleRow ? "text-[14px] font-medium leading-5" : "text-[15px] font-semibold leading-5")}>
+          <span className={cn("flex min-w-0 grow items-center gap-1.5 truncate text-ink leading-5", expandedRow ? "text-[14px] font-medium" : "text-[15px] font-semibold")}>
             {!simpleList && bot.pinned && <Pin size={12} className="shrink-0 text-ink-secondary" />}
             <RenameTitle
               key={iconOnly ? "icons" : "expanded"}
@@ -806,7 +800,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
               }}
               onEditingChange={setRenaming}
               className="truncate"
-              inputClassName={cn("w-full rounded bg-inset px-1 py-0.5", simpleRow ? "text-[14px] font-medium" : "text-[15px] font-semibold")}
+              inputClassName={cn("w-full rounded bg-inset px-1 py-0.5", expandedRow ? "text-[14px] font-medium" : "text-[15px] font-semibold")}
             />
             {!simpleList && bot.chiefOfStaff && !renaming && (
               <Crown size={13} strokeWidth={2.25} fill="currentColor" className="shrink-0 text-accent" role="img" aria-label={t("sidebar.bot.chiefOfStaff")} data-testid="chief-crown">
@@ -829,10 +823,9 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
               {formatTime(last.at)}
             </span>
           )}
-          {!simpleList && !simpleRow && !railTile && <BotModelMark bot={bot} instances={instances} />}
+          {!simpleList && !railTile && <BotModelMark bot={bot} instances={instances} />}
           {(expanded || (quiet && !statusLine)) && unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
           {!renaming && <span className="flex shrink-0 self-center"><OwnerFace bot={bot} /></span>}
-          {simpleRow && (unread || waiting) && <RowDot waiting={waiting} inline />}
         </div>
         {(!expanded || deleting) && (!quiet || statusLine) && <div className="flex items-center justify-between gap-2">
           {deleting ? (
@@ -841,7 +834,7 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
               {t("sidebar.bot.deletingRow")}
             </span>
           ) : (
-            <span className={cn("flex min-w-0 items-center gap-1.5 truncate text-[13px] leading-[18px]", waiting ? simpleRow ? "text-warning" : "font-semibold text-warning" : "text-ink-secondary")}>
+            <span className={cn("flex min-w-0 items-center gap-1.5 truncate text-[13px] leading-[18px]", waiting ? "font-semibold text-warning" : "text-ink-secondary")}>
               {working && simpleList ? (
                 <WorkingPhrase threadId={bot.threadId} last={last} />
               ) : working ? (
@@ -854,10 +847,8 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
               )}
             </span>
           )}
-          {!simpleList && simpleRow && <span className="contents max-md:hidden"><BotModelMark bot={bot} instances={instances} /></span>}
-          {!simpleRow && unread && <span className="size-2 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
+          {unread && <span className="size-2 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
         </div>}
-        {simpleRow && <RowStatusText working={working} unread={unread} />}
       </div>
       {simpleList && !showThreads && <SidebarSimpleRowActions bot={bot} instances={instances} menuOpen={menuOpen} onMenu={onMenu} />}
     </>
@@ -1016,11 +1007,11 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const simpleDesk = simple && !phone;
   const rail: boolean = density === "icons";
   const sidePanelOpen = state.computerOpen || state.inspectorOpen;
-  const sizing = useSidebarWidth({ simple: true, density, sidePanelOpen, sidebarRef });
+  const sizing = useSidebarWidth({ density, sidePanelOpen, sidebarRef });
   /** Simple mode keeps the field on screen; the toggle and the close button are gone. */
   const clearSearch = () => setQuery("");
   const [lastExpandedDensity, setLastExpandedDensity] = useState<Exclude<SidebarDensity, "icons">>(
-    () => density === "icons" ? "comfortable" : density,
+    () => density === "icons" ? "expanded" : density,
   );
   const pinnedCircles = usePinnedCircles();
   const universalPins = useUniversalPins();
@@ -1327,7 +1318,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       className={cn(
         "relative flex h-full shrink-0 flex-col border-r border-ink/[0.04] bg-panel max-md:[--scroll-fade-surface:var(--color-app)]",
         sizing.resizing ? "transition-none" : "transition-[width] duration-200",
-        density === "icons" ? rail ? "w-[92px]" : "w-[80px]" : density === "compact" ? "w-[272px] md:w-[var(--sidebar-width)]" : "w-[280px] md:w-[var(--sidebar-width)]",
+        density === "icons" ? rail ? "w-[92px]" : "w-[80px]" : "w-[272px] md:w-[var(--sidebar-width)]",
         sidePanelOpen ? density === "compact" ? "md:max-w-[272px]" : "md:max-w-[280px]" : "md:max-w-[calc(100vw-320px)]",
         // max-md: rather than an md: cancel: Tailwind v4 emits the native `translate`, and any value but `none` makes
         // this a containing block for its `fixed` descendants.
