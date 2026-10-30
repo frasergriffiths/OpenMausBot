@@ -47,10 +47,10 @@ afterEach(() => {
 });
 
 describe("shared sidebar density store", () => {
-  it("defaults to compact and reads a density saved before the first render", async () => {
+  it("defaults to expanded and reads a density saved before the first render", async () => {
     const preference = await import("./sidebar-preferences");
-    expect(preference.useSidebarDensity()).toBe("compact");
-    expect(hook.serverSnapshot!()).toBe("compact");
+    expect(preference.useSidebarDensity()).toBe("expanded");
+    expect(hook.serverSnapshot!()).toBe("expanded");
     preference.saveSidebarDensity("compact");
     expect(preference.useSidebarDensity()).toBe("compact");
   });
