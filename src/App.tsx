@@ -34,7 +34,7 @@ import { useTeamChats } from "@/state/team-chats";
 import { needsYouVersion, useTeamPeopleLoader } from "@/state/team-people";
 import { CloudAddDialog } from "@/components/CloudAddDialog";
 import { CloudHowTo } from "@/components/CloudHowTo";
-import { DesktopCapabilitiesProvider, useCaptionChrome, useDesktopCapabilities, WindowDragStrip } from "@/components/DesktopCapabilities";
+import { DesktopCapabilitiesProvider, SidebarEdgeNotch, useCaptionChrome, useDesktopCapabilities, WindowDragStrip } from "@/components/DesktopCapabilities";
 import { WindowCaptionButtons } from "@/components/WindowCaptionButtons";
 import { NoEngines } from "@/components/NoEngines";
 import { CloudEngineSignIn } from "@/components/CloudEngineSignIn";
@@ -299,46 +299,50 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
           menuButtonRef.current?.focus();
         }}
       />
-      {state.activeView === "team-map" ? (
-        <TeamMapPage />
-      ) : state.activeView === "files" ? (
-        <FilesView />
-      ) : state.activeView === "routines" ? (
-        <RoutineRunsPage onBack={() => dispatch({ type: "showChat" })} />
-      ) : !remoteClient && localVmWorkspaceBotId ? (
-        <LocalVmWorkspace
-          primaryBotId={localVmWorkspaceBotId}
-          overlayOpen={nativeViewOverlayOpen}
-          onClose={() => setLocalVmWorkspaceBotId(null)}
-          onOpenComputer={openComputerFromWorkspace}
-        />
-      ) : firstRun === "welcome" ? (
-        <CloudWelcome />
-      ) : firstRun === "intent" ? (
-        <CloudIntent />
-      ) : firstRun === "sign-in" ? (
-        <CloudEngineSignIn />
-      ) : noEngines ? (
-        <NoEngines />
-      ) : chiefStep ? (
-        <EmptyChatShell />
-      ) : group ? (
-        <GroupView key={group.id} group={group} />
-      ) : bot ? (
-        <ChatView bot={bot} />
-      ) : (
-        <main data-app-loading={loading.text} className="relative flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-3 bg-app text-ink-secondary">
-          <WindowDragStrip />
-          <div className="w-full max-w-md"><ChatNotice notice={state.notice} /></div>
-          {loading.busy && <Loader2 size={20} className="animate-spin" />}
-          <div className="text-[14px]">{t(loading.text)}</div>
-          {loading.command && (
-            <div className="text-[12px]">
-            {t("app.loading.startServer")} <code className="rounded bg-raised px-1.5 py-0.5">pnpm dev:server</code>
-            </div>
-          )}
-        </main>
-      )}
+      <div className="relative flex min-w-0 flex-1">
+        {state.activeView === "team-map" ? (
+          <TeamMapPage />
+        ) : state.activeView === "files" ? (
+          <FilesView />
+        ) : state.activeView === "routines" ? (
+          <RoutineRunsPage onBack={() => dispatch({ type: "showChat" })} />
+        ) : !remoteClient && localVmWorkspaceBotId ? (
+          <LocalVmWorkspace
+            primaryBotId={localVmWorkspaceBotId}
+            overlayOpen={nativeViewOverlayOpen}
+            onClose={() => setLocalVmWorkspaceBotId(null)}
+            onOpenComputer={openComputerFromWorkspace}
+          />
+        ) : firstRun === "welcome" ? (
+          <CloudWelcome />
+        ) : firstRun === "intent" ? (
+          <CloudIntent />
+        ) : firstRun === "sign-in" ? (
+          <CloudEngineSignIn />
+        ) : noEngines ? (
+          <NoEngines />
+        ) : chiefStep ? (
+          <EmptyChatShell />
+        ) : group ? (
+          <GroupView key={group.id} group={group} />
+        ) : bot ? (
+          <ChatView bot={bot} />
+        ) : (
+          <main data-app-loading={loading.text} className="relative flex h-full min-w-0 flex-1 flex-col items-center justify-center gap-3 bg-app text-ink-secondary">
+            <WindowDragStrip />
+            <div className="w-full max-w-md"><ChatNotice notice={state.notice} /></div>
+            {loading.busy && <Loader2 size={20} className="animate-spin" />}
+            <div className="text-[14px]">{t(loading.text)}</div>
+            {loading.command && (
+              <div className="text-[12px]">
+              {t("app.loading.startServer")} <code className="rounded bg-raised px-1.5 py-0.5">pnpm dev:server</code>
+              </div>
+            )}
+          </main>
+        )}
+        {/* The sidebar's edge bump hangs over this pane; the notch keeps it clickable under the header's drag region. */}
+        <SidebarEdgeNotch />
+      </div>
       {/* Sibling panels need distinct keys: two keyed `bot.id` collide in React's keyed reconciliation. */}
       {state.settingsOpen && bot && (
         remoteClient

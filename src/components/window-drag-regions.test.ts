@@ -13,7 +13,7 @@ const fixture = { chrome: "native" as Chrome };
 
 const { ChatView } = await import("./ChatView");
 const { GroupView } = await import("./GroupView");
-const { DesktopCapabilitiesProvider, WindowDragStrip, captionChrome } = await import("./DesktopCapabilities");
+const { DesktopCapabilitiesProvider, SidebarEdgeNotch, WindowDragStrip, captionChrome } = await import("./DesktopCapabilities");
 
 const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
 const noDragRule = /\/\* Window drag regions\.[\s\S]*?\*\/\s*([^{]+)\{\s*-webkit-app-region: no-drag;/.exec(css);
@@ -83,6 +83,26 @@ describe("caption chrome", () => {
     const matches = [...document.querySelectorAll("button, input, a, span, .field, [role], .backdrop, .overlay")].map((element) => element.matches(noDragSelector));
     expect(matches).toEqual([true, true, true, true, false, true, true, true, true, false]);
   });
+});
+
+describe("sidebar edge notch", () => {
+  it.each<[Chrome, boolean]>([["mac-inset", true], ["win-caption", true], ["native", false]])(
+    "cuts the pane's left edge out of the drag region on %s",
+    (chrome, shown) => {
+      fixture.chrome = chrome;
+      const document = dom(createElement(SidebarEdgeNotch));
+      const notch = document.querySelector("[data-sidebar-edge-notch]");
+      if (!shown) {
+        expect(notch).toBeNull();
+        return;
+      }
+      expect(notch).not.toBeNull();
+      expect(region(notch)).toBe("no-drag");
+      expect(notch!.getAttribute("class")).toContain("pointer-events-none");
+      expect(notch!.getAttribute("class")).toContain("w-3.5");
+      expect(notch!.getAttribute("aria-hidden")).toBe("true");
+    },
+  );
 });
 
 describe.each([

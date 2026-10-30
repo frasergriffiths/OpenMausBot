@@ -1,6 +1,5 @@
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import { useEffect, useState, type CSSProperties, type RefObject } from "react";
-import { createPortal } from "react-dom";
+import type { CSSProperties } from "react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -22,36 +21,17 @@ export const SIMPLE_RAIL_BUTTON = "flex size-9 shrink-0 items-center justify-cen
 /** The small bump on the sidebar's right edge that collapses it to the rail and back (Simple mode).
  * It sits level with the top row, beside the + button; the Simple rail is 92px wide so the bump stays clear of the macOS
  * traffic-light zone, which swallows clicks before 88px.
- * Once mounted it is portaled to the end of <body> and pinned to the sidebar's edge: Electron applies -webkit-app-region
- * rects in document order, so the chat header's drag region (which comes after the sidebar) would otherwise swallow it. */
-export function SidebarEdgeToggle({ collapsed, onToggle, style, anchorRef, shown = true, onHover }: {
+ * It hangs 14px over the sidebar's right edge in CSS, as a child of the sidebar, so a width change moves it in the same
+ * frame; there is no measured position to chase and nothing to detach during a collapse. */
+export function SidebarEdgeToggle({ collapsed, onToggle, style, shown = true, onHover }: {
   collapsed: boolean;
   onToggle: () => void;
   style?: CSSProperties;
-  anchorRef?: RefObject<HTMLElement | null>;
   shown?: boolean;
   onHover?: (inside: boolean) => void;
 }) {
-  const [edge, setEdge] = useState<{ left: number; top: number } | null>(null);
-  // A passive effect, not a layout one: React attaches the parent <aside>'s ref after its children's layout effects run.
-  // Its top too: a strip above the app (an update, My Cloud asleep, things arriving on My Cloud) moves the sidebar down,
-  // and the bump with it, so it never sits on the strip's words.
-  useEffect(() => {
-    const anchor = anchorRef?.current;
-    if (!anchor) return;
-    const measure = () => { const rect = anchor.getBoundingClientRect(); setEdge({ left: Math.round(rect.right), top: Math.round(rect.top) }); };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(anchor);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [anchorRef]);
   const Arrow = collapsed ? ChevronRight : ChevronLeft;
-  const pinned = edge !== null;
-  const button = (
+  return (
     <button
       type="button"
       data-sidebar-edge-toggle
@@ -59,20 +39,18 @@ export function SidebarEdgeToggle({ collapsed, onToggle, style, anchorRef, shown
       aria-label={t(collapsed ? "sidebar.density.expand" : "sidebar.density.collapseAria")}
       aria-expanded={!collapsed}
       title={t(collapsed ? "sidebar.density.expand" : "sidebar.density.collapse")}
-      style={pinned ? { ...style, left: edge.left, top: edge.top + 14 } : style}
+      style={style}
       onPointerEnter={() => onHover?.(true)}
       onPointerLeave={() => onHover?.(false)}
       className={cn(
-        pinned ? "fixed" : "absolute -right-[14px]",
+        "absolute -right-[14px] z-30 hidden h-8 w-[14px] items-center justify-center rounded-r-[4px] border border-l-0 border-hairline/50 bg-panel text-ink-tertiary shadow-[1px_0_2px_rgb(0_0_0/0.06)] hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:flex",
         shown ? "opacity-100" : "pointer-events-none opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100 touch:pointer-events-auto touch:opacity-100",
-        "transition-opacity duration-150",
-        "top-[14px] z-30 hidden h-8 w-[14px] items-center justify-center rounded-r-[4px] border border-l-0 border-hairline/50 bg-panel text-ink-tertiary shadow-[1px_0_2px_rgb(0_0_0/0.06)] hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:flex",
+        "transition-opacity duration-150 top-[14px]",
       )}
     >
       <Arrow size={12} strokeWidth={2.25} aria-hidden="true" />
     </button>
   );
-  return pinned ? createPortal(button, document.body) : button;
 }
 
 export const SIMPLE_SEARCH_INPUT = "min-w-0 flex-1 bg-transparent text-[13px] leading-[18px] text-ink placeholder:text-ink-tertiary focus:outline-none";
