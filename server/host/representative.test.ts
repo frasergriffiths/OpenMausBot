@@ -24,6 +24,12 @@ describe("what the assistant may answer", () => {
     expect(prompt).toContain("[QUESTION from Philipp]\nIs Marco free on Thursday at 3pm?\n[/QUESTION]");
   });
 
+  it("names the day on both ends of a busy window that crosses midnight", () => {
+    const start = Date.UTC(2026, 9, 29, 22, 0);
+    const prompt = representativePrompt(question("Is Marco free on Friday?"), [{ start, end: start + 2 * 60 * 60_000 }], "Europe/Berlin", NOW);
+    expect(prompt).toContain("Busy times in the next 14 days (free at every other time): Thu 29 Oct 23:00 – Fri 30 Oct 01:00.");
+  });
+
   it("never asks the model a question that decides, approves, promises or reaches outside the team", async () => {
     const { assistant, generate } = representative('{"answer": "Yes, Marco approves."}');
     for (const text of [

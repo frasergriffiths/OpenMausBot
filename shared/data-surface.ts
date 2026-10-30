@@ -163,7 +163,7 @@ export interface DataCard {
   elapsedMs?: number;
 }
 
-/** The sheet: what the Data tab shows and what `sheet.json` stores. */
+/** The sheet: what the result view shows and what `sheet.json` stores. */
 export interface DataSheet {
   version: 1;
   botId: string;
