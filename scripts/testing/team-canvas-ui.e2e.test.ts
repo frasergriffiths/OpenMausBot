@@ -87,6 +87,8 @@ type BotRecord = {
     await api("PATCH", "/api/bots/" + cleo.id, { chiefOfStaff: true });
     const dana: BotRecord = (await api("POST", "/api/bots", { name: "Dana", title: "Find supporting evidence", section: "Research",
       modelSelection: { instanceId: "qwen", model: "qwen3-coder-plus" } })).bot;
+    const legacy: BotRecord = (await api("POST", "/api/bots", { name: "Legacy lead", title: "Legacy department", section: "General",
+      modelSelection: { instanceId: "claude", model: "claude-sonnet-5" } })).bot;
     await api("POST", "/api/sidebar-sections", { name: "Delivery" });
     await control("send", "--bot", ben.id, "--text", "Remember this conversation when the team changes.");
     expect(await control("wait", "--bot", ben.id, "--timeout", "30")).toMatchObject({ status: "settled" });
@@ -101,7 +103,7 @@ type BotRecord = {
     expect(await snapshot()).toContain('region "Team canvas"');
     expect(await evaluate("Boolean(document.querySelector('[aria-label=\"Fit departments to view\"]'))")).toBe(false);
     expect(await evaluate("Boolean(document.querySelector('[aria-label=\"Zoom in\"]'))")).toBe(false);
-    const controls = await evaluate("JSON.stringify([...document.querySelectorAll('main > header button:not([role=switch]), main > header label, main > header summary')].filter(control => { const details = control.closest('details'); return !details || details.querySelector(':scope > summary') === control; }).map(control => Math.round(control.getBoundingClientRect().height)))");
+    const controls = await evaluate("JSON.stringify([...document.querySelectorAll('main > header button:not([role=switch]):not([aria-pressed]), main > header label, main > header summary')].filter(control => { const details = control.closest('details'); return !details || details.querySelector(':scope > summary') === control; }).map(control => Math.round(control.getBoundingClientRect().height)))");
     expect(JSON.parse(controls).every((height: number) => height === 32), controls).toBe(true);
     const cardWidth = await evaluate("Math.min(...[...document.querySelectorAll('[data-team-key] [data-bot-id]')].map(card => card.getBoundingClientRect().width))");
     expect(cardWidth).toBeGreaterThanOrEqual(208);
@@ -119,7 +121,12 @@ type BotRecord = {
     receipts.memoryHeader = "menu, same dialog, described, 32px close, focus returned";
 
     expect(await openMenu("Engineering")).toBe(true);
-    const menu = await evaluate("JSON.stringify([...document.querySelectorAll('[data-team-key=Engineering] [role=menuitem]')].map(item => item.textContent.trim()))");
+    const menu = await evaluate("JSON.stringify([...document.querySelectorAll('[data-team-menu] [role=menuitem]')].map(item => item.textContent.trim()))");
+    await evaluate("document.querySelector('[data-team-menu] [role=menuitem]').focus(); true");
+    await ui("press", "--keys", "ArrowDown");
+    expect(await focused()).toBe("Shared instructions");
+    await ui("press", "--keys", "ArrowUp");
+    expect(await focused()).toBe("Department memory");
     await click("Manage bots…", "menuitem");
     await expect.poll(snapshot).toContain('dialog "Manage bots"');
     expect(await snapshot()).toContain("Checked bots belong to this department");
@@ -155,6 +162,12 @@ type BotRecord = {
     await expect.poll(() => cardOrder("Research"), { timeout: 10_000 }).toEqual([cleo.id, dana.id, ben.id]);
     expect((await savedBot(ben.id)).section).toBe("Research");
     expect((await control("messages", "--bot", ben.id, "--limit", "10")).messages).toEqual(transcript);
+
+    expect(await evaluate("Boolean(document.querySelector(" + JSON.stringify(teamSelector("General") + " [data-bot-id=" + JSON.stringify(legacy.id) + "]") + "))")).toBe(true);
+    receipts.moveGeneral = await dragBot(ben.id, "General");
+    await expect.poll(snapshot).toContain('alertdialog "Move Ben to General?"');
+    await click("Move bot");
+    await expect.poll(async () => (await savedBot(ben.id)).section).toBe("General");
 
     const screenshots: string[] = [];
     for (const skin of ["midnight", "daylight"]) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, BookOpen, Box, Brain, Loader2, Monitor, Plus, Save, Users, UsersRound, X } from "lucide-react";
 
@@ -7,6 +7,7 @@ import {
   EMPTY_TEAM_MAP_SNAPSHOT,
   buildTeamMapEdges,
   buildTeamMapSections,
+  moveBotRequest,
   teamMapBotCount,
   type TeamMapEdge,
   type TeamMapSnapshot,
@@ -270,6 +271,17 @@ function SectionContextDialog({ section, label, onClose }: { section: string; la
 const SENT_HIGHLIGHT_MS = 1_400;
 const menuRow = cn(MENU_ROW, "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus");
 
+function moveMenuFocus(event: ReactKeyboardEvent<HTMLElement>) {
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+  const items = [...event.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]:not([disabled])')];
+  if (!items.length) return;
+  event.preventDefault();
+  const index = items.indexOf(document.activeElement as HTMLElement);
+  const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
+    : event.key === "ArrowDown" ? (index + 1) % items.length : (index - 1 + items.length) % items.length;
+  items[next].focus();
+}
+
 export function TeamMapPage() {
   const { state, dispatch } = useStore();
   const { dragProps } = useCaptionChrome();
@@ -297,7 +309,7 @@ export function TeamMapPage() {
   const bots = useMemo(() => state.bots.filter((bot) => !bot.hidden), [state.bots]);
   const sections = useMemo(() => {
     const names = [...new Set([...(state.sections ?? []), ...state.groups.flatMap((group) => group.section ? [group.section] : [])])];
-    const order = (key: string) => key === "" ? -1 : names.includes(key) ? names.indexOf(key) : names.length;
+    const order = (key: string) => key === "" ? names.length : names.includes(key) ? names.indexOf(key) : names.length;
     const namedGeneral = names.some((name) => name.trim() === "General");
     return buildTeamMapSections(bots, names).sort((a, b) => order(a.key) - order(b.key))
       .map((section) => section.key === "" && namedGeneral ? { ...section, name: t("canvas.generalUngrouped") } : section);
@@ -338,8 +350,9 @@ export function TeamMapPage() {
   const moveBot = async (bot: Bot, destination: string) => {
     setError(null);
     try {
-      const result: { sections: string[]; bots: Bot[] } = await api("/api/sidebar-sections", {
-        method: "POST", body: JSON.stringify({ name: destination, botIds: [bot.id] }),
+      const request = moveBotRequest(bot.id, destination, sections.map((section) => section.key));
+      const result: { sections: string[]; bots: Bot[] } = await api(request.path, {
+        method: request.method, body: JSON.stringify(request.body),
       });
       dispatch({ type: "sections", sections: result.sections });
       for (const patched of result.bots) dispatch({ type: "botPatched", bot: patched });
@@ -379,6 +392,7 @@ export function TeamMapPage() {
     <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-app text-ink"
       onPointerDownCapture={(event) => {
         const target = event.target as Node;
+        if (target instanceof Element && target.closest("[data-team-menu]")) return;
         for (const details of document.querySelectorAll<HTMLDetailsElement>("details[open]")) {
           if (!details.contains(target)) details.removeAttribute("open");
         }
@@ -402,21 +416,17 @@ export function TeamMapPage() {
               </button>
             ) : sections.length > 1 ? (
               <details ref={memoryMenu} className="relative" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMemoryMenu(); }}
+                onToggle={(event) => {
+                  if (!event.currentTarget.open) return;
+                  requestAnimationFrame(() => event.currentTarget.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus({ preventScroll: true }));
+                }}
                 onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); closeMemoryMenu(true); } }}>
                 <summary ref={(node) => { memoryTrigger.current = node; }} aria-haspopup="menu"
                   className="ui-button cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                   <Brain size={16} className="text-ink-secondary" />{t("canvas.departmentMemory")}
                 </summary>
                 <div role="menu" aria-label={t("canvas.departmentMemory")} className={cn("absolute right-0 top-full z-40 mt-2 min-w-[220px]", SIMPLE_MENU)}
-                  onKeyDown={(event) => {
-                    const items = [...(event.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]:not([disabled])') ?? [])];
-                    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key) || !items.length) return;
-                    event.preventDefault();
-                    const index = items.indexOf(document.activeElement as HTMLElement);
-                    const next = event.key === "Home" ? 0 : event.key === "End" ? items.length - 1
-                      : event.key === "ArrowDown" ? (index + 1) % items.length : (index - 1 + items.length) % items.length;
-                    items[next].focus();
-                  }}>
+                  onKeyDown={moveMenuFocus}>
                   <div className={MENU_LABEL}>{t("canvas.departmentMemory")}</div>
                   {sections.map((section) => <button key={section.key || "general"} type="button" role="menuitem" className={menuRow}
                     onClick={() => { closeMemoryMenu(); openMemory(section.key, section.name, true); }}>{section.name}</button>)}
@@ -431,11 +441,15 @@ export function TeamMapPage() {
               <Monitor size={16} className="text-ink-secondary" />{t("canvas.computers")}
             </button>
             <details className="relative" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) event.currentTarget.removeAttribute("open"); }}
+              onToggle={(event) => {
+                if (!event.currentTarget.open) return;
+                requestAnimationFrame(() => event.currentTarget.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus({ preventScroll: true }));
+              }}
               onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); event.currentTarget.removeAttribute("open"); event.currentTarget.querySelector("summary")?.focus(); } }}>
               <summary aria-label={t("canvas.addToMap")} className="ui-button cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                 <Plus size={16} className="text-ink-secondary" />{t("common.add")}
               </summary>
-              <div className={cn("absolute right-0 top-full z-40 mt-2 w-[220px]", SIMPLE_MENU)}>
+              <div role="menu" aria-label={t("canvas.addToMap")} className={cn("absolute right-0 top-full z-40 mt-2 w-[220px]", SIMPLE_MENU)} onKeyDown={moveMenuFocus}>
                 <div className={MENU_LABEL}>{t("canvas.departmentGroup")}</div>
                 <button type="button" role="menuitem" className={menuRow} onClick={(event) => {
                   event.currentTarget.closest("details")?.removeAttribute("open"); setTeamEditor({});

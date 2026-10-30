@@ -44,7 +44,6 @@ function sources(dir: string): string[] {
 
 // WCAG 1.4.11 asks nothing of a purely decorative mark; each exemption is named so a new one must be argued for.
 const DECORATIVE: Record<string, string> = {
-  "components/TeamCanvas.tsx text-ink-secondary/35": "decorative connector",
   "components/routines/CalendarSidebar.tsx text-ink-secondary/35": "decorative drag grip",
   "components/AttachmentGallery.tsx text-ink-secondary/50": "decorative placeholder glyph",
 };

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { createPortal } from "react-dom";
 import { BookOpen, Brain, Crown, MessageCircle, Monitor, MoreHorizontal, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { api, openBot, useStore, type Bot } from "@/state/store";
 import { useShowThreads } from "@/lib/thread-preferences";
@@ -13,6 +14,7 @@ import { InstanceProviderMark, ProviderMark } from "./ProviderIcons";
 import { openBotSettings } from "./bot-panel/panel-link";
 import { MENU_ROW, MENU_SEPARATOR } from "./menu-recipe";
 import { SIMPLE_MENU } from "./SidebarSimpleTop";
+import { teamMenuPosition, type TeamMenuAnchor } from "./SidebarTeamMenu";
 
 const BOT_DRAG_TYPE = "application/x-omb-bot";
 const menuRow = cn(MENU_ROW, "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus");
@@ -64,18 +66,18 @@ function BotCard({ bot, selected, moving, connected, tagged = false, sent, hasCo
       </div>
       <p className="mt-1 flex items-center gap-1 text-[11px] text-ink-secondary"><Monitor size={11} className="shrink-0" /><span className="truncate">{computer.name}</span></p>
     </div>}
-    <div className="mt-auto flex h-10 items-center gap-1 px-2">
-      <button className="flex size-7 shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-control hover:text-ink focus-visible:outline-2 focus-visible:outline-accent" aria-label={t("canvas.openBotChat", { name: bot.name })} title={t("canvas.openChat")}
+    <div className="mt-auto flex h-10 items-center gap-1 border-t border-hairline/40 px-2">
+      <button className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-ink focus-visible:outline-2 focus-visible:outline-accent" aria-label={t("canvas.openBotChat", { name: bot.name })} title={t("canvas.openChat")}
         onClick={() => openBot(dispatch, bot, showThreads)}><MessageCircle size={14} /></button>
       {status.tone !== "idle" && <span className="flex min-w-0 items-center gap-1.5 text-[11px] text-ink-secondary" title={status.label}>
         <span className={cn("size-1.5 shrink-0 rounded-full", status.tone === "success" ? "bg-success" : status.tone === "warning" ? "bg-warning" : status.tone === "danger" ? "bg-danger" : "bg-ink-secondary/35")} />
         <span className="truncate">{status.label}</span>
       </span>}
-      {hasComputer && onComputer && <button className="flex size-7 shrink-0 items-center justify-center rounded-md text-ink-secondary hover:bg-control hover:text-ink focus-visible:outline-2 focus-visible:outline-accent" aria-label={t("canvas.botComputer", { name: bot.name })} title={t("computer.tab.computer")}
+      {hasComputer && onComputer && <button className="flex size-7 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-control hover:text-ink focus-visible:outline-2 focus-visible:outline-accent" aria-label={t("canvas.botComputer", { name: bot.name })} title={t("computer.tab.computer")}
         onClick={() => onComputer(bot)}><Monitor size={14} /></button>}
       <button aria-label={t("canvas.changeModel", { name: bot.name })} title={t("canvas.defaultModel") + ": " + model}
         onClick={() => openBotSettings(dispatch, "model", { botId: bot.id })}
-        className="ml-auto flex h-8 min-w-0 max-w-[130px] items-center gap-1.5 rounded-md px-2 text-[11px] text-ink-secondary hover:bg-control hover:text-ink focus-visible:outline-2 focus-visible:outline-accent">
+        className="ml-auto flex h-6 min-w-0 max-w-[130px] items-center gap-1.5 rounded-lg px-2 text-[11px] text-ink-secondary hover:bg-control hover:text-ink focus-visible:outline-2 focus-visible:outline-accent">
         <span className="flex size-3.5 shrink-0 items-center justify-center">{instance
           ? <InstanceProviderMark instance={instance} size={13} />
           : <ProviderMark driverKind="" size={13} />}</span>
@@ -94,24 +96,64 @@ function SectionMenu({ section, onMemory, onInstructions, onEditTeam, onDeleteTe
 }) {
   const details = useRef<HTMLDetailsElement>(null);
   const menu = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<TeamMenuAnchor | null>(null);
   const close = (restoreFocus = true) => {
     const element = details.current;
-    if (!element) return;
-    element.removeAttribute("open");
-    if (restoreFocus) element.querySelector("summary")?.focus({ preventScroll: true });
+    setOpen(false);
+    setAnchor(null);
+    element?.removeAttribute("open");
+    if (restoreFocus) element?.querySelector("summary")?.focus({ preventScroll: true });
   };
-  const choose = (action: () => void) => { close(false); action(); };
+  const choose = (action: () => void) => { close(true); action(); };
+  const show = () => {
+    const summary = details.current?.querySelector("summary");
+    if (!summary) return;
+    const rect = summary.getBoundingClientRect();
+    setAnchor({ left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom });
+    setOpen(true);
+  };
+  useEffect(() => {
+    if (!open) return;
+    const panel = menu.current;
+    panel?.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus({ preventScroll: true });
+    const onDown = (event: MouseEvent) => {
+      if (!(event.target instanceof Node)) return;
+      if (panel?.contains(event.target) || details.current?.contains(event.target)) return;
+      close(false);
+    };
+    window.addEventListener("mousedown", onDown);
+    return () => window.removeEventListener("mousedown", onDown);
+  }, [open]);
+  useLayoutEffect(() => {
+    if (!open || !anchor) return;
+    const place = () => {
+      const panel = menu.current;
+      if (!panel) return;
+      const at = teamMenuPosition(anchor, { width: panel.offsetWidth, height: panel.offsetHeight }, { width: window.innerWidth, height: window.innerHeight });
+      panel.style.left = `${at.left}px`;
+      panel.style.top = `${at.top}px`;
+    };
+    place();
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+    };
+  }, [open, anchor]);
   return <details ref={details} className="relative shrink-0" onToggle={(event) => {
-    if (!event.currentTarget.open) return;
-    requestAnimationFrame(() => menu.current?.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus({ preventScroll: true }));
+    if (event.currentTarget.open) show();
+    else { setOpen(false); setAnchor(null); }
   }}>
     <summary aria-label={t("canvas.manageTeam", { name: section.name })}
-      className="flex size-7 cursor-pointer list-none items-center justify-center rounded-md text-ink-secondary hover:bg-raised hover:text-ink focus-visible:outline-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden"><MoreHorizontal size={16} /></summary>
-    <div ref={menu} role="menu" aria-label={t("canvas.manageTeam", { name: section.name })}
-      className={cn("absolute right-0 top-full z-40 mt-1 w-[220px]", SIMPLE_MENU)}
+      className="flex size-7 cursor-pointer list-none items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink focus-visible:outline-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden"><MoreHorizontal size={16} /></summary>
+    {open && anchor && createPortal(<div ref={menu} data-team-menu role="menu" aria-label={t("canvas.manageTeam", { name: section.name })}
+      style={{ left: anchor.right, top: anchor.bottom }}
+      className={cn("fixed z-40 w-[220px]", SIMPLE_MENU)}
       onKeyDown={(event) => {
         const items = [...(menu.current?.querySelectorAll<HTMLElement>('[role="menuitem"]:not([disabled])') ?? [])];
-        if (event.key === "Escape") { event.preventDefault(); close(); return; }
+        if (event.key === "Escape" || event.key === "Tab") { event.preventDefault(); event.stopPropagation(); close(); return; }
         if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key) || !items.length) return;
         event.preventDefault();
         const index = items.indexOf(document.activeElement as HTMLElement);
@@ -125,7 +167,7 @@ function SectionMenu({ section, onMemory, onInstructions, onEditTeam, onDeleteTe
         onClick={() => choose(() => onInstructions(section.key, section.name))}><BookOpen size={16} className="shrink-0 text-ink-secondary" />{t("team.instructions")}</button>
       <div className={MENU_SEPARATOR} />
       <button role="menuitem" className={menuRow}
-        onClick={() => choose(() => onEditTeam(section.key))}><Users size={16} className="shrink-0 text-ink-secondary" />{t("canvas.manageBots")}</button>
+        onClick={() => choose(() => onEditTeam(section.key))}><Users size={16} className="shrink-0 text-ink-secondary" />{section.key ? t("canvas.manageBots") : t("team.moveTo", { name: section.name })}</button>
       {section.key && <button role="menuitem" className={menuRow} aria-label={t("team.renameAria", { name: section.name })}
         onClick={() => choose(() => onEditTeam(section.key, true))}><Pencil size={16} className="shrink-0 text-ink-secondary" />{t("team.rename")}</button>}
       {section.key && <>
@@ -133,7 +175,7 @@ function SectionMenu({ section, onMemory, onInstructions, onEditTeam, onDeleteTe
         <button role="menuitem" className={cn(menuRow, "hover:text-danger focus-visible:text-danger")} aria-label={t("team.deleteAria", { name: section.name })}
           onClick={() => choose(() => onDeleteTeam(section.key))}><Trash2 size={16} className="shrink-0" />{t("team.deleteMenu")}</button>
       </>}
-    </div>
+    </div>, document.body)}
   </details>;
 }
 
@@ -281,7 +323,7 @@ export function TeamBoard({ sections, canManage, onMove, onInstructions, onMemor
       </div>
     </div>;
   }
-  return <div role="region" aria-label={t("canvas.region")} data-team-board tabIndex={0} className="mx-auto w-full max-w-[1400px] px-5 pb-2 pt-5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40 md:px-6">
+  return <div role="region" aria-label={t("canvas.region")} data-team-board tabIndex={0} className="mx-auto w-full max-w-[1400px] px-5 pb-6 pt-5 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40 md:px-6">
     <p className="mb-3 text-[12px] text-ink-secondary">{t("canvas.boardHint")}</p>
     <p role="status" aria-live="polite" className="sr-only">{dropKey ? t("canvas.moveBot", { name: dragged?.name ?? "", team: sections.find((section) => section.key === dropKey)?.name ?? "" }) : announcement}</p>
     <div className="grid grid-cols-1 gap-4 min-[900px]:grid-cols-2 min-[1440px]:grid-cols-3">

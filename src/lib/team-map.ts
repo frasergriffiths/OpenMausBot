@@ -44,6 +44,22 @@ export const EMPTY_TEAM_MAP_SNAPSHOT: TeamMapSnapshot = {
   running: [],
 };
 
+/** Moving into a department that already exists edits its membership; only a new name creates one. */
+export function moveBotRequest(botId: string, destination: string, knownSections: string[]) {
+  if (destination && knownSections.includes(destination)) {
+    return {
+      path: `/api/sidebar-sections?section=${encodeURIComponent(destination)}`,
+      method: "PUT" as const,
+      body: { addBotIds: [botId], removeBotIds: [] as string[] },
+    };
+  }
+  return {
+    path: "/api/sidebar-sections",
+    method: "POST" as const,
+    body: { name: destination, botIds: [botId] },
+  };
+}
+
 export function buildTeamMapSections<T extends TeamMapBot>(bots: T[], names: string[] = []): TeamMapSection<T>[] {
   const sections = new Map<string, T[]>();
   for (const bot of bots) {
