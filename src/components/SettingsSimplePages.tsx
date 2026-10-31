@@ -183,9 +183,14 @@ function CardBlock({ children }: { children: ReactNode }) {
   return <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4">{children}</div>;
 }
 
-export function SimpleKeysPage({ has, connections }: { has: Has; connections: ReactNode }) {
-  if (!has("connections")) return null;
-  return <div data-settings-block="connections" className="scroll-mt-4">{connections}</div>;
+export function SimpleKeysPage({ has, connections, sms }: { has: Has; connections: ReactNode; sms?: ReactNode }) {
+  if (!has("connections") && !has("sms")) return null;
+  return (
+    <>
+      {has("connections") && <div data-settings-block="connections" className="scroll-mt-4">{connections}</div>}
+      {has("sms") && <SettingsGroup label={t("settings.sms.group")} block="sms">{sms}</SettingsGroup>}
+    </>
+  );
 }
 
 export type RemoteAccessCards = Record<"client" | "domain" | "pairing" | "companion", ReactNode>;
