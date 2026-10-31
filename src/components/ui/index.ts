@@ -10,6 +10,7 @@ export { Tooltip } from "./tooltip";
 export { DropdownMenu, type MenuItem } from "./menu";
 export { RadioGroup, type RadioOption } from "./radio-group";
 export { Progress, Skeleton } from "./progress";
+export { StatusDot, type StatusState } from "./status-dot";
 export { Disclosure } from "./disclosure";
 export { ToastRegion, type ToastMessage, type ToastTone } from "./toast";
 export { SearchField } from "./search";

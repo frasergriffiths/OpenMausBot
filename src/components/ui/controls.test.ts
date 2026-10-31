@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import { ConfirmDialog, Disclosure, Progress, RadioGroup, SearchField, Skeleton, Switch, Tooltip } from ".";
+import { ConfirmDialog, Disclosure, Progress, RadioGroup, SearchField, Skeleton, StatusDot, Switch, Tooltip } from ".";
 
 const render = (element: Parameters<typeof renderToStaticMarkup>[0]) => renderToStaticMarkup(element);
 
@@ -66,5 +66,18 @@ describe("interactive primitives", () => {
   it("renders no tooltip bubble until it is opened", () => {
     const closed = render(createElement(Tooltip, { label: "Copy", children: createElement("button", null, "x") }));
     expect(closed).not.toContain('role="tooltip"');
+  });
+});
+
+describe("status dot", () => {
+  it("names the state for assistive tech and animates only while running", () => {
+    const running = render(createElement(StatusDot, { state: "running", label: "Running" }));
+    expect(running).toContain('role="img"');
+    expect(running).toContain('aria-label="Running"');
+    expect(running).toContain("animate-ping");
+    const done = render(createElement(StatusDot, { state: "done", label: "Completed" }));
+    expect(done).not.toContain("animate-ping");
+    expect(done).toContain("text-ink-tertiary");
+    expect(render(createElement(StatusDot, { state: "failed", label: "Failed" }))).toContain("text-danger");
   });
 });
