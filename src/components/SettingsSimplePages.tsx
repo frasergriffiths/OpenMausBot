@@ -17,10 +17,6 @@ import { LocalComputerSection } from "./LocalComputerSection";
 import { ActivitySection } from "./ActivitySection";
 import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
-import { CloudPlanRow, CloudPlanFootnote, useCloudPlan } from "./ProIntroduction";
-import { CloudUsageDetails, CloudUsageSummaryView, useCloudUsageSettings } from "./CloudUsageMeter";
-import { UsageSection } from "./UsageSection";
-import { PlanUsageSummary } from "./PlanUsage";
 import { SkinPicker } from "./SkinPicker";
 import { ChatWidthRow, FontRow, SidebarToolsLayoutRow } from "./AppearanceSelectRows";
 import { ProfileSummaryRow } from "./ProfileSettings";
@@ -62,7 +58,6 @@ export function SimpleAccountPage({ has }: { has: Has }) {
         <SettingsGroup block="general">
           <SettingsRows>
             <ProfileSummaryRow />
-            <CloudPlanRow place="account" />
           </SettingsRows>
         </SettingsGroup>
       )}
@@ -218,33 +213,6 @@ export function SimpleComputerPage({ has, remoteAccess, servers, installs, discl
           {has("desktopWorkspaces") && <div data-settings-block="desktopWorkspaces" className="flex scroll-mt-4 flex-col gap-4">{servers}</div>}
           {installs && <div data-settings-block="workspaces" className="scroll-mt-4">{installs}</div>}
         </SettingsDisclosureRow>
-      )}
-    </>
-  );
-}
-
-export function SimpleBillingPage({ has, disclose, cloudAccount }: { has: Has; disclose: Disclose; cloudAccount: ReactNode }) {
-  const { usage, upgrade, dialog } = useCloudUsageSettings();
-  const plan = useCloudPlan();
-  const signedOut = plan?.view.kind === "signed-out" || plan?.view.kind === "removed";
-  return (
-    <>
-      <div data-settings-block="usage" className="scroll-mt-4">
-        {usage ? <CloudUsageSummaryView usage={usage} upgrade={upgrade}>{dialog}</CloudUsageSummaryView> : <PlanUsageSummary />}
-      </div>
-      {(usage || has("usage")) && (
-        <SettingsDisclosureRow title={t("settings.simple.billing.limits")} {...disclose("billing-limits")}>
-          {usage && <CloudUsageDetails usage={usage} upgrade={upgrade} />}
-          {has("usage") && <UsageSection />}
-        </SettingsDisclosureRow>
-      )}
-      {has("cloudAccount") && (
-        <SettingsGroup label={t("settings.simple.billing.plan")} block="cloudAccount" footnote={<CloudPlanFootnote />}>
-          <SettingsRows>
-            <CloudPlanRow place="plan" usage={usage} upgrade={upgrade} />
-          </SettingsRows>
-          {signedOut ? null : <div className="flex flex-col gap-4">{cloudAccount}</div>}
-        </SettingsGroup>
       )}
     </>
   );
