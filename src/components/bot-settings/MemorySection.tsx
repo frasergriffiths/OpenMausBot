@@ -34,7 +34,7 @@ import { shortPath } from "@/lib/short-path";
 import { activeLocale, t } from "@/lib/i18n";
 import { roomMemoryCaptureEnabled } from "@/lib/feature-flags";
 import { api, ApiError, useStore, type Bot, type ConfigStatus } from "@/state/store";
-import { Switch } from "../SettingsPrimitives";
+import { Switch } from "@/components/ui";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
 import { inputCls } from "./field";
 import { Chevron } from "../chevron";

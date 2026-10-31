@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Check, ExternalLink, Globe, Loader2 } from "lucide-react";
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
-import { Card, CommandLine } from "./SettingsPrimitives";
+import { SettingsCard, CommandLine } from "@/components/ui";
 import { Chevron } from "./chevron";
 
 export interface CustomDomainStatus {
@@ -134,7 +134,7 @@ export function CustomDomainSettings() {
   };
 
   return (
-    <Card title={t("settings.domain.title")} subtitle={t("settings.domain.subtitle")}>
+    <SettingsCard title={t("settings.domain.title")} subtitle={t("settings.domain.subtitle")}>
       <div className="space-y-3" data-custom-domain-settings>
         {busy === "loading" && <p role="status" className="flex items-center gap-2 text-[13px] text-ink-secondary"><Loader2 size={14} className="animate-spin" />{t("settings.domain.loading")}</p>}
         {status && !status.supported && <p className="text-[13px] leading-relaxed text-ink-secondary">{t("settings.domain.serverOnly")}</p>}
@@ -161,6 +161,6 @@ export function CustomDomainSettings() {
         {notice && <p role="status" className="flex items-start gap-1.5 text-[12px] leading-relaxed text-success"><Check size={14} className="mt-0.5 shrink-0" />{notice}</p>}
         {error && <p role="alert" className="text-[12px] leading-relaxed text-danger">{error}</p>}
       </div>
-    </Card>
+    </SettingsCard>
   );
 }

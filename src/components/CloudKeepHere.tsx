@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { CloudSendPageBridge, KeepHereState } from "../../electron/cloud-send.mjs";
 import { ipcErrorText } from "@/lib/cloud-send";
 import { t } from "@/lib/i18n";
-import { Switch } from "./SettingsPrimitives";
+import { Switch } from "@/components/ui";
 
 /**
  * Settings → MausBot Cloud, for someone with a Cloud of their own the move applies to: "Keep this computer's bots on
