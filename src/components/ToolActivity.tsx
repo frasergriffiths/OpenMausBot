@@ -8,7 +8,7 @@ import { toolStepLabel } from "@/lib/tool-step-label";
 import { StatusDot, type StatusState } from "@/components/ui";
 import { PlaceIcon } from "./PlaceIcon";
 
-const FIELD_LABEL = "mb-1 text-[10.5px] font-medium uppercase tracking-[0.04em] text-ink-tertiary";
+const FIELD_LABEL = "mb-1 text-[11px] font-medium uppercase tracking-[0.04em] text-ink-tertiary";
 
 export function ToolActivity({ tool, place = null, live = false }: { tool: NonNullable<Message["tool"]>; place?: Place | null; live?: boolean }) {
   const [expanded, setExpanded] = useState(false);
@@ -19,7 +19,7 @@ export function ToolActivity({ tool, place = null, live = false }: { tool: NonNu
   return (
     <details
       onToggle={(event) => setExpanded(event.currentTarget.open)}
-      className="group/tool w-fit max-w-full rounded-lg text-[12.5px] open:w-[min(38rem,100%)] open:rounded-xl open:border-[0.5px] open:border-hairline/60 open:bg-panel open:shadow-sm"
+      className="group/tool w-fit max-w-full rounded-lg text-[13px] open:w-[min(38rem,100%)] open:rounded-xl open:border-[0.5px] open:border-hairline/60 open:bg-panel open:shadow-sm"
       data-testid="tool-activity"
     >
       <summary
@@ -47,15 +47,15 @@ export function ToolActivity({ tool, place = null, live = false }: { tool: NonNu
         <div className={cn("text-[11px] font-medium", failed && "text-danger")}>{status}</div>
         {label !== tool.name && <div>
           <div className={FIELD_LABEL}>{t("toolDetail.tool")}</div>
-          <p dir="ltr" className="break-words font-mono text-[11.5px] text-ink" data-testid="tool-name">{tool.name}</p>
+          <p dir="ltr" className="break-words font-mono text-[12px] text-ink" data-testid="tool-name">{tool.name}</p>
         </div>}
         <div>
           <div className={FIELD_LABEL}>{t("toolDetail.input")}</div>
-          <pre dir="ltr" className="max-h-52 overflow-auto rounded-lg bg-inset p-2.5 font-mono text-[11.5px] whitespace-pre-wrap break-words text-ink">{tool.input ?? tool.summary ?? tool.name}</pre>
+          <pre dir="ltr" className="max-h-52 overflow-auto rounded-lg bg-inset p-2.5 font-mono text-[12px] whitespace-pre-wrap break-words text-ink">{tool.input ?? tool.summary ?? tool.name}</pre>
         </div>
         <div>
           <div className={FIELD_LABEL}>{t("toolDetail.output")}</div>
-          {tool.output ? <pre dir="ltr" className="max-h-64 overflow-auto rounded-lg bg-inset p-2.5 font-mono text-[11.5px] whitespace-pre-wrap break-words text-ink">{tool.output}</pre> : <p className="text-xs">{tool.ok === undefined ? (live ? t("toolDetail.waiting") : t("toolDetail.unverified")) : t("toolDetail.noOutput")}</p>}
+          {tool.output ? <pre dir="ltr" className="max-h-64 overflow-auto rounded-lg bg-inset p-2.5 font-mono text-[12px] whitespace-pre-wrap break-words text-ink">{tool.output}</pre> : <p className="text-xs">{tool.ok === undefined ? (live ? t("toolDetail.waiting") : t("toolDetail.unverified")) : t("toolDetail.noOutput")}</p>}
         </div>
         <p className="text-[11px] text-ink-tertiary">{t("toolDetail.previewHint")}</p>
       </div>
