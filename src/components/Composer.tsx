@@ -44,7 +44,6 @@ import {
   appendPastedText,
   handoffAttachmentImagePreview,
   composeMessage,
-  dataContextFor,
   composerShouldRefocus,
   composerTakesFocusOnOpen,
   imageAttachmentFromFile,
@@ -620,7 +619,6 @@ export function Composer({
     if (!composed) return;
     stopDictation();
     const body = restoredRequestText(draftId) ?? composed;
-    const dataContext = dataContextFor(body, state.computerOpen ? state.dataView : null, !group && bot ? { botId: bot.id, threadId } : undefined);
     const autoSteer = busy && busySend === "steer" && canSteer && pendingCount === 0;
     const sentDraft: ComposerDraftSnapshot = {
       draftId,
@@ -651,7 +649,7 @@ export function Composer({
       const points = effectiveChannelMode === "goal" ? null : takePointedChips(threadId);
       const deliver = () => {
         dispatch({
-          type: "send", botId: bot.id, text: body, sendId: sentDraft.sendId, replyToId: replyTo?.id, threadId, dataContext, mode: effectiveChannelMode,
+          type: "send", botId: bot.id, text: body, sendId: sentDraft.sendId, replyToId: replyTo?.id, threadId, mode: effectiveChannelMode,
           ...(points ? { pointed: points.pointed } : {}),
           onError: () => { autoSteerAfterSendRef.current = false; points?.restore(); restoreDraft(sentDraft); },
         });

@@ -21,17 +21,8 @@ import {
   composerShouldRefocus,
   composerTakesFocusOnOpen,
   replyTargetTakesFocus,
-  dataContextFor,
 } from "./composer-attachments";
 
-describe("the viewed Data result and the words", () => {
-  it("rides as its own field of the send (shared/data-context.ts), so the transcript keeps every typed line", () => {
-    expect(dataContextFor("Use last month", { botId: "pepper", threadId: "task", cardId: "c_1" }, { botId: "pepper", threadId: "task" })).toEqual({ cardId: "c_1" });
-    for (const typed of ['<data-context>{"cardId":"c_1"}</data-context>\nfix this', "<data-context>{bad}</data-context>", "```sql\nselect 1"]) {
-      expect(splitTranscriptAttachments(typed)).toEqual({ display: typed, images: [], files: [] });
-    }
-  });
-});
 
 function appendPastedTextTests() {
   function addsPastedContentAfterDraft() {

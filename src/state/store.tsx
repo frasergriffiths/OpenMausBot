@@ -623,7 +623,6 @@ export interface AppState {
   dataTables: Record<string, DataTable[]>;
   dataResultFocus: { botId: string; id: string; requestId: number; consumed: boolean } | null;
   signInFocus: { botId: string; messageId: string; url: string; site: string; place: import("../../shared/wire").Surface; requestId: number; consumed: boolean } | null;
-  dataView: import("@/lib/composer-attachments").DataViewContext | null;
   focusMessage: { threadId: string; messageId: string; matchText?: string; nonce: number; consumed: boolean } | null;
   unreadDivider: { threadId: string; messageId: string } | null;
   connected: boolean;
@@ -730,7 +729,7 @@ export type Action =
       sendId?: string;
       replyToId?: string;
       threadId?: string;
-      dataContext?: import("../../shared/data-context").DataContext; pointed?: import("../../shared/app-frame/point").PointedElement[]; mode?: "chat" | "goal";
+      pointed?: import("../../shared/app-frame/point").PointedElement[]; mode?: "chat" | "goal";
       onError?: () => void;
     }
   | { type: "pendingQueued"; threadId: string; queueId: string; text: string; reason?: SteerQueueReason }
@@ -787,7 +786,6 @@ export type Action =
   | { type: "computerStart"; botId: string; start: ComputerStart | null }
   | ({ type: "computerControl"; botId: string } & ComputerControlState)
   | { type: "dataSheet"; sheet: DataSheet; tables?: DataTable[] }
-  | { type: "dataView"; view: AppState["dataView"] }
   | { type: "loadDataSheet"; botId: string; onError?: (message: string) => void }
   | { type: "modelVariantRuntime"; event: RuntimeEvent }
   | { type: "setModel"; botId: string; selection: ModelSelection; threadId?: string; updateBotDefault?: boolean; resetApprovalToAsk?: boolean }
@@ -1790,8 +1788,6 @@ export function reducer(state: AppState, action: Action): AppState {
         dataSheets: { ...state.dataSheets, [action.sheet.botId]: action.sheet },
         ...(action.tables ? { dataTables: { ...state.dataTables, [action.sheet.botId]: action.tables } } : {}),
       };
-    case "dataView":
-      return { ...state, dataView: action.view };
     case "sendGroup": {
       if (!action.sendId) return state;
       const group = state.groups.find((candidate) => candidate.id === action.groupId);
@@ -1883,7 +1879,6 @@ export const initialState: AppState = {
   dataTables: {},
   dataResultFocus: null,
   signInFocus: null,
-  dataView: null,
   focusMessage: null,
   unreadDivider: null,
   connected: false,
@@ -2451,7 +2446,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           void waitForExecutionSettings(botBeforeSend ? [botBeforeSend] : [], threadId)
             .then(() => api(`/api/bots/${action.botId}/messages`, {
                 method: "POST",
-                body: JSON.stringify({ text: action.text, replyToId: action.replyToId, threadId, sendId, ...(action.dataContext ? { dataContext: action.dataContext } : {}), ...(action.pointed?.length ? { pointed: action.pointed } : {}), ...(action.mode === "goal" ? { mode: "goal" } : {}) }),
+                body: JSON.stringify({ text: action.text, replyToId: action.replyToId, threadId, sendId, ...(action.pointed?.length ? { pointed: action.pointed } : {}), ...(action.mode === "goal" ? { mode: "goal" } : {}) }),
               }))
             .then((body) => {
               if (body?.message && typeof body.threadId === "string") {
