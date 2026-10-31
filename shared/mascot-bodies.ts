@@ -17,7 +17,7 @@
 import { z } from "zod";
 
 /** Every selectable body id, in the order the picker shows them. */
-export const MASCOT_BODY_IDS = ["cursor", "circle", "capsule", "drop", "shield", "hexagon", "diamond", "star", "sparkle", "wedge", "tablet"] as const;
+export const MASCOT_BODY_IDS = ["cursor", "circle", "capsule", "drop", "shield", "hexagon", "diamond", "star", "sparkle", "wedge", "tablet", "heart", "cloud"] as const;
 
 export type MascotBodyId = (typeof MASCOT_BODY_IDS)[number];
 
@@ -128,6 +128,22 @@ export const MASCOT_BODIES: Record<MascotBodyId, MascotBody> = {
     body: "<path fill=\"{{GRADIENT}}\" d=\"M30 22C76.66667 22 123.33333 22 170 22C186.56854 22 200 35.43146 200 52C200 84 200 116 200 148C200 164.56854 186.56854 178 170 178C123.33333 178 76.66667 178 30 178C13.43146 178 0 164.56854 0 148C0 116 0 84 0 52C0 35.43146 13.43146 22 30 22Z\"/>",
     clip: "<path d=\"M30 22C76.66667 22 123.33333 22 170 22C186.56854 22 200 35.43146 200 52C200 84 200 116 200 148C200 164.56854 186.56854 178 170 178C123.33333 178 76.66667 178 30 178C13.43146 178 0 164.56854 0 148C0 116 0 84 0 52C0 35.43146 13.43146 22 30 22Z\"/>",
     anchor: { x: 77.67, y: 106.85, scale: 1 },
+  },
+  heart: {
+    id: "heart",
+    name: "Heart",
+    fit: "translate(-27.7175 -51.0679) scale(1.41988)",
+    body: "<path fill=\"{{GRADIENT}}\" d=\"M100 74C86 46 56 38 34 58C10 80 18 112 42 132C62 150 84 166 100 186C116 166 138 150 158 132C182 112 190 80 166 58C144 38 114 46 100 74Z\"/>",
+    clip: "<path d=\"M100 74C86 46 56 38 34 58C10 80 18 112 42 132C62 150 84 166 100 186C116 166 138 150 158 132C182 112 190 80 166 58C144 38 114 46 100 74Z\"/>",
+    anchor: { x: 115.89, y: 105.76, scale: 0.887 },
+  },
+  cloud: {
+    id: "cloud",
+    name: "Cloud",
+    fit: "translate(-30.4547 -25.8904) scale(1.336752)",
+    body: "<path fill=\"{{GRADIENT}}\" d=\"M50 74C50 38 100 30 116 58C140 34 180 52 174 82C200 94 200 132 176 142C176 164 148 172 132 156C116 174 84 172 76 154C52 166 28 150 36 130C14 118 20 78 50 74Z\"/>",
+    clip: "<path d=\"M50 74C50 38 100 30 116 58C140 34 180 52 174 82C200 94 200 132 176 142C176 164 148 172 132 156C116 174 84 172 76 154C52 166 28 150 36 130C14 118 20 78 50 74Z\"/>",
+    anchor: { x: 107.48, y: 110.97, scale: 0.952 },
   },
 };
 

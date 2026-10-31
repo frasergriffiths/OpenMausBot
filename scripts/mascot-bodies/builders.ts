@@ -209,6 +209,35 @@ function buildHeart(w: number, h: number): string {
 }
 
 
+
+/** A chubby heart: shallow cleft, wide shoulders, a soft point. A narrower
+ * heart cannot hold the shared face without shrinking every other body. */
+function buildFatHeart(): string {
+  return new Path()
+    .moveTo(100, 74)
+    .curveTo([86, 46, 56, 38, 34, 58])
+    .curveTo([10, 80, 18, 112, 42, 132])
+    .curveTo([62, 150, 84, 166, 100, 186])
+    .curveTo([116, 166, 138, 150, 158, 132])
+    .curveTo([182, 112, 190, 80, 166, 58])
+    .curveTo([144, 38, 114, 46, 100, 74])
+    .close()
+}
+
+/** A cloud: three soft lobes over a rounded base. */
+function buildCloud(): string {
+  return new Path()
+    .moveTo(50, 74)
+    .curveTo([50, 38, 100, 30, 116, 58])
+    .curveTo([140, 34, 180, 52, 174, 82])
+    .curveTo([200, 94, 200, 132, 176, 142])
+    .curveTo([176, 164, 148, 172, 132, 156])
+    .curveTo([116, 174, 84, 172, 76, 154])
+    .curveTo([52, 166, 28, 150, 36, 130])
+    .curveTo([14, 118, 20, 78, 50, 74])
+    .close()
+}
+
 /** A star with every point rounded off: vertices alternate out and in, and each
  * corner is cut back along both edges and arced across, so no point is sharp. */
 function buildSoftStar(w: number, h: number, points: number, inner: number, round: number): string {
@@ -300,6 +329,8 @@ export const BODY_DEFS: BodyDef[] = [
   { id: "sparkle", name: "Sparkle", d: buildSoftStar(200, 200, 6, 0.74, 0.30), viewBox: [0, 0, 200, 200] },
   { id: "wedge", name: "Wedge", d: buildPolygon(198, 192, 3, 0.82), viewBox: [0, 0, 200, 200] },
   { id: "tablet", name: "Tablet", d: buildRoundedBox(200, 156, 30), viewBox: [0, 0, 200, 200] },
+  { id: "heart", name: "Heart", d: buildFatHeart(), viewBox: [0, 0, 200, 200] },
+  { id: "cloud", name: "Cloud", d: buildCloud(), viewBox: [0, 0, 200, 200] },
 ]
 
 export const BODY_IDS: string[] = BODY_DEFS.map(s => s.id)

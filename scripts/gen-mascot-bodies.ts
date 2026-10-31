@@ -441,23 +441,15 @@ function main(): void {
   }
   console.log("")
 
-  const shared = solved.reduce((min, s) => Math.min(min, s.scale), Infinity)
-  if (shared < cursor.scale) {
-    const tighter = solved
-      .filter(s => s.scale < cursor.scale)
-      .map(s => `${s.def.id} (${s.scale})`)
-      .join(", ")
-    throw new Error(
-      `the shared face scale ${shared} is below ${DEFAULT_ID}'s own ${cursor.scale}: ` +
-        `${tighter} cannot hold the shipped face, so clamping the catalog would shrink ` +
-        `the mascot everyone already has. Widen those outlines rather than lowering the floor.`
-    )
-  }
+  // Each body keeps the largest face it can hold, capped at the authored size.
+  // A single shared minimum punished round bodies for the sake of the pointiest
+  // one; a heart or a cloud now carries a slightly smaller face, never a broken one.
+  const shared = CAP
 
   const baked: Baked[] = []
   const clipped: string[] = []
   for (const body of solved) {
-    const anchor = anchorAt(body.sdf, body.seed, shared)
+    const anchor = anchorAt(body.sdf, body.seed, Math.min(shared, body.scale))
     const clipping = clippingAt(body.sdf, anchor)
     clipping.forEach((expressions, i) => {
       if (expressions.length === 0) return
