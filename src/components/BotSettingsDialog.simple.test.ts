@@ -494,16 +494,16 @@ describe("the hero", () => {
 describe("the avatar editor", () => {
   const editor = (bot: Bot) => capture(() => AvatarEditorCard({ bot, activeState: "idle", onPatch: patch, onClose }));
 
-  it("shows the nine bodies and twelve colours, with the faces behind More looks", () => {
+  it("shows the seven bodies and twelve colours, with the faces behind More looks", () => {
     const bot = makeBot();
     const rendered = editor(bot);
-    expect(rendered.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(9);
+    expect(rendered.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(7);
     expect(rendered.html.match(/aria-label="Use \w+ mascot color"/g)).toHaveLength(12);
     expect(rendered.html).not.toContain(">Halloween<");
     expect(has(rendered, "data-avatar-face", "idle")).toBe(false);
-    expect(find(rendered, "aria-label", "Use the Mochi body").props["aria-pressed"]).toBe(true);
-    click(find(rendered, "aria-label", "Use the Circle body"));
-    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "circle" });
+    expect(find(rendered, "aria-label", "Use the Kit body").props["aria-pressed"]).toBe(true);
+    click(find(rendered, "aria-label", "Use the Bun body"));
+    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "bun" });
     click(find(rendered, "aria-label", "Use blue mascot color"));
     expect(patch).toHaveBeenLastCalledWith({ color: "blue" });
     expect(find(rendered, "aria-label", "Use coral mascot color").props.title).toBe("Coral");
@@ -516,7 +516,7 @@ describe("the avatar editor", () => {
     click(more);
     const open = editor(bot);
     expect(find(open, "data-avatar-more").props["aria-expanded"]).toBe(true);
-    expect(open.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(9);
+    expect(open.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(7);
     expect(open.html).not.toContain(">Halloween<");
     expect(find(open, "data-avatar-face", "idle").props["aria-pressed"]).toBe(true);
     click(find(open, "data-avatar-face", "proud"));
@@ -532,14 +532,13 @@ describe("the avatar editor", () => {
 
   it("switches back to the mascot when a body is picked over a picture", () => {
     const bot = makeBot({ avatarUrl: "/api/attachments/cat.webp", avatarCrop: "circle" });
-    click(find(editor(bot), "data-avatar-tab", "bot"));
-    click(find(editor(bot), "aria-label", "Use the Star body"));
-    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "star", avatarCrop: "mascot" });
+    click(find(editor(bot), "aria-label", "Use the Hare body"));
+    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "hare", avatarCrop: "mascot" });
   });
 
   it("resets the mascot as the Advanced card does", () => {
     click(find(editor(makeBot()), "data-avatar-reset"));
-    expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "cursor" });
+    expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "kit" });
   });
 
 
