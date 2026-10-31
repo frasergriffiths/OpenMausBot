@@ -215,18 +215,6 @@ function buildHeart(w: number, h: number): string {
 
 /** A chubby heart: shallow cleft, wide shoulders, a soft point. A narrower
  * heart cannot hold the shared face without shrinking every other body. */
-function buildFatHeart(): string {
-  return new Path()
-    .moveTo(100, 92)
-    .curveTo([96, 66, 64, 54, 46, 72])
-    .curveTo([24, 94, 36, 124, 58, 142])
-    .curveTo([74, 156, 90, 168, 100, 180])
-    .curveTo([110, 168, 126, 156, 142, 142])
-    .curveTo([164, 124, 176, 94, 154, 72])
-    .curveTo([136, 54, 104, 66, 100, 92])
-    .close()
-}
-
 function buildCloud(): string {
   return new Path()
     .moveTo(50, 74)
@@ -328,8 +316,7 @@ export const BODY_DEFS: BodyDef[] = [
   { id: "star", name: "Star", d: buildSoftStar(198, 198, 5, 0.76, 0.42), viewBox: [0, 0, 200, 200] },
   { id: "sparkle", name: "Sparkle", d: buildSoftStar(200, 200, 6, 0.80, 0.58), viewBox: [0, 0, 200, 200] },
   { id: "wedge", name: "Wedge", d: buildPolygon(198, 192, 3, 0.82), viewBox: [0, 0, 200, 200] },
-  { id: "tablet", name: "Tablet", d: buildRoundedBox(200, 156, 30), viewBox: [0, 0, 200, 200] },
-  { id: "heart", name: "Heart", d: buildFatHeart(), viewBox: [0, 0, 200, 200] },
+  { id: "tablet", name: "Tablet", d: buildRoundedBox(240, 190, 72), viewBox: [-20, -5, 240, 200] },
   { id: "cloud", name: "Cloud", d: buildCloud(), viewBox: [0, 0, 200, 200] },
 ]
 

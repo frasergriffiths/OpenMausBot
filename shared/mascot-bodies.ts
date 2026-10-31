@@ -17,7 +17,7 @@
 import { z } from "zod";
 
 /** Every selectable body id, in the order the picker shows them. */
-export const MASCOT_BODY_IDS = ["cursor", "circle", "shield", "hexagon", "diamond", "star", "sparkle", "wedge", "tablet", "heart", "cloud"] as const;
+export const MASCOT_BODY_IDS = ["cursor", "circle", "shield", "hexagon", "diamond", "star", "sparkle", "wedge", "tablet", "cloud"] as const;
 
 export type MascotBodyId = (typeof MASCOT_BODY_IDS)[number];
 
@@ -108,18 +108,10 @@ export const MASCOT_BODIES: Record<MascotBodyId, MascotBody> = {
   tablet: {
     id: "tablet",
     name: "Tablet",
-    fit: "translate(0 0) scale(1.142705)",
-    body: "<path fill=\"{{GRADIENT}}\" d=\"M30 22C76.66667 22 123.33333 22 170 22C186.56854 22 200 35.43146 200 52C200 84 200 116 200 148C200 164.56854 186.56854 178 170 178C123.33333 178 76.66667 178 30 178C13.43146 178 0 164.56854 0 148C0 116 0 84 0 52C0 35.43146 13.43146 22 30 22Z\"/>",
-    clip: "<path d=\"M30 22C76.66667 22 123.33333 22 170 22C186.56854 22 200 35.43146 200 52C200 84 200 116 200 148C200 164.56854 186.56854 178 170 178C123.33333 178 76.66667 178 30 178C13.43146 178 0 164.56854 0 148C0 116 0 84 0 52C0 35.43146 13.43146 22 30 22Z\"/>",
-    anchor: { x: 77.67, y: 106.85, scale: 1 },
-  },
-  heart: {
-    id: "heart",
-    name: "Heart",
-    fit: "translate(-59.7317 -97.5096) scale(1.740022)",
-    body: "<path fill=\"{{GRADIENT}}\" d=\"M100 92C96 66 64 54 46 72C24 94 36 124 58 142C74 156 90 168 100 180C110 168 126 156 142 142C164 124 176 94 154 72C136 54 104 66 100 92Z\"/>",
-    clip: "<path d=\"M100 92C96 66 64 54 46 72C24 94 36 124 58 142C74 156 90 168 100 180C110 168 126 156 142 142C164 124 176 94 154 72C136 54 104 66 100 92Z\"/>",
-    anchor: { x: 115.87, y: 111.61, scale: 0.88 },
+    fit: "translate(19.0451 19.0451) scale(0.952254)",
+    body: "<path fill=\"{{GRADIENT}}\" d=\"M52 5C84 5 116 5 148 5C187.7645 5 220 37.2355 220 77C220 92.33333 220 107.66667 220 123C220 162.7645 187.7645 195 148 195C116 195 84 195 52 195C12.2355 195 -20 162.7645 -20 123C-20 107.66667 -20 92.33333 -20 77C-20 37.2355 12.2355 5 52 5Z\"/>",
+    clip: "<path d=\"M52 5C84 5 116 5 148 5C187.7645 5 220 37.2355 220 77C220 92.33333 220 107.66667 220 123C220 162.7645 187.7645 195 148 195C116 195 84 195 52 195C12.2355 195 -20 162.7645 -20 123C-20 107.66667 -20 92.33333 -20 77C-20 37.2355 12.2355 5 52 5Z\"/>",
+    anchor: { x: 97.42, y: 106.78, scale: 1 },
   },
   cloud: {
     id: "cloud",
