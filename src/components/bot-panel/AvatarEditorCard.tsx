@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { ChevronDown, ImagePlus, Loader2, Trash2 } from "lucide-react";
+import {ChevronDown, Trash2} from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -9,14 +9,14 @@ import type { Bot } from "@/state/store";
 import { MASCOT_BODIES, MASCOT_BODY_IDS } from "../../../shared/mascot-bodies";
 import type { BotBodyId } from "../../../shared/bot-body";
 import { MausAvatar } from "../Avatar";
-import { AvatarFraming, OrganizationAvatarIcons, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "../avatar-editing";
+import { AvatarFraming, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "../avatar-editing";
 import { Segmented } from "./rows";
 
-export type AvatarEditorTab = "bot" | "upload";
+export type AvatarEditorTab = "bot" | "picture";
 
 const TABS: ReadonlyArray<readonly [AvatarEditorTab, LocaleKey]> = [
   ["bot", "botPanel.avatar.tabBot"],
-  ["upload", "botPanel.avatar.tabUpload"],
+  ["picture", "botPanel.avatar.tabUpload"],
 ];
 
 const IMAGE_CROPS = ["circle", "rounded", "square"] as const;
@@ -51,9 +51,9 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
   onClose: () => void;
 }) {
   const image = useAvatarImage(bot, onPatch);
-  const { fileRef, crop, uploading, busy, error, upload, removeImage } = image;
+  const { crop, busy, error, removeImage } = image;
   const showsImage = crop !== "mascot" && Boolean(bot.avatarUrl);
-  const [tab, setTab] = useState<AvatarEditorTab>(showsImage ? "upload" : "bot");
+  const [tab, setTab] = useState<AvatarEditorTab>(showsImage ? "picture" : "bot");
   const tabsRef = useRef<HTMLDivElement>(null);
   // The card is a dialog: focus moves into it, onto the tab it opened on, so Escape and Tab work from the start.
   useEffect(() => {
@@ -183,33 +183,9 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
           </>
         )}
 
-        {tab === "upload" && (
+        {tab === "picture" && (
           <>
-            <OrganizationAvatarIcons busy={busy} onUpload={(file) => void upload(file)} />
             {showsImage && <AvatarFraming bot={bot} disabled={busy} onPatch={onPatch} />}
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/png,image/jpeg,image/gif,image/webp"
-              className="sr-only"
-              onChange={(event) => void upload(event.target.files?.[0])}
-            />
-            <button
-              type="button"
-              data-avatar-drop
-              disabled={busy}
-              onClick={() => fileRef.current?.click()}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => {
-                event.preventDefault();
-                void upload(event.dataTransfer.files?.[0]);
-              }}
-              className="flex w-full flex-col items-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink/15 px-3 py-6 text-center text-[13px] text-ink-secondary hover:border-ink/25 hover:text-ink disabled:opacity-50"
-            >
-              {uploading ? <Loader2 size={22} className="animate-spin" /> : <ImagePlus size={22} />}
-              <span>{t("botPanel.avatar.drop")}</span>
-              <span className="text-[12px] text-ink-tertiary">{t("botPanel.avatar.types")}</span>
-            </button>
             <div className="mt-2.5 flex items-center gap-2.5">
               <span className="shrink-0 text-[12px] text-ink-secondary">{t("botPanel.avatar.shape")}</span>
               <Segmented

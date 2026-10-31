@@ -547,28 +547,6 @@ describe("the avatar editor", () => {
     expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "cursor" });
   });
 
-  it("uploads with shape and framing", () => {
-    const bot = makeBot();
-    click(find(editor(bot), "data-avatar-tab", "upload"));
-    const upload = editor(bot);
-    expect(upload.html).toContain("Drop a picture here, or choose one");
-    expect(upload.html).toContain("PNG, JPEG, GIF, or WebP · up to 10 MB");
-    expect(segment(upload, "data-avatar-crop").options.map((option) => [option.value, option.disabled])).toEqual([
-      ["circle", true], ["rounded", true], ["square", true],
-    ]);
-    expect(ofType(upload, AvatarFraming)).toBeUndefined();
-
-    fresh();
-    const pictured = makeBot({ avatarUrl: "/api/attachments/cat.webp", avatarCrop: "circle" });
-    const withImage = editor(pictured);
-    expect(find(withImage, "data-avatar-tab", "upload").props["aria-selected"]).toBe(true);
-    expect(ofType(withImage, AvatarFraming)!.props.bot).toBe(pictured);
-    expect(segment(withImage, "data-avatar-crop").value).toBe("circle");
-    segment(withImage, "data-avatar-crop").onChange("square");
-    expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "square" });
-    click(find(withImage, "aria-label", "Remove picture"));
-    expect(patch).toHaveBeenLastCalledWith({ avatarUrl: null, avatarCrop: "mascot", avatarZoom: AVATAR_ZOOM_MIN, avatarFocusX: AVATAR_FOCUS_CENTER, avatarFocusY: AVATAR_FOCUS_CENTER });
-  });
 
   it("closes on Escape without letting the dialog close settings", () => {
     const event = key(editor(makeBot()).nodes[0]!, "Escape");

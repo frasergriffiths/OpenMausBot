@@ -44,6 +44,9 @@ section rail is now a vertical tab list from the shared library, with arrow-key
 movement and aria-selected, instead of a row of buttons with aria-current.
 
 Done: the Team Map page title no longer carries a person icon.
+Done: custom mascot uploads removed. The upload tab, its drop zone, the
+onboarding upload button and the organisation-icon picker are gone; a bot's
+picture is now only what it already had, with removal and framing still there.
 
 Remaining in Phase 5: the rest of the Defaults dialog polish, Settings pages,
 and the Team Map dialogs.

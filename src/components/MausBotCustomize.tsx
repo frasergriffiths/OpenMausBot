@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import { ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -78,13 +78,6 @@ export function MausBotCustomize({ preview, name, nameRef, image, onName, onPatc
       </div>
       <div>
         <div className="flex flex-wrap items-center gap-1.5 text-[13px]">
-          <input ref={image.fileRef} type="file" accept={AVATAR_FILE_TYPES} className="sr-only" tabIndex={-1} aria-hidden="true"
-            onChange={(event) => void image.upload(event.target.files?.[0])} />
-          <button type="button" data-mausbot-welcome-upload="" disabled={image.busy} onClick={() => image.fileRef.current?.click()}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-ink-secondary hover:bg-ink/[0.05] hover:text-ink disabled:opacity-50">
-            {image.uploading ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <ImagePlus size={14} aria-hidden="true" />}
-            {t("mausbotWelcome.upload")}
-          </button>
           {picture && (
             <div className="basis-full"><button type="button" data-mausbot-welcome-remove="" disabled={image.busy} onClick={image.removeImage}
               className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[13px] text-ink-secondary hover:bg-ink/[0.05] hover:text-ink disabled:opacity-50">
