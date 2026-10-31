@@ -16,7 +16,6 @@ import { MASCOT_BODIES, botMascotBody } from "../../shared/mascot-bodies";
 import type { BotBodyId } from "../../shared/bot-body";
 
 export const EYE_SCALE = 1.12;
-export const MOUTH_WEIGHT = 11;
 
 const POINTER_GAZE = { forward: 1, authored: 0.25 };
 
@@ -83,8 +82,6 @@ export type MausAvatarProps = {
   gaze?: { x?: number; y?: number };
   spring?: number;
   eyeScale?: number;
-  showMouth?: boolean;
-  mouthStroke?: number;
   forward?: boolean;
   lookAround?: number;
   trackPointer?: boolean;
@@ -110,8 +107,6 @@ function GradientAvatarComponent(
     gaze,
     spring,
     eyeScale,
-    showMouth,
-    mouthStroke,
     forward = true,
     lookAround,
     trackPointer = true,
@@ -173,8 +168,6 @@ function GradientAvatarComponent(
         turn={turn}
         spring={spring}
         eyeScale={eyeScale}
-        showMouth={showMouth}
-        mouthStroke={mouthStroke}
         paused={!animated}
       />
     </span>

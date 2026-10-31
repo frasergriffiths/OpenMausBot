@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { BOT_BODY_IDS, botBodyId, botBodySchema } from "./bot-body.ts";
-import { MASCOT_BODY_IDS } from "./mascot-bodies.ts";
+import { DEFAULT_MASCOT_BODY, MASCOT_BODY_IDS } from "./mascot-bodies.ts";
 
 describe("bot bodies", () => {
   it("accepts every gradient body the catalog ships", () => {
@@ -10,8 +10,8 @@ describe("bot bodies", () => {
   });
 
   it("falls back to the default for anything it does not know", () => {
-    expect(botBodyId("star")).toBe("star");
-    expect(botBodyId("hexagram")).toBe("cursor");
-    expect(botBodyId(undefined)).toBe("cursor");
+    expect(botBodyId("kit")).toBe("kit");
+    expect(botBodyId("star")).toBe(DEFAULT_MASCOT_BODY);
+    expect(botBodyId(undefined)).toBe(DEFAULT_MASCOT_BODY);
   });
 });

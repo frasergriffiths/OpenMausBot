@@ -1,7 +1,7 @@
 /**
  * Signed distance field for a silhouette, so each "how far from the edge?" is an
  * array lookup. Exact (Felzenszwalb & Huttenlocher's squared EDT, linear time per
- * axis): a wrong distance shows up as a mouth hanging off the edge.
+ * axis): a wrong distance shows up as a face hanging off the edge.
  */
 
 import { FACE_BOX } from "../../src/components/cursor-face-data.ts"

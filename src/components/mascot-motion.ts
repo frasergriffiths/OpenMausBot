@@ -212,14 +212,13 @@ export function morphUnitsPerMs(velocity: number, morph: number, stiffness: numb
 }
 
 export function faceTravelUnits(
-  from: { rings: Ring[]; mouth: number[]; gaze: number[] },
-  to: { rings: Ring[]; mouth: number[]; gaze: number[] },
+  from: { rings: Ring[]; gaze: number[] },
+  to: { rings: Ring[]; gaze: number[] },
 ): number {
   let travel = 0;
   from.rings.forEach((ring, eye) => ring.forEach((point, i) => {
     const target = to.rings[eye][i];
     travel = Math.max(travel, Math.hypot(target[0] - point[0], target[1] - point[1]));
   }));
-  from.mouth.forEach((value, i) => { travel = Math.max(travel, Math.abs(to.mouth[i] - value)); });
   return travel + Math.hypot(to.gaze[0] - from.gaze[0], to.gaze[1] - from.gaze[1]);
 }

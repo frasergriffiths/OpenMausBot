@@ -90,7 +90,7 @@ export function SectionContextDialog({ section, label, onClose, picker }: {
         <>
           <Button size="sm" type="button" onClick={close} disabled={saving}>{t("common.cancel")}</Button>
           <Button size="sm" variant="primary" type="button" onClick={() => void save()} disabled={loading || saving || !dirty || bytes > maxBytes}>
-            {saving ? t("common.saving") : t("common.save")}
+            {saving ? t("team.saving") : t("common.save")}
           </Button>
         </>
       }
