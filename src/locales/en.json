@@ -1555,7 +1555,7 @@
   "sidebar.copyConversationId": "Copy conversation ID",
   "sidebar.copyBotId": "Copy bot ID",
   "noBots.title": "No bots yet",
-  "noBots.body": "Make one and it lands here, ready to talk. Here are the shapes a bot can wear.",
+  "noBots.body": "Make your first bot and it lands here, ready to talk.",
   "noBots.new": "New bot",
   "settings.departments.subtitle": "Shared instructions and memory for this department.",
   "settings.departments.title": "Departments",
