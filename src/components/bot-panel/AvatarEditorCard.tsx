@@ -44,7 +44,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
     cardRef.current?.querySelector<HTMLElement>("button:not([disabled])")?.focus();
   }, []);
   const pickMascot = (patch: AvatarPatch) => onPatch(crop === "mascot" ? patch : { ...patch, avatarCrop: "mascot" });
-  const body = bot.mascotBody ?? "cursor";
+  const body = bot.mascotBody ?? "kit";
   const [moreLooks, setMoreLooks] = useState(() => Boolean(bot.mascotExpression && bot.mascotExpression !== "idle"));
   const bodyButton = (id: BotBodyId, name: string) => (
     <button
@@ -98,6 +98,12 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
             <div className="grid grid-cols-5 gap-1.5">
               {MASCOT_BODY_IDS.map((id) => bodyButton(id, MASCOT_BODIES[id].name))}
             </div>
+            <p className="mt-2 text-center text-[11px] leading-4 text-ink-tertiary">
+              {t("botPanel.avatar.credit")}{" "}
+              <a href="https://x.com/FredBergwitz" target="_blank" rel="noreferrer" className="underline hover:text-ink">
+                Fred Bergwitz
+              </a>
+            </p>
             <div className="flex flex-wrap justify-center gap-2 px-1 pb-1 pt-3.5">
               {MAUS_COLOR_NAMES.map((color) => (
                 <button

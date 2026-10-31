@@ -99,9 +99,9 @@ describe("parseBotProfilePatch (both modes)", () => {
 
 describe("mascotBody", () => {
   it("accepts a known body", () => {
-    expect(parseBotProfilePatch({ mascotBody: "circle" } as never, true)).toEqual({
+    expect(parseBotProfilePatch({ mascotBody: "bun" } as never, true)).toEqual({
       ok: true,
-      patch: { mascotBody: "circle" },
+      patch: { mascotBody: "bun" },
     });
   });
 

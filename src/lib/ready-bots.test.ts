@@ -52,7 +52,7 @@ describe("readyBotTemplate", () => {
 
   it("sets who the bot is and how it looks", () => {
     const { profile } = readyBotTemplate(defaults(), plant);
-    expect(profile).toMatchObject({ name: "Fern", title: "Plant care log", soul: plant.soul, color: "green", mascotBody: "circle" });
+    expect(profile).toMatchObject({ name: "Fern", title: "Plant care log", soul: plant.soul, color: "green", mascotBody: "bun" });
   });
 
   it("never changes the person's model, approval level, computer, folder or apps", () => {
