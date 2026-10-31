@@ -5,7 +5,6 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Routine } from "@/lib/routines";
 import type { MemoryDoc } from "@/lib/memory";
 import type { Bot, BotSettingsSection, InstanceInfo } from "@/state/store";
-import { AVATAR_FOCUS_CENTER, AVATAR_ZOOM_MIN } from "../../shared/bot-avatar";
 import type { ManagedSkill } from "./bot-settings/SkillsSection";
 import type { BotApps } from "./bot-settings/useBotApps";
 
@@ -126,7 +125,6 @@ const { SoulField } = await import("./SoulField");
 const { ModelPicker } = await import("./ModelPicker");
 const { RoutineList } = await import("./routines/RoutineList");
 const { SignedInSites } = await import("./SignedInSites");
-const { AvatarFraming } = await import("./avatar-editing");
 const { Switch } = await import("./ui");
 
 afterAll(() => vi.unstubAllGlobals());

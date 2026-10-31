@@ -34,6 +34,12 @@ The Composio GitHub tool rejects base64 payloads near 1 MB. UTF-8 payloads work
 up to about 950 KB (server/index.ts, 922 KB, pushed fine). Use encoding utf-8
 and read content with cat. Anything larger must be split or restructured.
 
+## Threads
+
+The conversation menu no longer offers New thread or the thread switcher:
+Reset Context is the way to start again. The sidebar's thread rows and the
+server's thread model are still in place and are the next step.
+
 ## Current phase
 
 Phase 6 — Reset Context: working end to end. POST
