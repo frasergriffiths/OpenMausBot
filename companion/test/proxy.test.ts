@@ -281,7 +281,7 @@ describe("the sidecar in front of an unmodified harness", () => {
   it("saves a paired device's bot appearance and returns it to other clients", async () => {
     const { body } = await device("GET", "/api/bots");
     const bot = body.bots[0];
-    const appearance = { color: "teal", mascotBody: "star", mascotExpression: "happy" };
+    const appearance = { color: "teal", mascotBody: "hare", mascotExpression: "happy" };
     const saved = await device("PATCH", `/api/bots/${bot.id}`, { body: appearance });
     expect(saved.status, JSON.stringify(saved.body)).toBe(200);
     expect(saved.body.bot).toMatchObject(appearance);
@@ -298,7 +298,7 @@ describe("the sidecar in front of an unmodified harness", () => {
     const { body } = await device("GET", "/api/bots");
     const bot = body.bots[0];
     const path = `/api/bots/${bot.id}`;
-    const appearance = { color: "coral", mascotBody: "diamond", mascotExpression: "sleeping" };
+    const appearance = { color: "coral", mascotBody: "imp", mascotExpression: "sleeping" };
     for (const token of [null, "omb_wrong"]) {
       expect((await device("PATCH", path, { token, body: appearance })).status).toBe(401);
     }
@@ -342,10 +342,10 @@ describe("the sidecar in front of an unmodified harness", () => {
     expect(await ids()).toEqual(before);
 
     const made = await device("POST", "/api/bots", {
-      body: { name: "From the phone", settings: { soul: "Plans trips.", color: "teal", mascotBody: "star" } },
+      body: { name: "From the phone", settings: { soul: "Plans trips.", color: "teal", mascotBody: "hare" } },
     });
     expect(made.status, JSON.stringify(made.body)).toBe(201);
-    expect(made.body.bot).toMatchObject({ name: "From the phone", color: "teal", mascotBody: "star" });
+    expect(made.body.bot).toMatchObject({ name: "From the phone", color: "teal", mascotBody: "hare" });
   });
 
   it("saves the avatar panel's reset and shape choices from a paired device", async () => {
@@ -356,11 +356,11 @@ describe("the sidecar in front of an unmodified harness", () => {
     expect(shape.status, JSON.stringify(shape.body)).toBe(200);
     expect(shape.body.bot).toMatchObject({ color: "purple", avatarCrop: "square", avatarZoom: 1.5, avatarFocusX: 0.25, avatarFocusY: 0.75 });
 
-    const reset = await device("PATCH", path, { body: { avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "cursor" } });
+    const reset = await device("PATCH", path, { body: { avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "kit" } });
     expect(reset.status, JSON.stringify(reset.body)).toBe(200);
     const host = await fetch(`${HARNESS}/api/bots`).then((response) => response.json()) as { bots: Array<{ id: string }> };
     expect(host.bots.find((candidate) => candidate.id === bot.id))
-      .toMatchObject({ avatarCrop: "mascot", color: "green", mascotBody: "cursor" });
+      .toMatchObject({ avatarCrop: "mascot", color: "green", mascotBody: "kit" });
     expect((await device("PATCH", path, { body: { avatarUrl: "/etc/passwd" } })).status).toBe(400);
   });
 
