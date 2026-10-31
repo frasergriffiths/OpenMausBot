@@ -17,7 +17,7 @@
 import { z } from "zod";
 
 /** Every selectable body id, in the order the picker shows them. */
-export const MASCOT_BODY_IDS = ["cursor", "circle", "drop", "shield", "hexagon", "diamond", "star", "sparkle", "wedge", "tablet", "heart", "cloud"] as const;
+export const MASCOT_BODY_IDS = ["cursor", "circle", "shield", "hexagon", "diamond", "star", "sparkle", "wedge", "tablet", "heart", "cloud"] as const;
 
 export type MascotBodyId = (typeof MASCOT_BODY_IDS)[number];
 
@@ -56,14 +56,6 @@ export const MASCOT_BODIES: Record<MascotBodyId, MascotBody> = {
     body: "<path fill=\"{{GRADIENT}}\" d=\"M200 100C200 155.22847 155.22847 200 100 200C44.77153 200 0 155.22847 0 100C0 44.77153 44.77153 0 100 0C155.22847 0 200 44.77153 200 100Z\"/>",
     clip: "<path d=\"M200 100C200 155.22847 155.22847 200 100 200C44.77153 200 0 155.22847 0 100C0 44.77153 44.77153 0 100 0C155.22847 0 200 44.77153 200 100Z\"/>",
     anchor: { x: 113.82, y: 112.05, scale: 1 },
-  },
-  drop: {
-    id: "drop",
-    name: "Drop",
-    fit: "translate(-6.6507 -7.2553) scale(1.209212)",
-    body: "<path fill=\"{{GRADIENT}}\" d=\"M78.16 13C92.72 3.66667 107.28 3.66667 121.84 13C168.88 95.592 184 118.24 184 111C184 157.39192 146.39192 195 100 195C53.60808 195 16 157.39192 16 111C16 118.24 31.12 95.592 78.16 13Z\"/>",
-    clip: "<path d=\"M78.16 13C92.72 3.66667 107.28 3.66667 121.84 13C168.88 95.592 184 118.24 184 111C184 157.39192 146.39192 195 100 195C53.60808 195 16 157.39192 16 111C16 118.24 31.12 95.592 78.16 13Z\"/>",
-    anchor: { x: 112.43, y: 138.33, scale: 1 },
   },
   shield: {
     id: "shield",
@@ -124,10 +116,10 @@ export const MASCOT_BODIES: Record<MascotBodyId, MascotBody> = {
   heart: {
     id: "heart",
     name: "Heart",
-    fit: "translate(-63.3745 -95.5543) scale(1.77645)",
-    body: "<path fill=\"{{GRADIENT}}\" d=\"M100 86C92 62 66 52 48 68C28 86 34 112 54 130C70 146 88 160 100 176C112 160 130 146 146 130C166 112 172 86 152 68C134 52 108 62 100 86Z\"/>",
-    clip: "<path d=\"M100 86C92 62 66 52 48 68C28 86 34 112 54 130C70 146 88 160 100 176C112 160 130 146 146 130C166 112 172 86 152 68C134 52 108 62 100 86Z\"/>",
-    anchor: { x: 115.88, y: 108.01, scale: 0.88 },
+    fit: "translate(-59.7317 -97.5096) scale(1.740022)",
+    body: "<path fill=\"{{GRADIENT}}\" d=\"M100 92C96 66 64 54 46 72C24 94 36 124 58 142C74 156 90 168 100 180C110 168 126 156 142 142C164 124 176 94 154 72C136 54 104 66 100 92Z\"/>",
+    clip: "<path d=\"M100 92C96 66 64 54 46 72C24 94 36 124 58 142C74 156 90 168 100 180C110 168 126 156 142 142C164 124 176 94 154 72C136 54 104 66 100 92Z\"/>",
+    anchor: { x: 115.87, y: 111.61, scale: 0.88 },
   },
   cloud: {
     id: "cloud",

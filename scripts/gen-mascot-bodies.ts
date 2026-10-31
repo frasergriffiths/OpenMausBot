@@ -449,7 +449,10 @@ function main(): void {
   const baked: Baked[] = []
   const clipped: string[] = []
   for (const body of solved) {
-    const anchor = anchorAt(body.sdf, body.seed, Math.min(shared, body.scale))
+    const solvedAnchor = anchorAt(body.sdf, body.seed, Math.min(shared, body.scale))
+    const anchor = body.def.offset
+      ? { ...solvedAnchor, x: solvedAnchor.x + (body.def.offset.x ?? 0), y: solvedAnchor.y + (body.def.offset.y ?? 0) }
+      : solvedAnchor
     const clipping = clippingAt(body.sdf, anchor)
     clipping.forEach((expressions, i) => {
       if (expressions.length === 0) return

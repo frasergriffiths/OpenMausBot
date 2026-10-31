@@ -13,6 +13,9 @@ export interface BodyDef {
    * `cursor`'s is the original artwork canvas and `blob`'s is padded, so
    * bounds come from flattening the path. */
   viewBox: [number, number, number, number]
+  /** Visual nudge in face-space units: a face is not vertically symmetric
+   * (eyes sit above the mouth), so a wide body can want it moved to read centred. */
+  offset?: { x?: number; y?: number }
 }
 
 type Sextet = [number, number, number, number, number, number]
@@ -214,13 +217,13 @@ function buildHeart(w: number, h: number): string {
  * heart cannot hold the shared face without shrinking every other body. */
 function buildFatHeart(): string {
   return new Path()
-    .moveTo(100, 86)
-    .curveTo([92, 62, 66, 52, 48, 68])
-    .curveTo([28, 86, 34, 112, 54, 130])
-    .curveTo([70, 146, 88, 160, 100, 176])
-    .curveTo([112, 160, 130, 146, 146, 130])
-    .curveTo([166, 112, 172, 86, 152, 68])
-    .curveTo([134, 52, 108, 62, 100, 86])
+    .moveTo(100, 92)
+    .curveTo([96, 66, 64, 54, 46, 72])
+    .curveTo([24, 94, 36, 124, 58, 142])
+    .curveTo([74, 156, 90, 168, 100, 180])
+    .curveTo([110, 168, 126, 156, 142, 142])
+    .curveTo([164, 124, 176, 94, 154, 72])
+    .curveTo([136, 54, 104, 66, 100, 92])
     .close()
 }
 
@@ -317,7 +320,6 @@ export const BODY_DEFS: BodyDef[] = [
   // The wobble reaches 4.2 units past the 200x200 stage, so its box is padded:
   // a 200x200 viewBox would let the scanline pass shave the top lobe flat.
   { id: "circle", name: "Circle", d: buildEllipse(200, 200), viewBox: [0, 0, 200, 200] },
-  { id: "drop", name: "Drop", d: buildDrop(168, 190, 0.92), viewBox: [0, 0, 200, 200] },
   { id: "shield", name: "Pebble", d: buildRoundedBox(190, 200, 72), viewBox: [0, 0, 200, 200] },
   { id: "hexagon", name: "Hexagon", d: buildPolygon(196, 196, 6, 0.48), viewBox: [0, 0, 200, 200] },
   { id: "diamond", name: "Diamond", d: buildPolygon(196, 196, 4, 0.58), viewBox: [0, 0, 200, 200] },
