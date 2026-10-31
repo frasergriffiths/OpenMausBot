@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { z } from "zod";
 
-export type SidebarDensity = "expanded" | "compact" | "icons";
+export type SidebarDensity = "expanded" | "icons";
 export type SidebarToolsLayout = "rows" | "toolbar";
 
 export const SIDEBAR_TOOLS_LAYOUTS: readonly SidebarToolsLayout[] = ["rows", "toolbar"];

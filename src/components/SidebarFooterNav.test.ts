@@ -48,7 +48,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("sidebar footer places", () => {
-  it.each(["compact"] as const)("keeps Team map out of Advanced mode's Tools rows (%s)", (density) => {
+  it.each(["expanded"] as const)("keeps Team map out of Advanced mode's Tools rows (%s)", (density) => {
     fixture.advanced = true;
     const { html } = render(density);
     expect(html).not.toContain('data-sidebar-nav="team-map"');
@@ -58,7 +58,7 @@ describe("sidebar footer places", () => {
     expect(html).not.toContain('data-sidebar-nav="apps"');
   });
 
-  it.each(["compact"] as const)("leaves no places in Simple mode's sidebar (%s)", (density) => {
+  it.each(["expanded"] as const)("leaves no places in Simple mode's sidebar (%s)", (density) => {
     expect(render(density).html).toBe("");
   });
 
@@ -78,7 +78,7 @@ describe("sidebar footer places", () => {
   it("toggles through the header", () => {
     fixture.advanced = true;
     const onToggleCollapsed = vi.fn();
-    const { nodes: tree } = render("compact", { onToggleCollapsed });
+    const { nodes: tree } = render("expanded", { onToggleCollapsed });
     const header = tree.find((node) => String(node.props.className ?? "").includes("group"))!;
     void header;
     expect(onToggleCollapsed).toBeTypeOf("function");

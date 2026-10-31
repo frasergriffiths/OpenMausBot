@@ -136,13 +136,11 @@ export function openBotContextMenu(onMenu: (menu: MenuState) => void, botId: str
 export function GroupListItem({
   group,
   density,
-  quiet = false,
   query = "",
   onMenu,
 }: {
   group: Group;
   density: SidebarDensity;
-  quiet?: boolean;
   query?: string;
   onMenu: (menu: { groupId: string; x: number; y: number }) => void;
 }) {
@@ -184,8 +182,7 @@ export function GroupListItem({
       className={cn(
         "relative flex w-full items-center rounded-md text-left", SIMPLE_ROW_FOCUS,
         density === "icons" ? (railTile ? "h-[54px] justify-center" : "justify-center px-1 py-1.5")
-          : expandedRow ? cn("gap-2 rounded-[10px] py-2 pr-9 md:h-[54px] md:py-0", !group.dm && hasThreadList ? "pl-6" : "pl-2")
-          : "gap-1.5 py-1 pl-6 pr-9",
+          : cn("gap-2 rounded-[10px] py-2 pr-9 md:h-[54px] md:py-0", !group.dm && hasThreadList ? "pl-6" : "pl-2"),
         selected && !expanded ? "bg-raised" : "hover:bg-raised/50",
       )}
       title={density === "icons" ? group.name : undefined}
@@ -195,9 +192,9 @@ export function GroupListItem({
       <div className={cn("min-w-0 flex-1", density === "icons" && "hidden")}>
         <div className="flex items-baseline justify-between gap-2">
           <span className={cn("truncate text-[14px] text-ink", expandedRow ? "font-medium" : "font-semibold")}>{group.name}</span>
-          {(expanded || (quiet && !groupStatus)) && group.unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
+          {expanded && group.unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
         </div>
-        {!expanded && (!quiet || groupStatus) && <div className="flex items-center justify-between gap-2">
+        {!expanded && <div className="flex items-center justify-between gap-2">
           <span className={cn("truncate text-ink-secondary", expandedRow ? "text-[13px] leading-[18px]" : "text-[11px]")}>{group.description || groupPreview(group, state.bots, state.instances)}</span>
           {group.unread && <span className="size-2 shrink-0 rounded-full bg-accent" />}
         </div>}
@@ -214,7 +211,7 @@ export function GroupListItem({
       onClick={() => { setThreadsOpen(true); dispatch({ type: "newGroupTask", groupId: group.id }); }}
       className="pointer-events-none absolute right-1 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center ui-hover-action text-ink-secondary opacity-0 hover:bg-raised hover:text-ink disabled:opacity-40 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 max-md:pointer-events-auto max-md:opacity-70 touch:pointer-events-auto touch:opacity-70 touch:disabled:opacity-40"><Plus size={14} /></button>}
     </div>
-    {expanded && <GroupThreadList group={group} selected={selected} density={density} query={group.name.toLowerCase().includes(query.toLowerCase()) ? "" : query} />}
+    {expanded && <GroupThreadList group={group} selected={selected} query={group.name.toLowerCase().includes(query.toLowerCase()) ? "" : query} />}
     </>
   );
 }
@@ -458,7 +455,7 @@ export function currentArchivableBot(bots: readonly Bot[], id: string): Bot | un
 
 const NO_FOLDERS: BotProject[] = [];
 
-export function BotThreadList({ bot, selected, density, query, pendingQueued, reveal, locale, generatedTitles, dispatch, activityLabel, hidden = false }: BotRowProps & {
+export function BotThreadList({ bot, selected, query, pendingQueued, reveal, locale, generatedTitles, dispatch, activityLabel, hidden = false }: BotRowProps & {
   activityLabel?: string;
   hidden?: boolean;
 }) {
@@ -521,7 +518,7 @@ export function BotThreadList({ bot, selected, density, query, pendingQueued, re
   }), [botId, dispatch, generatedTitles]);
   const renderThread = (task: (typeof tasks)[number]) => {
     const thread = currentTaskBot(bot, task.threadId);
-    return <SidebarThreadRow key={task.threadId} task={{ ...task, busy: thread.busy, activity: thread.activity, waitingForTeammates: thread.waitingForTeammates }} ownerId={bot.id} current={selected && task.threadId === bot.threadId} compact={density === "compact"} folders={projects} color={spinnerColor(bot.color)}
+    return <SidebarThreadRow key={task.threadId} task={{ ...task, busy: thread.busy, activity: thread.activity, waitingForTeammates: thread.waitingForTeammates }} ownerId={bot.id} current={selected && task.threadId === bot.threadId} folders={projects} color={spinnerColor(bot.color)}
       activityLabel={task.threadId === bot.threadId ? activityLabel : undefined} now={stampClock(threadRecency(task), now)} locale={locale} {...actions} />;
   };
   const ungrouped = activeVisible.filter((task) => !projects.some((project) => project.id === task.projectId));
@@ -658,7 +655,6 @@ export interface BotRowProps {
   locale: string;
   generatedTitles: boolean;
   density: SidebarDensity;
-  quiet: boolean;
   query: string;
   dispatch: Dispatch<Action>;
   onMenu: (menu: MenuState) => void;
@@ -671,7 +667,7 @@ export function botRowProps(
   state: AppState,
   dispatch: Dispatch<Action>,
   bot: Bot,
-  layout: Pick<BotRowProps, "density" | "quiet" | "query" | "onMenu" | "renameRequest">,
+  layout: Pick<BotRowProps, "density" | "query" | "onMenu" | "renameRequest">,
 ): BotRowProps {
   const selected = state.activeView === "chat" && state.selectedId === bot.id;
   const reveal = state.revealThread;
@@ -702,7 +698,7 @@ function WorkingPhrase({ threadId, last }: { threadId: string; last?: Message })
 }
 
 export const BotListItem = memo(function BotListItem(props: BotRowProps) {
-  const { bot, selected, deleting, mascotMotion, reveal, pendingQueued, instances, liveCall, density, quiet, query, dispatch, onMenu, renameRequest, menuOpen } = props;
+  const { bot, selected, deleting, mascotMotion, reveal, pendingQueued, instances, liveCall, density, query, dispatch, onMenu, renameRequest, menuOpen } = props;
   const showThreads = useShowThreads();
   const liveMedia = useLiveMedia();
   const remoteClient = typeof window !== "undefined" && window.ogb?.remoteClient?.active === true;
@@ -736,7 +732,6 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
   const { waiting, working, teammateWait, queued } = sidebarBotStatus(bot, pendingQueued);
   const unread = botShowsUnread(bot);
   const onLiveCall = liveBadgeFor(bot.id, liveMedia, liveCall);
-  const statusLine = deleting || working || waiting || teammateWait || queued;
   const body = (
     <>
       <span className="relative flex shrink-0" title={iconOnly || simpleList ? undefined : [bot.name, ...details].join(" · ")}>
@@ -823,10 +818,10 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
             </span>
           )}
           {!simpleList && !railTile && <BotModelMark bot={bot} instances={instances} />}
-          {(expanded || (quiet && !statusLine)) && unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
+          {expanded && unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
           {!renaming && <span className="flex shrink-0 self-center"><OwnerFace bot={bot} /></span>}
         </div>
-        {(!expanded || deleting) && (!quiet || statusLine) && <div className="flex items-center justify-between gap-2">
+        {(!expanded || deleting) && <div className="flex items-center justify-between gap-2">
           {deleting ? (
             <span role="status" className="flex min-w-0 items-center gap-1.5 truncate text-[13px] leading-[18px] text-ink-secondary">
               <Loader2 size={12} className="shrink-0 animate-spin" />
@@ -1002,12 +997,11 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const [query, setQuery] = useState("");
   const storedDensity = useSidebarDensity();
   const density = collapseToIcons ? "icons" : storedDensity;
-  const quietRows = density === "compact";
   const simple: boolean = density !== "icons";
   const simpleDesk = simple && !phone;
   const rail: boolean = density === "icons";
   const sidePanelOpen = state.computerOpen;
-  const sizing = useSidebarWidth({ density, sidePanelOpen, sidebarRef });
+  const sizing = useSidebarWidth({ sidePanelOpen, sidebarRef });
   /** Simple mode keeps the field on screen; the toggle and the close button are gone. */
   const clearSearch = () => setQuery("");
   const [lastExpandedDensity, setLastExpandedDensity] = useState<Exclude<SidebarDensity, "icons">>(
@@ -1227,7 +1221,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const archivedEntry = remoteClient ? undefined : { count: archivedBots.length, open: () => setArchivedBotsOpen(true) };
   const attention = crossBotAttentionThreads(state.bots, state.pendingQueued, undefined, state.groups);
   const pendingBotUndo = teamFeedback?.restoreBot;
-  const botRow = (bot: Bot): BotRowProps => ({ ...botRowProps(state, dispatch, bot, { density, quiet: quietRows, query: q, onMenu: setMenu, renameRequest: renameRequest?.botId === bot.id ? renameRequest.nonce : 0 }), menuOpen: menu?.botId === bot.id });
+  const botRow = (bot: Bot): BotRowProps => ({ ...botRowProps(state, dispatch, bot, { density, query: q, onMenu: setMenu, renameRequest: renameRequest?.botId === bot.id ? renameRequest.nonce : 0 }), menuOpen: menu?.botId === bot.id });
   const railSearch = () => {
     toggleCollapsed();
     // The field is always mounted once the sidebar is wide; put the caret in it after the rail has expanded.
@@ -1316,7 +1310,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       className={cn(
         "relative flex h-full shrink-0 flex-col border-r border-ink/[0.04] bg-panel max-md:[--scroll-fade-surface:var(--color-app)]",
         density === "icons" ? rail ? "w-[92px]" : "w-[80px]" : "w-[272px] md:w-[var(--sidebar-width)]",
-        sidePanelOpen ? density === "compact" ? "md:max-w-[272px]" : "md:max-w-[280px]" : "md:max-w-[calc(100vw-320px)]",
+        sidePanelOpen ? "md:max-w-[280px]" : "md:max-w-[calc(100vw-320px)]",
         // max-md: rather than an md: cancel: Tailwind v4 emits the native `translate`, and any value but `none` makes
         // this a containing block for its `fixed` descendants.
         "max-md:absolute max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:w-full max-md:bg-app",
@@ -1434,7 +1428,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       {attentionPinned && density !== "icons" && (
         <SidebarAttentionPanel
           entries={attention}
-          density={density}
           onUnpin={() => setAttentionPinned(false)}
           onJump={(entry) => dispatch(attentionJumpAction(entry))}
           collapsed={sectionCollapsed(ATTENTION_SECTION_ID)}
@@ -1553,7 +1546,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
                         key={group.id}
                         group={group}
                         density={density}
-                        quiet={quietRows}
                         query={q}
                         onMenu={setRoomMenu}
                       />

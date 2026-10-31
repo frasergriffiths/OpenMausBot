@@ -112,7 +112,7 @@ describe("sidebar phone status", () => {
 });
 
 describe("SidebarPhoneStatusButton", () => {
-  const render = (density: "compact" | "icons", status: SidebarPhoneStatus) =>
+  const render = (density: "expanded" | "icons", status: SidebarPhoneStatus) =>
     renderToStaticMarkup(createElement(SidebarPhoneStatusButton, {
       density,
       status,
@@ -120,7 +120,7 @@ describe("SidebarPhoneStatusButton", () => {
     }));
 
   it("keeps its plain status accessible in the full sidebar without exposing connection details", () => {
-    const markup = render("compact", {
+    const markup = render("expanded", {
       kind: "connected",
       label: "Device connected",
       pairedCount: 1,
@@ -129,7 +129,7 @@ describe("SidebarPhoneStatusButton", () => {
 
     expect(markup).toContain('aria-label="Device connected"');
     expect(markup).toContain('title="Device connected"');
-    expect(markup).toContain('data-sidebar-density="compact"');
+    expect(markup).toContain('data-sidebar-density="expanded"');
     expect(markup).toContain('data-phone-status="connected"');
     expect(markup).toContain("data-phone-connected");
     expect(markup).toContain("text-success");
@@ -158,14 +158,14 @@ describe("SidebarPhoneStatusButton", () => {
   });
 
   it("uses the same fixed-size control in the compact text sidebar", () => {
-    const markup = render("compact", {
+    const markup = render("expanded", {
       kind: "stale",
       label: "Device paired — not recently active",
       pairedCount: 1,
       connectedCount: 0,
     });
 
-    expect(markup).toContain('data-sidebar-density="compact"');
+    expect(markup).toContain('data-sidebar-density="expanded"');
     expect(markup).toContain("size-[46px]");
     expect(markup).toContain("shrink-0");
   });

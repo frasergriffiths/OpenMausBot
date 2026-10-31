@@ -29,8 +29,8 @@ const bot = (overrides: Partial<Bot> = {}): Bot => ({
   ...overrides,
 });
 
-function renderRow(candidate: Bot, quiet = false, density: "compact" | "icons" = "compact") {
-  return renderToStaticMarkup(createElement(BotListItem, botRowProps(initialState, vi.fn(), candidate, { density, quiet, query: "", onMenu: vi.fn() })));
+function renderRow(candidate: Bot, density: "expanded" | "icons" = "expanded") {
+  return renderToStaticMarkup(createElement(BotListItem, botRowProps(initialState, vi.fn(), candidate, { density, query: "", onMenu: vi.fn() })));
 }
 
 afterEach(() => {
@@ -61,7 +61,7 @@ describe("BotListItem", () => {
     expect(waiting).toContain('class="flex min-w-0 items-center gap-1.5 truncate text-[13px] leading-[18px] font-semibold text-warning"');
     expect(waiting).toContain('class="truncate">Waiting for you…</span>');
 
-    const icons = opening(renderRow(bot({ activity: "waiting-on-you" }), false, "icons"), "waiting-dot");
+    const icons = opening(renderRow(bot({ activity: "waiting-on-you" }), "icons"), "waiting-dot");
     expect(icons).toContain("size-5");
     expect(icons).toContain("bg-warning");
     expect(icons).not.toContain("size-4");
@@ -127,7 +127,7 @@ describe("BotListItem", () => {
     const spoken = { id: "u1", role: "user", kind: "text", text: "what is the weather", at: at(0), via: "call", callId: "c1" };
     const draw = (candidate: Bot, { selected = false, query = "" } = {}) => renderToStaticMarkup(createElement(BotListItem, botRowProps(
       selected ? { ...initialState, activeView: "chat", selectedId: candidate.id } : initialState,
-      vi.fn(), candidate, { density: "compact", quiet: false, query, onMenu: vi.fn() },
+      vi.fn(), candidate, { density: "expanded", query, onMenu: vi.fn() },
     )));
 
     it("previews the last reply, not the record that follows it", () => {
@@ -230,9 +230,9 @@ describe("BotListItem", () => {
     expect(rowClass(chief)).toBe(rowClass(plain));
   });
 
-  it("reads the name at 15px semibold and the preview at 13px", () => {
+  it("reads the name at 14px medium and the preview at 13px", () => {
     const markup = renderRow(bot({ messages: [{ id: "b1", role: "bot", kind: "text", text: "All set.", at: 1 }] as Bot["messages"] }));
-    expect(markup).toMatch(/class="[^"]*text-\[15px\] font-semibold[^"]*"/);
+    expect(markup).toMatch(/class="[^"]*text-\[14px\] font-medium[^"]*"/);
     expect(markup).toMatch(/class="[^"]*truncate text-\[13px\][^"]*text-ink-secondary[^"]*"/);
   });
 
@@ -262,9 +262,9 @@ describe("BotListItem", () => {
     expect(markup).toContain('aria-label="On a Live call"');
     expect(markup.indexOf('data-testid="live-call-badge"')).toBeGreaterThan(markup.indexOf(">Atlas<"));
     expect(renderRow(bot({ id: "other" }))).not.toContain('data-testid="live-call-badge"');
-    expect(renderRow(bot(), true)).toContain('data-testid="live-call-badge"');
+    expect(renderRow(bot())).toContain('data-testid="live-call-badge"');
 
-    const icons = renderRow(bot(), false, "icons");
+    const icons = renderRow(bot(), "icons");
     expect(icons).toContain('data-testid="live-call-badge"');
     expect(icons).toContain('aria-label="Atlas · On a Live call"');
   });
@@ -362,11 +362,4 @@ describe("bot deletion feedback", () => {
     expect(markup).not.toContain('disabled=""');
   });
 
-  describe("quiet rows", () => {
-    it("keeps the unread dot in the name line when the preview line is gone", () => {
-      const markup = renderRow(bot({ unread: true, messages: [{ id: "b1", role: "bot", kind: "text", text: "hello", at: 1 }] as Bot["messages"] }), true);
-      expect(markup).toContain('aria-label="Unread threads"');
-      expect(markup).not.toContain(">hello<");
-    });
-  });
 });

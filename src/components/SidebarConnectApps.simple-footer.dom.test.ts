@@ -78,7 +78,7 @@ const dismiss = () => host.querySelector<HTMLElement>("[data-connect-apps-dismis
 const apps = () => host.querySelector<HTMLElement>('[data-sidebar-footer="simple"] [data-sidebar-nav="apps"]');
 
 function renderFooter() {
-  flushSync(() => root.render(createElement(SidebarFooter, { density: "compact", simple: true, owner: null, toolsCollapsed: false })));
+  flushSync(() => root.render(createElement(SidebarFooter, { density: "expanded", simple: true, owner: null, toolsCollapsed: false })));
 }
 
 describe("the connect-apps prompt in the shipping Simple footer", () => {
@@ -120,7 +120,7 @@ describe("the connect-apps prompt in the shipping Simple footer", () => {
 
   it("brings the row back from the PluginsPanel control", async () => {
     flushSync(() => root.render(createElement("div", null,
-      createElement(SidebarFooter, { density: "compact", simple: true, owner: null, toolsCollapsed: false }),
+      createElement(SidebarFooter, { density: "expanded", simple: true, owner: null, toolsCollapsed: false }),
       createElement(ConnectAppsPillRestore),
     )));
     await settle();

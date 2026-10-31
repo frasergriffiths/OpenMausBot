@@ -18,7 +18,7 @@ const dispatch = vi.fn(), off = vi.fn();
 function bridge(phase: CloudFilesState["phase"]) {
   window.ogb = { cloudAccount: { files: { state: vi.fn().mockResolvedValue(files(phase)), onState: (callback: typeof emit) => { emit = callback; return off; } } } } as unknown as typeof window.ogb;
 }
-async function render(density: SidebarDensity = "compact", state: Partial<AppState> = {}, rail = false) {
+async function render(density: SidebarDensity = "expanded", state: Partial<AppState> = {}, rail = false) {
   const store = { state: { ...initialState, ...state }, dispatch } as unknown as ReturnType<typeof useStore>;
   act(() => root.unmount());
   root = createRoot(host);
@@ -33,7 +33,7 @@ beforeEach(() => {
 });
 afterEach(() => { act(() => root.unmount()); host.remove(); delete window.ogb; });
 
-it.each(["compact"] as const)("leaves Files out of Simple mode's footer and rail, since the account menu holds it (%s)", async (density) => {
+it.each(["expanded"] as const)("leaves Files out of Simple mode's footer and rail, since the account menu holds it (%s)", async (density) => {
   bridge("idle");
   await render(density);
   expect(row()).toBeNull();

@@ -6,22 +6,20 @@ import {
   clampSidebarWidth,
   loadSidebarWidth,
   saveSidebarWidth,
-  type SidebarDensity,
 } from "@/lib/sidebar-preferences";
 
-export function sidebarDefaultWidth(density: SidebarDensity): number {
-  return density === "compact" ? 272 : 280;
+export function sidebarDefaultWidth(): number {
+  return 280;
 }
 
 export type SidebarSizing = ReturnType<typeof useSidebarWidth>;
 
-export function useSidebarWidth({ density, sidePanelOpen, sidebarRef }: {
-  density: SidebarDensity;
+export function useSidebarWidth({ sidePanelOpen, sidebarRef }: {
   sidePanelOpen: boolean;
   sidebarRef: RefObject<HTMLElement | null>;
 }) {
   const key = SIMPLE_SIDEBAR_WIDTH_KEY;
-  const defaultWidth = sidebarDefaultWidth(density);
+  const defaultWidth = sidebarDefaultWidth();
   const cap = 400;
   const maxWidth = sidePanelOpen ? defaultWidth : Math.min(cap, window.innerWidth - 320);
   const [savedWidth, setSavedWidth] = useState<number | null>(() => loadSidebarWidth(undefined, key));
