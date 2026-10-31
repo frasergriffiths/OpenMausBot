@@ -14,7 +14,7 @@ import { parseComputerHelp } from "@/lib/computer-control";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatView } from "@/components/ChatView";
 import { GroupView } from "@/components/GroupView";
-import { PHONE_LAYOUT, SIDEBAR_AND_PANEL_FIT, SIDEBAR_INLINE, TWO_SIDE_PANELS_FIT, useMediaQuery } from "@/lib/use-media-query";
+import { PHONE_LAYOUT, SIDEBAR_INLINE, TWO_SIDE_PANELS_FIT, useMediaQuery } from "@/lib/use-media-query";
 import { PluginsPanel, preloadConnectedApps } from "@/components/PluginsPanel";
 import {
   BotSettingsDialog, FilesView, KeyboardShortcutsModal, LocalVmWorkspace,
@@ -74,7 +74,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
     state.groups.filter((group) => group.unread).length;
   const remoteClient = window.ogb?.remoteClient?.active === true;
   const twoSidePanelsFit = useMediaQuery(TWO_SIDE_PANELS_FIT, true);
-  const sidebarAndPanelFit = useMediaQuery(SIDEBAR_AND_PANEL_FIT, true);
   const sidebarInline = useMediaQuery(SIDEBAR_INLINE, false);
   const simplePanelOverlay = useMediaQuery(PHONE_LAYOUT, false);
   useEffect(() => {
@@ -131,7 +130,7 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
   const roomPanelOpen = useRoomPanelShown({ group, state, simple: !remoteClient });
   const botPanelOpen = state.settingsOpen;
   const sidePanelOpen = (Boolean(bot) && botPanelOpen) || roomPanelOpen || (notificationFeed && state.notificationsOpen);
-  const collapseSidebar = sidePanelOpen && !sidebarAndPanelFit;
+  const collapseSidebar = sidePanelOpen;
 
   const noEngines =
     state.connected &&
