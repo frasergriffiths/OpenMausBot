@@ -85,7 +85,7 @@ describe("SecretRequestCard ask card", () => {
   it("folds into one line that names the key once it is saved and the bot resumed", () => {
     const html = view({ provided: true, resumed: true });
     expect(html).toContain('data-ask-card="settled"');
-    expect(html).toContain("OpenAI API key saved securely");
+    expect(html).toContain("ElevenLabs API key saved securely");
     expect(html).toContain("Bot resumed without seeing the key");
     expect(html).not.toContain("<input");
     expect(html).not.toContain("<form");

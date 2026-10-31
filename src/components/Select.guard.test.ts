@@ -47,7 +47,9 @@ describe("dropdowns", () => {
       // An invisible <select> laid over a custom button shows no arrow to align.
       && !/\bopacity-0\b/.test(text)
       // Bot-built widgets draw their own fields and chevron in the widget kit's style.
-      && !file.startsWith(join("components", "widget") + sep));
+      && !file.startsWith(join("components", "widget") + sep)
+      // The shared library is the one place a native <select> is wrapped, and every screen uses it from there.
+      && !file.startsWith(join("components", "ui") + sep));
     expect(raw.map(({ at }) => at)).toEqual([]);
   });
 
