@@ -12,8 +12,6 @@ export type DefaultBotStore = Pick<Store, "bots" | "bot" | "createBot" | "patchB
  * gone is never made twice. */
 const LEDGER = "default-bot.json";
 
-/** The colour a new install gave its MausBot before Chrome, which an adopted MausBot trades for Chrome. */
-
 export const HELPER_ASKS = ["What are my bots up to?", "Set up a bot for my inbox", "Make me a morning routine", "How do I connect my email?"];
 
 export function defaultBotRefusal(name: string): string {
@@ -65,11 +63,12 @@ function remember(dataDir: string, person: string, botId: string): void {
 }
 
 /** A new install's own MausBot from before it was marked: the place's oldest bot, still live, outside any department,
- * not installed from a package, and still named MausBot or still in the colour a new install gave it. */
+ * not installed from a package, and still named MausBot. The colour is no longer a clue: every new install's first bot
+ * wears the default green now, so matching on it would adopt a first bot that was never a helper. */
 export function seededMausBot(bots: readonly BotRecord[]): BotRecord | undefined {
   const oldest = bots.reduce<BotRecord | undefined>((first, bot) => !first || bot.createdAt < first.createdAt ? bot : first, undefined);
   if (!oldest || oldest.hidden || oldest.movedTo || oldest.section?.trim() || oldest.installedPackage) return undefined;
-  return oldest.name === DEFAULT_BOT_NAME || oldest.color === DEFAULT_BOT_COLOR ? oldest : undefined;
+  return oldest.name === DEFAULT_BOT_NAME ? oldest : undefined;
 }
 
 /** Puts the intro where its person sees it next: in its open conversation while nobody has written there, else at the
@@ -116,7 +115,7 @@ export function ensureDefaultBot(store: DefaultBotStore, options: { dataDir: str
   const chief = !person && !store.bots.some((bot) => bot.chiefOfStaff && !bot.hidden) ? (id: string) => store.setChiefOfStaff(id) : undefined;
   let bot: BotRecord;
   if (adoptable) {
-    bot = store.patchBot(adoptable.id, { defaultBot: {}, ...(adoptable.color === DEFAULT_BOT_COLOR ? { color: DEFAULT_BOT_COLOR } : {}) }) ?? adoptable;
+    bot = store.patchBot(adoptable.id, { defaultBot: {} }) ?? adoptable;
     chief?.(bot.id);
     introduce(store, bot, options.team);
   } else {
