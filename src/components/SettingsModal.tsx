@@ -8,7 +8,7 @@ import { AnthropicEveryClaudeBot, ApiKeyRow, OpenCodeProviderKeys, VpsConnection
 import { LmStudioServer, OtherOpenAiCompatServers } from "./OpenAiCompatServers";
 import { CompanionSection } from "./CompanionSection";
 import { ServerPairingCard } from "./ServerPairingCard";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import { Notice } from "./Notice";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { currentPhonePairingTarget, phonePairingSettingsAction } from "@/lib/phone-pairing";
@@ -258,7 +258,7 @@ export function SettingsModal() {
           : null;
       case "connections":
         return (
-          <Card title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
+          <SettingsCard title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
             <div className="flex flex-col gap-4">
               {state.config?.composio.mode === "managed" ? (
                 <Notice tone="ready">{t("settings.connections.ready")}</Notice>
@@ -295,7 +295,7 @@ export function SettingsModal() {
                 </div>
               </details>
             </div>
-          </Card>
+          </SettingsCard>
         );
       default:
         return null;

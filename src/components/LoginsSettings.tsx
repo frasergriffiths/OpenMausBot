@@ -8,7 +8,7 @@ import { relativeTime } from "@/lib/memory";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { useStore } from "@/state/store";
 import { LoginBotPicker, LoginForm } from "./LoginForm";
-import { Card } from "./SettingsPrimitives";
+import { Checkbox, SettingsCard } from "@/components/ui";
 
 // Security: a row never shows the password, which no route returns.
 
@@ -50,7 +50,7 @@ export function LoginsSettings() {
   useEffect(() => { if (ownerOrAdmin) void load(); }, [ownerOrAdmin]);
 
   if (ownerOrAdmin === false) {
-    return <Card title={t("settings.logins.title")} subtitle={t("settings.logins.adminOnly")} />;
+    return <SettingsCard title={t("settings.logins.title")} subtitle={t("settings.logins.adminOnly")} />;
   }
 
   const botNames = (value: LoginBots) => {
@@ -75,7 +75,7 @@ export function LoginsSettings() {
   };
 
   return (
-    <Card title={t("settings.logins.title")} subtitle={t("settings.logins.subtitle")}>
+    <SettingsCard title={t("settings.logins.title")} subtitle={t("settings.logins.subtitle")}>
       <div className="flex flex-col gap-3" aria-busy={logins === null || busy}>
         {state.config?.cloudHome === true && <p className="text-[12px] leading-relaxed text-ink-secondary" data-logins-cloud-own>{t("settings.logins.cloudOwn")}</p>}
         {logins === null && !error && <p className="text-[12px] text-ink-secondary">{t("settings.logins.loading")}</p>}
@@ -123,10 +123,7 @@ export function LoginsSettings() {
                         await load();
                       }}>
                       {login.hasTotp && (
-                        <label className="flex items-center gap-2 text-[13px] text-ink">
-                          <input type="checkbox" checked={removeTotp} onChange={(event) => setRemoveTotp(event.target.checked)} />
-                          {t("settings.logins.removeTotp")}
-                        </label>
+                        <Checkbox checked={removeTotp} onChange={setRemoveTotp} label={t("settings.logins.removeTotp")} />
                       )}
                       <ExactHostChoice checked={editExact} onChange={setEditExact}
                         label={t("settings.logins.exactHostFor", { hosts: login.hosts.join(", "), site: login.site })} />
@@ -165,7 +162,7 @@ export function LoginsSettings() {
         <OnePasswordConnection status={onePassword} disabled={logins === null} bots={bots} botNames={botNames}
           onChange={async (next) => { setOnePassword(next); await load(); }} />
       </div>
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -178,10 +175,7 @@ function signInHostsLine(login: LoginSummary): string | null {
 
 function ExactHostChoice({ checked, onChange, label }: { checked: boolean; onChange: (checked: boolean) => void; label: string }) {
   return (
-    <label className="flex items-start gap-2 text-[13px] leading-snug text-ink">
-      <input type="checkbox" name="exactHost" className="mt-[2px]" checked={checked} onChange={(event) => onChange(event.target.checked)} />
-      {label}
-    </label>
+    <Checkbox name="exactHost" checked={checked} onChange={onChange} label={label} />
   );
 }
 

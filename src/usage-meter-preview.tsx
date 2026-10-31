@@ -7,7 +7,7 @@ import type { CloudUsage } from "../electron/cloud-home.mjs";
 import { InitialsAvatar } from "@/components/Avatar";
 import { ConfirmDialogCard } from "@/components/ConfirmDialog";
 import { CloudUsageCardView, CloudUsageSettingsView } from "@/components/CloudUsageMeter";
-import { Card } from "@/components/SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import { cloudPlanLabel } from "@/lib/cloud-plan";
 import { setLocale, t } from "@/lib/i18n";
 import { SKIN_IDS, type SkinId } from "@/lib/skins";
@@ -67,7 +67,7 @@ function SettingsMock({ usage }: { usage: CloudUsage }) {
           <span className="ui-button">{t("pro.openCloudSettings")}</span>
         </section>
         <CloudUsageSettingsView usage={usage} upgrade={{ busy: null, note: null, onUpgrade: noop }} />
-        <Card title={t("settings.profile.title")} subtitle={t("settings.profile.sharedSubtitle")} />
+        <SettingsCard title={t("settings.profile.title")} subtitle={t("settings.profile.sharedSubtitle")} />
       </div>
     </div>
   </div>;

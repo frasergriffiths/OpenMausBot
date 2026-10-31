@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FolderPlus, X } from "lucide-react";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import { useStore } from "@/state/store";
 import { sharedComputersEnabled } from "@/lib/feature-flags";
 import { LendingActivityList } from "./LendingActivity";
@@ -44,7 +44,7 @@ export function ComputerSharingSettings({ workspace, onClose }: { workspace: { i
     finally { pending.current = false; if (mounted.current) setBusy(false); }
   };
   if (!bridge) return null;
-  return <div ref={panel}><Card title={`Computer access · ${workspace.name}`} subtitle={workspace.origin}>
+  return <div ref={panel}><SettingsCard title={`Computer access · ${workspace.name}`} subtitle={workspace.origin}>
     <div className="flex flex-col gap-4 text-[13px]">
       <div className="flex items-center justify-between gap-2">
         <p role="status" className="text-ink-secondary">{!state ? "Loading access…" : !state.enabled ? "Not shared" : state.connected ? "Sharing while this desktop is open" : "Waiting for the workspace to connect"}</p>
@@ -83,5 +83,5 @@ export function ComputerSharingSettings({ workspace, onClose }: { workspace: { i
       {state?.enabled && <p className="text-[12px] text-ink-secondary">Stopping blocks new requests and cancels running work where possible. An action already sent to an app may still finish.</p>}
       <div className="border-t border-hairline/40 pt-3"><LendingActivityList entries={activity} /></div>
     </div>
-  </Card></div>;
+  </SettingsCard></div>;
 }

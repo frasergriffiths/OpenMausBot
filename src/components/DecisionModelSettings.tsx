@@ -5,7 +5,7 @@ import { api, useStore, type ConfigStatus } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
-import { Card, SettingRow, Switch } from "./SettingsPrimitives";
+import { SettingsCard, SettingRow, Switch } from "@/components/ui";
 import { Select } from "./Select";
 import { WorkersAiKeyCard } from "./WorkersAiKeyCard";
 
@@ -258,7 +258,7 @@ export function DecisionModelSettings() {
         />
       </SettingRow>
 
-      <Card title={t(openrouter ? "decider.openrouter.key.label" : "decider.key.label")}>
+      <SettingsCard title={t(openrouter ? "decider.openrouter.key.label" : "decider.key.label")}>
         <div role="status" className="mb-2 flex items-center gap-2 text-[13px] text-ink-secondary">
           <span className={cn("size-1.5 rounded-full", configured ? "bg-success" : "bg-raised-hover")} />
           <span className={configured ? "text-success" : undefined}>
@@ -338,9 +338,9 @@ export function DecisionModelSettings() {
             <ExternalLink size={11} aria-hidden="true" />
           </a>
         )}
-      </Card>
+      </SettingsCard>
 
-      <Card title={t("decider.jobs.title")}>
+      <SettingsCard title={t("decider.jobs.title")}>
         <ul className="flex flex-col">
           <li className="flex items-start justify-between gap-4 py-2">
             <div className="min-w-0">
@@ -365,7 +365,7 @@ export function DecisionModelSettings() {
             </li>
           ))}
         </ul>
-      </Card>
+      </SettingsCard>
     </>
   );
 }

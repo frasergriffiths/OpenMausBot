@@ -5,7 +5,7 @@ import type { CloudPlanBridge, CloudPlanSnapshot, CloudUpgradePreview, CloudUpgr
 import type { CloudUsage, CloudUsageMeter } from "../../electron/cloud-home.mjs";
 import { cloudPlanChanged, useCloudPlanSnapshot } from "./CloudTrialNotice";
 import { ConfirmDialog } from "./ConfirmDialog";
-import { Card, SIMPLE_CARD } from "./SettingsPrimitives";
+import { SettingsCard, SIMPLE_CARD } from "@/components/ui";
 import { localDesktopPage } from "./onboarding/WelcomeGate";
 import { cloudPlanLabel } from "@/lib/cloud-plan";
 import { cn } from "@/lib/cn";
@@ -201,7 +201,7 @@ function OtherPlans({ usage, upgrade }: { usage: CloudUsage; upgrade: UpgradeUi 
 
 export function CloudUsageSettingsView({ usage, upgrade, children }: { usage: CloudUsage; upgrade: UpgradeUi; children?: ReactNode }) {
   return (
-    <Card title={t("usageMeter.title")} subtitle={t("usageMeter.subtitle", { plan: cloudPlanLabel(usage.tier) })}>
+    <SettingsCard title={t("usageMeter.title")} subtitle={t("usageMeter.subtitle", { plan: cloudPlanLabel(usage.tier) })}>
       <div data-cloud-usage={usage.tier}>
         <MeterList usage={usage} />
         <p className="mt-2 text-[12px] text-ink-secondary">{resetLine(usage)}</p>
@@ -212,7 +212,7 @@ export function CloudUsageSettingsView({ usage, upgrade, children }: { usage: Cl
         {upgrade.note && <div className="mt-2"><NoteLine note={upgrade.note} /></div>}
       </div>
       {children}
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -281,7 +281,7 @@ export function CloudUsageSummaryView({ usage, upgrade, children }: { usage: Clo
 
 export function CloudUsageDetails({ usage, upgrade }: { usage: CloudUsage; upgrade: UpgradeUi }) {
   return (
-    <Card title={t("usageMeter.title")} subtitle={t("usageMeter.subtitle", { plan: cloudPlanLabel(usage.tier) })}>
+    <SettingsCard title={t("usageMeter.title")} subtitle={t("usageMeter.subtitle", { plan: cloudPlanLabel(usage.tier) })}>
       <div data-cloud-usage={usage.tier}>
         <MeterList usage={usage} />
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 empty:hidden">
@@ -289,6 +289,6 @@ export function CloudUsageDetails({ usage, upgrade }: { usage: CloudUsage; upgra
           <OtherPlans usage={usage} upgrade={upgrade} />
         </div>
       </div>
-    </Card>
+    </SettingsCard>
   );
 }
