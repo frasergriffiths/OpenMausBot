@@ -6677,8 +6677,8 @@ describe("harness HTTP API", () => {
             saves = saves.then(async () => {
               while (!existsSync(release)) await delay(10);
               try {
-                const patch = message.target === "ttsKey"
-                  ? { tts: { key: message.value } }
+                const patch = message.target === "xaiApiKey"
+                  ? { xai: { key: message.value } }
                   : null;
                 if (!patch) throw new Error("unsupported test credential target");
                 const response = await fetch(
@@ -6756,7 +6756,7 @@ describe("harness HTTP API", () => {
         body: JSON.stringify({
           fromBotId: botId,
           fromThreadId: threadId,
-          credentialId: "ttsKey",
+          credentialId: "xaiApiKey",
           reason: "needed for this task",
         }),
       });
@@ -6847,7 +6847,7 @@ describe("harness HTTP API", () => {
         botId: direct.id,
         threadId: directOriginalThread,
         messageId: directRequest.messageId,
-        target: "ttsKey",
+        target: "xaiApiKey",
         requestKey: directCard.secret.requestKey,
       }, "sk-test-direct");
       const groupEnvelope = await sealPhoneSecretForTest({
@@ -6857,7 +6857,7 @@ describe("harness HTTP API", () => {
         botId: channelOwner.id,
         threadId: groupOriginalThread,
         messageId: groupRequest.messageId,
-        target: "ttsKey",
+        target: "xaiApiKey",
         requestKey: groupCard.secret.requestKey,
       }, "sk-test-channel");
       const provide = (botId: string, messageId: string, envelope: PhoneSecretContext) => fetch(
@@ -6888,7 +6888,7 @@ describe("harness HTTP API", () => {
         botId: raceBot.id,
         threadId: raceThread,
         messageId: supersededRequest.messageId,
-        target: "ttsKey",
+        target: "xaiApiKey",
         requestKey: (await raceCard(supersededRequest.messageId)).secret.requestKey,
       }, "sk-test-superseded");
       const supersededProvide = provide(raceBot.id, supersededRequest.messageId, supersededEnvelope);
@@ -6907,7 +6907,7 @@ describe("harness HTTP API", () => {
         botId: raceBot.id,
         threadId: raceThread,
         messageId: freshRequest.messageId,
-        target: "ttsKey",
+        target: "xaiApiKey",
         requestKey: (await raceCard(freshRequest.messageId)).secret.requestKey,
       }, "sk-test-fresh-card");
       const freshProvide = await provide(raceBot.id, freshRequest.messageId, freshEnvelope);
@@ -6983,7 +6983,7 @@ describe("harness HTTP API", () => {
         botId: direct.id,
         threadId: directOriginalThread,
         messageId: directRequest.messageId,
-        target: "ttsKey",
+        target: "xaiApiKey",
         requestKey: directCard.secret.requestKey,
       }, "sk-test-replacement");
       const replacement = await provide(direct.id, directRequest.messageId, replacementEnvelope);

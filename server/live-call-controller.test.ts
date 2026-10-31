@@ -1067,7 +1067,7 @@ describe("LiveCallController relay", () => {
       await vi.advanceTimersByTimeAsync(0);
       const said = t.socket().appends("instructions").map((e) => String(e.content));
       expect(said).toHaveLength(1);
-      expect(said[0]).toContain("OpenAI image key");
+      expect(said[0]).toContain("ElevenLabs key");
       expect(said[0]).toMatch(/never ask .*aloud/i);
     });
 
