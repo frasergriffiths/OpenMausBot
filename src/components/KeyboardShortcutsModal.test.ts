@@ -17,12 +17,12 @@ function keys(html: string, description: string): string[] {
 }
 
 describe("KeyboardShortcutsModal", () => {
-  it("uses a labeled native dialog with search and dismiss controls", () => {
+  it("uses the shared dialog with search and dismiss controls", () => {
     const html = renderToStaticMarkup(createElement(KeyboardShortcutsModal, { open: true, onClose: vi.fn() }));
-    expect(html).toContain('<dialog aria-labelledby="shortcuts-dialog-title"');
+    expect(html).toContain('role="dialog"');
+    expect(html).toContain("Keyboard shortcuts");
     expect(html).toContain('aria-label="Search shortcuts"');
     expect(html).toContain('aria-label="Close keyboard shortcuts"');
-    expect(html).toContain("Done");
     expect(html).not.toContain("Double-click");
     expect(html).not.toContain("from anywhere");
   });

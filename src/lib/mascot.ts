@@ -59,8 +59,8 @@ export const MAUS_COLORS = {
   yellow: "#D8A729",
   teal: "#01A492",
   coral: "#E5634E",
-  silver: "#A8ADB4",
-  chrome: "#B3BAC4",
+  white: "#F2F2F3",
+  black: "#1B1B1E",
 } satisfies Record<MausColor, string>;
 
 /** Status spinners mix the mascot hue toward the skin's ink, so the 12px mark clears 3:1 on the active tab
@@ -69,6 +69,8 @@ export const MAUS_COLORS = {
 export const SPINNER_HUE_PERCENT = 65;
 
 export function spinnerColor(color: MausColor): string {
+  // White and black have no hue to carry: the mark reads as ink on the tab instead.
+  if (color === "white" || color === "black") return "color-mix(in oklab, var(--color-ink) 78%, var(--color-app))";
   return `color-mix(in oklab, ${MAUS_COLORS[color]} ${SPINNER_HUE_PERCENT}%, var(--color-ink))`;
 }
 
@@ -86,17 +88,12 @@ export function mascotInk(color: MausColor): "#ffffff" | "#111111" {
 export const MAUS_COLOR_LABEL = {
   green: "mascotColor.green", blue: "mascotColor.blue", red: "mascotColor.red", orange: "mascotColor.orange",
   purple: "mascotColor.purple", cyan: "mascotColor.cyan", pink: "mascotColor.pink", yellow: "mascotColor.yellow",
-  teal: "mascotColor.teal", coral: "mascotColor.coral", silver: "mascotColor.silver",
-  chrome: "mascotColor.chrome",
+  teal: "mascotColor.teal", coral: "mascotColor.coral",
+  white: "mascotColor.white", black: "mascotColor.black",
 } as const satisfies Record<MausColor, LocaleKey>;
 
-export const CHROME_GRADIENT: [string, string, string] = ["#F1F4F7", "#AEB8C3", "#66717E"];
-export const CHROME_EYES = "#1E2833";
-
 export function colorSwatch(color: MausColor): string {
-  if (color !== "chrome") return MAUS_COLORS[color];
-  const [light, mid, edge] = CHROME_GRADIENT;
-  return `radial-gradient(circle at 34% 26%, #ffffff 0%, ${light} 20%, ${mid} 55%, ${edge} 100%)`;
+  return MAUS_COLORS[color];
 }
 
 export const MAUS_MOTIONS = [

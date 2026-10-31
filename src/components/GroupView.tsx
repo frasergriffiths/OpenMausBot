@@ -15,6 +15,7 @@ import {
   type GroupDefaultResponder,
   type Message,
 } from "@/state/store";
+import { Button, buttonStyles } from "@/components/ui";
 import { BotAvatar } from "./Avatar";
 import { ScreenFrame } from "./ScreenFrame";
 import { RoomHoldsBanner } from "./RoomHoldsBanner";
@@ -120,7 +121,7 @@ export function RoomToolChip({ message, roomId, live = false }: { message: Messa
     <div className="flex justify-start">
       <div
         className={cn(
-          "ui-pill",
+          buttonStyles({ size: "xs", shape: "pill", variant: "chip" }),
           tool.ok === false && "text-danger",
         )}
       >
@@ -1120,9 +1121,9 @@ export function GroupView({ group }: { group: Group }) {
             <>
               <div ref={topSentinelRef} className="h-2 w-full pointer-events-none" aria-hidden="true" />
               <div className="flex justify-center">
-                <button type="button" className="ui-pill" onClick={() => (hiddenCount > 0 ? showEarlier() : loadOlder())}>
+                <Button size="xs" shape="pill" type="button" onClick={() => (hiddenCount > 0 ? showEarlier() : loadOlder())}>
                   {hiddenCount > 0 ? t("chat.showEarlier", { count: hiddenCount }) : t("chat.loadEarlier")}
-                </button>
+                </Button>
               </div>
             </>
           ) : null}
@@ -1171,16 +1172,15 @@ export function GroupView({ group }: { group: Group }) {
           <RoomQueueList group={group} members={members} />
           {threadSpeaker && !group.dm && members.length > 1 && !group.holds?.[threadSpeaker.id] && (
             <div className="flex justify-start pl-12">
-              <button
+              <Button size="xs" shape="pill"
                 type="button"
                 data-testid="room-stop-member"
                 onClick={() => dispatch({ type: "setGroupHold", groupId: group.id, botId: threadSpeaker.id, held: true })}
                 title={t("room.holds.stopTitle", { name: threadSpeaker.name })}
-                className="ui-pill"
               >
                 <Square size={11} aria-hidden="true" />
                 <span>{t("room.holds.stop", { name: threadSpeaker.name })}</span>
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -100,7 +100,7 @@ describe("every baked anchor", () => {
       const sdf = fieldFromMask(maskFromPolylines(applyFit(polylines, fit), 256), 256);
 
       for (const aim of AIMS) {
-        const result = report(buildClouds(0, undefined, aim), sdf, MASCOT_BODIES[id].anchor);
+        const result = report(buildClouds(0, aim), sdf, MASCOT_BODIES[id].anchor);
         expect(result.clipping, `${id} clips looking (${aim.x}, ${aim.y})`).toEqual([]);
       }
     }

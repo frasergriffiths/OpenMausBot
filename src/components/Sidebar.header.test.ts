@@ -8,7 +8,7 @@ import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { StoreProvider } from "@/state/store";
 
 const fixture = vi.hoisted(() => ({
-  density: "compact" as SidebarDensity,
+  density: "expanded" as SidebarDensity,
   windowChrome: undefined as "mac-inset" | "win-caption" | "native" | undefined,
   hostLabel: undefined as string | undefined,
 }));
@@ -33,7 +33,7 @@ const render = () => renderToStaticMarkup(
 );
 
 beforeEach(() => {
-  fixture.density = "compact";
+  fixture.density = "expanded";
   fixture.windowChrome = undefined;
   fixture.hostLabel = undefined;
   vi.stubGlobal("window", { innerWidth: 1280, location: { protocol: "http:", search: "" } });
@@ -46,7 +46,7 @@ afterEach(() => {
 });
 
 describe("sidebar header", () => {
-  it.each(["compact", "icons"] as const)(
+  it.each(["expanded", "icons"] as const)(
     "keeps collapse and add but no density menu at %s density in Simple mode",
     (density) => {
       fixture.density = density;
@@ -59,7 +59,7 @@ describe("sidebar header", () => {
     },
   );
 
-  it.each(["compact"] as const)("keeps collapse and add but no activity menu in Simple mode at %s density", (density) => {
+  it.each(["expanded"] as const)("keeps collapse and add but no activity menu in Simple mode at %s density", (density) => {
     fixture.density = density;
     const html = render();
     expect(html).toContain('aria-label="Collapse sidebar to avatars"');
@@ -102,7 +102,7 @@ describe("sidebar top row", () => {
   });
 
   it("puts the lights, the server switcher and one + on one 60px macOS row in Simple mode at compact density", () => {
-    fixture.density = "compact";
+    fixture.density = "expanded";
     fixture.windowChrome = "mac-inset";
     desktop();
     const html = render();
@@ -198,8 +198,6 @@ describe("sidebar top row", () => {
     expect(foot).not.toContain('aria-label="Search bots and messages"');
     const positions = [
       at('data-sidebar-nav="apps"'),
-      at('data-sidebar-nav="team-map"'),
-      at('data-sidebar-nav="templates"'),
       at("data-sidebar-account"),
     ];
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
@@ -227,7 +225,7 @@ describe("sidebar top row", () => {
 });
 
 describe("sidebar glass head and foot", () => {
-  it.each(["compact", "icons"] as const)(
+  it.each(["expanded", "icons"] as const)(
     "puts the top row and search in the glass head, the places in the glass foot, and the list between at %s density",
     (density) => {
       fixture.density = density;
@@ -256,7 +254,7 @@ describe("sidebar glass head and foot", () => {
 });
 
 describe("sidebar foot in Simple mode", () => {
-  it.each(["compact"] as const)("puts the account avatar, Apps, Team map and Templates in the foot, with Files and Archived in the account menu (%s)", (density) => {
+  it.each(["expanded"] as const)("puts the account avatar and Apps in the foot, with Files and Archived in the account menu (%s)", (density) => {
     fixture.density = density;
     const html = render();
     const foot = html.slice(html.indexOf('data-glass-bar="bottom"'));
@@ -265,8 +263,6 @@ describe("sidebar foot in Simple mode", () => {
     expect(html.match(/data-sidebar-nav="apps"/g)).toHaveLength(1);
     expect(foot.indexOf("data-sidebar-account")).toBeGreaterThan(-1);
     expect(foot.indexOf("data-sidebar-account")).toBeLessThan(foot.indexOf('data-sidebar-nav="apps"'));
-    expect(foot.indexOf('data-sidebar-nav="apps"')).toBeLessThan(foot.indexOf('data-sidebar-nav="team-map"'));
-    expect(foot.indexOf('data-sidebar-nav="team-map"')).toBeLessThan(foot.indexOf('data-sidebar-nav="templates"'));
     expect(foot).toMatch(/data-tour="nav-apps" data-sidebar-nav="apps"[^>]*aria-label="Apps"[^>]*><svg[^>]*lucide-puzzle/);
     const account = foot.slice(foot.indexOf("data-sidebar-account"), foot.indexOf('data-sidebar-nav="apps"'));
     expect(account).toContain("size-9");

@@ -4,9 +4,10 @@ import { Check, ChevronLeft, Cloud } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { cloudColorFill } from "@/lib/cloud-look";
 import { t } from "@/lib/i18n";
+import { buttonStyles } from "@/components/ui";
 
 /** The app's primary action, full width, for the one next step of a screen. */
-export const PRIMARY_WIDE = "ui-button ui-button-primary min-h-11 w-full rounded-xl px-4 text-[15px] font-semibold";
+export const PRIMARY_WIDE = buttonStyles({ variant: "primary", size: "md", className: "min-h-11 w-full rounded-xl px-4 text-[15px] font-semibold" });
 export const LINK = "rounded-md text-[13px] font-medium text-accent-text underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus disabled:opacity-50";
 export const FIELD = "w-full rounded-lg border border-hairline bg-app px-3 py-2.5 text-[14px] text-ink outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-ink-tertiary focus:border-accent focus:ring-[3px] focus:ring-accent/25 disabled:opacity-60 motion-reduce:transition-none";
 

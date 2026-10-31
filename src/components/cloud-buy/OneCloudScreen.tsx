@@ -1,5 +1,6 @@
 // Screen 6 until more Clouds per account are sold: a calm word and the way to the one there is, never an error box.
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui";
 import type { CloudColor } from "../../../electron/cloud-buy.mjs";
 import { t } from "@/lib/i18n";
 import { CloudTile, Heading } from "./parts";
@@ -11,8 +12,8 @@ export function OneCloudScreen({ name, color, busy, interest, openFailed, onInte
     <CloudTile color={color} size={36} />
     <Heading title={t("cloudBuy.one.title")} sub={t("cloudBuy.one.sub", { name })} />
     <div className="flex flex-wrap items-center justify-end gap-2">
-      {interest !== "sent" && <button type="button" className="ui-button" disabled={busy} onClick={onInterest}>{t("cloudBuy.one.email")}</button>}
-      <button type="button" className="ui-button ui-button-primary" disabled={busy} onClick={onOpen}>{t("cloudBuy.setup.open", { name })}</button>
+      {interest !== "sent" && <Button size="sm" type="button" disabled={busy} onClick={onInterest}>{t("cloudBuy.one.email")}</Button>}
+      <Button variant="primary" size="sm" type="button" disabled={busy} onClick={onOpen}>{t("cloudBuy.setup.open", { name })}</Button>
     </div>
     <div aria-live="polite" className="text-[13px] empty:-mt-4">
       {interest === "sent" && <p className="text-ink-secondary">{t("cloudBuy.one.thanks")}</p>}
@@ -29,8 +30,8 @@ export function StatusScreen({ kind, line, onRetry, onClose }: { kind: string; l
     {line ? <p role="alert" className="text-[14px] leading-relaxed text-ink">{line}</p>
       : <p role="status" className="flex items-center gap-2 text-[13px] text-ink-secondary"><Loader2 size={14} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />{t("cloudAdd.checking")}</p>}
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <button type="button" className="ui-button" onClick={onClose}>{t("cloudAdd.close")}</button>
-      {onRetry && <button type="button" className="ui-button ui-button-primary" onClick={onRetry}>{t("cloudAdd.tryAgain")}</button>}
+      <Button size="sm" type="button" onClick={onClose}>{t("cloudAdd.close")}</Button>
+      {onRetry && <Button variant="primary" size="sm" type="button" onClick={onRetry}>{t("cloudAdd.tryAgain")}</Button>}
     </div>
   </div>;
 }

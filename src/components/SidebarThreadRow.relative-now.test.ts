@@ -111,7 +111,7 @@ describe("relative clock tick", () => {
       ],
     };
     fixture.index = 0; fixture.effects = [];
-    const markup = renderToStaticMarkup(createElement(BotThreadList, { ...botRowProps(initialState, vi.fn(), bot, { density: "compact", quiet: false, query: "", onMenu: vi.fn() }), selected: true }));
+    const markup = renderToStaticMarkup(createElement(BotThreadList, { ...botRowProps(initialState, vi.fn(), bot, { density: "expanded", query: "", onMenu: vi.fn() }), selected: true }));
     expect(markup).toContain("just now");
     expect(markup).toContain("5 min ago");
     runEffects();

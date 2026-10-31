@@ -1,5 +1,3 @@
-export { dataContextFor, type DataContext, type DataViewContext } from "../../shared/data-context.ts";
-
 export type PasteAttachment = {
   kind: "paste";
   id: string;

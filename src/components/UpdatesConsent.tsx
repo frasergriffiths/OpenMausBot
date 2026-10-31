@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Mail } from "lucide-react";
 import type { UpdatesConsentBridge, UpdatesConsentState, UpdatesConsentStatus } from "../../electron/updates-consent.mjs";
 import { t } from "@/lib/i18n";
-import { SettingRow, Switch } from "./SettingsPrimitives";
+import { SettingRow, Switch } from "@/components/ui";
 
 export const UPDATES_CONSENT_POPUP = "[data-updates-consent-popup]";
 const TITLE = "updates-consent-title";

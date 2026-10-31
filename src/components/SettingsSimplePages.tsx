@@ -4,6 +4,7 @@ import type { AppSettingsSection } from "@/state/store";
 import type { LocaleKey } from "@/locales";
 import { t } from "@/lib/i18n";
 import { appVersion } from "@/lib/app-links";
+import { Button, SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { brand } from "../lib/brand";
 import { AnalyticsRow } from "./AnalyticsRow";
 import { UpdatesConsentRow } from "./UpdatesConsent";
@@ -13,22 +14,17 @@ import { DiagnosticsRow } from "./DiagnosticsRow";
 import { DecisionModelSettings } from "./DecisionModelSettings";
 import { EnginesSettings } from "./EnginesSettings";
 import { LocalComputerSection } from "./LocalComputerSection";
-import { PeopleSection } from "./PeopleSection";
 import { ActivitySection } from "./ActivitySection";
 import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
-import { CloudPlanRow, CloudPlanFootnote, useCloudPlan } from "./ProIntroduction";
-import { CloudUsageDetails, CloudUsageSummaryView, useCloudUsageSettings } from "./CloudUsageMeter";
-import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "./SettingsPrimitives";
-import { UsageSection } from "./UsageSection";
-import { PlanUsageSummary } from "./PlanUsage";
 import { SkinPicker } from "./SkinPicker";
 import { ChatWidthRow, FontRow, SidebarToolsLayoutRow } from "./AppearanceSelectRows";
 import { ProfileSummaryRow } from "./ProfileSettings";
+import { DepartmentsSettings } from "./DepartmentsSettings";
 import { ImportSettings } from "./ImportSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
-import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, SendKeyRow, ShowThreadsRow, SidebarDensityRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
+import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, SendKeyRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
 import { SkillsSection } from "./SkillsSection";
 import { WorkspacesSection } from "./WorkspacesSection";
 import { WorkspaceBackupSettings } from "./WorkspaceBackupSettings";
@@ -36,9 +32,7 @@ import { CompanyBackupSettings } from "./CompanyBackupSettings";
 import { DefaultBotSettings } from "./NewBotDialog";
 import { RoomTurnTimeoutSettings } from "./RoomTurnTimeoutSettings";
 import { McpCallTimeoutSettings } from "./McpCallTimeoutSettings";
-import { ThreadConcurrencySettings } from "./ThreadConcurrencySettings";
 import { AutomaticRecoverySettings } from "./AutomaticRecoverySettings";
-import { ThreadCleanupSettings } from "./ThreadCleanupSettings";
 import { CacheKeepWarmSettings } from "./CacheKeepWarmSettings";
 import { ThemeRow } from "./ThemeRow";
 
@@ -57,22 +51,19 @@ export type Disclose = (id: SimpleDisclosureId) => { id: SimpleDisclosureId; ope
 
 type Has = (id: AppSettingsSection) => boolean;
 
-export function SimpleAccountPage({ has, peopleOpen }: { has: Has; peopleOpen: boolean }) {
+export function SimpleAccountPage({ has }: { has: Has }) {
   return (
     <>
       {has("general") && (
         <SettingsGroup block="general">
           <SettingsRows>
             <ProfileSummaryRow />
-            <CloudPlanRow place="account" />
           </SettingsRows>
         </SettingsGroup>
       )}
-      {has("people") && (
-        <SettingsGroup block="people">
-          <SettingsRows>
-            <PeopleSection simple startOpen={peopleOpen} />
-          </SettingsRows>
+      {has("general") && (
+        <SettingsGroup label={t("settings.departments.title")} block="departments">
+          <DepartmentsSettings />
         </SettingsGroup>
       )}
       {has("general") && (
@@ -88,9 +79,7 @@ export function SimpleAccountPage({ has, peopleOpen }: { has: Has; peopleOpen: b
       {has("general") && (
         <SettingsGroup label={t("settings.simple.group.limits")} block="limits">
           <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4"><RoomTurnTimeoutSettings /></div>
-          <ThreadConcurrencySettings />
           <AutomaticRecoverySettings />
-          <ThreadCleanupSettings />
         </SettingsGroup>
       )}
     </>
@@ -110,7 +99,7 @@ export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onL
             <LanguageRow simple />
             <SendKeyRow simple />
             <SettingRow title={t("settings.simple.looks.title")}>
-              <button type="button" className="ui-button" onClick={onLooks}>{t("settings.simple.looks.change")}</button>
+              <Button size="sm" type="button" onClick={onLooks}>{t("settings.simple.looks.change")}</Button>
             </SettingRow>
           </SettingsRows>
         </SettingsGroup>
@@ -118,9 +107,7 @@ export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onL
       {has("appearance") && (
         <SettingsDisclosureRow title={t("settings.simple.group.sidebar")} subtitle={t("settings.simple.sidebar.subtitle")} block="sidebar" {...disclose("general-sidebar")}>
           <SettingsRows>
-            <SidebarDensityRow />
             <SidebarToolsLayoutRow />
-            <ShowThreadsRow />
             <PinnedCirclesRow />
             <UniversalPinsRow />
           </SettingsRows>
@@ -150,7 +137,7 @@ export function SimpleDataPage({ has, disclose }: { has: Has; disclose: Disclose
 export function SimpleLooksPage({ onBack }: { onBack: () => void }) {
   return (
     <>
-      <div><button type="button" className="ui-button" onClick={onBack}>{t("settings.simple.looks.back")}</button></div>
+      <div><Button size="sm" type="button" onClick={onBack}>{t("settings.simple.looks.back")}</Button></div>
       <div data-settings-block="looks"><SkinPicker /></div>
     </>
   );
@@ -231,33 +218,6 @@ export function SimpleComputerPage({ has, remoteAccess, servers, installs, discl
   );
 }
 
-export function SimpleBillingPage({ has, disclose, cloudAccount }: { has: Has; disclose: Disclose; cloudAccount: ReactNode }) {
-  const { usage, upgrade, dialog } = useCloudUsageSettings();
-  const plan = useCloudPlan();
-  const signedOut = plan?.view.kind === "signed-out" || plan?.view.kind === "removed";
-  return (
-    <>
-      <div data-settings-block="usage" className="scroll-mt-4">
-        {usage ? <CloudUsageSummaryView usage={usage} upgrade={upgrade}>{dialog}</CloudUsageSummaryView> : <PlanUsageSummary />}
-      </div>
-      {(usage || has("usage")) && (
-        <SettingsDisclosureRow title={t("settings.simple.billing.limits")} {...disclose("billing-limits")}>
-          {usage && <CloudUsageDetails usage={usage} upgrade={upgrade} />}
-          {has("usage") && <UsageSection />}
-        </SettingsDisclosureRow>
-      )}
-      {has("cloudAccount") && (
-        <SettingsGroup label={t("settings.simple.billing.plan")} block="cloudAccount" footnote={<CloudPlanFootnote />}>
-          <SettingsRows>
-            <CloudPlanRow place="plan" usage={usage} upgrade={upgrade} />
-          </SettingsRows>
-          {signedOut ? null : <div className="flex flex-col gap-4">{cloudAccount}</div>}
-        </SettingsGroup>
-      )}
-    </>
-  );
-}
-
 const versionTitle = () => `${brand().name} ${appVersion()}`;
 
 function ServerUpdatesRow() {
@@ -269,7 +229,7 @@ function ServerUpdatesRow() {
       : entry.phase === "checking" ? t("common.checking") : t("settings.updates.check");
   return (
     <SettingRow title={versionTitle()} subtitle={status}>
-      <button type="button" className="ui-button" disabled={entry.item.disabled} onClick={entry.item.onSelect}>{action}</button>
+      <Button size="sm" type="button" disabled={entry.item.disabled} onClick={entry.item.onSelect}>{action}</Button>
     </SettingRow>
   );
 }

@@ -9,9 +9,6 @@ import {
   FACE_CENTRE,
   GAZE,
   GAZE_TRAVEL,
-  MOUTHS,
-  MOUTH_STROKE,
-  mouthFrame,
   type Ring,
 } from "./cursor-face-data"
 import { GLYPH_EASE_MS, MOTION, VIEW_SPAN, bodyTransform, faceTravelUnits, morphUnitsPerMs, nextMascotFrame, type BodyMotion } from "./mascot-motion"
@@ -26,9 +23,6 @@ export {
   FACE_CENTRE,
   GAZE,
   GAZE_TRAVEL,
-  MOUTHS,
-  MOUTH_STROKE,
-  mouthFrame,
 }
 export type { Ring }
 
@@ -42,7 +36,7 @@ export interface CursorSilhouette {
   anchor: { x: number; y: number; scale: number }
 }
 
-const { id: _cursorBodyId, ...cursorSilhouette } = MASCOT_BODIES.cursor;
+const { id: _cursorBodyId, ...cursorSilhouette } = MASCOT_BODIES.kit;
 export const DEFAULT_SILHOUETTE: CursorSilhouette = cursorSilhouette;
 
 export const DEFAULT_GRADIENT: [string, string, string] = ["#9FE6B5","#3FAE6E","#1C7A4C"]
@@ -862,23 +856,6 @@ const ringCentre = (ring: Ring): [number, number] => {
   return [x / ring.length, y / ring.length]
 }
 
-export function mouthPath(frame: { x: number; y: number; angle: number }, spec: number[]) {
-  const ca = Math.cos(frame.angle)
-  const sa = Math.sin(frame.angle)
-  const at = (lx: number, ly: number): [number, number] => [
-    frame.x + lx * ca - ly * sa,
-    frame.y + lx * sa + ly * ca,
-  ]
-  const a = at(-spec[0], 0)
-  const c = at(0, spec[1])
-  const b = at(spec[0], 0)
-  return (
-    'M' + a[0].toFixed(2) + ' ' + a[1].toFixed(2) +
-    ' Q' + c[0].toFixed(2) + ' ' + c[1].toFixed(2) +
-    ' ' + b[0].toFixed(2) + ' ' + b[1].toFixed(2)
-  )
-}
-
 export const anchorTransform = (a: { x: number; y: number; scale: number }) =>
   `translate(${a.x} ${a.y}) scale(${a.scale}) translate(${-FACE_CENTRE[0]} ${-FACE_CENTRE[1]})`
 
@@ -893,8 +870,6 @@ export interface CursorAvatarProps {
   flip?: boolean
   spring?: number
   eyeScale?: number
-  showMouth?: boolean
-  mouthStroke?: number
   motion?: number
   effects?: boolean
   glyphs?: boolean
@@ -928,8 +903,6 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
       flip = false,
       spring = 7,
       eyeScale = 1,
-      showMouth = true,
-      mouthStroke = MOUTH_STROKE,
       motion,
       effects = true,
       glyphs = true,
@@ -950,7 +923,6 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
     const svg = useRef<SVGSVGElement | null>(null)
     const eye0 = useRef<SVGPathElement | null>(null)
     const eye1 = useRef<SVGPathElement | null>(null)
-    const mouth = useRef<SVGPathElement | null>(null)
     const bodyGroup = useRef<SVGGElement | null>(null)
     const bodyContent = useRef<SVGGElement | null>(null)
     const trailLayer = useRef<SVGGElement | null>(null)
@@ -982,8 +954,6 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
     const engine = useRef({
       current: clone(EXPRESSIONS[0]),
       target: EXPRESSIONS[0],
-      currentMouth: MOUTHS[0].slice(),
-      targetMouth: MOUTHS[0],
       currentGaze: [...GAZE[0]],
       targetGaze: [...GAZE[0]],
       expression: 0,
@@ -1008,14 +978,12 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
       const e = engine.current
       const i = ((index % EXPRESSION_COUNT) + EXPRESSION_COUNT) % EXPRESSION_COUNT
       if (i === e.expression && e.morph >= 1) return
-      const from = { rings: displayed(e), mouth: displayedMouth(e), gaze: displayedGaze(e) }
+      const from = { rings: displayed(e), gaze: displayedGaze(e) }
       e.current = from.rings
-      e.currentMouth = from.mouth
       e.currentGaze = from.gaze
       e.target = EXPRESSIONS[i]
-      e.targetMouth = MOUTHS[i]
       e.targetGaze = GAZE[i]
-      e.travel = faceTravelUnits(from, { rings: e.target, mouth: e.targetMouth, gaze: e.targetGaze })
+      e.travel = faceTravelUnits(from, { rings: e.target, gaze: e.targetGaze })
       e.expression = i
       e.morph = 0
       e.velocity = 0
@@ -1084,7 +1052,7 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
     useEffect(() => {
       engine.current.faceStale = true
       wake()
-    }, [state, expression, gaze?.x, gaze?.y, turn, eyeScale, lookAround, paused, reduced, motionStrength, effects, glyphs, paint, showMouth, size])
+    }, [state, expression, gaze?.x, gaze?.y, turn, eyeScale, lookAround, paused, reduced, motionStrength, effects, glyphs, paint, size])
 
     useEffect(() => {
       const drawFace = (e: typeof engine.current, now: number, spinTurn: number) => {
@@ -1124,25 +1092,6 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
           el.style.opacity = depth > 0.02 ? '1' : '0'
         })
 
-        const mouthEl = mouth.current
-        if (mouthEl) {
-          const spec = displayedMouth(e)
-          const frameGeom = mouthFrame(rings, spec)
-          const baseLongitude = Math.asin(clamp((frameGeom.x - SPHERE_C) / SPHERE_R, -1, 1))
-          const longitude = baseLongitude + radians
-          const depth = Math.cos(longitude)
-          const perspective = Math.max(depth, 0.02) / Math.max(Math.cos(baseLongitude), 0.02)
-          mouthEl.setAttribute('d', mouthPath(frameGeom, spec))
-          mouthEl.setAttribute(
-            'transform',
-            `translate(${(SPHERE_C + SPHERE_R * Math.sin(longitude) + gx).toFixed(2)} ${(
-              frameGeom.y + gy
-            ).toFixed(2)}) scale(${clamp(perspective, 0.02, 2.4).toFixed(4)} 1) translate(${(
-              -frameGeom.x
-            ).toFixed(2)} ${(-frameGeom.y).toFixed(2)})`
-          )
-          mouthEl.style.opacity = depth > 0.02 ? '1' : '0'
-        }
       }
 
       const drawBody = (e: typeof engine.current, now: number, showEffects: boolean, showGlyphs: boolean) => {
@@ -1260,6 +1209,11 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
             <stop offset="100%" stopColor={gradient[2]} />
           </linearGradient>
           {/* The fit goes on the clipPath itself: browsers ignore a <g> inside one, which is also why silhouette.clip is pre-flattened. */}
+          <radialGradient id={`${uid}-sheen`} cx="0.34" cy="0.20" r="0.78">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.30" />
+            <stop offset="55%" stopColor="#ffffff" stopOpacity="0.07" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+          </radialGradient>
           <clipPath
             id={`${uid}-clip`}
             transform={silhouette.fit || undefined}
@@ -1272,18 +1226,10 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
           <g ref={bodyContent}>
           {picture ? <image href={picture} x="-15" y="-15" width={VIEW_SPAN} height={VIEW_SPAN} preserveAspectRatio="none" /> : <g transform={silhouette.fit || undefined} dangerouslySetInnerHTML={{ __html: body }} />}
           <g clipPath={`url(#${uid}-clip)`} visibility={picture ? 'hidden' : undefined}>
+            <rect x="-240" y="-240" width="680" height="680" fill={`url(#${uid}-sheen)`} aria-hidden="true" />
             <g transform={anchorTransform(silhouette.anchor)}>
               <path ref={eye0} fill={eyeColor} />
               <path ref={eye1} fill={eyeColor} />
-              {showMouth && (
-                <path
-                  ref={mouth}
-                  fill="none"
-                  stroke={eyeColor}
-                  strokeWidth={mouthStroke}
-                  strokeLinecap="round"
-                />
-              )}
             </g>
           </g>
           </g>
@@ -1308,7 +1254,6 @@ function displayed(e: { current: Ring[]; target: Ring[]; morph: number }): Ring[
 }
 
 const towards = (from: number[], to: number[], morph: number) => from.map((v, i) => v + (to[i] - v) * clamp(morph, 0, 1))
-const displayedMouth = (e: { currentMouth: number[]; targetMouth: number[]; morph: number }) => towards(e.currentMouth, e.targetMouth, e.morph)
 const displayedGaze = (e: { currentGaze: number[]; targetGaze: number[]; morph: number }) => towards(e.currentGaze, e.targetGaze, e.morph)
 
 function blinkScale(e: { blinkStart: number | null }, now: number) {

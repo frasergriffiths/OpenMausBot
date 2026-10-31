@@ -59,8 +59,3 @@ export function timelineEvents(messages: TimelineMessage[], run?: LiveToolRun): 
 }
 
 /** Only the displayed activity, never chat text or raw provider data; scrubs again for older messages. */
-export function runLogText(events: TimelineEvent[]): string {
-  return redactSecretsInText(events.map((event) =>
-    `[${new Date(event.at).toISOString()}] ${event.state} · ${event.label}${event.command ? `\n  ${event.command}` : ""}`,
-  ).join("\n"));
-}

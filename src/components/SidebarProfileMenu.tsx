@@ -4,7 +4,6 @@ import {
   ArrowDownToLine,
   Check,
   CircleUserRound,
-  Download,
   FolderOpen,
   Gauge,
   Info,
@@ -21,7 +20,6 @@ import {
 import { InitialsAvatar } from "./Avatar";
 import { DiscordIcon } from "./DiscordIcon";
 import { AboutDialog } from "./AboutDialog";
-import { PhoneAppDialog } from "./PhoneAppDialog";
 import { usageBridge } from "./CloudUsageMeter";
 import { useCloudPlanSnapshot } from "./CloudTrialNotice";
 import type { WorkspacePlace } from "./DesktopWorkspaceSwitcher";
@@ -294,15 +292,12 @@ export function phoneMenuItems({
   destinations,
   connected,
   onConnect,
-  onGetApp,
 }: {
   destinations: PhoneDestination[];
   connected: boolean;
   onConnect: (destination: PhoneDestination) => void;
-  onGetApp: () => void;
 }): SidebarMenuItem[] {
-  return [
-    ...destinations.map((destination) => ({
+  return destinations.map((destination) => ({
       key: destination.id === "cloud" ? "connect-phone-cloud" : "connect-phone",
       label: t("sidebar.menu.connectPhone"),
       subtitle: destination.team ? t("sidebar.menu.connectPhone.team", { team: destination.team }) : t(destination.subtitleKey),
@@ -313,14 +308,7 @@ export function phoneMenuItems({
           <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-success" />
         ) : undefined,
       onSelect: () => onConnect(destination),
-    } satisfies SidebarMenuItem)),
-    {
-      key: "phone-app",
-      label: t("sidebar.menu.getPhoneApp"),
-      icon: <Download size={18} />,
-      onSelect: onGetApp,
-    },
-  ];
+    } satisfies SidebarMenuItem));
 }
 
 export function toolMenuItems({ activeView, onFiles, archived }: {
@@ -340,14 +328,8 @@ export function accountLabel(name: string, { update }: { update: string | null }
   return [name, update ?? ""].filter(Boolean).join(" · ");
 }
 
-export function simplePhoneItems({ connected, onGetApp }: { connected: boolean; onGetApp: () => void }): SidebarMenuItem[] {
-  return [{
-    key: "phone-app",
-    label: t("sidebar.menu.getPhoneApp"),
-    icon: <Smartphone size={18} />,
-    trailing: connected ? <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-success" /> : undefined,
-    onSelect: onGetApp,
-  }];
+export function simplePhoneItems(): SidebarMenuItem[] {
+  return [];
 }
 
 type PlanWindowUse = { available: boolean; usedPercent: number | null; resetsAt: string | null };
@@ -503,7 +485,6 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
   const serverUpdate = useServerUpdateItem(!window.ogb?.updater);
   const update = desktopUpdate ?? serverUpdate;
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [phoneAppOpen, setPhoneAppOpen] = useState(false);
   const [session, setSession] = useState<SessionState | null>(null);
   const triggerRef = useRef<HTMLSpanElement>(null);
 
@@ -524,12 +505,11 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
 
   const items = profileMenuItems({
     phone: simple
-      ? simplePhoneItems({ connected: phone.kind === "connected", onGetApp: () => setPhoneAppOpen(true) })
+      ? simplePhoneItems()
       : phoneMenuItems({
         destinations,
         connected: phone.kind === "connected",
         onConnect: connectTo,
-        onGetApp: () => setPhoneAppOpen(true),
       }),
     usage: !remote,
     usageSummary: cloudUsage ?? engineUsage,
@@ -634,15 +614,6 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
         )}
       />
       <AboutDialog open={aboutOpen} onClose={() => setAboutOpen(false)} />
-      <PhoneAppDialog
-        open={phoneAppOpen}
-        onClose={() => setPhoneAppOpen(false)}
-        connect={destinations.map((destination) => ({
-          key: destination.id,
-          subtitle: destination.team ? t("sidebar.menu.connectPhone.team", { team: destination.team }) : t(destination.subtitleKey),
-          onSelect: () => connectTo(destination),
-        }))}
-      />
     </>
   );
 }

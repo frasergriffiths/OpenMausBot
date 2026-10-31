@@ -2,10 +2,9 @@ import { useMemo, useRef } from "react";
 import { useStore, type Group } from "@/state/store";
 import { activeLocale, t } from "@/lib/i18n";
 import { roomThreadSpeakerId, roomThreadWorking } from "@/lib/room-threads";
-import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { orderedThreadList, SidebarThreadRow, stampClock, threadRecency, useRelativeNow, useRevealedThreadRow, visibleSidebarThreads } from "./SidebarThreadRow";
 
-export function GroupThreadList({ group, selected, density = "compact", query = "" }: { group: Group; selected: boolean; density?: SidebarDensity; query?: string }) {
+export function GroupThreadList({ group, selected, query = "" }: { group: Group; selected: boolean; query?: string }) {
   const { state, dispatch } = useStore();
   const now = useRelativeNow();
   const tasks = (group.tasks ?? [{ threadId: group.threadId, title: group.name, createdAt: group.createdAt }]).map((task) => {
@@ -30,7 +29,7 @@ export function GroupThreadList({ group, selected, density = "compact", query = 
   }), [groupId, dispatch]);
   const locale = activeLocale();
   return <div className="mb-2 space-y-0.5" role="group" aria-label={t("task.namedList", { name: group.name })}>
-    {visible.map((task) => <SidebarThreadRow key={task.threadId} task={task} ownerId={group.id} current={selected && task.threadId === group.threadId} compact={density === "compact"}
+    {visible.map((task) => <SidebarThreadRow key={task.threadId} task={task} ownerId={group.id} current={selected && task.threadId === group.threadId} 
       now={stampClock(threadRecency(task), now)} locale={locale} {...actions} />)}
   </div>;
 }

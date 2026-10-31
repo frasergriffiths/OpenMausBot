@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { t } from "@/lib/i18n";
 import { useModalDialog } from "@/hooks/use-modal-dialog";
 import { useStore } from "@/state/store";
-import { Card, Switch } from "./SettingsPrimitives";
+import { SettingsCard, Switch } from "@/components/ui";
 import type { SkillsLibrarySkillWire } from "../../shared/wire";
 import { Select } from "./Select";
 
@@ -207,7 +207,7 @@ export function SkillsSection() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card title={t("skills.library.title")} subtitle={t("skills.library.subtitle")}>
+      <SettingsCard title={t("skills.library.title")} subtitle={t("skills.library.subtitle")}>
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <Search size={15} className="shrink-0 text-ink-secondary" />
@@ -339,9 +339,9 @@ export function SkillsSection() {
           )}
           {error && <div role="alert" className="mt-2 text-[12px] text-danger">{error}</div>}
         </div>
-      </Card>
+      </SettingsCard>
 
-      <Card title={t("skills.library.importTitle")} subtitle={t("skills.library.importHint")}>
+      <SettingsCard title={t("skills.library.importTitle")} subtitle={t("skills.library.importHint")}>
         <form
           className="flex flex-col gap-2"
           onSubmit={(e) => {
@@ -367,7 +367,7 @@ export function SkillsSection() {
             </button>
           </div>
         </form>
-      </Card>
+      </SettingsCard>
 
       {viewing && <SkillSourceDialog viewing={viewing} error={error} working={Boolean(working)} onClose={() => { if (!working) setViewing(null); }} onEnable={() => void toggle(viewing.skill, true)} />}
     </div>

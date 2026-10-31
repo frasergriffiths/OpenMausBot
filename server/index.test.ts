@@ -6164,7 +6164,7 @@ describe("harness HTTP API", () => {
         body: JSON.stringify({
           fromBotId: bot.id,
           fromThreadId: bot.threadId,
-          credentialId: "openaiImageApiKey",
+          credentialId: "ttsKey",
           reason: "needed for the task",
         }),
       });
@@ -6176,7 +6176,7 @@ describe("harness HTTP API", () => {
         .find((message: { id: string }) => message.id === messageId);
       expect(directCard).toMatchObject({
         kind: "secret",
-        text: "Securely provide the OpenAI API key from OpenMausBot on your phone or computer. It is never added to chat.",
+        text: "Securely provide the ElevenLabs API key from OpenMausBot on your phone or computer. It is never added to chat.",
       });
       expect(directCard.secret.description).toContain(
         `${bot.name} can use it but never read it back.`,
@@ -6188,7 +6188,7 @@ describe("harness HTTP API", () => {
         threadId: bot.threadId,
         keyId: "A".repeat(22),
         deviceId: "phone-1",
-        target: "openaiImageApiKey",
+        target: "ttsKey",
         requestKey: directCard.secret.requestKey,
         encapsulatedKey: "A".repeat(87),
         ciphertext: "A".repeat(23),
@@ -6550,7 +6550,7 @@ describe("harness HTTP API", () => {
         body: JSON.stringify({
           fromBotId: bot.id,
           fromThreadId: bot.threadId,
-          credentialId: "openaiImageApiKey",
+          credentialId: "ttsKey",
           reason,
         }),
       });
@@ -6598,7 +6598,7 @@ describe("harness HTTP API", () => {
         body: JSON.stringify({
           fromBotId: bot.id,
           fromThreadId: bot.threadId,
-          credentialId: "openaiImageApiKey",
+          credentialId: "ttsKey",
           reason,
         }),
       });
@@ -6677,8 +6677,8 @@ describe("harness HTTP API", () => {
             saves = saves.then(async () => {
               while (!existsSync(release)) await delay(10);
               try {
-                const patch = message.target === "openaiImageApiKey"
-                  ? { imageGen: { key: message.value } }
+                const patch = message.target === "xaiApiKey"
+                  ? { xai: { key: message.value } }
                   : null;
                 if (!patch) throw new Error("unsupported test credential target");
                 const response = await fetch(
@@ -6756,7 +6756,7 @@ describe("harness HTTP API", () => {
         body: JSON.stringify({
           fromBotId: botId,
           fromThreadId: threadId,
-          credentialId: "openaiImageApiKey",
+          credentialId: "xaiApiKey",
           reason: "needed for this task",
         }),
       });
@@ -6847,7 +6847,7 @@ describe("harness HTTP API", () => {
         botId: direct.id,
         threadId: directOriginalThread,
         messageId: directRequest.messageId,
-        target: "openaiImageApiKey",
+        target: "xaiApiKey",
         requestKey: directCard.secret.requestKey,
       }, "sk-test-direct");
       const groupEnvelope = await sealPhoneSecretForTest({
@@ -6857,7 +6857,7 @@ describe("harness HTTP API", () => {
         botId: channelOwner.id,
         threadId: groupOriginalThread,
         messageId: groupRequest.messageId,
-        target: "openaiImageApiKey",
+        target: "xaiApiKey",
         requestKey: groupCard.secret.requestKey,
       }, "sk-test-channel");
       const provide = (botId: string, messageId: string, envelope: PhoneSecretContext) => fetch(
@@ -6888,7 +6888,7 @@ describe("harness HTTP API", () => {
         botId: raceBot.id,
         threadId: raceThread,
         messageId: supersededRequest.messageId,
-        target: "openaiImageApiKey",
+        target: "xaiApiKey",
         requestKey: (await raceCard(supersededRequest.messageId)).secret.requestKey,
       }, "sk-test-superseded");
       const supersededProvide = provide(raceBot.id, supersededRequest.messageId, supersededEnvelope);
@@ -6907,7 +6907,7 @@ describe("harness HTTP API", () => {
         botId: raceBot.id,
         threadId: raceThread,
         messageId: freshRequest.messageId,
-        target: "openaiImageApiKey",
+        target: "xaiApiKey",
         requestKey: (await raceCard(freshRequest.messageId)).secret.requestKey,
       }, "sk-test-fresh-card");
       const freshProvide = await provide(raceBot.id, freshRequest.messageId, freshEnvelope);
@@ -6983,7 +6983,7 @@ describe("harness HTTP API", () => {
         botId: direct.id,
         threadId: directOriginalThread,
         messageId: directRequest.messageId,
-        target: "openaiImageApiKey",
+        target: "xaiApiKey",
         requestKey: directCard.secret.requestKey,
       }, "sk-test-replacement");
       const replacement = await provide(direct.id, directRequest.messageId, replacementEnvelope);
@@ -7739,11 +7739,11 @@ describe("harness HTTP API", () => {
     let id = "";
     try {
       await stream.until((frame) => frame.kind === "hello");
-      const bot = (await api("POST", "/api/bots", { name: "Scout", useDefaults: false, settings: { color: "purple", mascotBody: "star" } })).body.bot;
+      const bot = (await api("POST", "/api/bots", { name: "Scout", useDefaults: false, settings: { color: "purple", mascotBody: "hare" } })).body.bot;
       id = bot.id;
       expect(bot.messages[0].text).toBe("Hi Milind, I'm Scout. What would you like me to do?");
       const announced = await stream.until((frame) => frame.kind === "bot" && frame.bot?.id === id);
-      expect(announced.bot).toMatchObject({ color: "purple", mascotBody: "star" });
+      expect(announced.bot).toMatchObject({ color: "purple", mascotBody: "hare" });
       const plain = (await api("POST", "/api/bots", { name: "Wren", useDefaults: false })).body.bot;
       await api("DELETE", `/api/bots/${plain.id}`);
       const fresh = (await stream.until((frame) => frame.kind === "bot" && frame.bot?.id === plain.id)).bot;
@@ -10635,7 +10635,7 @@ describe("harness HTTP API", () => {
         body: JSON.stringify({
           fromBotId: second.id,
           fromThreadId: room.threadId,
-          credentialId: "openaiImageApiKey",
+          credentialId: "ttsKey",
           reason: "needed for the queued task",
         }),
       });
@@ -10647,7 +10647,7 @@ describe("harness HTTP API", () => {
         .find((message: { id: string }) => message.id === messageId);
       expect(roomCard).toMatchObject({
         kind: "secret",
-        text: "Securely provide the OpenAI API key from OpenMausBot on your phone or computer. It is never added to chat.",
+        text: "Securely provide the ElevenLabs API key from OpenMausBot on your phone or computer. It is never added to chat.",
         from: { botId: second.id, name: second.name, color: second.color },
       });
 
@@ -10669,7 +10669,7 @@ describe("harness HTTP API", () => {
             threadId: room.threadId,
             keyId: "A".repeat(22),
             deviceId: "phone-1",
-            target: "openaiImageApiKey",
+            target: "ttsKey",
             requestKey: roomCard.secret.requestKey,
             encapsulatedKey: "A".repeat(87),
             ciphertext: "A".repeat(23),
@@ -12278,53 +12278,6 @@ describe("harness HTTP API", () => {
     const after = await api("GET", "/api/config");
     expect(after.body.opencodeGo).toEqual({ configured: true, providerKeys: [] });
     expect(JSON.stringify(after.body)).not.toContain("opencode-secret");
-  });
-
-  it("stores the avatar image key as configured-only status", async () => {
-    try {
-      const put = await api("PUT", "/api/config", { imageGen: { key: "sk-image-secret" } });
-      expect(put.status).toBe(200);
-      expect(put.body.imageGen).toMatchObject({ provider: "openai", configured: true, openaiConfigured: true });
-      expect(JSON.stringify(put.body)).not.toContain("sk-image-secret");
-
-      const after = await api("GET", "/api/config");
-      expect(after.body.imageGen).toMatchObject({ provider: "openai", configured: true, openaiConfigured: true });
-      expect(JSON.stringify(after.body)).not.toContain("sk-image-secret");
-    } finally {
-      await api("PUT", "/api/config", { imageGen: { key: "" } });
-    }
-  });
-
-  it("keeps avatar providers and externally stored image credentials separate", async () => {
-    try {
-      const saved = await api("PUT", "/api/config?secretStorage=external", {
-        imageGen: { provider: "custom", key: "openai-avatar-fixture", customApiKey: "custom-avatar-fixture",
-          customUrl: "http://127.0.0.1:4321/v1/images/generations", customModel: "local/image" },
-      });
-      expect(saved.status).toBe(200);
-      expect(saved.body.imageGen).toEqual({ provider: "custom", configured: true, model: "local/image",
-        customUrl: "http://127.0.0.1:4321/v1", customModel: "local/image",
-        openaiConfigured: true, xaiConfigured: false, customKeyConfigured: true });
-      for (const secret of ["openai-avatar-fixture", "custom-avatar-fixture"]) {
-        expect(JSON.stringify(saved.body)).not.toContain(secret);
-        expect(readFileSync(join(home, ".openmausbot", "config.json"), "utf8")).not.toContain(secret);
-      }
-      const disk = JSON.parse(readFileSync(join(home, ".openmausbot", "config.json"), "utf8"));
-      expect(disk.imageGen).toMatchObject({ key: "", customApiKey: "", provider: "custom" });
-
-      const preset = await api("PUT", "/api/config", { imageGen: { provider: "openai" } });
-      expect(preset.body.imageGen).toMatchObject({ provider: "openai", configured: true, customKeyConfigured: true });
-      const keyless = await api("PUT", "/api/config", { imageGen: { provider: "custom", customApiKey: "" } });
-      expect(keyless.body.imageGen).toMatchObject({ provider: "custom", configured: true, customKeyConfigured: false,
-        customUrl: "http://127.0.0.1:4321/v1", customModel: "local/image" });
-
-      const invalid = await api("PUT", "/api/config", { imageGen: { customUrl: "https://user:private@router.example/v1" } });
-      expect(invalid.status).toBe(400);
-      expect(JSON.stringify(invalid.body)).not.toContain("private");
-      expect((await api("GET", "/api/config")).body.imageGen).toMatchObject({ configured: true, customUrl: "http://127.0.0.1:4321/v1" });
-    } finally {
-      await api("PUT", "/api/config", { imageGen: { provider: "openai", key: "", customApiKey: "", customUrl: "", customModel: "" } });
-    }
   });
 
   it("rejects a non-string OpenCode Go API key", async () => {

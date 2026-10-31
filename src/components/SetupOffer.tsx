@@ -125,7 +125,7 @@ export function SetupOffer({ botId, threadId, message, transcript }: { botId: st
             const chosen = selected === index;
             return (
               <button key={label} type="button" role="radio" aria-checked={chosen} data-ask-choice="" data-selected={chosen || undefined}
-                disabled={settled || busy} onClick={() => setSelected(index)}
+                disabled={settled} onClick={() => setSelected(index)}
                 className={cn("group flex min-h-10 items-center gap-3 rounded-xl px-3 py-2 text-start",
                   settled ? "cursor-default"
                     : chosen ? "text-ink"
@@ -176,6 +176,7 @@ export function SetupPlaceQuestion({ bot, answered = false }: { bot: Bot; answer
       <PlaceControl
         bot={bot}
         approvalMode={bot.approvalMode}
+        disabled={answered}
         patch={(value) => dispatch({ type: "updateBot", botId: bot.id, patch: value })}
       />
     </div>

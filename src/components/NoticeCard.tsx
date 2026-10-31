@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ArrowUpRight, X, type LucideIcon } from "lucide-react";
 import { openExternalLink } from "@/lib/app-links";
 import { t } from "@/lib/i18n";
+import { buttonStyles, IconButton } from "@/components/ui";
 
 export function NoticeCard({ titleId, icon: Icon, title, onDismiss, dismissLabel = t("notice.dismiss"), notice, children }: {
   titleId: string; icon: LucideIcon; title: string; onDismiss: () => void;
@@ -17,14 +18,14 @@ export function NoticeCard({ titleId, icon: Icon, title, onDismiss, dismissLabel
         <Icon size={16} className="mt-0.5 shrink-0 text-ink-secondary" aria-hidden="true" />
         <h2 id={titleId} className="text-[14px] font-semibold">{title}</h2>
       </div>
-      <button type="button" onClick={onDismiss} aria-label={dismissLabel} className="ui-icon-button"><X size={16} /></button>
+      <IconButton label={dismissLabel} onClick={onDismiss}><X size={16} /></IconButton>
     </div>
     {children}
     <p role="status" className="sr-only">{title}</p>
   </aside>;
 }
 
-export const PRIMARY_BUTTON = "ui-button ui-button-primary min-h-9 gap-1.5 px-3 py-1.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
+export const PRIMARY_BUTTON = buttonStyles({ variant: "primary", size: "sm", className: "h-9 gap-1.5 px-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus" });
 
 export function LinkButton({ url, label, onOpened }: { url: string; label: string; onOpened?: () => void }) {
   const [failed, setFailed] = useState(false);

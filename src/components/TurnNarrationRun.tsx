@@ -1,6 +1,7 @@
 // Providers such as Grok narrate before tools.
 import { useEffect, useState } from "react";
 import { Check, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui";
 
 export function TurnNarrationRun({
   label,
@@ -21,17 +22,16 @@ export function TurnNarrationRun({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-start">
-        <button
+        <Button size="xs" shape="pill"
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           title={title ?? (open ? "Hide progress messages" : "Show progress messages")}
-          className="ui-pill"
         >
           <Check size={13} className="text-success" />
           <span>{label}</span>
           <ChevronRight size={13} className={open ? "rotate-90" : undefined} />
-        </button>
+        </Button>
       </div>
       {open && children}
     </div>

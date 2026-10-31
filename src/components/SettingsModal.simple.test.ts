@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setLocale, t } from "@/lib/i18n";
 import type { AppSettingsSection } from "@/state/store";
-import type { Switch } from "./SettingsPrimitives";
+import type { Switch } from "./ui";
 import { SECTIONS, SIMPLE_FOLDED, SIMPLE_HIDDEN_SECTIONS, SIMPLE_PAGES, SettingsModal, revealSettingsBlock } from "./SettingsModal";
 
 const fixture = vi.hoisted(() => ({
@@ -26,8 +26,8 @@ vi.mock("@/state/store", async (importOriginal) => ({
 }));
 vi.mock("@/lib/analytics", () => ({ analyticsEnabled: () => false, setAnalyticsEnabled: vi.fn() }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => fixture.ownerOrAdmin }));
-vi.mock("./SettingsPrimitives", async (importOriginal) => {
-  const original = await importOriginal<typeof import("./SettingsPrimitives")>();
+vi.mock("./ui", async (importOriginal) => {
+  const original = await importOriginal<typeof import("./ui")>();
   return {
     ...original,
     Switch: (props: ComponentProps<typeof Switch>) => {
@@ -45,9 +45,7 @@ vi.mock("./DecisionModelSettings", () => ({ DecisionModelSettings: marker("decis
 vi.mock("./SkillsSection", () => ({ SkillsSection: marker("skills") }));
 vi.mock("./CacheKeepWarmSettings", () => ({ CacheKeepWarmSettings: marker("keepWarm") }));
 vi.mock("./McpCallTimeoutSettings", () => ({ McpCallTimeoutSettings: marker("mcpCalls") }));
-vi.mock("./ThreadConcurrencySettings", () => ({ ThreadConcurrencySettings: marker("threads") }));
 vi.mock("./AutomaticRecoverySettings", () => ({ AutomaticRecoverySettings: marker("recovery") }));
-vi.mock("./ThreadCleanupSettings", () => ({ ThreadCleanupSettings: marker("threadCleanup") }));
 vi.mock("./NewBotDialog", () => ({ DefaultBotSettings: marker("defaults"), NewBotDialog: marker("newBotDialog") }));
 vi.mock("./ApiKeys", () => ({
   ApiKeyRow: marker("apiKey"),
@@ -63,7 +61,7 @@ vi.mock("./ServerPairingCard", () => ({ ServerPairingCard: () => null }));
 vi.mock("./ConnectedWorkspacesSettings", () => ({ ConnectedWorkspacesSettings: marker("desktopWorkspaces") }));
 vi.mock("./LocalComputerSection", () => ({ LocalComputerSection: marker("computer") }));
 vi.mock("./CloudAccountSettings", () => ({ CloudAccountSettings: marker("cloudAccount") }));
-vi.mock("./PeopleSection", () => ({ PeopleSection: marker("people") }));
+
 vi.mock("./ActivitySection", () => ({ ActivitySection: marker("activity") }));
 vi.mock("./UsageSection", () => ({ UsageSection: marker("usage") }));
 vi.mock("./WorkspaceBackupSettings", () => ({ WorkspaceBackupSettings: marker("backups") }));
@@ -132,7 +130,7 @@ const open = (section: AppSettingsSection) => { fixture.section = section; retur
 describe("Settings, the one plain UI", () => {
   it("draws nine pages in the split order and no section rail", () => {
     const html = render();
-    const order = ["account", "appearance", "data", "ai", "skills", "keys", "computer", "billing", "updates"];
+    const order = ["account", "appearance", "data", "ai", "skills", "keys", "computer", "updates"];
     expect(pages(html)).toEqual(order);
     expect(SIMPLE_PAGES.map((page) => page.id)).toEqual(order);
     expect(html).not.toContain("data-settings-group=");
@@ -150,7 +148,6 @@ describe("Settings, the one plain UI", () => {
       "settings.simple.page.skills.description",
       "settings.simple.page.keys.description",
       "settings.simple.page.computer.description",
-      "settings.simple.page.billing.description",
       "settings.simple.page.updates.description",
     ]);
     expect(render()).toContain(t("settings.simple.page.account.description"));
@@ -159,7 +156,7 @@ describe("Settings, the one plain UI", () => {
   it("places every section on a page, with none left over", () => {
     const placed = SIMPLE_PAGES.flatMap((page) => page.sections);
     expect(new Set(placed).size).toBe(placed.length);
-    const unplaced = SECTIONS.map((entry) => entry.id).filter((id) => !placed.includes(id) && id !== "updates");
+    const unplaced = SECTIONS.map((entry) => entry.id).filter((id) => !placed.includes(id) && id !== "updates" && id !== "usage" && id !== "cloudAccount");
     expect(unplaced).toEqual([]);
     expect(SIMPLE_HIDDEN_SECTIONS).toEqual([]);
   });
@@ -167,7 +164,7 @@ describe("Settings, the one plain UI", () => {
   it("opens Account on the profile, the plan, People, System and Limits", () => {
     const html = render();
     expect(currentPage(html)).toBe("account");
-    expect(groupLabels(html)).toEqual(["System", "Limits and recovery"]);
+    expect(groupLabels(html)).toEqual(["Departments", "System", "Limits and recovery"]);
     expect(html).toContain("Add your name");
     expect(html).not.toContain('data-settings-disclosure="general-backups"');
   });
@@ -188,13 +185,14 @@ describe("Settings, the one plain UI", () => {
   it("keeps the everyday rows and every merged control reachable by its own page", () => {
     const account = open("general");
     expect(placement(account, 'aria-label="Send usage analytics"')).toBe("shown");
-    expect(markers(account)).toEqual(expect.arrayContaining(["roomTurns", "threads", "recovery", "threadCleanup"]));
+    expect(markers(account)).toEqual(expect.arrayContaining(["roomTurns", "recovery"]));
     const appearance = open("appearance");
     for (const shown of ['aria-label="Color my messages with the bot&#x27;s color"', 'aria-label="Send messages with"',
       'aria-label="Notification sounds"', 'aria-label="Show the notification feed"', 'aria-label="App language"', 'role="radiogroup" aria-label="Theme"']) {
       expect(placement(appearance, shown), shown).toBe("shown");
     }
-    expect(placement(appearance, 'aria-label="Choose sidebar density"')).toBe("folded");
+    // The density setting went with the compact layout: the sidebar's own toggle is the only way to the icons rail.
+    expect(placement(appearance, 'aria-label="Choose sidebar density"')).toBe("missing");
     const ai = open("engines");
     expect(markers(ai)).toEqual(expect.arrayContaining(["engines", "keepWarm", "decisionModel", "mcpCalls", "defaults"]));
     expect(ai).toContain('aria-label="Effort for new bots"');
@@ -264,24 +262,14 @@ describe("Settings, the one plain UI", () => {
     expect(html).toContain("MARKER:workspaces;");
   });
 
-  it("leads Usage & billing with one usage block, folds the limits, then shows the plan", () => {
-    fixture.section = "cloudAccount";
-    const html = render();
-    expect(currentPage(html)).toBe("billing");
-    expect(blocks(html)).toEqual(["usage", "cloudAccount"]);
-    expect(html.indexOf("See all limits")).toBeLessThan(html.indexOf("MARKER:cloudAccount;"));
-    expect(placement(html, "MARKER:usage;")).toBe("folded");
-    expect(groupLabels(html)).toContain("Plan");
-  });
-
-  it("shows a hosted workspace's admins People in Account and Activity as its own group on Data", () => {
+  it("drops People from Account and keeps Activity as its own group on Data for a hosted workspace", () => {
     vi.stubGlobal("window", {});
     fixture.ownerOrAdmin = true;
     fixture.section = "people";
     const html = render();
-    expect(pages(html)).toEqual(["account", "appearance", "data", "ai", "skills", "keys", "computer", "billing", "updates"]);
+    expect(pages(html)).toEqual(["account", "appearance", "data", "ai", "skills", "keys", "computer", "updates"]);
     expect(currentPage(html)).toBe("account");
-    expect(placement(html, "MARKER:people;")).toBe("shown");
+    expect(placement(html, "MARKER:people;")).toBe("missing");
     expect(placement(html, "MARKER:activity;")).toBe("missing");
     const data = open("activity");
     expect(currentPage(data)).toBe("data");
@@ -319,8 +307,6 @@ describe("Settings, the one plain UI", () => {
     ["computer", "computer"],
     ["logins", "computer"],
     ["workspaces", "computer"],
-    ["usage", "billing"],
-    ["cloudAccount", "billing"],
     ["updates", "updates"],
   ])("lands a deep link to %s on %s", (section, page) => {
     fixture.section = section;

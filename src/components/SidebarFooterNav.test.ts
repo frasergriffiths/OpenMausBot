@@ -17,7 +17,7 @@ vi.mock("@/lib/sidebar-preferences", async (importOriginal) => ({
   useSidebarToolsLayout: () => fixture.toolsLayout,
 }));
 vi.mock("./UpdateIndicator", () => ({ UpdateIndicator: () => null }));
-import { SidebarAppsButton, SidebarBottomButtons, SidebarFooterNav, SidebarTeamMapButton, SidebarTemplatesButton } from "./SidebarFooterNav";
+import { SidebarAppsButton, SidebarBottomButtons, SidebarFooterNav } from "./SidebarFooterNav";
 
 type Props = { children?: ReactNode; [key: string]: unknown };
 function nodes(value: ReactNode): ReactElement<Props>[] {
@@ -48,7 +48,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("sidebar footer places", () => {
-  it.each(["compact"] as const)("keeps Team map out of Advanced mode's Tools rows (%s)", (density) => {
+  it.each(["expanded"] as const)("keeps Team map out of Advanced mode's Tools rows (%s)", (density) => {
     fixture.advanced = true;
     const { html } = render(density);
     expect(html).not.toContain('data-sidebar-nav="team-map"');
@@ -58,7 +58,7 @@ describe("sidebar footer places", () => {
     expect(html).not.toContain('data-sidebar-nav="apps"');
   });
 
-  it.each(["compact"] as const)("leaves no places in Simple mode's sidebar (%s)", (density) => {
+  it.each(["expanded"] as const)("leaves no places in Simple mode's sidebar (%s)", (density) => {
     expect(render(density).html).toBe("");
   });
 
@@ -78,7 +78,7 @@ describe("sidebar footer places", () => {
   it("toggles through the header", () => {
     fixture.advanced = true;
     const onToggleCollapsed = vi.fn();
-    const { nodes: tree } = render("compact", { onToggleCollapsed });
+    const { nodes: tree } = render("expanded", { onToggleCollapsed });
     const header = tree.find((node) => String(node.props.className ?? "").includes("group"))!;
     void header;
     expect(onToggleCollapsed).toBeTypeOf("function");
@@ -99,19 +99,11 @@ describe("sidebar footer places", () => {
     expect(toolbar).toBe(rows);
   });
 
-  it("keeps Apps, Team map and Templates side by side before the update indicator", () => {
-    const html = button(() => createElement(SidebarBottomButtons, {
-      teamMapOpen: false,
-      onOpenTeamMap: () => {},
-      templatesOpen: false,
-      onOpenTemplates: () => {},
-    }));
-    const order = ['data-sidebar-nav="apps"', 'data-sidebar-nav="team-map"', 'data-sidebar-nav="templates"'].map((marker) => {
-      const at = html.indexOf(marker);
-      expect(at, marker).toBeGreaterThan(-1);
-      return at;
-    });
-    expect(order).toEqual([...order].sort((a, b) => a - b));
+  it("keeps Apps before the update indicator", () => {
+    const html = button(() => createElement(SidebarBottomButtons, {}));
+    expect(html).toContain('data-sidebar-nav="apps"');
+    expect(html).not.toContain('data-sidebar-nav="team-map"');
+    expect(html).not.toContain('data-sidebar-nav="templates"');
   });
 });
 
@@ -125,38 +117,4 @@ describe("the footer's place buttons", () => {
     expect(fixture.dispatch).toHaveBeenCalledWith({ type: "togglePlugins", open: true });
   });
 
-  it("draws Team map and Templates on the apps button's geometry, naming their destinations", () => {
-    let team!: ReturnType<typeof SidebarTeamMapButton>;
-    function Team() { team = SidebarTeamMapButton({ open: true, onOpen: () => {} }); return team; }
-    let templates!: ReturnType<typeof SidebarTemplatesButton>;
-    function Templates() { templates = SidebarTemplatesButton({ open: true, onOpen: () => {} }); return templates; }
-    const teamHtml = renderToStaticMarkup(createElement(Team));
-    const templatesHtml = renderToStaticMarkup(createElement(Templates));
-    for (const [html, nav, label] of [
-      [teamHtml, "team-map", "Team map"],
-      [templatesHtml, "templates", "Templates"],
-    ] as const) {
-      expect(html).toContain(`data-sidebar-nav="${nav}"`);
-      expect(html).toContain(`aria-label="${label}"`);
-      expect(html).toContain(`title="${label}"`);
-      expect(html).not.toContain("aria-pressed");
-      expect(html).toContain("bg-raised");
-      expect(html).toContain("size-9");
-      expect(html).toContain("rounded-xl");
-      if (nav === "templates") expect(html).toContain('aria-haspopup="dialog"');
-    }
-  });
-
-  it("carries Team map's tour anchor and opens each destination", () => {
-    const onTeamMap = vi.fn(), onTemplates = vi.fn();
-    const team = SidebarTeamMapButton({ open: false, onOpen: onTeamMap });
-    const templates = SidebarTemplatesButton({ open: false, onOpen: onTemplates });
-    expect(team.props.tour).toBe("team-tools");
-    expect(team.props.active).toBe(false);
-    expect(templates.props.nav).toBe("templates");
-    (team.props.onOpen as () => void)();
-    (templates.props.onOpen as () => void)();
-    expect(onTeamMap).toHaveBeenCalledOnce();
-    expect(onTemplates).toHaveBeenCalledOnce();
-  });
 });

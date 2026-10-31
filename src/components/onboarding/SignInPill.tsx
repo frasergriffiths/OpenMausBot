@@ -9,10 +9,11 @@ import { t } from "@/lib/i18n";
 import { plainSignIn } from "@/lib/onboarding";
 import { engineSignedIn } from "@/lib/product-events";
 import { api, useStore, type InstanceInfo } from "@/state/store";
+import { buttonStyles } from "@/components/ui";
 import { deviceSignInLink, isDeviceSignInCode } from "../../../shared/device-sign-in";
 
 const POLL_MS = 2_000;
-export const PILL = "ui-button ui-button-pill ui-button-lg ui-button-primary w-[288px] max-w-full";
+export const PILL = buttonStyles({ variant: "primary", size: "md", shape: "pill", className: "w-[288px] max-w-full" });
 
 type Slot =
   | { kind: "start" }

@@ -46,7 +46,6 @@ import { SIDEBAR_COLLAPSED_SECTIONS_KEY, SIDEBAR_DENSITY_KEY, SIDEBAR_SECTION_OR
 import { Sidebar } from "./Sidebar";
 import { TeamContextMenu } from "./SidebarTeamMenu";
 import { SidebarFooter } from "./SidebarFooter";
-import { TeamLibraryPanel } from "./TeamLibraryPanel";
 import { SidebarResizeHandle } from "./SidebarResizeHandle";
 import { SidebarTileGrid } from "./SidebarTiles";
 import { GlassBar, GlassScrollFrame, GlassScroller } from "./GlassScrollFrame";
@@ -102,7 +101,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => {
-  setSidebarDensity("compact");
+  setSidebarDensity("expanded");
   vi.unstubAllGlobals();
 });
 
@@ -233,15 +232,15 @@ describe("Simple-mode sidebar layout", () => {
     expect(listedBots(render().tree)).toEqual(["atlas", "bea", "dodo"]);
   });
 
-  it("opens at 272px and remembers its resized width", () => {
+  it("opens at 280px and remembers its resized width", () => {
     const width = () => render().root.props.style!["--sidebar-width"];
-    expect(width()).toBe("272px");
+    expect(width()).toBe("280px");
     expect(render().root.props.className).toContain("w-[272px]");
     fixture.storage.set(SIMPLE_SIDEBAR_WIDTH_KEY, "300");
     fixture.values = [];
     expect(width()).toBe("300px");
     const handle = render().tree.find((node) => node.type === SidebarResizeHandle)!.props as Parameters<typeof SidebarResizeHandle>[0];
-    expect(handle.sizing.defaultWidth).toBe(272);
+    expect(handle.sizing.defaultWidth).toBe(280);
     expect(handle.sizing.valueNow).toBe(300);
     fixture.storage.set(SIMPLE_SIDEBAR_WIDTH_KEY, "460");
     fixture.values = [];
@@ -317,30 +316,3 @@ describe("Simple-mode sidebar layout", () => {
   });
 });
 
-describe("the footer's places", () => {
-  const footer = (tree: ReactElement<Props>[]) => tree.find((node) => node.type === SidebarFooter)!;
-  const places = (tree: ReactElement<Props>[]) => footer(tree).props.places as NonNullable<Parameters<typeof SidebarFooter>[0]["places"]>;
-
-  it("offers Team map and Templates from the Simple footer and opens each", () => {
-    const shared = places(render().tree);
-    expect(shared).toMatchObject({ teamMapOpen: false, templatesOpen: false });
-    shared.onOpenTeamMap!();
-    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "showTeamMap" });
-    fixture.dispatch.mockClear();
-    shared.onOpenTemplates!();
-    expect(render().tree.some((node) => node.type === TeamLibraryPanel)).toBe(true);
-  });
-
-  it("keeps Templates and Team map out of the + menu", () => {
-    {
-      fixture.values = [];
-      const plus = render().tree.find((node) => node.type === "button" && node.props["aria-label"] === "New or share")!;
-      (plus.props.onClick as () => void)();
-      const labels = nodes(render().tree.find((node) => node.props.role === "menu")!.props.children)
-        .filter((node) => node.type === "button")
-        .map((node) => Children.toArray(node.props.children).filter((part) => typeof part === "string"));
-      expect(labels.flat()).not.toContain("Templates");
-      expect(labels.flat()).not.toContain("Team map");
-    }
-  });
-});

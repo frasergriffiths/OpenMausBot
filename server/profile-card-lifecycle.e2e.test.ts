@@ -56,7 +56,7 @@ it("applies the bot's own alert and voice changes at once, refuses a stale Undo,
     token = JSON.parse(readFileSync(fixture.fixtureDumpPath, "utf8")).mcpConfig.mcpServers.agents.env.OMB_COMMS_TOKEN;
     const toggle = await propose({ notifications: false, speakReplies: true });
     const credential = (reason: string) => api("POST", "/api/internal/request-credential", {
-      fromBotId: bot.id, fromThreadId: bot.threadId, credentialId: "openaiImageApiKey", reason,
+      fromBotId: bot.id, fromThreadId: bot.threadId, credentialId: "ttsKey", reason,
     }, 201, token);
     const prior = await credential("First request");
     const fresh = await credential("Replacement request");

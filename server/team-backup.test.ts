@@ -24,7 +24,7 @@ function fixture() {
   });
   const chief = store.createBot({ name: "Mira", section: "Engineering", description: "Full instructions\n".repeat(400) }, { seedMessages: false });
   store.setSoul(chief.id, "  Cite sources.\nRespect the user's current request. 🐭\n");
-  const scout = store.createBot({ name: "Scout", section: "Engineering", mascotBody: "circle" }, { seedMessages: false });
+  const scout = store.createBot({ name: "Scout", section: "Engineering", mascotBody: "bun" }, { seedMessages: false });
   const otherChief = store.createBot({ name: "Ava", section: "Operations" }, { seedMessages: false });
   const archived = store.createBot({ name: "Archived" }, { seedMessages: false });
   store.patchBot(archived.id, { hidden: true });
@@ -76,13 +76,13 @@ describe("additive portable team backups", () => {
     expect(() => parseTeamBackup(invalid)).toThrow();
   });
 
-  it("backs up and restores a silver bot in silver", () => {
+  it("backs up and restores a MausBot in its colour", () => {
     const { store, routines } = fixture();
-    const maus = store.createBot({ name: "MausBot", color: "silver" }, { seedMessages: false });
+    const maus = store.createBot({ name: "MausBot", color: "green" }, { seedMessages: false });
     const backup = createTeamBackup(store, routines.listRoutines(), "With MausBot");
-    expect(backup.bots.find((bot) => bot.key === maus.id)?.color).toBe("silver");
+    expect(backup.bots.find((bot) => bot.key === maus.id)?.color).toBe("green");
     const restored = importTeamBackup(store, routines, JSON.parse(JSON.stringify(backup)), selection());
-    expect(restored.bots.find((bot) => bot.name === "MausBot 2")?.color).toBe("silver");
+    expect(restored.bots.find((bot) => bot.name === "MausBot 2")?.color).toBe("green");
   });
 
   it("carries a bot's never-use-the-helper switch through backup and import, so its restored notes and chats stay off the helper", () => {

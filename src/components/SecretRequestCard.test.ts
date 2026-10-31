@@ -31,13 +31,13 @@ const secretCard = (secret: Record<string, unknown>): Message => ({
   role: "bot",
   kind: "secret",
   at: 1,
-  text: "Securely provide the OpenAI API key.",
+  text: "Securely provide the ElevenLabs API key.",
   secret: {
-    target: "openaiImageApiKey",
-    label: "OpenAI API key",
-    description: "Generate a key at platform.openai.com. Scout can use it but never read it back.",
-    placeholder: "sk-…",
-    helpUrl: "https://platform.openai.com/api-keys",
+    target: "ttsKey",
+    label: "ElevenLabs API key",
+    description: "Enables text-to-speech voices in calls.",
+    placeholder: "Paste your ElevenLabs API key",
+    helpUrl: "https://elevenlabs.io/app/settings/api-keys",
     requestKey: "request-key-1",
     ...secret,
   },
@@ -85,7 +85,7 @@ describe("SecretRequestCard ask card", () => {
   it("folds into one line that names the key once it is saved and the bot resumed", () => {
     const html = view({ provided: true, resumed: true });
     expect(html).toContain('data-ask-card="settled"');
-    expect(html).toContain("OpenAI API key saved securely");
+    expect(html).toContain("ElevenLabs API key saved securely");
     expect(html).toContain("Bot resumed without seeing the key");
     expect(html).not.toContain("<input");
     expect(html).not.toContain("<form");

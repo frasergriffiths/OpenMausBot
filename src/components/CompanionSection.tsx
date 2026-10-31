@@ -23,7 +23,7 @@ import { companionPairingMode } from "../lib/phone-setup";
 import { revealPhonePairing } from "../lib/phone-pairing";
 import { PhonesList } from "./PhonesList";
 import { ConnectionDetail } from "./ConnectionDetail";
-import { Card, Switch } from "./SettingsPrimitives";
+import { SettingsCard, Switch } from "@/components/ui";
 import { SIMPLE_ROW_FOCUS } from "./SidebarSimpleTop";
 import { brand } from "../lib/brand";
 import { useStore } from "@/state/store";
@@ -154,7 +154,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
 
   if (!companionBridge()) {
     return (
-      <Card
+      <SettingsCard
         title={t("remote.desktopOnly.title", { app: brand().name })}
         subtitle={t("remote.desktopOnly.subtitle")}
       />
@@ -163,9 +163,9 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
 
   if (!state) {
     return (
-      <Card title={t("remote.title")} subtitle={t("remote.checking")}>
+      <SettingsCard title={t("remote.title")} subtitle={t("remote.checking")}>
         <Loader2 size={15} className="animate-spin text-ink-secondary" />
-      </Card>
+      </SettingsCard>
     );
   }
 
@@ -193,7 +193,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
     <div className="flex flex-col gap-4">
       {remoteBlocked && <p role="status" className="text-[13px] leading-relaxed text-ink-secondary">{remoteBlocked}</p>}
       <div ref={pairingFlow} tabIndex={-1} data-phone-pairing="computer" className={`scroll-mt-4 rounded-xl ${SIMPLE_ROW_FOCUS}`}>
-        <Card title={pairingCopy.title} subtitle={pairingCopy.subtitle}>
+        <SettingsCard title={pairingCopy.title} subtitle={pairingCopy.subtitle}>
           {(panelStatus || (pairedCount > 0 && c.hostedReady)) && (
             <div className="mb-4 flex items-center justify-between gap-3">
               {panelStatus && (
@@ -214,7 +214,7 @@ export function CompanionSection({ profileEmail = "", focusRequest = 0 }: { prof
             </div>
           )}
           <PhoneSetupFlowView controller={c} />
-        </Card>
+        </SettingsCard>
       </div>
 
       <details className="rounded-xl border border-hairline/40 bg-card">

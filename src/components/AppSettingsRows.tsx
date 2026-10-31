@@ -1,21 +1,20 @@
 import { useState } from "react";
 import { api, useStore, type ConfigStatus } from "@/state/store";
 import { builtInBrowserEnabled, skillAuthoringEnabled } from "@/lib/feature-flags";
-import { localeChoices, type LocaleKey } from "@/locales";
+import { localeChoices } from "@/locales";
 import { activeLocale, t } from "@/lib/i18n";
 import { withTourReset } from "@/lib/guided-tour";
 import { completionPatch } from "@/lib/onboarding";
 import { useUpdaterState } from "@/lib/updater";
+import { Button, SettingRow, SettingsCard, Switch } from "@/components/ui";
 import { brand } from "../lib/brand";
 import { BrowserProfilesManager } from "./BrowserProfilesManager";
 import { NewBrowserSettings } from "./BrowserSettingsRows";
-import { Card, SettingRow, Switch } from "./SettingsPrimitives";
 import { LearnedSkillsSettings } from "./ShareLearnedSkillsSettings";
 import { effortLabel } from "./ModelPicker";
 import { EFFORT_LEVELS, isEffortLevel } from "../../shared/wire";
 import { setColorUserBubbles, useColorUserBubbles } from "@/lib/user-bubble-preference";
-import { setShowThreads, useShowThreadsChoice } from "@/lib/thread-preferences";
-import { parseSidebarDensity, setPinnedCircles, setSidebarDensity, setUniversalPins, SIDEBAR_DENSITIES, usePinnedCircles, useSidebarDensity, useUniversalPins, type SidebarDensity } from "@/lib/sidebar-preferences";
+import { setPinnedCircles, setUniversalPins, usePinnedCircles, useUniversalPins } from "@/lib/sidebar-preferences";
 import { parseSendKey, SEND_KEYS, sendKeyLabel, setSendKey, useSendKey } from "@/lib/send-key";
 import { effectiveLanguage, setLanguageChoice, useLanguageChoice } from "@/lib/language-preference";
 import { Select } from "./Select";
@@ -51,7 +50,7 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
                   : t("settings.updates.latest");
   return (
     <SettingRow title={title} subtitle={label}>
-      <button
+      <Button size="sm"
         onClick={() => {
           if (s.status === "downloaded") return void updater.install();
           void updater.check();
@@ -60,7 +59,6 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
           s.status === "checking" || s.status === "downloading" || s.status === "preparing" ||
           s.status === "installing" || s.retryable === false
         }
-        className="ui-button"
       >
         {s.retryable === false
           ? t("settings.updates.quitReopen")
@@ -75,7 +73,7 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
                   ? t("settings.updates.opening")
                   : t("settings.updates.restartingShort")
                 : t("settings.updates.check")}
-      </button>
+      </Button>
     </SettingRow>
   );
 }
@@ -132,7 +130,7 @@ function ReplayAppTourButton() {
   const [failed, setFailed] = useState(false);
   return (
     <div>
-      <button
+      <Button size="sm"
         disabled={saving}
         onClick={() => {
           setSaving(true);
@@ -152,10 +150,9 @@ function ReplayAppTourButton() {
             .catch(() => setFailed(true))
             .finally(() => setSaving(false));
         }}
-        className="ui-button"
       >
         {t("settings.welcome.appTour")}
-      </button>
+      </Button>
       {failed && <p role="alert" className="mt-2 text-[13px] text-danger">{t("onboarding.tour.error")}</p>}
     </div>
   );
@@ -167,12 +164,11 @@ export function ReplayTourRow() {
     <SettingRow title={t("settings.welcome.title")} subtitle={t("settings.welcome.subtitleShort")}>
       <div className="flex flex-wrap justify-end gap-2">
         <ReplayAppTourButton />
-        <button
+        <Button size="sm"
           onClick={() => dispatch({ type: "toggleWelcome", open: true })}
-          className="ui-button"
         >
           {t("settings.welcome.replay")}
-        </button>
+        </Button>
       </div>
     </SettingRow>
   );
@@ -256,19 +252,6 @@ export function ColorUserBubblesRow({ simple = false }: { simple?: boolean }) {
   );
 }
 
-export function ShowThreadsRow() {
-  const enabled = useShowThreadsChoice();
-  return (
-    <SettingRow title={t("settings.threadDisplay.title")} subtitle={t("settings.threadDisplay.subtitle")}>
-      <Switch
-        checked={enabled}
-        aria-label={t("settings.threadDisplay.show")}
-        onClick={() => setShowThreads(!enabled)}
-      />
-    </SettingRow>
-  );
-}
-
 export function PinnedCirclesRow() {
   const enabled = usePinnedCircles();
   return (
@@ -278,31 +261,6 @@ export function PinnedCirclesRow() {
         aria-label={t("settings.pinnedCircles.title")}
         onClick={() => setPinnedCircles(!enabled)}
       />
-    </SettingRow>
-  );
-}
-
-const SIDEBAR_DENSITY_LABEL_KEYS: Record<SidebarDensity, LocaleKey> = {
-  expanded: "sidebar.density.expanded",
-  compact: "sidebar.density.compact",
-  icons: "sidebar.density.iconsOnly",
-};
-
-export function SidebarDensityRow() {
-  const density = useSidebarDensity();
-  return (
-    <SettingRow title={t("sidebar.density.title")} subtitle={t("settings.sidebarDensity.subtitle")}>
-      <Select size="sm" className="w-full max-w-[240px]"
-        value={density}
-        aria-label={t("sidebar.density.chooseAria")}
-        onChange={(event) => setSidebarDensity(parseSidebarDensity(event.target.value))}
-      >
-        {SIDEBAR_DENSITIES.map((option) => (
-          <option key={option} value={option}>{t(SIDEBAR_DENSITY_LABEL_KEYS[option])}</option>
-        ))}
-        {/* Avatars only is the collapsed state, not a normal choice, but the current value must still show when open. */}
-        {density === "icons" && <option value="icons">{t(SIDEBAR_DENSITY_LABEL_KEYS.icons)}</option>}
-      </Select>
     </SettingRow>
   );
 }
@@ -344,7 +302,7 @@ export function ExperimentalFeaturesRow() {
   };
 
   return (
-    <Card subtitle={t("settings.experimental.subtitle")}>
+    <SettingsCard subtitle={t("settings.experimental.subtitle")}>
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="text-[14px] font-medium text-ink">{t("settings.experimental.skillAuthoring")}</div>
@@ -363,7 +321,7 @@ export function ExperimentalFeaturesRow() {
       {error ? <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p> : null}
       <LearnedSkillsSettings />
       <NewBrowserSettings />
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -372,8 +330,8 @@ export function BrowserProfilesRow() {
   const profiles = state.config?.browserProfiles ?? [];
   if (!builtInBrowserEnabled(state.config) && profiles.length === 0) return null;
   return (
-    <Card title={t("settings.profiles.title")} subtitle={t("settings.profiles.sharedSubtitle")}>
+    <SettingsCard title={t("settings.profiles.title")} subtitle={t("settings.profiles.sharedSubtitle")}>
       <BrowserProfilesManager />
-    </Card>
+    </SettingsCard>
   );
 }

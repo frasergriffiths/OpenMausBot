@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { Button, SettingsCard, Switch } from "@/components/ui";
 import type { ManagedDesktopState } from "../../electron/managed-desktop.mjs";
 import type { WorkspaceBackupSummary } from "../../shared/workspace-backup";
 import { activeLocale, t } from "@/lib/i18n";
 import { collectWorkspaceClientState, WORKSPACE_RESTORE_MARKER } from "@/lib/workspace-backup-client";
-import { Card, Switch } from "./SettingsPrimitives";
 import { WorkspaceBackupRestartNotice, WorkspaceBackupSummaryView } from "./WorkspaceBackupSettings";
 import { Chevron } from "./chevron";
 
@@ -70,7 +70,7 @@ export function SavedCompanyBackupSchedule({ bridge }: { bridge: BackupBridge })
     catch { if (current === generation.current) setError(t("companyBackup.scheduleFailed")); }
     finally { if (current === generation.current) setBusy(false); }
   };
-  return <Card title={t("companyBackup.title")} subtitle={t("companyBackup.savedSchedule")}>
+  return <SettingsCard title={t("companyBackup.title")} subtitle={t("companyBackup.savedSchedule")}>
     <div className="rounded-lg border border-hairline/40 p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="text-[14px] font-medium">{t("companyBackup.daily")}</div>
@@ -79,7 +79,7 @@ export function SavedCompanyBackupSchedule({ bridge }: { bridge: BackupBridge })
       <p role="status" className="mt-2 text-[12px] text-ink-secondary">{t(`companyBackup.scheduleStatus.${schedule.status}`)}</p>
       {error && <p role="alert" className="mt-1 text-[12px] text-danger">{error}</p>}
     </div>
-  </Card>;
+  </SettingsCard>;
 }
 
 /** Security: a new connection identity remounts this panel, clearing passwords and staged previews. */
@@ -235,13 +235,13 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
   const busyView = (state?.busy || action) && <div role="status" className="flex flex-col items-start gap-2 text-[13px] text-ink-secondary">
     <span>{action === "restore" ? t("backup.restoring") : progress ? t(`companyBackup.phase.${progress.phase}`) : t("companyBackup.working")}</span>
     {progress && progress.totalBytes > 0 && <><progress className="w-full accent-accent" max={progress.totalBytes} value={Math.min(progress.bytesTransferred, progress.totalBytes)} aria-label={t("companyBackup.progress")} /><span>{t("companyBackup.transferred", { done: bytes(progress.bytesTransferred), total: bytes(progress.totalBytes) })}</span></>}
-    {state?.busy && action !== "restore" && <button type="button" className="ui-button" onClick={() => void cancelTransfer()}>{t("companyBackup.cancelTransfer")}</button>}
+    {state?.busy && action !== "restore" && <Button size="sm" type="button" onClick={() => void cancelTransfer()}>{t("companyBackup.cancelTransfer")}</Button>}
   </div>;
   const title = dialog?.kind === "restore" ? t("companyBackup.restore") : dialog?.kind === "delete" ? t("companyBackup.delete") : dialog?.kind === "schedule" ? t("companyBackup.enableSchedule") : t("companyBackup.create");
   const schedule = state?.schedule;
   const scheduledDate = (value: number) => new Intl.DateTimeFormat(activeLocale(), { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
-  return <Card title={t("companyBackup.title")} subtitle={t("companyBackup.account", { organization: connection.organization?.name ?? "", email: connection.email ?? "" })}>
+  return <SettingsCard title={t("companyBackup.title")} subtitle={t("companyBackup.account", { organization: connection.organization?.name ?? "", email: connection.email ?? "" })}>
     <div className="flex flex-col gap-3">
       <p className="text-[13px] text-ink-secondary">{t("companyBackup.managedScope")}</p>
       {bridge.configureSchedule && schedule && <div className="rounded-lg border border-hairline/40 p-3">
@@ -256,8 +256,8 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
       </div>}
       {needsRestart ? <div className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-ink"><WorkspaceBackupRestartNotice /></div> : <>
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="ui-button" disabled={disabled} onClick={() => openDialog({ kind: "create" })}>{t("companyBackup.create")}</button>
-          <button type="button" className="ui-button" disabled={action !== null || state?.busy || needsRestart || loading} onClick={() => void refresh()}>{t("companyBackup.refresh")}</button>
+          <Button size="sm" type="button" disabled={disabled} onClick={() => openDialog({ kind: "create" })}>{t("companyBackup.create")}</Button>
+          <Button size="sm" type="button" disabled={action !== null || state?.busy || needsRestart || loading} onClick={() => void refresh()}>{t("companyBackup.refresh")}</Button>
         </div>
         {loading && <p role="status" className="text-[13px] text-ink-secondary">{t("companyBackup.loading")}</p>}
         {listing && <p className="text-[12px] text-ink-secondary">{t("companyBackup.quota", { used: bytes(listing.usedBytes), total: bytes(listing.limits.ownerQuotaBytes), count: listing.limits.retainedSnapshots })}</p>}
@@ -265,7 +265,7 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
         {listing && ready.length === 0 && <p className="text-[13px] text-ink-secondary">{t("companyBackup.empty")}</p>}
         <ul className="divide-y divide-hairline/40">{ready.map((entry) => <li key={entry.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="min-w-0 text-[13px]"><div className="text-ink">{dateLabel(entry)}</div><div className="text-[12px] text-ink-secondary">{bytes(entry.sizeBytes)}{entry.appVersion ? ` · ${entry.appVersion}` : ""}</div><code className="break-all text-[11px] text-ink-secondary">{entry.id}</code></div>
-          <div className="flex flex-wrap gap-2"><button type="button" className="ui-button" disabled={disabled} onClick={() => openDialog({ kind: "restore", entry })}>{t("companyBackup.restore")}</button><button type="button" className="ui-button text-danger" disabled={disabled} onClick={() => openDialog({ kind: "delete", entry })}>{t("companyBackup.delete")}</button></div>
+          <div className="flex flex-wrap gap-2"><Button size="sm" type="button" disabled={disabled} onClick={() => openDialog({ kind: "restore", entry })}>{t("companyBackup.restore")}</Button><Button size="sm" type="button" className="text-danger" disabled={disabled} onClick={() => openDialog({ kind: "delete", entry })}>{t("companyBackup.delete")}</Button></div>
         </li>)}</ul>
       </>}
       {!dialog && busyView}
@@ -284,27 +284,27 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
           {dialog.kind === "schedule" ? <details className="text-[13px] text-ink-secondary"><summary className="cursor-pointer text-ink flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("companyBackup.included")}</summary><p className="mt-2">{t("backup.excluded")}</p><p className="mt-2">{t("companyBackup.managedPrivacy")}</p></details> : <><p className="text-[13px] text-ink-secondary">{t("backup.excluded")}</p><p className="text-[13px] text-ink-secondary">{t("companyBackup.managedPrivacy")}</p></>}
           <p className="text-[13px] text-ink-secondary">{t("companyBackup.managedEncryption")}</p>
           {dialog.kind === "schedule" && <label className="flex items-start gap-2 text-[13px]"><input className="mt-1 accent-accent" type="checkbox" required disabled={disabled} checked={confirmation === "BACK UP THIS WORKSPACE DAILY"} onChange={event => setConfirmation(event.target.checked ? "BACK UP THIS WORKSPACE DAILY" : "")} /><span>{t("companyBackup.scheduleConsent")}</span></label>}
-          <button type="submit" className="ui-button" disabled={disabled || (dialog.kind === "schedule" && confirmation !== "BACK UP THIS WORKSPACE DAILY")}>{t(dialog.kind === "schedule" ? "companyBackup.enableSchedule" : "companyBackup.create")}</button>
+          <Button size="sm" type="submit" disabled={disabled || (dialog.kind === "schedule" && confirmation !== "BACK UP THIS WORKSPACE DAILY")}>{t(dialog.kind === "schedule" ? "companyBackup.enableSchedule" : "companyBackup.create")}</Button>
         </form>}
         {dialog.kind === "restore" && (!preview ? <form className="flex flex-col gap-3" onSubmit={(event) => { event.preventDefault(); prepare(); }}>
           <p className="text-[13px] text-ink-secondary">{t("companyBackup.previewHelp")}</p>
           {dialog.entry.passwordRequired !== false && <label className="text-[13px]">{t("backup.importPassword")}<input type="password" autoComplete="off" required minLength={12} maxLength={1024} disabled={disabled} value={password} onChange={(event) => setPassword(event.target.value)} className={inputClass} /></label>}
-          <button type="submit" className="ui-button" disabled={disabled || (dialog.entry.passwordRequired !== false && (password.length < 12 || password.length > 1024))}>{t("backup.validate")}</button>
+          <Button size="sm" type="submit" disabled={disabled || (dialog.entry.passwordRequired !== false && (password.length < 12 || password.length > 1024))}>{t("backup.validate")}</Button>
         </form> : <>
           <WorkspaceBackupSummaryView summary={preview.summary} />
           <p className="text-[13px] text-danger">{t("backup.replaceWarning")}</p><p className="text-[13px] text-danger">{t("backup.trustWarning")}</p>
           <label className="text-[13px]">{t("backup.confirmReplace")}<input autoComplete="off" spellCheck={false} maxLength={7} disabled={disabled} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className={inputClass} /></label>
-          <button type="button" className="ui-button text-danger" disabled={disabled || confirmation !== "REPLACE"} onClick={restore}>{t("backup.replace")}</button>
+          <Button size="sm" type="button" className="text-danger" disabled={disabled || confirmation !== "REPLACE"} onClick={restore}>{t("backup.replace")}</Button>
         </>)}
         {dialog.kind === "delete" && <>
           <p className="text-[13px] text-danger">{t("companyBackup.deleteWarning")}</p>
           <label className="text-[13px]">{t("companyBackup.confirmDelete")}<input autoComplete="off" spellCheck={false} maxLength={6} disabled={disabled} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className={inputClass} /></label>
-          <button type="button" className="ui-button text-danger" disabled={disabled || confirmation !== "DELETE"} onClick={deleteBackup}>{t("companyBackup.delete")}</button>
+          <Button size="sm" type="button" className="text-danger" disabled={disabled || confirmation !== "DELETE"} onClick={deleteBackup}>{t("companyBackup.delete")}</Button>
         </>}
         {busyView}
         {statusMessage && <p role="alert" className="break-words text-[13px] text-danger">{statusMessage}</p>}
-        <button type="button" autoFocus className="ui-button w-fit" disabled={action !== null} onClick={closeDialog}>{t("companyBackup.cancel")}</button>
+        <Button size="sm" type="button" autoFocus className="w-fit" disabled={action !== null} onClick={closeDialog}>{t("companyBackup.cancel")}</Button>
       </div>
     </dialog>}
-  </Card>;
+  </SettingsCard>;
 }

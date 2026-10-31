@@ -3,7 +3,7 @@ import { Loader2, RefreshCw } from "lucide-react";
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { Card, SIMPLE_CARD } from "./SettingsPrimitives";
+import { SettingsCard, SIMPLE_CARD } from "@/components/ui";
 import { UsageSummaryCard } from "./CloudUsageMeter";
 
 interface PlanWindow {
@@ -215,7 +215,7 @@ export function PlanUsage() {
   const { report, loading, error, now, load } = usePlanUsage();
 
   return (
-    <Card title={t("planUsage.title")} subtitle={t("planUsage.subtitle")}>
+    <SettingsCard title={t("planUsage.title")} subtitle={t("planUsage.subtitle")}>
       <div className="mb-3 flex justify-end">
         <button
           type="button"
@@ -290,6 +290,6 @@ export function PlanUsage() {
           ))}
         </div>
       )}
-    </Card>
+    </SettingsCard>
   );
 }

@@ -6,7 +6,6 @@
     "enterprise/server/workspace-access.test.ts": 5,
     "evals/evals.test.ts": 71,
     "evals/runners/run-skill-bench.test.ts": 18,
-    "scripts/mascot-bodies/halloween.test.mjs": 7,
     "scripts/testing/automations-journey.ui.e2e.test.ts": 1,
     "scripts/testing/bot-draft-visibility-ui.e2e.test.ts": 1,
     "scripts/testing/bot-tools-ui.e2e.test.ts": 1,
@@ -304,7 +303,6 @@
     "enterprise/server/workspace-access.test.ts": 6,
     "evals/evals.test.ts": 74,
     "evals/runners/run-skill-bench.test.ts": 17,
-    "scripts/mascot-bodies/halloween.test.mjs": 6,
     "scripts/testing/automations-journey.ui.e2e.test.ts": 1,
     "scripts/testing/bot-draft-visibility-ui.e2e.test.ts": 1,
     "scripts/testing/bot-tools-ui.e2e.test.ts": 1,
@@ -601,7 +599,6 @@
     "evals/golden/golden.test.ts": 5,
     "evals/runners/run-skill-bench.test.ts": 25,
     "scripts/ci-scope.test.ts": 16,
-    "scripts/mascot-bodies/halloween.test.mjs": 8,
     "scripts/testing/automations-journey.ui.e2e.test.ts": 1,
     "scripts/testing/bot-draft-visibility-ui.e2e.test.ts": 1,
     "scripts/testing/bot-tools-ui.e2e.test.ts": 1,
@@ -910,7 +907,6 @@
     "src/components/ChatMarkdown.test.ts": 6,
     "src/components/ComputerPanel.tabs.test.ts": 6,
     "src/components/ComputerPanel.takeover.test.ts": 11,
-    "src/components/data/DataPanel.test.ts": 8,
     "src/locales/vocabulary.test.ts": 5
   }
 }

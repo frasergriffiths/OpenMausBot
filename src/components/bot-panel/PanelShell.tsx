@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 import type { Bot, BotSettingsSection } from "@/state/store";
 import { ChatShareMenu } from "@/components/ChatMoreMenu";
 import { BotAvatar } from "@/components/Avatar";
-import { Select } from "@/components/Select";
+import { Tabs } from "@/components/ui";
 import { MAUS_COLORS, mascotInk } from "@/lib/mascot";
 import type { useBotSettingsDerived } from "../bot-settings/useBotSettingsDerived";
 import { AvatarEditorCard } from "./AvatarEditorCard";
@@ -160,15 +160,13 @@ export function BotPanel({ bot, derived, linkedSection, onClose, onOpenVmWorkspa
             )}
           </div>
           <div className="relative z-10 flex shrink-0 items-center bg-panel px-3 pb-1 pt-2">
-            <Select
+            <Tabs
               className="w-full"
-              size="md"
-              value={tab}
-              aria-label={t("botSettings.simple.tabs")}
-              onChange={(event) => openTab(event.target.value as PanelTarget["tab"])}
-            >
-              {PANEL_TABS.map((id) => <option key={id} value={id}>{t(TAB_LABEL[id])}</option>)}
-            </Select>
+              ariaLabel={t("botSettings.simple.tabs")}
+              active={tab}
+              onChange={(id) => openTab(id as PanelTarget["tab"])}
+              items={PANEL_TABS.map((id) => ({ id, label: t(TAB_LABEL[id]) }))}
+            />
           </div>
         </>
       ) : (

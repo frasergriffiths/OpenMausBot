@@ -35,10 +35,11 @@ import type {
   TaskClosedBy, TaskOpenedBy, TaskUsage, WireBot, WireGroup,
   WireMessage, WireTask, BotProject as BotProjectRecord,
 } from "../shared/wire.ts";
-import { movesThreadToTop, nextOpenThread } from "../shared/wire.ts";
+import { isMausColor, movesThreadToTop, nextOpenThread } from "../shared/wire.ts";
+import { DEFAULT_BOT_COLOR } from "../shared/default-bot.ts";
 import { parseConnectorTools } from "./connector-tools.ts";
 import { sameModelSelection } from "../shared/thread-model.ts";
-import { initialGreetingMessage } from "./initial-greeting.ts"; import { createDefaultBot, defaultBotRefusal, type DefaultBotIntro } from "./default-bot.ts";
+import { initialGreetingMessage } from "./initial-greeting.ts"; import { createDefaultBot, type DefaultBotIntro } from "./default-bot.ts";
 import { appsFromCreator } from "./inherited-apps.ts";
 import { ThreadCache, type ThreadState } from "./thread-cache.ts";
 export type {
@@ -352,6 +353,12 @@ export class Store {
       if (b.busy || (b.activity !== undefined && b.activity !== "idle")) botsMigrated = true;
       b.busy = false;
       b.activity = "idle";
+      // A colour the palette no longer has (the retired chrome and silver) reads as the default green, so the
+      // renderer never meets a hue it cannot look up.
+      if (!isMausColor(b.color)) {
+        b.color = DEFAULT_BOT_COLOR;
+        botsMigrated = true;
+      }
       if (typeof b.soul !== "string") {
         b.soul = "";
         botsMigrated = true;
@@ -1481,7 +1488,6 @@ export class Store {
   deleteBot(id: string, setupRequest?: TeamSetupRequest): boolean {
     const bot = this.bot(id);
     if (!bot) return false;
-    if (bot.defaultBot) throw Object.assign(new Error(defaultBotRefusal(bot.name)), { status: 409 });
     let nextBots = this.bots.filter((b) => b.id !== id);
     if (setupRequest) {
       const chief = this.bot(setupRequest.botId);

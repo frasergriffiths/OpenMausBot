@@ -61,8 +61,6 @@ function keyProviders(config: ConfigStatus): KeyProvider[] {
     [ownVoice && config.tts?.provider === "fish", "fish_audio"],
     [ownDecider && config.decider?.provider === "jev", "jev"],
     [ownDecider && config.decider?.provider === "openrouter", "openrouter_decider"],
-    [config.imageGen?.openaiConfigured, "openai_image"],
-    [config.imageGen?.customKeyConfigured, "custom_image"],
     [config.live?.keySource === "live", "openai_live"],
     [config.treg?.configured, "treg"],
   ];

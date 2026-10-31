@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import {
   EYE_SCALE,
   MausAvatar,
-  MOUTH_WEIGHT,
   type MausAvatarHandle,
 } from "@/components/Avatar";
 import {
@@ -57,7 +56,6 @@ const MOTION_COLORS: MausColor[] = [
 
 type Tuning = {
   eyeScale: number;
-  mouthStroke: number;
   spring: number;
   turn: number;
   gazeX: number;
@@ -66,7 +64,6 @@ type Tuning = {
 
 const DEFAULTS: Tuning = {
   eyeScale: EYE_SCALE,
-  mouthStroke: MOUTH_WEIGHT,
   spring: 7,
   turn: 0,
   gazeX: 0,
@@ -75,7 +72,6 @@ const DEFAULTS: Tuning = {
 
 const SLIDERS: { key: keyof Tuning; min: number; max: number; step: number; hint: string }[] = [
   { key: "eyeScale", min: 0.4, max: 2, step: 0.01, hint: "eye size" },
-  { key: "mouthStroke", min: 2, max: 26, step: 0.5, hint: "mouth thickness" },
   { key: "spring", min: 2, max: 20, step: 0.5, hint: "morph stiffness" },
   { key: "turn", min: -180, max: 180, step: 1, hint: "head turn — body stays still" },
   { key: "gazeX", min: -1, max: 1, step: 0.01, hint: "gaze across" },
@@ -121,7 +117,6 @@ function Tuner({
           size={300}
           label={`${state} maus`}
           eyeScale={tuning.eyeScale}
-          mouthStroke={tuning.mouthStroke}
           spring={tuning.spring}
           turn={tuning.turn}
           forward={forward}

@@ -6,8 +6,8 @@ import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { ACTIVITY_WHATS, activityQuery, describeEntry, formatValue, whoLabel, type ActivityEntry, type ActivityFilters, type ActivityWhat } from "@/lib/activity";
 import type { LocaleKey } from "@/locales";
+import { buttonStyles, SettingsCard } from "@/components/ui";
 import { Select } from "./Select";
-import { Card } from "./SettingsPrimitives";
 
 const inputClass = "rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none [color-scheme:dark]";
 
@@ -81,7 +81,7 @@ export function ActivitySection() {
 
   const set = (patch: Partial<ActivityFilters>) => setFilters((current) => ({ ...current, ...patch }));
   return (
-    <Card title={t("activity.title")} subtitle={t("activity.subtitle", { days: String(days ?? 180) })}>
+    <SettingsCard title={t("activity.title")} subtitle={t("activity.subtitle", { days: String(days ?? 180) })}>
       <div className="flex flex-wrap items-end gap-2">
         <label className="flex flex-col gap-1 text-[12px] text-ink-secondary">
           {t("activity.who")}
@@ -104,7 +104,7 @@ export function ActivitySection() {
         <button type="button" onClick={() => void load()} disabled={loading} aria-label={t("activity.refresh")} title={t("activity.refresh")} className="cursor-pointer rounded-md p-2 text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50">
           {loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
         </button>
-        <a href={`/api/admin-activity.csv${query}`} download className="ui-button hover:bg-raised-hover">
+        <a href={`/api/admin-activity.csv${query}`} download className={buttonStyles({ size: "sm", className: "hover:bg-raised-hover" })}>
           <Download size={13} aria-hidden="true" />{t("activity.export")}
         </a>
       </div>
@@ -116,6 +116,6 @@ export function ActivitySection() {
         </ul>
       )}
       {total > entries.length && <p className="mt-3 text-[12px] text-ink-secondary">{t("activity.more", { shown: String(entries.length), total: String(total) })}</p>}
-    </Card>
+    </SettingsCard>
   );
 }

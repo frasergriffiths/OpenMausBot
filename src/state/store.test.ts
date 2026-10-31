@@ -67,15 +67,6 @@ describe("api refusals", () => {
   });
 });
 
-describe("mounted Data view context", () => {
-  it("stores and clears the active view independently from one-shot result navigation", () => {
-    const view = { botId: "pepper", threadId: "task", cardId: "c_1", draftSql: "select incomplete" };
-    const opened = reducer(initialState, { type: "dataView", view });
-    expect(opened.dataView).toEqual(view);
-    expect(opened.dataResultFocus).toBeNull();
-    expect(reducer(opened, { type: "dataView", view: null }).dataView).toBeNull();
-  });
-});
 
 describe("partial profile save responses", () => {
   it.each([true, false])("preserves independently saved fields with about-me response first: %s", aboutFirst => {
@@ -2333,15 +2324,6 @@ describe("bot settings section", () => {
     expect(next.botSettingsExpandAccordion).toBe(true);
   });
 
-  it("toggleSettings leaves the computer panel and inspector open, closes app settings", () => {
-    const withPanels = { ...initialState, computerOpen: true, inspectorOpen: true, appSettingsOpen: true };
-    const next = reducer(withPanels, { type: "toggleSettings", open: true });
-    expect(next.settingsOpen).toBe(true);
-    expect(next.computerOpen).toBe(true);
-    expect(next.inspectorOpen).toBe(true);
-    expect(next.appSettingsOpen).toBe(false);
-  });
-
   it("reopens the same section after a collapse without remounting settings", () => {
     const opened = reducer(initialState, { type: "toggleSettings", open: true, section: "usage" });
     const collapsed = reducer(opened, { type: "toggleSettings", open: true });
@@ -2519,49 +2501,6 @@ describe("bot settings section", () => {
   });
 });
 
-describe("activity panel", () => {
-  it("starts closed", () => {
-    expect(initialState.activityOpen).toBe(false);
-  });
-
-  it("toggleActivity opens it and closes the other side panels", () => {
-    const withPanels = { ...initialState, computerOpen: true, inspectorOpen: true, appSettingsOpen: true };
-    const next = reducer(withPanels, { type: "toggleActivity" });
-    expect(next.activityOpen).toBe(true);
-    expect(next.computerOpen).toBe(false);
-    expect(next.inspectorOpen).toBe(false);
-    expect(next.appSettingsOpen).toBe(false);
-    expect(reducer(next, { type: "toggleActivity" }).activityOpen).toBe(false);
-  });
-
-  it("opening the inspector or the computer closes the activity panel", () => {
-    const open = { ...initialState, activityOpen: true };
-    expect(reducer(open, { type: "toggleInspector", open: true }).activityOpen).toBe(false);
-    expect(reducer(open, { type: "toggleComputer", open: true }).activityOpen).toBe(false);
-  });
-
-  it("opening bot settings closes activity without changing the other panels", () => {
-    const open = { ...initialState, activityOpen: true, computerOpen: true };
-    const next = reducer(open, { type: "toggleSettings", open: true });
-    expect(next.activityOpen).toBe(false);
-    expect(next.computerOpen).toBe(true);
-  });
-
-  it("switching to routines or the team map closes the activity panel", () => {
-    const open = { ...initialState, activityOpen: true };
-    expect(reducer(open, { type: "showRoutines" }).activityOpen).toBe(false);
-    expect(reducer(open, { type: "showTeamMap" }).activityOpen).toBe(false);
-  });
-
-  it("opens Files as its own page, carrying the folders it should offer to share only when asked", () => {
-    const open = { ...initialState, activityOpen: true, appSettingsOpen: true, settingsOpen: true };
-    const suggested = reducer(open, { type: "showFiles", suggest: ["/Users/ada/site"] });
-    expect(suggested).toMatchObject({ activeView: "files", filesSuggest: ["/Users/ada/site"], activityOpen: false, appSettingsOpen: false, settingsOpen: false });
-    expect(reducer(suggested, { type: "showFiles" })).toMatchObject({ activeView: "files", filesSuggest: null });
-    expect(reducer(suggested, { type: "showFiles", suggest: [] }).filesSuggest).toBeNull();
-    expect(reducer(suggested, { type: "showTeamMap" })).toMatchObject({ activeView: "team-map", filesSuggest: null });
-  });
-});
 
 describe("live config frames", () => {
   const baseFrame: ConfigStatusFrame = {
@@ -3095,8 +3034,6 @@ describe("notifications feed", () => {
     expect(state.computerOpen).toBe(true);
     state = reducer(state, { type: "toggleNotifications", open: true });
     expect(state).toMatchObject({ notificationsOpen: true, computerOpen: false });
-    state = reducer(state, { type: "toggleActivity", open: true });
-    expect(state).toMatchObject({ activityOpen: true, notificationsOpen: false });
   });
 
   it("toggleNotificationsPinned flips independently of notificationsOpen", () => {
@@ -3110,25 +3047,21 @@ describe("notifications feed", () => {
     expect(afterSwitch.notificationsOpen).toBe(true);
   });
 
-  it("pinned, the feed survives Computer/Inspector/Activity/AppSettings opening", () => {
+  it("pinned, the feed survives Computer and AppSettings opening", () => {
     const open = { ...reducer(initialState, { type: "toggleNotifications", open: true }), notificationsPinned: true };
     for (const action of [
       { type: "toggleComputer", open: true } as const,
-      { type: "toggleInspector", open: true } as const,
-      { type: "toggleActivity", open: true } as const,
       { type: "toggleAppSettings", open: true } as const,
     ]) {
       expect(reducer(open, action).notificationsOpen).toBe(true);
     }
   });
 
-  it("unpinned, the same four still close it exactly as before (regression guard)", () => {
+  it("unpinned, the same panels still close it exactly as before (regression guard)", () => {
     const open = reducer(initialState, { type: "toggleNotifications", open: true });
     expect(open.notificationsPinned).toBe(false);
     for (const action of [
       { type: "toggleComputer", open: true } as const,
-      { type: "toggleInspector", open: true } as const,
-      { type: "toggleActivity", open: true } as const,
       { type: "toggleAppSettings", open: true } as const,
     ]) {
       expect(reducer(open, action).notificationsOpen).toBe(false);

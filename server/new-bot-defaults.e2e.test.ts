@@ -60,9 +60,6 @@ it("applies independent creation templates through the real isolated HTTP routes
       await api("POST", "/api/bot-defaults/skills/preview", body, 400);
       await api("POST", `/api/bots/${first.id}/skill-template`, body, 400);
     }
-    for (const body of [null, [], {}, { profile: {}, prompt: 42 }]) {
-      await api("POST", "/api/bot-defaults/avatar", body, 400);
-    }
     await api("PATCH", "/api/config", { browserProfiles: [{ id: "fixture-profile", name: "Fixture profile" }] });
     await api("PATCH", "/api/config", { newBotDefaults: { profile: { browserProfile: "fixture-profile" } } });
     await api("PATCH", "/api/config", { browserProfiles: [] });

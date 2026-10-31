@@ -1,6 +1,7 @@
 import { Info } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/state/store";
+import { Button } from "@/components/ui";
 
 /** A turn the trial credit could no longer pay for: a quiet note with the one way on, never an error in the chat. */
 export function TrialCreditNotice({ kind }: { kind: "used_up" | "ended" }) {
@@ -12,13 +13,13 @@ export function TrialCreditNotice({ kind }: { kind: "used_up" | "ended" }) {
           <Info size={15} aria-hidden="true" className="mt-0.5 shrink-0 text-ink-secondary" />
           <span className="min-w-0 break-words">{t(kind === "used_up" ? "engines.trialCreditUsedUp" : "engines.trialCreditEnded")}</span>
         </div>
-        <button
+        <Button size="xs"
           type="button"
           onClick={() => dispatch({ type: "toggleAppSettings", open: true, section: "engines" })}
-          className="ui-button ui-button-md mt-2 rounded-full"
+          className="mt-2 rounded-full"
         >
           {t("chat.error.connectOwnAi")}
-        </button>
+        </Button>
       </div>
     </div>
   );

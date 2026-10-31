@@ -1,25 +1,21 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 
-import { useStore, type Bot } from "@/state/store";
-import { imageAttachmentFromFile } from "@/lib/composer-attachments";
-import { useOrganizationBranding } from "@/lib/use-organization-branding";
+import type { Bot } from "@/state/store";
 import {
   AVATAR_FOCUS_CENTER,
   AVATAR_ZOOM_MAX,
   AVATAR_ZOOM_MIN,
-  botAvatarUrlFromStoredPath,
   clampAvatarFocus,
   clampAvatarZoom,
   type BotAvatarCrop,
 } from "../../shared/bot-avatar";
 import { BotAvatar } from "./Avatar";
-import { useBotEditor } from "./bot-settings/BotEditorContext";
 
 export type AvatarPatch = Partial<
   Pick<Bot, "avatarCrop" | "avatarUrl" | "avatarZoom" | "avatarFocusX" | "avatarFocusY" | "color" | "mascotExpression" | "mascotBody">
 >;
 
-export const RESET_MASCOT_PATCH: AvatarPatch = { avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "cursor" };
+export const RESET_MASCOT_PATCH: AvatarPatch = { avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "kit" };
 
 export const CROP_LABEL = {
   mascot: "Mascot",
@@ -115,56 +111,13 @@ export function AvatarFraming({
   );
 }
 
-export function OrganizationAvatarIcons({ busy, onUpload }: { busy: boolean; onUpload: (file: File) => void }) {
-  const organization = useOrganizationBranding();
-  if (!organization?.icons.length) return null;
-  return (
-    <div className="mb-3 border-b border-hairline/40 pb-3">
-      <div className="mb-2 text-[13px] font-medium text-ink-secondary">{organization.name} icons</div>
-      <div className="flex flex-wrap gap-2">{organization.icons.map(icon => <button key={icon.id} type="button" disabled={busy} title={icon.name} aria-label={`Use ${icon.name} icon`} className="flex size-12 items-center justify-center rounded-lg border border-hairline/40 hover:bg-control disabled:opacity-50" onClick={() => {
-        const bytes = Uint8Array.from(atob(icon.image.slice(22)), byte => byte.charCodeAt(0));
-        onUpload(new File([bytes], `${icon.id}.png`, { type: "image/png" }));
-      }}><img src={icon.image} alt="" className="size-10 rounded-md object-contain" /></button>)}</div>
-    </div>
-  );
-}
-
 export function useAvatarImage(bot: Bot, onPatch: (patch: AvatarPatch) => void) {
-  const { flushBotPatches } = useStore();
-  const { request: api, uploadAvatar } = useBotEditor();
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
-  const [savingConnection, setSavingConnection] = useState(false);
-  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const crop = bot.avatarCrop ?? "mascot";
   const cropRef = useRef(crop);
   cropRef.current = crop;
-  const busy = uploading || generating || savingConnection;
+  const busy = false;
 
-  const upload = async (file: File | undefined) => {
-    if (!file || busy) return;
-    setUploading(true);
-    setError(null);
-    try {
-      const saved = uploadAvatar ? null : await imageAttachmentFromFile(file);
-      const avatarUrl = uploadAvatar ? await uploadAvatar(file) : saved ? botAvatarUrlFromStoredPath(saved.path) : null;
-      if (!avatarUrl) throw new Error("The uploaded image could not be used as an avatar");
-      const latestCrop = cropRef.current;
-      onPatch({
-        avatarUrl,
-        avatarCrop: latestCrop === "mascot" ? "circle" : latestCrop,
-        avatarZoom: AVATAR_ZOOM_MIN,
-        avatarFocusX: AVATAR_FOCUS_CENTER,
-        avatarFocusY: AVATAR_FOCUS_CENTER,
-      });
-    } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : String(uploadError));
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  };
 
   const removeImage = () => {
     setError(null);
@@ -177,33 +130,6 @@ export function useAvatarImage(bot: Bot, onPatch: (patch: AvatarPatch) => void) 
     });
   };
 
-  const generate = async (direction: string) => {
-    if (busy) return;
-    setGenerating(true);
-    setError(null);
-    try {
-      // Commit debounced profile edits first, then feed the generated avatar back through the same serialized mutation
-      // lane as upload and remove.
-      const cropAtStart = cropRef.current;
-      await flushBotPatches(bot.id);
-      const result: { avatarUrl: string; bot: Bot } = await api(`/api/bots/${bot.id}/avatar/generate`, {
-        method: "POST",
-        body: JSON.stringify({ prompt: direction.trim() }),
-      });
-      const latestCrop = cropRef.current;
-      onPatch({
-        avatarUrl: result.avatarUrl,
-        avatarCrop:
-          latestCrop === cropAtStart
-            ? (result.bot.avatarCrop ?? "circle")
-            : latestCrop,
-      });
-    } catch (generateError) {
-      setError(generateError instanceof Error ? generateError.message : String(generateError));
-    } finally {
-      setGenerating(false);
-    }
-  };
 
-  return { fileRef, crop, uploading, generating, setSavingConnection, busy, error, upload, removeImage, generate };
+  return { crop, busy, error, removeImage };
 }

@@ -21,24 +21,24 @@ const renderBot = (bot: Partial<BotAvatarProps["bot"]>) =>
 
 describe("MausAvatar body", () => {
   it("wears the cursor when no body is given", () => {
-    expect(render({})).toContain(MASCOT_BODIES.cursor.fit);
+    expect(render({})).toContain(MASCOT_BODIES.kit.fit);
   });
 
   it("wears the body it is given", () => {
-    const markup = render({ bodyId: "star" });
-    expect(markup).toContain(MASCOT_BODIES.star.fit);
+    const markup = render({ bodyId: "hare" });
+    expect(markup).toContain(MASCOT_BODIES.hare.fit);
   });
 
   it("falls back to the cursor for an unknown body", () => {
     // SAFETY: "hexagram" is deliberately not a MascotBodyId, to exercise the runtime fallback for persisted or streamed
     // data.
     expect(render({ bodyId: "hexagram" as MausAvatarProps["bodyId"] })).toContain(
-      MASCOT_BODIES.cursor.fit,
+      MASCOT_BODIES.kit.fit,
     );
   });
 
   it("paints the body with the per-bot gradient, never a flat black fill", () => {
-    const markup = render({ bodyId: "circle" });
+    const markup = render({ bodyId: "bun" });
     expect(markup).not.toContain('fill="#000000"');
     expect(markup).not.toContain("{{GRADIENT}}");
     expect(markup).toContain("url(#");

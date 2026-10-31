@@ -1,5 +1,5 @@
-import { useState, type RefObject } from "react";
-import { ImagePlus, Loader2, Sparkles, Trash2 } from "lucide-react";
+import type { RefObject } from "react";
+import { Trash2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -8,7 +8,6 @@ import type { Bot } from "@/state/store";
 import { BOT_PROFILE_LIMITS } from "../../shared/bot-profile";
 import { MASCOT_BODIES, MASCOT_BODY_IDS } from "../../shared/mascot-bodies";
 import { MausAvatar } from "./Avatar";
-import { AvatarImageGenerator } from "./AvatarImageGenerator";
 import type { AvatarPatch, useAvatarImage } from "./avatar-editing";
 
 export const AVATAR_FILE_TYPES = "image/png,image/jpeg,image/gif,image/webp";
@@ -23,7 +22,6 @@ export function MausBotCustomize({ preview, name, nameRef, image, onName, onPatc
   onName(name: string): void;
   onPatch(patch: AvatarPatch): void;
 }) {
-  const [generating, setGenerating] = useState(false);
   const picture = Boolean(preview.avatarUrl) && preview.avatarCrop !== "mascot";
   const shape = (patch: AvatarPatch) => onPatch({ ...patch, avatarCrop: "mascot" });
   return (
@@ -66,12 +64,12 @@ export function MausBotCustomize({ preview, name, nameRef, image, onName, onPatc
             <button
               key={id}
               type="button"
-              aria-pressed={!picture && (preview.mascotBody ?? "cursor") === id}
+              aria-pressed={!picture && (preview.mascotBody ?? "kit") === id}
               aria-label={MASCOT_BODIES[id].name}
               title={MASCOT_BODIES[id].name}
               data-mausbot-welcome-body={id}
               onClick={() => shape({ mascotBody: id })}
-              className={cn("flex h-11 items-center justify-center rounded-xl", !picture && (preview.mascotBody ?? "cursor") === id ? "bg-ink/[0.08] ring-[1.5px] ring-inset ring-ink/25" : "hover:bg-ink/[0.05]")}
+              className={cn("flex h-11 items-center justify-center rounded-xl", !picture && (preview.mascotBody ?? "kit") === id ? "bg-ink/[0.08] ring-[1.5px] ring-inset ring-ink/25" : "hover:bg-ink/[0.05]")}
             >
               <MausAvatar color={preview.color} bodyId={id} size={30} animated={false} trackPointer={false} />
             </button>
@@ -80,18 +78,6 @@ export function MausBotCustomize({ preview, name, nameRef, image, onName, onPatc
       </div>
       <div>
         <div className="flex flex-wrap items-center gap-1.5 text-[13px]">
-          <input ref={image.fileRef} type="file" accept={AVATAR_FILE_TYPES} className="sr-only" tabIndex={-1} aria-hidden="true"
-            onChange={(event) => void image.upload(event.target.files?.[0])} />
-          <button type="button" data-mausbot-welcome-upload="" disabled={image.busy} onClick={() => image.fileRef.current?.click()}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-ink-secondary hover:bg-ink/[0.05] hover:text-ink disabled:opacity-50">
-            {image.uploading ? <Loader2 size={14} className="animate-spin" aria-hidden="true" /> : <ImagePlus size={14} aria-hidden="true" />}
-            {t("mausbotWelcome.upload")}
-          </button>
-          <span aria-hidden="true" className="text-ink-tertiary">·</span>
-          <button type="button" data-mausbot-welcome-generate="" aria-expanded={generating} onClick={() => setGenerating(!generating)}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-ink-secondary hover:bg-ink/[0.05] hover:text-ink">
-            <Sparkles size={14} aria-hidden="true" />{t("mausbotWelcome.generate")}
-          </button>
           {picture && (
             <div className="basis-full"><button type="button" data-mausbot-welcome-remove="" disabled={image.busy} onClick={image.removeImage}
               className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[13px] text-ink-secondary hover:bg-ink/[0.05] hover:text-ink disabled:opacity-50">
@@ -100,11 +86,6 @@ export function MausBotCustomize({ preview, name, nameRef, image, onName, onPatc
           )}
         </div>
         {image.error && <p role="alert" data-mausbot-welcome-error="" className="mt-1 px-2 text-[13px] text-danger">{image.error}</p>}
-        {generating && (
-          <div className="mt-2">
-            <AvatarImageGenerator botLabel={name || "MausBot"} disabled={image.uploading} generating={image.generating} onGenerate={image.generate} onSavingChange={image.setSavingConnection} />
-          </div>
-        )}
       </div>
     </div>
   );

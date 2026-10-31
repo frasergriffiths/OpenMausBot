@@ -90,7 +90,6 @@ function hostileState(): SnapshotState {
       tts: { configured: true, ready: true, voice: HOSTILE, provider: "fish" },
       decider: { provider: "jev", model: HOSTILE, configured: true, enabled: true, jobs: { roomRouting: true } },
       live: { configured: true, keySource: "live", voice: HOSTILE, readTypedReplies: false, idleMinutes: 5 },
-      imageGen: { configured: true, provider: "custom", model: HOSTILE, customUrl: `https://${HOSTILE}.example.com`, customModel: HOSTILE, customKeyConfigured: true },
       profile: { name: HOSTILE, email: `${HOSTILE}@example.com`, aboutMe: HOSTILE },
       language: "ja",
       edition: { edition: "enterprise", features: [HOSTILE] },
@@ -195,8 +194,8 @@ describe("the daily usage snapshot", () => {
     expect(await snapshot.sendDailySnapshot(hostileState(), hostileSources(), DAY)).toBe(true);
     const [sent] = snapshots();
     expect(sent).toEqual({
-      key_providers: ["anthropic", "openai_compat", "boat", "composio", "opencode_go", "fish_audio", "jev", "custom_image", "openai_live"],
-      key_count: 9, has_boat_key: true, cloud_computer_source: "own_key", cloud_computers: 3, team_computers: 1,
+      key_providers: ["anthropic", "openai_compat", "boat", "composio", "opencode_go", "fish_audio", "jev", "openai_live"],
+      key_count: 8, has_boat_key: true, cloud_computer_source: "own_key", cloud_computers: 3, team_computers: 1,
       bots_cloud_boat: 2, bots_cloud_vps: 1, bots: 9, bots_local_vm: 1, bots_this_computer: 1, bots_browser: 1, bots_off: 1, bots_auto: 2,
       rooms: 2, bot_channels: 1, teams: 2,
       routines: 4, routines_enabled: 3, routines_cloud: 1, routines_room_goal: 1, routines_once: 1, routines_daily: 1, routines_interval: 1, routines_cron: 1,
@@ -273,7 +272,7 @@ describe("the daily usage snapshot", () => {
     for (const key of ["cloud_computers", "team_computers", "apps", "apps_connected", "phones_paired", "paired_devices", "phone_paired", "members", "cloud_trial"]) {
       expect(sent, key).not.toHaveProperty(key);
     }
-    expect(sent).toMatchObject({ cloud_plan: "unknown", bots: 9, key_count: 9 });
+    expect(sent).toMatchObject({ cloud_plan: "unknown", bots: 9, key_count: 8 });
   });
 
   it("reads the plan from a Cloud page's own bridge, and leaves out what only this computer knows", async () => {
@@ -354,9 +353,8 @@ describe("what counts as a key, a computer source and an app", () => {
     expect(buildUsageSnapshot(minimal({}, { apps: { services, authoritative: true } }))).toMatchObject({ apps: ["gmail"], apps_connected: 1 });
   });
 
-  it("counts one xAI key once, though avatar images can use it too", () => {
-    const imageGen = { configured: false, provider: "openai" as const, openaiConfigured: false, xaiConfigured: true, customKeyConfigured: false };
-    expect(buildUsageSnapshot(minimal({ xai: { configured: true }, imageGen }))).toMatchObject({ key_providers: ["xai"], key_count: 1 });
+  it("counts one xAI key once", () => {
+    expect(buildUsageSnapshot(minimal({ xai: { configured: true } }))).toMatchObject({ key_providers: ["xai"], key_count: 1 });
   });
 
   it("counts a separate Live key as openai_live, and Live calls on the OpenAI key from API keys as the openai key only", () => {

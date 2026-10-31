@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 import type RFB from "@novnc/novnc";
 import { connectDesktop, DesktopUnreachable, typeOnDesktop } from "@/lib/desktop-connection";
 import { t } from "@/lib/i18n";
+import { buttonStyles, IconButton } from "@/components/ui";
 import { useHeldMenuMotion, useMenuMotion } from "./MenuMotion";
 
 function subscribeLocation(listener: () => void) {
@@ -104,7 +105,7 @@ export function DesktopViewer() {
   const focusSoon = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus());
   const togglePanel = (next: "keyboard" | "clipboard") => setPanel(value => value === next ? null : next);
   const slide = "transition-[width,translate,opacity] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none";
-  const action = "ui-button min-h-11 rounded-xl focus-visible:outline-2 focus-visible:outline-focus";
+  const action = buttonStyles({ size: "sm", className: "min-h-11 rounded-xl focus-visible:outline-2 focus-visible:outline-focus" });
 
   return (
     <div className="relative flex h-dvh overflow-hidden bg-app text-sm text-ink" style={{ paddingLeft: "env(safe-area-inset-left)", paddingRight: "env(safe-area-inset-right)" }}>
@@ -142,9 +143,9 @@ export function DesktopViewer() {
       }} className={cn("absolute left-[72px] top-1/2 z-20 max-h-[calc(100dvh-24px)] w-[min(320px,calc(100%-84px))] -translate-y-1/2 overflow-y-auto rounded-2xl border border-hairline bg-panel p-4 shadow-2xl", panelMotion.className)} style={{ marginLeft: "env(safe-area-inset-left)" }}>
         <div className="mb-3 flex items-center justify-between gap-2">
           <h1 className="font-medium">{t(keyboardPanel ? "desktopViewer.keyboard" : "desktopViewer.clipboard")}</h1>
-          <button type="button" title={t("desktopViewer.closePanel")} aria-label={t("desktopViewer.closePanel")} onClick={closePanel} className="ui-icon-button shrink-0">
+          <IconButton label={t("desktopViewer.closePanel")} onClick={closePanel} className="shrink-0">
             <X size={18} aria-hidden="true" />
-          </button>
+          </IconButton>
         </div>
         <form onSubmit={event => {
           event.preventDefault();
@@ -179,7 +180,7 @@ function ViewerTool({ id, label, icon: Icon, disabled, active, expanded, onClick
   id?: string; label: string; icon: LucideIcon; disabled?: boolean; active?: boolean; expanded?: boolean; onClick: () => void;
 }) {
   return <button id={id} type="button" title={label} aria-label={label} aria-pressed={active} aria-expanded={expanded} disabled={disabled} onClick={onClick} className={cn(
-    "ui-icon-button size-11 min-h-11 shrink-0 rounded-xl focus-visible:outline-2 focus-visible:outline-focus",
+    buttonStyles({ size: "icon", className: "size-11 min-h-11 shrink-0 rounded-xl focus-visible:outline-2 focus-visible:outline-focus" }),
     active ? "bg-accent/15 text-accent-text hover:bg-accent/25" : "text-ink-secondary hover:bg-raised-hover hover:text-ink",
   )}><Icon size={19} strokeWidth={1.75} aria-hidden="true" /></button>;
 }

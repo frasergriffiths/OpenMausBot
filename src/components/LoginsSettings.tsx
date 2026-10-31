@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { KeyRound, Loader2, LockKeyhole, Plus, RefreshCw, ShieldCheck, Trash2 } from "lucide-react";
+import { Button, Checkbox, SettingsCard } from "@/components/ui";
 
 import type { LoginBots, LoginSummary, OnePasswordStatus, OnePasswordVault } from "../../shared/logins";
 import { t } from "@/lib/i18n";
@@ -8,7 +9,6 @@ import { relativeTime } from "@/lib/memory";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { useStore } from "@/state/store";
 import { LoginBotPicker, LoginForm } from "./LoginForm";
-import { Card } from "./SettingsPrimitives";
 
 // Security: a row never shows the password, which no route returns.
 
@@ -50,7 +50,7 @@ export function LoginsSettings() {
   useEffect(() => { if (ownerOrAdmin) void load(); }, [ownerOrAdmin]);
 
   if (ownerOrAdmin === false) {
-    return <Card title={t("settings.logins.title")} subtitle={t("settings.logins.adminOnly")} />;
+    return <SettingsCard title={t("settings.logins.title")} subtitle={t("settings.logins.adminOnly")} />;
   }
 
   const botNames = (value: LoginBots) => {
@@ -75,7 +75,7 @@ export function LoginsSettings() {
   };
 
   return (
-    <Card title={t("settings.logins.title")} subtitle={t("settings.logins.subtitle")}>
+    <SettingsCard title={t("settings.logins.title")} subtitle={t("settings.logins.subtitle")}>
       <div className="flex flex-col gap-3" aria-busy={logins === null || busy}>
         {state.config?.cloudHome === true && <p className="text-[12px] leading-relaxed text-ink-secondary" data-logins-cloud-own>{t("settings.logins.cloudOwn")}</p>}
         {logins === null && !error && <p className="text-[12px] text-ink-secondary">{t("settings.logins.loading")}</p>}
@@ -123,10 +123,7 @@ export function LoginsSettings() {
                         await load();
                       }}>
                       {login.hasTotp && (
-                        <label className="flex items-center gap-2 text-[13px] text-ink">
-                          <input type="checkbox" checked={removeTotp} onChange={(event) => setRemoveTotp(event.target.checked)} />
-                          {t("settings.logins.removeTotp")}
-                        </label>
+                        <Checkbox checked={removeTotp} onChange={setRemoveTotp} label={t("settings.logins.removeTotp")} />
                       )}
                       <ExactHostChoice checked={editExact} onChange={setEditExact}
                         label={t("settings.logins.exactHostFor", { hosts: login.hosts.join(", "), site: login.site })} />
@@ -155,17 +152,17 @@ export function LoginsSettings() {
             </LoginForm>
           </div>
         ) : (
-          <button type="button" className="ui-button ui-button-md self-start" disabled={logins === null}
+          <Button size="xs" type="button" className="self-start" disabled={logins === null}
             onClick={() => { setEditing(null); setDeleting(null); setAdding(true); }}>
             <Plus size={14} />{t("settings.logins.add")}
-          </button>
+          </Button>
         )}
         <p className="text-[12px] leading-relaxed text-ink-tertiary">{t("settings.logins.limits")}</p>
         {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
         <OnePasswordConnection status={onePassword} disabled={logins === null} bots={bots} botNames={botNames}
           onChange={async (next) => { setOnePassword(next); await load(); }} />
       </div>
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -178,10 +175,7 @@ function signInHostsLine(login: LoginSummary): string | null {
 
 function ExactHostChoice({ checked, onChange, label }: { checked: boolean; onChange: (checked: boolean) => void; label: string }) {
   return (
-    <label className="flex items-start gap-2 text-[13px] leading-snug text-ink">
-      <input type="checkbox" name="exactHost" className="mt-[2px]" checked={checked} onChange={(event) => onChange(event.target.checked)} />
-      {label}
-    </label>
+    <Checkbox name="exactHost" checked={checked} onChange={onChange} label={label} />
   );
 }
 
@@ -220,8 +214,8 @@ function VaultAccess({ vault, bots, botNames, disabled, onChange }: {
           <LoginBotPicker value={value} onChange={setValue} bots={bots} disabled={busy} />
           {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
           <div className="flex flex-wrap justify-end gap-2">
-            <button type="button" className="ui-button ui-button-md" disabled={busy} onClick={() => setEditing(false)}>{t("logins.cancel")}</button>
-            <button type="button" className="ui-button ui-button-md ui-button-primary" disabled={busy} onClick={() => void save()}>{t("settings.logins.saveChange")}</button>
+            <Button size="xs" type="button" disabled={busy} onClick={() => setEditing(false)}>{t("logins.cancel")}</Button>
+            <Button variant="primary" size="xs" type="button" disabled={busy} onClick={() => void save()}>{t("settings.logins.saveChange")}</Button>
           </div>
         </div>
       )}
@@ -266,12 +260,12 @@ function OnePasswordConnection({ status, disabled, bots, botNames, onChange }: {
             </ul>
           )}
           <div className="flex flex-wrap gap-2">
-            <button type="button" className="ui-button ui-button-md" disabled={disabled || busy !== null} onClick={() => void run("refresh", refreshOnePassword)}>
+            <Button size="xs" type="button" disabled={disabled || busy !== null} onClick={() => void run("refresh", refreshOnePassword)}>
               {busy === "refresh" ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}{t("settings.logins.onePassword.refresh")}
-            </button>
-            <button type="button" className="ui-button ui-button-md" disabled={disabled || busy !== null} onClick={() => void run("disconnect", disconnectOnePassword)}>
+            </Button>
+            <Button size="xs" type="button" disabled={disabled || busy !== null} onClick={() => void run("disconnect", disconnectOnePassword)}>
               {t("settings.logins.onePassword.disconnect")}
-            </button>
+            </Button>
           </div>
         </>
       ) : (
@@ -282,9 +276,9 @@ function OnePasswordConnection({ status, disabled, bots, botNames, onChange }: {
               onChange={(event) => setToken(event.target.value)} disabled={disabled || busy !== null}
               aria-label={t("settings.logins.onePassword.token")} placeholder={t("settings.logins.onePassword.token")}
               className="min-w-0 flex-1 rounded-lg border border-hairline/60 bg-inset px-3 py-1.5 text-[13px] text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-60" />
-            <button type="submit" className="ui-button ui-button-md ui-button-primary" disabled={disabled || busy !== null || !token.trim()}>
+            <Button variant="primary" size="xs" type="submit" disabled={disabled || busy !== null || !token.trim()}>
               {busy === "connect" && <Loader2 size={13} className="animate-spin" />}{t("settings.logins.onePassword.connect")}
-            </button>
+            </Button>
           </div>
         </form>
       )}

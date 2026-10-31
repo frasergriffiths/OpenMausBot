@@ -5,7 +5,6 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Routine } from "@/lib/routines";
 import type { MemoryDoc } from "@/lib/memory";
 import type { Bot, BotSettingsSection, InstanceInfo } from "@/state/store";
-import { AVATAR_FOCUS_CENTER, AVATAR_ZOOM_MIN } from "../../shared/bot-avatar";
 import type { ManagedSkill } from "./bot-settings/SkillsSection";
 import type { BotApps } from "./bot-settings/useBotApps";
 
@@ -126,9 +125,7 @@ const { SoulField } = await import("./SoulField");
 const { ModelPicker } = await import("./ModelPicker");
 const { RoutineList } = await import("./routines/RoutineList");
 const { SignedInSites } = await import("./SignedInSites");
-const { AvatarImageGenerator } = await import("./AvatarImageGenerator");
-const { AvatarFraming } = await import("./avatar-editing");
-const { Switch } = await import("./SettingsPrimitives");
+const { Switch } = await import("./ui");
 
 afterAll(() => vi.unstubAllGlobals());
 
@@ -194,6 +191,11 @@ const segment = (rendered: { nodes: Node[] }, attr: string) => {
 const has = (rendered: { nodes: Node[] }, attr: string, value: unknown = true) => rendered.nodes.some((node) => node.props[attr] === value);
 const ofType = (rendered: { nodes: Node[] }, type: unknown) => rendered.nodes.find((node) => node.type === type);
 const click = (node: Node) => (node.props.onClick as () => void)();
+const switchTab = (rendered: { nodes: Node[] }, id: string) => {
+  const list = tabList(rendered);
+  if (!list) throw new Error("no tab list");
+  (list.props.onChange as (id: string) => void)(id);
+};
 const change = (node: Node, value: string) => (node.props.onChange as (event: unknown) => void)({ target: { value } });
 const submit = (node: Node) => (node.props.onSubmit as (event: unknown) => void)({ preventDefault: () => {} });
 const key = (node: Node, name: string) => {
@@ -201,8 +203,9 @@ const key = (node: Node, name: string) => {
   (node.props.onKeyDown as (event: unknown) => void)(event);
   return event;
 };
+const tabList = (rendered: { nodes: Node[] }) => rendered.nodes.find((node) => node.props.ariaLabel === "Bot settings");
 const shown = (rendered: Rendered) => ({
-  tab: rendered.nodes.find((node) => node.props["aria-label"] === "Bot settings")?.props.value,
+  tab: tabList(rendered)?.props.active,
   page: rendered.nodes.find((node) => node.type === PageBody)?.props.page,
 });
 const rowValue = (rendered: Rendered, page: string) => find(rendered, "data-panel-page", page).props.value;
@@ -265,7 +268,7 @@ describe("the bot panel in Simple mode", () => {
     click(find(rendered, "aria-label", "Close settings"));
     expect(onClose).toHaveBeenCalled();
     expect(find(rendered, "data-panel-avatar").props["aria-expanded"]).toBe(false);
-    const tabs = Children.toArray(find(rendered, "aria-label", "Bot settings").props.children).map((option) => [(option as ReactElement<{ value: string }>).props.value, (option as ReactElement<{ children: string }>).props.children]);
+    const tabs = (tabList(rendered)!.props.items as { id: string; label: string }[]).map((item) => [item.id, item.label]);
     expect(tabs).toEqual([["profile", "Profile"], ["library", "Library"], ["computer", "Computer"]]);
     expect(shown(rendered)).toEqual({ tab: "profile", page: undefined });
     expect(ofType(rendered, DetailsTab)!.props.bot).toBe(bot);
@@ -275,7 +278,7 @@ describe("the bot panel in Simple mode", () => {
   it("switches tabs", () => {
     const bot = makeBot();
     for (const [tab, type] of [["library", LibraryTab], ["computer", ComputerTab], ["profile", DetailsTab]] as const) {
-      change(find(panel(bot), "aria-label", "Bot settings"), tab);
+      switchTab(panel(bot), tab);
       const rendered = panel(bot);
       expect(shown(rendered).tab).toBe(tab);
       expect(ofType(rendered, type)).toBeDefined();
@@ -285,7 +288,7 @@ describe("the bot panel in Simple mode", () => {
   it("keeps the last top-level tab when another bot takes the panel, at that tab's root", () => {
     const scout = makeBot();
     const nova = makeBot({ id: "nova", threadId: "thread-nova", name: "Nova" });
-    change(find(panel(scout), "aria-label", "Bot settings"), "library");
+    switchTab(panel(scout), "library");
     expect(shown(panel(scout)).tab).toBe("library");
     (ofType(panel(scout), LibraryTab)!.props.onOpen as (page: string) => void)("memory");
     expect(shown(panel(scout))).toEqual({ tab: undefined, page: "memory" });
@@ -293,10 +296,10 @@ describe("the bot panel in Simple mode", () => {
     const switched = panel(nova);
     expect(shown(switched)).toEqual({ tab: "library", page: undefined });
     expect(ofType(switched, LibraryTab)).toBeDefined();
-    change(find(panel(nova), "aria-label", "Bot settings"), "profile");
+    switchTab(panel(nova), "profile");
     fresh();
     expect(shown(panel(nova, "access")).tab).toBe("computer");
-    change(find(panel(nova), "aria-label", "Bot settings"), "profile");
+    switchTab(panel(nova), "profile");
   });
 
   it("drills into a page with its intro and back, naming where Back goes", () => {
@@ -310,12 +313,12 @@ describe("the bot panel in Simple mode", () => {
     click(find(page, "data-panel-back"));
     expect(shown(panel(bot))).toEqual({ tab: "profile", page: undefined });
 
-    change(find(panel(bot), "aria-label", "Bot settings"), "library");
+    switchTab(panel(bot), "library");
     (ofType(panel(bot), LibraryTab)!.props.onOpen as (page: string) => void)("memory");
     expect(panel(bot).html).toContain(">What it remembers<");
     click(find(panel(bot), "data-panel-back"));
 
-    change(find(panel(bot), "aria-label", "Bot settings"), "profile");
+    switchTab(panel(bot), "profile");
     (ofType(panel(bot), DetailsTab)!.props.onOpen as (page: string) => void)("browser");
     expect(shown(panel(bot))).toEqual({ tab: undefined, page: "browser" });
     expect(ofType(panel(bot), DetailsTab)).toBeUndefined();
@@ -408,7 +411,7 @@ describe("the bot panel in Simple mode", () => {
     expect(switches(panel(bot).html)).toBe(0);
     expect(panel(bot).html).not.toContain('aria-label="Work until done"');
     for (const tab of ["library"]) {
-      change(find(panel(bot), "aria-label", "Bot settings"), tab);
+      switchTab(panel(bot), tab);
       const rendered = panel(bot);
       expect(switches(rendered.html), tab).toBe(0);
       for (const text of ["Memory", "Upkeep", "Record"]) expect(rendered.html).not.toContain(`>${text}<`);
@@ -491,24 +494,21 @@ describe("the hero", () => {
 describe("the avatar editor", () => {
   const editor = (bot: Bot) => capture(() => AvatarEditorCard({ bot, activeState: "idle", onPatch: patch, onClose }));
 
-  it("shows the ten bodies and twelve colors, with the Halloween bodies and the faces behind More looks", () => {
+  it("shows the seven bodies and twelve colours, with the faces behind More looks", () => {
     const bot = makeBot();
     const rendered = editor(bot);
-    expect(rendered.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(10);
+    expect(rendered.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(7);
     expect(rendered.html.match(/aria-label="Use \w+ mascot color"/g)).toHaveLength(12);
     expect(rendered.html).not.toContain(">Halloween<");
     expect(has(rendered, "data-avatar-face", "idle")).toBe(false);
-    expect(find(rendered, "aria-label", "Use the Cursor body").props["aria-pressed"]).toBe(true);
-    click(find(rendered, "aria-label", "Use the Blob body"));
-    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "blob" });
+    expect(find(rendered, "aria-label", "Use the Kit body").props["aria-pressed"]).toBe(true);
+    click(find(rendered, "aria-label", "Use the Bun body"));
+    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "bun" });
     click(find(rendered, "aria-label", "Use blue mascot color"));
     expect(patch).toHaveBeenLastCalledWith({ color: "blue" });
-    expect(find(rendered, "aria-label", "Use silver mascot color").props.title).toBe("Silver");
-    click(find(rendered, "aria-label", "Use silver mascot color"));
-    expect(patch).toHaveBeenLastCalledWith({ color: "silver" });
-    expect(find(rendered, "aria-label", "Use chrome mascot color").props.title).toBe("Chrome");
-    click(find(rendered, "aria-label", "Use chrome mascot color"));
-    expect(patch).toHaveBeenLastCalledWith({ color: "chrome" });
+    expect(find(rendered, "aria-label", "Use coral mascot color").props.title).toBe("Coral");
+    click(find(rendered, "aria-label", "Use coral mascot color"));
+    expect(patch).toHaveBeenLastCalledWith({ color: "coral" });
 
     const more = find(rendered, "data-avatar-more");
     expect(more.props["aria-expanded"]).toBe(false);
@@ -516,19 +516,15 @@ describe("the avatar editor", () => {
     click(more);
     const open = editor(bot);
     expect(find(open, "data-avatar-more").props["aria-expanded"]).toBe(true);
-    expect(open.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(20);
-    expect(open.html).toContain(">Halloween<");
-    click(find(open, "aria-label", "Use the Pumpkin body"));
-    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "pumpkin" });
+    expect(open.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(7);
+    expect(open.html).not.toContain(">Halloween<");
     expect(find(open, "data-avatar-face", "idle").props["aria-pressed"]).toBe(true);
     click(find(open, "data-avatar-face", "proud"));
     expect(patch).toHaveBeenLastCalledWith({ mascotExpression: "proud" });
     expect(open.html).toContain(">Proud<");
   });
 
-  it("opens More looks at once for a Halloween body or a chosen face", () => {
-    expect(find(editor(makeBot({ mascotBody: "pumpkin" })), "data-avatar-more").props["aria-expanded"]).toBe(true);
-    fresh();
+  it("opens More looks at once for a chosen face", () => {
     expect(find(editor(makeBot({ mascotExpression: "proud" })), "data-avatar-more").props["aria-expanded"]).toBe(true);
     fresh();
     expect(find(editor(makeBot()), "data-avatar-more").props["aria-expanded"]).toBe(false);
@@ -536,42 +532,15 @@ describe("the avatar editor", () => {
 
   it("switches back to the mascot when a body is picked over a picture", () => {
     const bot = makeBot({ avatarUrl: "/api/attachments/cat.webp", avatarCrop: "circle" });
-    click(find(editor(bot), "data-avatar-tab", "bot"));
-    click(find(editor(bot), "aria-label", "Use the Star body"));
-    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "star", avatarCrop: "mascot" });
+    click(find(editor(bot), "aria-label", "Use the Hare body"));
+    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "hare", avatarCrop: "mascot" });
   });
 
   it("resets the mascot as the Advanced card does", () => {
     click(find(editor(makeBot()), "data-avatar-reset"));
-    expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "cursor" });
+    expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "kit" });
   });
 
-  it("generates with the shared generator, and uploads with shape and framing", () => {
-    const bot = makeBot();
-    click(find(editor(bot), "data-avatar-tab", "generate"));
-    const generate = editor(bot);
-    expect(ofType(generate, AvatarImageGenerator)!.props.botLabel).toBe("Researcher");
-
-    click(find(generate, "data-avatar-tab", "upload"));
-    const upload = editor(bot);
-    expect(upload.html).toContain("Drop a picture here, or choose one");
-    expect(upload.html).toContain("PNG, JPEG, GIF, or WebP · up to 10 MB");
-    expect(segment(upload, "data-avatar-crop").options.map((option) => [option.value, option.disabled])).toEqual([
-      ["circle", true], ["rounded", true], ["square", true],
-    ]);
-    expect(ofType(upload, AvatarFraming)).toBeUndefined();
-
-    fresh();
-    const pictured = makeBot({ avatarUrl: "/api/attachments/cat.webp", avatarCrop: "circle" });
-    const withImage = editor(pictured);
-    expect(find(withImage, "data-avatar-tab", "upload").props["aria-selected"]).toBe(true);
-    expect(ofType(withImage, AvatarFraming)!.props.bot).toBe(pictured);
-    expect(segment(withImage, "data-avatar-crop").value).toBe("circle");
-    segment(withImage, "data-avatar-crop").onChange("square");
-    expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "square" });
-    click(find(withImage, "aria-label", "Remove picture"));
-    expect(patch).toHaveBeenLastCalledWith({ avatarUrl: null, avatarCrop: "mascot", avatarZoom: AVATAR_ZOOM_MIN, avatarFocusX: AVATAR_FOCUS_CENTER, avatarFocusY: AVATAR_FOCUS_CENTER });
-  });
 
   it("closes on Escape without letting the dialog close settings", () => {
     const event = key(editor(makeBot()).nodes[0]!, "Escape");
@@ -610,28 +579,24 @@ describe("the Details tab", () => {
     expect(switches(rendered.html)).toBe(0);
   });
 
-  it("offers no Add a routine path while the bot has none, and lists routines once it has some", () => {
-    const empty = botTab(makeBot());
-    expect(empty.html).not.toContain('data-panel-empty="routines"');
-    expect(empty.html).not.toContain("Add a routine");
-    expect(empty.html).not.toContain("Routines are recurring tasks");
-    expect(empty.html).not.toContain('data-panel-page="routines"');
+  it("lists Routines in the Rows card whether or not the bot has any, and opens the routines page", () => {
+    const empty = settingsPage(makeBot());
+    expect(empty.html).toContain('data-panel-page="routines"');
     fixture.derived.botRoutines = [routine()];
-    const some = botTab(makeBot());
+    const some = settingsPage(makeBot());
     expect(some.html).not.toContain('data-panel-empty="routines"');
-    expect(some.html.indexOf('data-panel-row="model"')).toBeLessThan(some.html.indexOf('data-panel-page="routines"'));
     click(find(some, "data-panel-page", "routines"));
     expect(onOpen).toHaveBeenLastCalledWith("routines");
   });
 
   it("values Routines by how many are on, and opens the routines page", () => {
     fixture.derived.botRoutines = [routine(), routine({ id: "r2", enabled: false }), routine({ id: "r3" })];
-    const rendered = botTab(makeBot());
+    const rendered = settingsPage(makeBot());
     expect(rowValue(rendered, "routines")).toBe("2 on");
     click(find(rendered, "data-panel-page", "routines"));
     expect(onOpen).toHaveBeenLastCalledWith("routines");
     fixture.derived.botRoutines = [routine({ enabled: false })];
-    expect(rowValue(botTab(makeBot()), "routines")).toBe("None");
+    expect(rowValue(settingsPage(makeBot()), "routines")).toBe("None");
   });
 });
 
@@ -829,8 +794,10 @@ describe("the Computer tab", () => {
     const bot = makeBot();
     const rendered = panel(bot);
     expect(ofType(rendered, DetailsTab)!.props.bot).toBe(bot);
-    expect(rendered.html).toContain('data-select-values="profile|library|computer"');
-    expect(rendered.html).toContain('data-select-labels="Profile|Library|Computer"');
+    expect(rendered.html).toContain('role="tablist"');
+    expect(rendered.html).toContain('data-tab="profile"');
+    expect(rendered.html).toContain('data-tab="library"');
+    expect(rendered.html).toContain('data-tab="computer"');
     expect(rendered.html).not.toContain("data-panel-where-section");
   });
 

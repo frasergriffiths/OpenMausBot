@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type DragEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { BookOpen, Crown, Pencil, Sparkles, Wand2 } from "lucide-react";
 
@@ -11,6 +11,7 @@ import { firstReplyPending } from "@/lib/corner-popup";
 import { launchDialogShown, markLaunchDialog } from "@/lib/launch-dialogs";
 import { welcomeDue, welcomeFinishedThisLaunch, type WelcomeViewer } from "@/lib/onboarding";
 import { useStore, type Bot } from "@/state/store";
+import { Button } from "@/components/ui";
 import { BOT_PROFILE_LIMITS } from "../../shared/bot-profile";
 import { BotAvatar } from "./Avatar";
 import { useAvatarImage } from "./avatar-editing";
@@ -25,7 +26,7 @@ const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 export const welcomeName = (name: string): string => name.trim().slice(0, BOT_PROFILE_LIMITS.name) || DEFAULT_BOT_NAME;
 
 export function draftOf(bot: Bot): WelcomeDraft {
-  return { name: bot.name, color: bot.color, mascotBody: bot.mascotBody ?? "cursor", avatarUrl: bot.avatarUrl ?? null,
+  return { name: bot.name, color: bot.color, mascotBody: bot.mascotBody ?? "kit", avatarUrl: bot.avatarUrl ?? null,
     avatarCrop: bot.avatarCrop ?? "mascot", avatarZoom: bot.avatarZoom, avatarFocusX: bot.avatarFocusX, avatarFocusY: bot.avatarFocusY };
 }
 
@@ -126,13 +127,6 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
     onClose();
   };
 
-  const drop = (event: DragEvent) => {
-    const file = event.dataTransfer.files?.[0];
-    if (!file) return;
-    event.preventDefault();
-    setEditing(true);
-    void image.upload(file);
-  };
 
   return (
     <div ref={overlayRef} className={cn("fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-6 pb-6 pt-[min(6vh,48px)]", "ui-scrim", leaving && "pointer-events-none")} data-mausbot-welcome="">
@@ -160,7 +154,7 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
             data-mausbot-welcome-picture=""
             onClick={() => setEditing(!editing)}
             onDragOver={(event) => { if (event.dataTransfer.types.includes("Files")) event.preventDefault(); }}
-            onDrop={drop}
+           
             className="group relative rounded-full p-1 transition-transform duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
             <span className="pointer-events-none absolute inset-1 rounded-full ring-0 ring-accent/35 transition-[box-shadow] duration-200 group-hover:ring-2 group-focus-visible:ring-2" aria-hidden="true" />
@@ -196,14 +190,12 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
         </div>
 
         <div className={cn("mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center", "sm:justify-end")}>
-          <button type="button" data-mausbot-welcome-later="" onClick={() => choose(false)} title={t("mausbotWelcome.notNowHint", { name })}
-            className="ui-button ui-button-pill">
+          <Button size="xs" shape="pill" type="button" data-mausbot-welcome-later="" onClick={() => choose(false)} title={t("mausbotWelcome.notNowHint", { name })}>
             {t("mausbotWelcome.notNow")}
-          </button>
-          <button type="button" data-mausbot-welcome-add="" onClick={() => choose(true)}
-            className="ui-button ui-button-pill ui-button-primary">
+          </Button>
+          <Button variant="primary" size="xs" shape="pill" type="button" data-mausbot-welcome-add="" onClick={() => choose(true)}>
             {t("mausbotWelcome.add", { name })}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

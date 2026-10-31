@@ -10,14 +10,13 @@
 import { writeFileSync } from "node:fs"
 import { fileURLToPath } from "node:url"
 
-import { MOUTH_STROKE } from "../src/components/cursor-face-data.ts"
 import { BODY_DEFS, type BodyDef } from "./mascot-bodies/builders.ts"
 import { applyFit, boundsOf, fitTransform, flatten } from "./mascot-bodies/geometry.ts"
 import { maskFromPolylines } from "./mascot-bodies/raster.ts"
 import { fieldFromMask, largestInscribedCircle, type Sdf } from "./mascot-bodies/sdf.ts"
 import { buildClouds, maxScaleAt, report } from "./mascot-bodies/solve.ts"
 
-const DEFAULT_ID = "cursor"
+const DEFAULT_ID = "kit"
 
 /** The avatar renders every expression facing forward, which zeroes the authored gaze. */
 const LOOK_AROUND = 0
@@ -49,7 +48,7 @@ interface Solved {
 }
 
 
-const CLOUD_SETS = AIMS.map(aim => buildClouds(LOOK_AROUND, MOUTH_STROKE, aim))
+const CLOUD_SETS = AIMS.map(aim => buildClouds(LOOK_AROUND, aim))
 
 /** Pooled, not solved per aim: a face has one anchor, so the four aims constrain the same
  * placement. */
@@ -165,11 +164,20 @@ interface Baked {
   name: string
   fit: Fit
   d: string
+  paths?: string[]
   anchor: Anchor
   clearance: number
   /** Only the Kotlin catalog carries them: Android's native path bounds are the cubic
    * control hull, which is wider than the drawn shape. */
   bounds: { minX: number; minY: number; maxX: number; maxY: number }
+}
+
+/** One path per body shape, so overlapping ears paint over the head instead of
+ * winding against it. */
+function pathMarkup(body: Baked, fill: string): string {
+  return (body.paths ?? [body.d])
+    .map(d => (fill ? `<path ${fill} d="${d}"/>` : `<path d="${d}"/>`))
+    .join("")
 }
 
 function emit(bodies: Baked[]): string {
@@ -181,8 +189,8 @@ function emit(bodies: Baked[]): string {
         `    id: ${quote(body.id)},`,
         `    name: ${quote(body.name)},`,
         `    fit: ${quote(body.fit.transform)},`,
-        `    body: ${quote(`<path fill="{{GRADIENT}}" d="${body.d}"/>`)},`,
-        `    clip: ${quote(`<path d="${body.d}"/>`)},`,
+        `    body: ${quote(pathMarkup(body, 'fill="{{GRADIENT}}"'))},`,
+        `    clip: ${quote(pathMarkup(body, ""))},`,
         `    anchor: { x: ${body.anchor.x}, y: ${body.anchor.y}, scale: ${body.anchor.scale} },`,
         `  },`,
       ].join("\n")
@@ -196,10 +204,13 @@ function emit(bodies: Baked[]): string {
  * \`scripts/gen-mascot-bodies.ts\`, which solves each face placement against the real
  * expression geometry and verifies that nothing clips.
  *
+ * The shapes are BotKit, drawn by Fred Bergwitz (https://forgedaughter.com/bots) and
+ * used with credit at https://x.com/FredBergwitz.
+ *
  * Every body carries the same face at the same size: the generator clamps the whole
  * catalog to the smallest face any one body can hold, so the mascot reads as one
- * character in different bodies rather than ten different mascots. Roomier bodies simply
- * end up with more margin around the face.
+ * character in different bodies rather than seven different mascots. Roomier bodies
+ * simply end up with more margin around the face.
  *
  * The fields match \`CursorSilhouette\` exactly, so a body can be handed to the renderer
  * with no adapter in between.
@@ -324,7 +335,7 @@ enum MausBodies {
     static let order: [String] = [${order}]
 
     /// The shipped mascot, and the fallback for any unrecognised value.
-    static let defaultID = "cursor"
+    static let defaultID = "${DEFAULT_ID}"
 
     static let all: [String: Body] = [
 ${entries}
@@ -412,7 +423,7 @@ internal object MausBodies {
     val order: List<String> = listOf(${order})
 
     /** The shipped mascot, and the fallback for any unrecognised value. */
-    const val DEFAULT_ID: String = "cursor"
+    const val DEFAULT_ID: String = "${DEFAULT_ID}"
 
     val all: Map<String, Body> = mapOf(
 ${entries}
@@ -441,23 +452,20 @@ function main(): void {
   }
   console.log("")
 
-  const shared = solved.reduce((min, s) => Math.min(min, s.scale), Infinity)
-  if (shared < cursor.scale) {
-    const tighter = solved
-      .filter(s => s.scale < cursor.scale)
-      .map(s => `${s.def.id} (${s.scale})`)
-      .join(", ")
-    throw new Error(
-      `the shared face scale ${shared} is below ${DEFAULT_ID}'s own ${cursor.scale}: ` +
-        `${tighter} cannot hold the shipped face, so clamping the catalog would shrink ` +
-        `the mascot everyone already has. Widen those outlines rather than lowering the floor.`
-    )
-  }
+  // Each body keeps the largest face it can hold, capped at the authored size.
+  // A single shared minimum punished round bodies for the sake of the pointiest
+  // one; a heart or a cloud now carries a slightly smaller face, never a broken one.
+  const shared = CAP
 
   const baked: Baked[] = []
   const clipped: string[] = []
   for (const body of solved) {
-    const anchor = anchorAt(body.sdf, body.seed, shared)
+    // Artwork that states where its eyes are keeps the face there; the solved
+    // anchor is only for bodies that leave the face open.
+    const solvedAnchor = anchorAt(body.sdf, body.seed, Math.min(shared, body.scale))
+    const anchor = body.def.offset
+      ? { ...solvedAnchor, x: solvedAnchor.x + (body.def.offset.x ?? 0), y: solvedAnchor.y + (body.def.offset.y ?? 0) }
+      : solvedAnchor
     const clipping = clippingAt(body.sdf, anchor)
     clipping.forEach((expressions, i) => {
       if (expressions.length === 0) return
@@ -470,6 +478,7 @@ function main(): void {
       name: body.def.name,
       fit: body.fit,
       d: body.def.d,
+      paths: body.def.paths,
       anchor,
       clearance: clearanceAt(body.sdf, anchor),
       bounds: {

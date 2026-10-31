@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { MAUS_COLORS, SPINNER_HUE_PERCENT, spinnerColor, type MausColor } from "./mascot";
 
 const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-const SKINS = ["midnight", "atelier", "foundry", "lagoon", "graphite", "linen", "dusk", "daylight", "meadow", "pop", "halloween"] as const;
+const SKINS = ["midnight", "atelier", "foundry", "lagoon", "graphite", "linen", "dusk", "daylight", "meadow", "pop"] as const;
 const DEFAULTS = css.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 
 function rawVar(skin: string, name: string): string {
@@ -81,8 +81,13 @@ const contrast = (left: [number, number, number], right: [number, number, number
 };
 
 function statusInk(color: MausColor, skin: string): [number, number, number] {
-  const hue = toOklab(rgb(MAUS_COLORS[color]));
   const ink = toOklab(rgb(varFor(skin, "color-ink")));
+  // White and black carry no hue: the mark is ink over the app, as spinnerColor draws it.
+  if (color === "white" || color === "black") {
+    const app = toOklab(rgb(varFor(skin, "color-app")));
+    return fromOklab(ink.map((channel, index) => channel * 0.78 + app[index]! * 0.22) as [number, number, number]);
+  }
+  const hue = toOklab(rgb(MAUS_COLORS[color]));
   const share = SPINNER_HUE_PERCENT / 100;
   return fromOklab(hue.map((channel, index) => channel * share + ink[index]! * (1 - share)) as [number, number, number]);
 }
@@ -108,7 +113,7 @@ describe("the running mark on a tab", () => {
   });
 
   it("clears 3:1 against every skin's active tab fill, for every mascot colour", () => {
-    expect(new Set(SKINS).size).toBe(11);
+    expect(new Set(SKINS).size).toBe(10);
     const failures: string[] = [];
     for (const skin of SKINS) {
       const raised = rgb(varFor(skin, "color-raised"));

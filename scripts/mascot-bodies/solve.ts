@@ -9,9 +9,6 @@ import {
   FACE_CENTRE,
   GAZE,
   GAZE_TRAVEL,
-  MOUTHS,
-  MOUTH_STROKE,
-  mouthFrame,
 } from "../../src/components/cursor-face-data.ts"
 import { sampleSdf, type Sdf } from "./sdf.ts"
 
@@ -20,8 +17,7 @@ const PAD = 2
 
 /**
  * One expression's points in face space, relative to FACE_CENTRE.
- * `need` is the clearance that point requires — the mouth is a stroked line, so its samples
- * need half the stroke on top of the base padding.
+ * `need` is the clearance that point requires.
  */
 interface Cloud {
   points: Float32Array // x, y interleaved
@@ -35,11 +31,7 @@ export interface Aim {
 
 /** `lookAround` and `aim` must match what the engine renders: aiming the eyes at
  * an edge moves every face point toward it. */
-export function buildClouds(
-  lookAround: number,
-  mouthStroke = MOUTH_STROKE,
-  aim: Aim = { x: 0, y: 0 }
-): Cloud[] {
+export function buildClouds(lookAround: number, aim: Aim = { x: 0, y: 0 }): Cloud[] {
   const aimX = clamp(aim.x, -1, 1) * GAZE_TRAVEL.x
   const aimY = clamp(aim.y, -1, 1) * GAZE_TRAVEL.y
   const eyePad = PAD
@@ -55,23 +47,6 @@ export function buildClouds(
         xs.push(p[0] - FACE_CENTRE[0], p[1] - FACE_CENTRE[1])
         needs.push(eyePad)
       }
-    }
-
-    // Sample the mouth curve; it is stroked, so it needs extra room.
-    const spec = MOUTHS[k]
-    const frame = mouthFrame(rings, spec)
-    const ca = Math.cos(frame.angle)
-    const sa = Math.sin(frame.angle)
-    const half = mouthStroke / 2
-    for (let i = 0; i <= 16; i++) {
-      const t = i / 16
-      const lx = (1 - t) * (1 - t) * -spec[0] + t * t * spec[0]
-      const ly = 2 * (1 - t) * t * spec[1]
-      xs.push(
-        frame.x + lx * ca - ly * sa - FACE_CENTRE[0],
-        frame.y + lx * sa + ly * ca - FACE_CENTRE[1]
-      )
-      needs.push(PAD + half)
     }
 
     return { points: new Float32Array(xs), need: new Float32Array(needs) }

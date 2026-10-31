@@ -1,26 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import { Archive, ChartNoAxesColumn, Cloud, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Search, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen } from "lucide-react";
+import { Archive, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen } from "lucide-react";
 import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
 import { t } from "@/lib/i18n";
+import { SettingsCard } from "@/components/ui";
 import { AnthropicEveryClaudeBot, ApiKeyRow, OpenCodeProviderKeys, VpsConnection } from "./ApiKeys";
 import { LmStudioServer, OtherOpenAiCompatServers } from "./OpenAiCompatServers";
 import { CompanionSection } from "./CompanionSection";
 import { ServerPairingCard } from "./ServerPairingCard";
-import { Card } from "./SettingsPrimitives";
 import { Notice } from "./Notice";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
-import { currentPhonePairingTarget, phonePairingSettingsAction } from "@/lib/phone-pairing";
+import { currentPhonePairingTarget } from "@/lib/phone-pairing";
 import { CustomDomainSettings } from "./CustomDomainSettings";
 import { RemoteComputerSection } from "./RemoteComputerSection";
 import { ConnectedWorkspacesSettings } from "./ConnectedWorkspacesSettings";
-import { CloudAccountSettings } from "./CloudAccountSettings";
 import { shortcutLabel } from "./ShortcutHint";
 import { LicenseExpiryBanner } from "./LicenseExpiryBanner";
 import { WorkspacesSection, workspacesAvailable } from "./WorkspacesSection";
 import { Select } from "./Select";
-import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleBillingPage, SimpleComputerPage, SimpleDataPage, SimpleKeysPage, SimpleLooksPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
+import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleComputerPage, SimpleDataPage, SimpleKeysPage, SimpleLooksPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
 import { cn } from "@/lib/cn";
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { Chevron } from "./chevron";
@@ -55,7 +54,6 @@ export const SECTIONS: Array<{
   { id: "desktopWorkspaces", group: "computers", labelKey: "settings.section.desktopWorkspaces", icon: Building2, keywords: ["workspace", "cloud", "hosted", "vps", "server", "servers", "connect", "pair", "switch", "local"] },
   { id: "computer", group: "computers", labelKey: "settings.section.computer", icon: Monitor, keywords: ["vm", "virtual", "desktop", "browser", "built-in browser", "profiles", "browser profiles"] },
   { id: "logins", group: "computers", labelKey: "settings.section.logins", icon: LockKeyhole, keywords: ["logins", "login", "passwords", "password", "sign in", "2fa", "one-time code", "totp", "fill_login", "1password", "vault"] },
-  { id: "cloudAccount", group: "account", labelKey: "settings.section.cloudAccount", icon: Cloud, keywords: ["cloud", "my cloud", "account", "personal", "sign in", "pro", "subscription", "billing", "sync", "send", "this computer", "bots", "logins", "1password", "lend"] },
   { id: "usage", group: "account", labelKey: "settings.section.usage", icon: Coins, keywords: ["tokens", "cost", "billing", "plan", "quota", "remaining", "weekly", "5-hour", "model", "used"] },
   { id: "backups", group: "account", labelKey: "settings.section.backups", icon: Archive, keywords: ["export", "import", "restore", "full backup", "password", "recovery"] },
   { id: "import", group: "account", labelKey: "settings.section.import", icon: Download, keywords: ["import", "grok", "grok bot", "x.ai", "cursor", "claude code", "codex", "gemini", "skills", "mcp", "tools", "bring"] },
@@ -81,7 +79,6 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
   { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
     keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },
   { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["companion", "desktopWorkspaces", "computer", "logins", "workspaces"] },
-  { id: "billing", labelKey: "settings.simple.page.billing", descriptionKey: "settings.simple.page.billing.description", icon: ChartNoAxesColumn, sections: ["usage", "cloudAccount"], keywords: ["billing", "included", "allowance", "cloud hours", "voice", "keep this computer"] },
   { id: "updates", labelKey: "settings.simple.page.updates", descriptionKey: "settings.simple.page.updates.description", icon: CloudDownload, sections: ["updates"],
     keywords: ["update", "version", "release", "product updates", "newsletter", "email updates", "welcome", "tour", "diagnostics", "logs", "support"] },
 ];
@@ -141,7 +138,6 @@ export function SettingsModal() {
   const baseSections = SECTIONS.filter((entry) => !remoteActive || entry.id === "companion" || entry.id === "appearance" || entry.id === "desktopWorkspaces")
     .filter((entry) => entry.id !== "desktopWorkspaces" || Boolean(window.ogb?.environments))
     .filter((entry) => entry.id !== "import" || Boolean(window.ogb))
-    .filter((entry) => entry.id !== "cloudAccount" || Boolean(window.ogb?.cloudAccount || (window.ogb?.cloudPlan && state.config?.cloudHome === true)))
     .filter((entry) => entry.id !== "workspaces" || workspacesAvailable(state.config))
     .filter((entry) => entry.id !== "people" || (!window.ogb && state.config?.cloudHome !== true))
     .filter((entry) => entry.id !== "activity" || (!window.ogb && ownerOrAdmin === true));
@@ -250,15 +246,9 @@ export function SettingsModal() {
     switch (id) {
       case "desktopWorkspaces":
         return <ConnectedWorkspacesSettings />;
-      case "cloudAccount":
-        return (window.ogb?.cloudAccount || (window.ogb?.cloudPlan && state.config?.cloudHome === true)) && !remoteActive
-          ? <CloudAccountSettings linkRequest={state.appSettingsCloudLink} cloudHome={state.config?.cloudHome === true} teamHome={state.config?.team}
-            onConnectPhone={() => dispatch(phonePairingSettingsAction())}
-            onSignIn={() => dispatch({ type: "openCloudAdd", source: "app_settings", signIn: true })} />
-          : null;
       case "connections":
         return (
-          <Card title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
+          <SettingsCard title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
             <div className="flex flex-col gap-4">
               {state.config?.composio.mode === "managed" ? (
                 <Notice tone="ready">{t("settings.connections.ready")}</Notice>
@@ -295,7 +285,7 @@ export function SettingsModal() {
                 </div>
               </details>
             </div>
-          </Card>
+          </SettingsCard>
         );
       default:
         return null;
@@ -305,7 +295,7 @@ export function SettingsModal() {
   const renderSimplePage = (page: SimpleSettingsPage) => {
     const has = (id: AppSettingsSection) => page.sections.includes(id);
     switch (page.id) {
-      case "account": return <SimpleAccountPage has={has} peopleOpen={section === "people"} />;
+      case "account": return <SimpleAccountPage has={has} />;
       case "appearance": return looks
         ? <SimpleLooksPage onBack={() => { setLooks(false); setReveal("appearance"); }} />
         : <SimpleAppearancePage has={has} onLooks={() => setLooks(true)} disclose={disclose} />;
@@ -314,7 +304,6 @@ export function SettingsModal() {
       case "skills": return <SimpleSkillsPage has={has} />;
       case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} />;
       case "computer": return <SimpleComputerPage has={has} remoteAccess={remoteAccess} servers={renderSection("desktopWorkspaces")} installs={workspacesAvailable(state.config) ? <WorkspacesSection /> : undefined} disclose={disclose} />;
-      case "billing": return <SimpleBillingPage has={has} disclose={disclose} cloudAccount={renderSection("cloudAccount")} />;
       case "updates": return <SimpleUpdatesPage remoteActive={remoteActive} />;
       default:
         return page.sections.map((id) => <section key={id} data-settings-block={id} className="flex scroll-mt-4 flex-col gap-4">{renderSection(id)}</section>);
@@ -322,26 +311,6 @@ export function SettingsModal() {
   };
 
   const close = () => dispatch({ type: "toggleAppSettings", open: false });
-  const searchField = (className: string, inputClassName: string) => (
-    <div className={className}>
-      <Search size={15} aria-hidden="true" className="shrink-0 text-ink-secondary" />
-      <input
-        data-settings-search
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key !== "Escape") return;
-          e.stopPropagation();
-          if (query) setQuery("");
-          else close();
-        }}
-        placeholder={t("settings.search")}
-        aria-label={t("settings.searchAria")}
-        className={inputClassName}
-      />
-    </div>
-  );
-
   const looksOpen = looks && currentPage?.id === "appearance";
   const goTo = (id: AppSettingsSection) => { setLooks(false); openSection(id); };
   return (
@@ -364,10 +333,6 @@ export function SettingsModal() {
       >
         <span id="app-settings-title" className="sr-only">{t("settings.title")}</span>
         <nav aria-label={t("settings.title")} className="glass-rail hidden min-h-0 w-[198px] shrink-0 flex-col gap-0.5 overflow-y-auto px-3 py-4 sm:flex">
-          {searchField(
-            "mb-2 flex h-8 shrink-0 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1 text-ink-secondary focus-within:ring-1 focus-within:ring-accent",
-            "w-full min-w-0 bg-transparent text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none",
-          )}
           {visiblePages.length === 0 && (
             <div className="px-[9px] py-3 text-[13px] leading-[18px] text-ink-secondary">{t("settings.noMatch", { query: query.trim() })}</div>
           )}
@@ -432,9 +397,9 @@ export function SettingsModal() {
             data-settings-scroll
             className={cn(
               "flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto px-4 pb-8 pt-4 sm:px-8 sm:pb-7 sm:pt-4",
-              "[&_.ui-button]:h-8 [&_.ui-button]:rounded-full [&_.ui-button]:border-0 [&_.ui-button]:px-3 [&_.ui-button]:text-[14px] [&_.ui-button]:font-normal",
-              "[&_.ui-button:not(.ui-button-primary)]:bg-ink/5 [&_.ui-button:not(.ui-button-primary)]:text-ink [&_.ui-button:not(.ui-button-primary):enabled:hover]:bg-ink/10",
-              "[&_.ui-button-primary]:bg-ink [&_.ui-button-primary]:text-app [&_.ui-button-primary:enabled:hover]:bg-ink/85",
+              "[&_[data-ui=button]]:h-8 [&_[data-ui=button]]:rounded-full [&_[data-ui=button]]:border-0 [&_[data-ui=button]]:px-3 [&_[data-ui=button]]:text-[14px] [&_[data-ui=button]]:font-normal",
+              "[&_[data-ui=button]:not([data-variant=primary])]:bg-ink/5 [&_[data-ui=button]:not([data-variant=primary])]:text-ink [&_[data-ui=button]:not([data-variant=primary]):enabled:hover]:bg-ink/10",
+              "[&_[data-ui=button][data-variant=primary]]:bg-ink [&_[data-ui=button][data-variant=primary]]:text-app [&_[data-ui=button][data-variant=primary]:enabled:hover]:bg-ink/85",
               "[&_.uppercase]:normal-case [&_.uppercase]:tracking-normal",
             )}
           >
