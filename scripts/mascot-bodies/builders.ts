@@ -191,6 +191,23 @@ function buildCone(w: number, h: number, tip: number, base: number): string {
     .close()
 }
 
+
+/** A heart: two round shoulders meeting at a soft point, drawn from cubics only. */
+function buildHeart(w: number, h: number): string {
+  const c = 100
+  const top = c - h * 0.20
+  const left = c - w / 2
+  const right = c + w / 2
+  const bottom = c + h * 0.40
+  return new Path()
+    .moveTo(c, top + h * 0.10)
+    .curveTo([c - w * 0.22, top - h * 0.16, left, top + h * 0.04, left, top + h * 0.24])
+    .curveTo([left, top + h * 0.46, c - w * 0.16, bottom - h * 0.16, c, bottom])
+    .curveTo([c + w * 0.16, bottom - h * 0.16, right, top + h * 0.46, right, top + h * 0.24])
+    .curveTo([right, top + h * 0.04, c + w * 0.22, top - h * 0.16, c, top + h * 0.16])
+    .close()
+}
+
 const lerp = (a: [number, number], b: [number, number], t: number): [number, number] => [
   a[0] + (b[0] - a[0]) * t,
   a[1] + (b[1] - a[1]) * t,
@@ -257,6 +274,10 @@ export const BODY_DEFS: BodyDef[] = [
   // A face-fit constraint, not taste: at the classic 0.42 the notches pinch the
   // star to a 50-unit inscribed circle, and the smallest face clamps every body.
   { id: "star", name: "Star", d: buildStar(196, 196, 5, 0.78), viewBox: [0, 0, 200, 200] },
+  { id: "sparkle", name: "Sparkle", d: buildStar(198, 198, 4, 0.84), viewBox: [0, 0, 200, 200] },
+  { id: "wedge", name: "Wedge", d: buildPolygon(198, 192, 3, 0.82), viewBox: [0, 0, 200, 200] },
+  { id: "tablet", name: "Tablet", d: buildRoundedBox(160, 200, 30), viewBox: [0, 0, 200, 200] },
+  { id: "square", name: "Square", d: buildRoundedBox(190, 190, 22), viewBox: [0, 0, 200, 200] },
 ]
 
 export const BODY_IDS: string[] = BODY_DEFS.map(s => s.id)
