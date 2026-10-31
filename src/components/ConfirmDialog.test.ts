@@ -41,7 +41,7 @@ describe("the confirm dialog", () => {
 
   it("uses the accent button for a neutral question", () => {
     const html = card({ tone: "neutral", confirmLabel: "Replace" });
-    expect(html).toContain("ui-button-primary");
+    expect(html).toContain('data-variant="primary"');
     expect(html).not.toContain("bg-danger");
   });
 });

@@ -1,5 +1,6 @@
 // Screen 3: the browser has the payment page; this sheet shows where things stand and moves on by itself.
 import { Copy, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui";
 import type { CloudOffer } from "../../../electron/cloud-home.mjs";
 import { cloudPlanLabel, dueToday, offerPlanLabel, usd } from "@/lib/cloud-plan";
 import { t } from "@/lib/i18n";
@@ -22,9 +23,9 @@ export function PayScreen({ plan, offer, browser, late, link, email, busy, copie
       { key: "setup", state: "next", title: t("cloudBuy.pay.setup"), detail: t("cloudBuy.pay.setupHint") },
     ]} />
     <div className="flex flex-wrap items-center gap-2">
-      <button type="button" className={late ? "ui-button ui-button-primary" : "ui-button"} disabled={busy} onClick={onReopen}>
-        <ExternalLink size={14} aria-hidden="true" />{t("cloudAdd.reopenCheckout")}</button>
-      {link && <button type="button" className="ui-button" disabled={busy} onClick={onCopy}><Copy size={14} aria-hidden="true" />{t("cloudBuy.pay.copy")}</button>}
+      <Button size="sm" variant={late ? "primary" : "secondary"} type="button" disabled={busy} onClick={onReopen}>
+        <ExternalLink size={14} aria-hidden="true" />{t("cloudAdd.reopenCheckout")}</Button>
+      {link && <Button size="sm" type="button" disabled={busy} onClick={onCopy}><Copy size={14} aria-hidden="true" />{t("cloudBuy.pay.copy")}</Button>}
       <button type="button" className={`${LINK} px-1 py-1`} onClick={onChangePlan}>{t("cloudAdd.changePlan")}</button>
     </div>
     <div aria-live="polite" className="text-[13px] empty:-mt-4">

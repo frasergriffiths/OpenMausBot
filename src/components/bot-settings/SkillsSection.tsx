@@ -3,9 +3,9 @@ import { t } from "@/lib/i18n";
 import { useEffect, useRef, useState } from "react";
 
 import { useStore, type Bot } from "@/state/store";
+import { Switch } from "@/components/ui";
 import { useBotEditor } from "./BotEditorContext";
 import { skillAuthoringEnabled, skillsLibraryEnabled } from "@/lib/feature-flags";
-import { Switch } from "@/components/ui";
 import { inputCls } from "./field";
 import { OrgSkillsCard } from "./OrgSkillsCard";
 import { WriteCommandCard } from "./WriteCommandCard";

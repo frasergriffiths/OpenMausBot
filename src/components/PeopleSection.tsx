@@ -6,11 +6,11 @@ import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { useCopyFeedback } from "@/lib/copy-text";
 import { formatUsd, hasFiniteCost } from "@/lib/usage";
+import { Button, SettingRow, SettingsCard } from "@/components/ui";
 import { readMembership, type Membership } from "../lib/membership";
 import { readSessionState, type SessionState } from "../lib/session";
 import { canPairDevices } from "./ServerPairingCard";
 import { normalizeAccessEntry, withEntry, withoutEntry, type SignInLists } from "./SignInAccessCard";
-import { SettingsCard, SettingRow } from "@/components/ui";
 import { Select } from "./Select";
 
 export type Role = "admin" | "member";
@@ -274,9 +274,9 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
           <option value="member">{t("people.roleMember")}</option>
           <option value="admin">{t("people.roleAdmin")}</option>
         </Select>
-        <button type="submit" disabled={busy || !draft.trim()} className="ui-button ui-button-primary">
+        <Button variant="primary" size="sm" type="submit" disabled={busy || !draft.trim()}>
           {busy ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}{t("people.invite")}
-        </button>
+        </Button>
         <button type="button" onClick={() => void load()} disabled={loading || busy} aria-label={t("people.refresh")} title={t("people.refresh")} className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50"><RefreshCw size={13} className={cn(loading && "animate-spin")} /></button>
       </form>
       <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("people.inviteHint")}</p>
@@ -298,9 +298,9 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
     return (
       <div data-people-summary="">
         <SettingRow title={t("people.title")} subtitle={t("settings.simple.people")}>
-          <button type="button" aria-expanded={open} className="ui-button" onClick={() => setOpen(!open)}>
+          <Button size="sm" type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
             {open ? t("common.done") : t("settings.simple.people.invite")}
-          </button>
+          </Button>
         </SettingRow>
         {open && <div className="px-3.5 pb-3.5 pt-1">{portal ?? content}</div>}
       </div>

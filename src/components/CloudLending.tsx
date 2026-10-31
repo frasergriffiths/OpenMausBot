@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronRight, FolderPlus, X } from "lucide-react";
+import { Button, Switch } from "@/components/ui";
 import type { CloudLendingBridge, CloudLendingSnapshot, SharedFolder } from "../../electron/computer-sharing.mjs";
 import { ipcErrorText, listOf } from "@/lib/cloud-send";
 import { activeLocale, t } from "@/lib/i18n";
 import { localizedRelativeTime } from "@/lib/memory";
 import type { LocaleKey } from "@/locales";
 import { LendingActivityList } from "./LendingActivity";
-import { Switch } from "@/components/ui";
 
 const PROBLEMS: Partial<Record<string, LocaleKey>> = {
   "connect-first": "lending.status.connectFirst",
@@ -195,12 +195,12 @@ export function CloudLending({ bridge, moving = false }: { bridge: CloudLendingB
           </label>
           <button type="button" aria-label={t("lending.removeFolder", { name: folder.name })} onClick={() => lend(folders.filter(entry => entry.id !== folder.id), screen, internet)} className="rounded p-1 text-ink-secondary hover:bg-control"><X size={14} /></button>
         </div>)}
-        <button type="button" disabled={folders.length >= 20} onClick={() => void perform(async () => {
+        <Button size="sm" type="button" disabled={folders.length >= 20} onClick={() => void perform(async () => {
           const folder = await bridge.chooseFolder();
           const next = folder && !folders.some(entry => entry.path === folder.path) ? [...folders, folder] : folders;
           if (next !== folders) { setFolders(next); return bridge.save(choiceOf(next, screen, internet, terminal, chrome)); }
           return bridge.state();
-        })} className="ui-button flex w-fit items-center gap-2"><FolderPlus size={14} />{t("lending.addFolder")}</button>
+        })} className="flex w-fit items-center gap-2"><FolderPlus size={14} />{t("lending.addFolder")}</Button>
       </fieldset>
       <fieldset disabled={working} className="flex flex-col gap-1 disabled:opacity-60">
         <label className="flex items-start gap-2">

@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { AlertTriangle } from "lucide-react";
 
 import { cn } from "@/lib/cn";
+import { Button } from "@/components/ui";
 
 export type ConfirmTone = "danger" | "neutral";
 
@@ -121,23 +122,23 @@ export function ConfirmDialogCard({
         {body}
       </p>
       <div className="mt-5 flex justify-end gap-2">
-        <button
+        <Button size="sm"
           ref={cancelRef}
           type="button"
           onClick={onCancel}
           disabled={pending}
-          className="ui-button"
         >
           {cancelLabel}
-        </button>
-        <button
+        </Button>
+        <Button size="sm"
+          variant={danger ? "danger" : "primary"}
           type="button"
           onClick={onConfirm}
           disabled={pending}
-          className={cn("ui-button", danger ? "border-transparent bg-danger text-danger-ink hover:brightness-110" : "ui-button-primary")}
+          className={danger ? "border-transparent bg-danger text-danger-ink hover:brightness-110" : undefined}
         >
           {confirmLabel}
-        </button>
+        </Button>
       </div>
     </div>
   );

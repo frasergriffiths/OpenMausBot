@@ -19,11 +19,11 @@ import {
   type PhoneSetupController,
   usePhoneSetupController,
 } from "./PhoneSetupFlow";
+import { SettingsCard, Switch } from "@/components/ui";
 import { companionPairingMode } from "../lib/phone-setup";
 import { revealPhonePairing } from "../lib/phone-pairing";
 import { PhonesList } from "./PhonesList";
 import { ConnectionDetail } from "./ConnectionDetail";
-import { SettingsCard, Switch } from "@/components/ui";
 import { SIMPLE_ROW_FOCUS } from "./SidebarSimpleTop";
 import { brand } from "../lib/brand";
 import { useStore } from "@/state/store";

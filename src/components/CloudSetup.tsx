@@ -16,6 +16,7 @@ import type { LocaleKey } from "@/locales";
 import type { Routine } from "@/lib/routines";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { openBot, useStore } from "@/state/store";
+import { Button, buttonStyles, IconButton } from "@/components/ui";
 
 const TITLE: Record<CloudSetupStep, LocaleKey> = {
   cloud: "cloudSetup.cloud.title", job: "cloudSetup.job.title", engine: "cloudSetup.engine.title", plan: "cloudSetup.plan.title", move: "cloudWelcome.step.bring",
@@ -34,7 +35,7 @@ function storeCollapsed(collapsed: boolean) {
 }
 
 const CARD = "fixed bottom-4 left-4 z-40 max-h-[calc(100dvh-32px)] w-[300px] max-w-[calc(100vw-32px)] origin-bottom-left overflow-y-auto rounded-2xl border border-hairline/50 bg-menu text-ink shadow-[0_18px_48px_-16px_rgba(0,0,0,0.55),0_4px_12px_-6px_rgba(0,0,0,0.3)]";
-const PRIMARY = "ui-button ui-button-primary shrink-0 gap-1.5 text-[13px] transition-transform duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none";
+const PRIMARY = buttonStyles({ variant: "primary", size: "sm", className: "shrink-0 gap-1.5 text-[13px] transition-transform duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none" });
 
 function nextRunLabel(at: number | null, now = Date.now()): string | null {
   if (!at) return null;
@@ -97,7 +98,7 @@ function CloudReady({ routine, onDone }: { routine?: Routine; onDone: () => void
           </button>
           <button type="button" className="py-1 text-[12px] text-ink-secondary transition-colors hover:text-ink" onClick={() => setLeaving(true)}>{t("cloudSetup.ready.later")}</button>
         </div>
-      : <button type="button" className="ui-button relative mt-4 w-full" onClick={() => setLeaving(true)}>{t("cloudSetup.ready.done")}</button>}
+      : <Button size="sm" type="button" className="relative mt-4 w-full" onClick={() => setLeaving(true)}>{t("cloudSetup.ready.done")}</Button>}
   </aside>;
 }
 
@@ -215,10 +216,10 @@ export function CloudSetup({ viewer, welcomeShown = false }: { viewer: WelcomeVi
       <Cloud size={14} aria-hidden="true" className="shrink-0 text-ink-secondary" />
       <h2 id="cloud-setup-title" className="min-w-0 flex-1 truncate text-[13px] font-semibold">{t("cloudSetup.title")}</h2>
       <span aria-hidden="true" className="shrink-0 text-[12px] tabular-nums text-ink-secondary">{progress}</span>
-      <button type="button" aria-label={t(collapsed ? "cloudSetup.expand" : "cloudSetup.collapse")} aria-expanded={!collapsed} aria-controls="cloud-setup-body" onClick={toggle}
-        className={cn("ui-icon-button -mr-1.5 size-6 min-h-0 shrink-0 p-0", collapsed && "after:absolute after:inset-0 after:content-['']")}>
+      <IconButton label={t(collapsed ? "cloudSetup.expand" : "cloudSetup.collapse")} aria-expanded={!collapsed} aria-controls="cloud-setup-body" onClick={toggle}
+        className={cn("-mr-1.5 size-6 min-h-0 shrink-0 p-0", collapsed && "after:absolute after:inset-0 after:content-['']")}>
         <ChevronDown size={14} aria-hidden="true" className={cn("transition-transform duration-200 ease-out", collapsed && "rotate-180")} />
-      </button>
+      </IconButton>
     </div>
     <div role="progressbar" aria-labelledby="cloud-setup-title" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={done} aria-valuetext={progress} className="mt-3 flex gap-1">
       {items.map((_, index) => {

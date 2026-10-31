@@ -1,4 +1,5 @@
 import { useCallback, useId, useState } from "react";
+import { Checkbox } from "@/components/ui";
 
 import { LIVE_VOICE_OPTIONS } from "../../shared/live-call";
 import { t } from "@/lib/i18n";
@@ -7,7 +8,6 @@ import { api, useStore, type ConfigStatus } from "@/state/store";
 import type { LiveSettings } from "../../shared/wire";
 import { LiveKeySetup } from "./LiveKeySetup";
 import { Select } from "./Select";
-import { Checkbox } from "@/components/ui";
 
 const IDLE_CHOICES = [1, 2, 3, 5, 10, 15, 30, 60];
 

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Download, Loader2, Upload } from "lucide-react";
+import { SettingsCard } from "@/components/ui";
 import type { WorkspaceBackupSummary } from "../../shared/workspace-backup";
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
 import { applyWorkspaceClientState, collectWorkspaceClientState, WORKSPACE_RESTORE_MARKER } from "@/lib/workspace-backup-client";
-import { SettingsCard } from "@/components/ui";
 
 type BackupStatus = { busy: boolean; pendingRestore?: boolean; lastRestoreId?: string };
 const inputClass = "w-full rounded-lg border border-hairline/50 bg-inset px-3 py-2 text-[14px] text-ink disabled:opacity-50";

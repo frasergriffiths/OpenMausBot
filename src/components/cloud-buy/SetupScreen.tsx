@@ -1,4 +1,5 @@
 // Screen 4: the Cloud is set up (about two minutes); meanwhile it gets a name and a colour, then it opens by itself.
+import { Button } from "@/components/ui";
 import type { CloudColor } from "../../../electron/cloud-buy.mjs";
 import type { CloudSetupStep } from "../../../electron/cloud-home.mjs";
 import { cn } from "@/lib/cn";
@@ -77,8 +78,8 @@ export function SetupScreen({ started, received, step, slow, ready, sleeps = fal
     </div>
     <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
       {counting !== null && <span role="status" className="text-[13px] text-ink-secondary">{t("cloudBuy.setup.openingIn", { seconds: counting })}</span>}
-      {counting !== null && <button type="button" className="ui-button" onClick={onNotNow}>{t("notice.notNow")}</button>}
-      <button type="button" className="ui-button ui-button-primary" disabled={!ready || busy} onClick={onOpen}>{t("cloudBuy.setup.open", { name })}</button>
+      {counting !== null && <Button size="sm" type="button" onClick={onNotNow}>{t("notice.notNow")}</Button>}
+      <Button variant="primary" size="sm" type="button" disabled={!ready || busy} onClick={onOpen}>{t("cloudBuy.setup.open", { name })}</Button>
     </div>
     {ready && counting === null && <p className="text-[12px] text-ink-tertiary">{t("cloudBuy.ready.hint", { name })}</p>}
     {openFailed && <p role="alert" className="text-[13px] text-danger">{t("cloudBuy.openFailed", { name })}</p>}
@@ -104,7 +105,7 @@ export function TeamReadyScreen({ name, busy, openFailed, onOpen }: { name: stri
   return <div data-cloud-add="team-ready" className="flex flex-col gap-4 px-[30px] pb-[26px] pt-7">
     <Heading title={t("cloudBuy.team.readyTitle")} sub={t("cloudBuy.team.readySub", { name })} />
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <button type="button" data-autofocus className="ui-button ui-button-primary" disabled={busy} onClick={onOpen}>{t("cloudBuy.setup.open", { name })}</button>
+      <Button variant="primary" size="sm" type="button" data-autofocus disabled={busy} onClick={onOpen}>{t("cloudBuy.setup.open", { name })}</Button>
     </div>
     <p className="text-[12px] text-ink-tertiary">{t("cloudBuy.ready.hint", { name })}</p>
     {openFailed && <p role="alert" className="text-[13px] text-danger">{t("cloudBuy.openFailed", { name })}</p>}

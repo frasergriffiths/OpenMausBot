@@ -87,7 +87,7 @@ describe("the move-to-department picker", () => {
 
     const add = panel.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     expect(add.disabled).toBe(true);
-    expect(add.className).not.toContain("bg-accent");
+    expect(add.className).toContain("disabled:opacity-45");
 
     const input = panel.querySelector<HTMLInputElement>("input")!;
     const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
@@ -96,7 +96,7 @@ describe("the move-to-department picker", () => {
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
     expect(add.disabled).toBe(false);
-    expect(add.className).toContain("ui-button-primary");
+    expect(add.dataset.variant).toBe("primary");
   });
 
   it("offers the danger row as a normal menu row when the bot is in a department", () => {

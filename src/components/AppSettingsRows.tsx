@@ -6,10 +6,10 @@ import { activeLocale, t } from "@/lib/i18n";
 import { withTourReset } from "@/lib/guided-tour";
 import { completionPatch } from "@/lib/onboarding";
 import { useUpdaterState } from "@/lib/updater";
+import { Button, SettingRow, SettingsCard, Switch } from "@/components/ui";
 import { brand } from "../lib/brand";
 import { BrowserProfilesManager } from "./BrowserProfilesManager";
 import { NewBrowserSettings } from "./BrowserSettingsRows";
-import { SettingsCard, SettingRow, Switch } from "@/components/ui";
 import { LearnedSkillsSettings } from "./ShareLearnedSkillsSettings";
 import { effortLabel } from "./ModelPicker";
 import { EFFORT_LEVELS, isEffortLevel } from "../../shared/wire";
@@ -51,7 +51,7 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
                   : t("settings.updates.latest");
   return (
     <SettingRow title={title} subtitle={label}>
-      <button
+      <Button size="sm"
         onClick={() => {
           if (s.status === "downloaded") return void updater.install();
           void updater.check();
@@ -60,7 +60,6 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
           s.status === "checking" || s.status === "downloading" || s.status === "preparing" ||
           s.status === "installing" || s.retryable === false
         }
-        className="ui-button"
       >
         {s.retryable === false
           ? t("settings.updates.quitReopen")
@@ -75,7 +74,7 @@ export function UpdatesRow({ title = t("settings.updates.title") }: { title?: st
                   ? t("settings.updates.opening")
                   : t("settings.updates.restartingShort")
                 : t("settings.updates.check")}
-      </button>
+      </Button>
     </SettingRow>
   );
 }
@@ -132,7 +131,7 @@ function ReplayAppTourButton() {
   const [failed, setFailed] = useState(false);
   return (
     <div>
-      <button
+      <Button size="sm"
         disabled={saving}
         onClick={() => {
           setSaving(true);
@@ -152,10 +151,9 @@ function ReplayAppTourButton() {
             .catch(() => setFailed(true))
             .finally(() => setSaving(false));
         }}
-        className="ui-button"
       >
         {t("settings.welcome.appTour")}
-      </button>
+      </Button>
       {failed && <p role="alert" className="mt-2 text-[13px] text-danger">{t("onboarding.tour.error")}</p>}
     </div>
   );
@@ -167,12 +165,11 @@ export function ReplayTourRow() {
     <SettingRow title={t("settings.welcome.title")} subtitle={t("settings.welcome.subtitleShort")}>
       <div className="flex flex-wrap justify-end gap-2">
         <ReplayAppTourButton />
-        <button
+        <Button size="sm"
           onClick={() => dispatch({ type: "toggleWelcome", open: true })}
-          className="ui-button"
         >
           {t("settings.welcome.replay")}
-        </button>
+        </Button>
       </div>
     </SettingRow>
   );

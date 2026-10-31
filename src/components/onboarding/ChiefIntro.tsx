@@ -7,14 +7,15 @@ import { chiefChoices, chiefFor, createChiefPatch, DEFAULT_BOT_NAME, myDefaultBo
 import { t } from "@/lib/i18n";
 import { FLIGHT_MS, landInSidebar } from "@/lib/mausbot-landing";
 import { useStore, type Bot } from "@/state/store";
+import { buttonStyles } from "@/components/ui";
 
 /** Clicks, Enter and Space wait this long after the dialog opens, so a double click on Next never presses Create. */
 export const CHIEF_GUARD_MS = 300;
 /** The dialog and its scrim fade out (opacity only), and a reduced-motion landing crossfades, over this long. */
 export const CHIEF_FADE_MS = 150;
 const AVATAR_SIZE = 64;
-const SECONDARY = "ui-button ui-button-pill";
-const PRIMARY = "ui-button ui-button-pill ui-button-primary";
+const SECONDARY = buttonStyles({ size: "sm", shape: "pill" });
+const PRIMARY = buttonStyles({ variant: "primary", size: "sm", shape: "pill" });
 
 function ChiefBadge() {
   return (

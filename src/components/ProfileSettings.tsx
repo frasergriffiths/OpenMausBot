@@ -4,6 +4,7 @@ import { t } from "@/lib/i18n";
 import { saveTeamProfile } from "@/lib/own-profile";
 import { IMAGE_MAX_BYTES, imageAttachmentFromFile, isImageFile } from "@/lib/composer-attachments";
 import type { LocaleKey } from "@/locales";
+import { Button } from "@/components/ui";
 import { botAvatarUrlFromStoredPath } from "../../shared/bot-avatar";
 import { AboutMeSettings } from "./AboutMeSettings";
 import { profileInitials } from "./SidebarProfileMenu";
@@ -232,9 +233,9 @@ export function ProfileSummaryRow() {
             {name && email && <div className="truncate text-[13px] leading-[18px] text-ink-secondary">{email}</div>}
           </> : <div className="truncate text-[14px] leading-5 text-ink-secondary">{t("settings.simple.account.noName")}</div>}
         </div>
-        <button type="button" aria-expanded={editing} aria-controls={fieldsId} className="ui-button shrink-0" onClick={() => setEditing(!editing)}>
+        <Button size="sm" type="button" aria-expanded={editing} aria-controls={fieldsId} className="shrink-0" onClick={() => setEditing(!editing)}>
           {editing ? t("common.done") : t(name || email ? "settings.simple.account.edit" : "settings.simple.account.add")}
-        </button>
+        </Button>
       </div>
       <div id={fieldsId} ref={fields} hidden={!editing} className="mt-4">
         {editing && <ProfileFields />}

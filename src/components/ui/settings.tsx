@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from "react";
 import { Check, ChevronRight, Copy, X } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { IconButton } from "./button";
 import { Switch } from "./switch";
 
 export { Switch };
@@ -129,14 +130,13 @@ export function CommandLine({ command, copyLabel = "Copy command" }: { command: 
       <code className="min-w-0 flex-1 select-all overflow-x-auto whitespace-nowrap font-mono text-[12px] text-ink">
         {command}
       </code>
-      <button
-        type="button"
+      <IconButton
+        label={state === "failed" ? t("common.copyFailed") : copyLabel}
         onClick={copy}
-        aria-label={state === "failed" ? t("common.copyFailed") : copyLabel}
-        className="ui-icon-button shrink-0"
+        className="shrink-0"
       >
         {state === "copied" ? <Check size={13} className="text-success" /> : state === "failed" ? <X size={13} className="text-danger" /> : <Copy size={13} />}
-      </button>
+      </IconButton>
     </div>
   );
 }
