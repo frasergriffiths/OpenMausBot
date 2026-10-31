@@ -45,9 +45,7 @@ vi.mock("./DecisionModelSettings", () => ({ DecisionModelSettings: marker("decis
 vi.mock("./SkillsSection", () => ({ SkillsSection: marker("skills") }));
 vi.mock("./CacheKeepWarmSettings", () => ({ CacheKeepWarmSettings: marker("keepWarm") }));
 vi.mock("./McpCallTimeoutSettings", () => ({ McpCallTimeoutSettings: marker("mcpCalls") }));
-vi.mock("./ThreadConcurrencySettings", () => ({ ThreadConcurrencySettings: marker("threads") }));
 vi.mock("./AutomaticRecoverySettings", () => ({ AutomaticRecoverySettings: marker("recovery") }));
-vi.mock("./ThreadCleanupSettings", () => ({ ThreadCleanupSettings: marker("threadCleanup") }));
 vi.mock("./NewBotDialog", () => ({ DefaultBotSettings: marker("defaults"), NewBotDialog: marker("newBotDialog") }));
 vi.mock("./ApiKeys", () => ({
   ApiKeyRow: marker("apiKey"),
@@ -188,7 +186,7 @@ describe("Settings, the one plain UI", () => {
   it("keeps the everyday rows and every merged control reachable by its own page", () => {
     const account = open("general");
     expect(placement(account, 'aria-label="Send usage analytics"')).toBe("shown");
-    expect(markers(account)).toEqual(expect.arrayContaining(["roomTurns", "threads", "recovery", "threadCleanup"]));
+    expect(markers(account)).toEqual(expect.arrayContaining(["roomTurns", "recovery"]));
     const appearance = open("appearance");
     for (const shown of ['aria-label="Color my messages with the bot&#x27;s color"', 'aria-label="Send messages with"',
       'aria-label="Notification sounds"', 'aria-label="Show the notification feed"', 'aria-label="App language"', 'role="radiogroup" aria-label="Theme"']) {

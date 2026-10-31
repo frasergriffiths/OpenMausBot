@@ -27,7 +27,7 @@ import { ProfileSummaryRow } from "./ProfileSettings";
 import { ImportSettings } from "./ImportSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
-import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, SendKeyRow, ShowThreadsRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
+import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, SendKeyRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
 import { SkillsSection } from "./SkillsSection";
 import { WorkspacesSection } from "./WorkspacesSection";
 import { WorkspaceBackupSettings } from "./WorkspaceBackupSettings";
@@ -35,9 +35,7 @@ import { CompanyBackupSettings } from "./CompanyBackupSettings";
 import { DefaultBotSettings } from "./NewBotDialog";
 import { RoomTurnTimeoutSettings } from "./RoomTurnTimeoutSettings";
 import { McpCallTimeoutSettings } from "./McpCallTimeoutSettings";
-import { ThreadConcurrencySettings } from "./ThreadConcurrencySettings";
 import { AutomaticRecoverySettings } from "./AutomaticRecoverySettings";
-import { ThreadCleanupSettings } from "./ThreadCleanupSettings";
 import { CacheKeepWarmSettings } from "./CacheKeepWarmSettings";
 import { ThemeRow } from "./ThemeRow";
 
@@ -80,9 +78,7 @@ export function SimpleAccountPage({ has }: { has: Has }) {
       {has("general") && (
         <SettingsGroup label={t("settings.simple.group.limits")} block="limits">
           <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4"><RoomTurnTimeoutSettings /></div>
-          <ThreadConcurrencySettings />
           <AutomaticRecoverySettings />
-          <ThreadCleanupSettings />
         </SettingsGroup>
       )}
     </>
@@ -111,7 +107,6 @@ export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onL
         <SettingsDisclosureRow title={t("settings.simple.group.sidebar")} subtitle={t("settings.simple.sidebar.subtitle")} block="sidebar" {...disclose("general-sidebar")}>
           <SettingsRows>
             <SidebarToolsLayoutRow />
-            <ShowThreadsRow />
             <PinnedCirclesRow />
             <UniversalPinsRow />
           </SettingsRows>
