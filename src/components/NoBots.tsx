@@ -49,7 +49,10 @@ export function NoBots({ onNew }: { onNew: () => void }) {
         })}
       </div>
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-5 px-6 text-center">
-        <h1 className="text-[22px] font-semibold tracking-[-0.01em]">{t("noBots.title")}</h1>
+        <div className="flex flex-col gap-1.5">
+          <h1 className="text-[22px] font-semibold tracking-[-0.01em]">{t("noBots.title")}</h1>
+          <p className="max-w-[22rem] text-[13px] leading-relaxed text-ink-secondary">{t("noBots.body")}</p>
+        </div>
         <Button variant="primary" size="md" type="button" onClick={onNew}>
           <Plus size={15} aria-hidden="true" />
           {t("noBots.new")}
