@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Brain, Check, Loader2, Pin, Plus, Trash2 } from "lucide-react";
+import { Check, Pin, Plus, Trash2 } from "lucide-react";
 
 
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
-import { cn } from "@/lib/cn";
-import { Dialog, Select } from "@/components/ui";
+import { Button, Callout, Dialog, Select, Spinner } from "@/components/ui";
+import { DepartmentPicker } from "./team/DepartmentPicker";
 import type { DepartmentsPicker } from "./team/SectionContextDialog";
 import { Chevron } from "./chevron";
 
@@ -115,37 +115,34 @@ export function TeamMemoryDialog({ section, label, onClose, picker }: { section:
     <Dialog
       open
       onClose={onClose}
-      size="lg"
-      title={<span className="flex items-center gap-2"><Brain size={18} className="text-accent" aria-hidden="true" />{t("teamMemory.title", { name: label })}</span>}
+      size="md"
+      title={t("teamMemory.title", { name: label })}
       description={t("teamMemory.description")}
       closeLabel={t("teamMemory.close")}
+      footer={
+        <>
+          <Button variant="ghost" size="sm" onClick={onClose}>{t("teamMemory.close")}</Button>
+          <Button variant="primary" size="sm" onClick={() => setAdding(true)} disabled={adding || entries === null}>
+            <Plus size={14} /> {t("teamMemory.addEntry")}
+          </Button>
+        </>
+      }
     >
       <div className="flex flex-col gap-4">
-        {picker && picker.sections.length > 1 && (
-          <label className="flex items-center gap-2 text-[13px] text-ink-secondary">
-            {t("settings.departments.title")}
-            <Select
-              value={section}
-              aria-label={t("settings.departments.title")}
-              onChange={(event) => {
-                const next = picker.sections.find((entry) => entry.key === event.target.value);
-                if (next) picker.onPick(next.key, next.name);
-              }}
-            >
-              {picker.sections.map((entry) => (
-                <option key={entry.key || "general"} value={entry.key}>{entry.name}</option>
-              ))}
-            </Select>
-          </label>
-        )}
+        <DepartmentPicker
+          value={section}
+          sections={picker?.sections ?? []}
+          disabled={busyId !== null}
+          onChange={(key, name) => picker?.onPick(key, name)}
+        />
         <div className="flex flex-col gap-3">
           {entries === null && !error && (
-            <div className="flex min-h-[200px] items-center justify-center text-ink-secondary">
-              <Loader2 size={20} className="animate-spin" aria-label={t("teamMemory.loading")} />
+            <div className="flex min-h-[200px] items-center justify-center">
+              <Spinner label={t("teamMemory.loading")} />
             </div>
           )}
           {entries && <p className="mb-3 text-[12px] text-ink-secondary">{t("teamMemory.loadedSummary", { loaded: loadedIds.length, total: entries.filter(entry => entry.status === "accepted").length })}</p>}
-          {error && <div role="alert" className="mb-3 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-[12px] text-danger">{error} <button onClick={() => void load()} className="underline">{t("teamMemory.reload")}</button></div>}
+          {error && <Callout tone="danger" role="alert">{error} <button onClick={() => void load()} className="underline">{t("teamMemory.reload")}</button></Callout>}
           {Object.entries(unsaved).map(([id, draft]) => <p key={id} className="mb-3 text-[12px] text-ink-secondary"><strong>{draft.name}</strong> · {t("teamMemory.unsaved", { text: draft.text })}</p>)}
 
           {proposed.length > 0 && (
@@ -278,14 +275,7 @@ export function TeamMemoryDialog({ section, label, onClose, picker }: { section:
                 </button>
               </div>
             </div>
-          ) : (
-            <button
-              onClick={() => setAdding(true)}
-              className={cn("flex items-center gap-1.5 text-[13px] text-ink-secondary hover:text-ink", entries === null && "hidden")}
-            >
-              <Plus size={13} /> {t("teamMemory.addEntry")}
-            </button>
-          )}
+          ) : null}
         </div>
       </div>
     </Dialog>

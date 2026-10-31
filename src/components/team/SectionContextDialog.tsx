@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
-import { Button, Callout, Dialog, Select, Spinner } from "@/components/ui";
+import { Button, Callout, Dialog, Spinner, Textarea } from "@/components/ui";
+import { DepartmentPicker } from "./DepartmentPicker";
 
 interface SectionContextResponse {
   section: string;
@@ -82,48 +83,40 @@ export function SectionContextDialog({ section, label, onClose, picker }: {
     <Dialog
       open
       onClose={close}
-      size="lg"
+      size="md"
       title={t("team.instructionsTitle", { name: label })}
       description={t("team.instructionsHint")}
       closeLabel={t("team.instructionsClose")}
       footer={
         <>
-          <Button size="sm" type="button" onClick={close} disabled={saving}>{t("common.cancel")}</Button>
-          <Button size="sm" variant="primary" type="button" onClick={() => void save()} disabled={loading || saving || !dirty || bytes > maxBytes}>
-            {saving ? t("team.saving") : t("common.save")}
+          <Button variant="ghost" size="sm" type="button" onClick={close} disabled={saving}>{t("common.cancel")}</Button>
+          <Button variant="primary" size="sm" type="button" onClick={() => void save()} disabled={loading || saving || !dirty || bytes > maxBytes} loading={saving}>
+            {t("common.save")}
           </Button>
         </>
       }
     >
       <div className="flex flex-col gap-3">
-        {picker && picker.sections.length > 1 && (
-          <label className="flex items-center gap-2 text-[13px] text-ink-secondary">
-            {t("settings.departments.title")}
-            <Select
-              value={section}
-              aria-label={t("settings.departments.title")}
-              onChange={(event) => {
-                const next = picker.sections.find((entry) => entry.key === event.target.value);
-                if (next && !(dirty && !window.confirm(t("team.instructionsDiscard")))) picker.onPick(next.key, next.name);
-              }}
-            >
-              {picker.sections.map((entry) => (
-                <option key={entry.key || "general"} value={entry.key}>{entry.name}</option>
-              ))}
-            </Select>
-          </label>
-        )}
+        <DepartmentPicker
+          value={section}
+          sections={picker?.sections ?? []}
+          disabled={saving}
+          onChange={(key, name) => {
+            if (dirty && !window.confirm(t("team.instructionsDiscard"))) return;
+            picker?.onPick(key, name);
+          }}
+        />
         {loading ? (
           <div className="flex min-h-[240px] items-center justify-center"><Spinner label={t("team.instructionsLoading")} /></div>
         ) : (
           <>
-            <textarea
+            <Textarea
               ref={textareaRef}
               value={text}
               onChange={(event) => setText(event.target.value)}
               placeholder={t("team.instructionsPlaceholder")}
               aria-label={t("team.instructionsTitle", { name: label })}
-              className="min-h-[240px] w-full resize-y rounded-xl bg-ink/[0.04] px-3 py-2.5 font-mono text-[13px] leading-relaxed text-ink outline-none placeholder:text-ink-tertiary focus:ring-1 focus:ring-focus"
+              className="min-h-[240px] font-mono leading-relaxed"
             />
             <div className="flex items-start justify-between gap-4 text-[12px] text-ink-secondary">
               <span>
