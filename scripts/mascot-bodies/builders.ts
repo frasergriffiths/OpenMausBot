@@ -313,10 +313,9 @@ export const BODY_DEFS: BodyDef[] = [
   { id: "diamond", name: "Diamond", d: buildPolygon(196, 196, 4, 0.58), viewBox: [0, 0, 200, 200] },
   // A face-fit constraint, not taste: at the classic 0.42 the notches pinch the
   // star to a 50-unit inscribed circle, and the smallest face clamps every body.
-  { id: "star", name: "Star", d: buildSoftStar(198, 198, 5, 0.76, 0.42), viewBox: [0, 0, 200, 200] },
-  { id: "sparkle", name: "Sparkle", d: buildSoftStar(200, 200, 6, 0.80, 0.58), viewBox: [0, 0, 200, 200] },
+  { id: "star", name: "Star", d: buildSoftStar(198, 198, 5, 0.80, 0.56), viewBox: [0, 0, 200, 200] },
+  { id: "sparkle", name: "Sparkle", d: buildSoftStar(200, 200, 6, 0.84, 0.72), viewBox: [0, 0, 200, 200] },
   { id: "wedge", name: "Wedge", d: buildPolygon(198, 192, 3, 0.82), viewBox: [0, 0, 200, 200] },
-  { id: "tablet", name: "Tablet", d: buildRoundedBox(240, 190, 72), viewBox: [-20, -5, 240, 200] },
   { id: "cloud", name: "Cloud", d: buildCloud(), viewBox: [0, 0, 200, 200] },
 ]
 
