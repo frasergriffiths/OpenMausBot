@@ -18,6 +18,12 @@ export function DepartmentsSettings() {
     return buildTeamMapSections(bots, names);
   }, [state.bots, state.sections, state.groups]);
 
+  // Both dialogs read and write one department at a time; the picker moves the open
+  // dialog to another one instead of closing it and hunting for the row again.
+  const picker = {
+    sections: sections.map((section) => ({ key: section.key, name: section.name })),
+    onPick: (key: string, name: string) => setEditing((current) => (current ? { ...current, key, label: name } : current)),
+  };
   if (sections.length === 0) return null;
   const action = "flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[12px] text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus motion-reduce:transition-none";
 
@@ -41,10 +47,21 @@ export function DepartmentsSettings() {
         ))}
       </SettingsRows>
       {editing?.kind === "instructions" && (
-        <SectionContextDialog section={editing.key} label={editing.label} onClose={() => setEditing(null)} />
+        <SectionContextDialog
+          section={editing.key}
+          label={editing.label}
+          onClose={() => setEditing(null)}
+          picker={picker}
+        />
       )}
       {editing?.kind === "memory" && (
-        <TeamMemoryDialog key={editing.key} section={editing.key} label={editing.label} onClose={() => setEditing(null)} />
+        <TeamMemoryDialog
+          key={editing.key}
+          section={editing.key}
+          label={editing.label}
+          onClose={() => setEditing(null)}
+          picker={picker}
+        />
       )}
     </>
   );
