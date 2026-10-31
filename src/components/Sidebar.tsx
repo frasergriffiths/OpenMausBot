@@ -1005,7 +1005,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const simple: boolean = density !== "icons";
   const simpleDesk = simple && !phone;
   const rail: boolean = density === "icons";
-  const sidePanelOpen = state.computerOpen || state.inspectorOpen;
+  const sidePanelOpen = state.computerOpen;
   const sizing = useSidebarWidth({ density, sidePanelOpen, sidebarRef });
   /** Simple mode keeps the field on screen; the toggle and the close button are gone. */
   const clearSearch = () => setQuery("");

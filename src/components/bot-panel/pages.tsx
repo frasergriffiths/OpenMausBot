@@ -19,8 +19,6 @@ import { RoutineList } from "../routines/RoutineList";
 import { BrowserPanel } from "../BrowserPanel";
 import { ComputerPanel } from "../ComputerPanel";
 import { AndroidDevicePanel, useAndroidUsbDevices } from "../AndroidDevicePanel";
-import { ActivityPanel } from "../ActivityPanel";
-import { InspectorPanel } from "../InspectorPanel";
 import { UsageSection } from "../bot-settings/UsageSection";
 import { ComputerFilesPane } from "../ComputerFilesPane";
 import { memoryNotes, withMemoryNote, withoutMemoryNote } from "./memory-notes";
@@ -363,14 +361,6 @@ export function FolderPage({ bot }: PageContext) {
   );
 }
 
-export function ActivityPage({ bot }: PageContext) {
-  return <ActivityPanel bot={bot} embedded />;
-}
-
-export function RunLogPage({ bot }: PageContext) {
-  return <InspectorPanel bot={bot} embedded />;
-}
-
 /** The browser itself: its page, its tabs and its typing. Signed-in sites and signing out live on the Computer tab. */
 export function BrowserLivePage({ bot, derived }: PageContext) {
   if (!derived.browserEnabled) return <Card><NoteRow>{t("botAccess.browser.off")}</NoteRow></Card>;
@@ -419,10 +409,6 @@ export function PageBody({ page, onOpen, editingInstructions, onEditInstructions
       return <BrowserLivePage {...context} />;
     case "computer":
       return <ComputerPage {...context} />;
-    case "activity":
-      return <ActivityPage {...context} />;
-    case "runlog":
-      return <RunLogPage {...context} />;
     case "android":
       return <AndroidPage />;
     case "usage":

@@ -1,5 +1,5 @@
 import { useMemo, useState, type JSX } from "react";
-import { Bug, Copy, Cpu, Download, Gauge, ListChecks, MessagesSquare, Monitor, MoreHorizontal, Search, Share, SquarePen, UserRound } from "lucide-react";
+import { Copy, Download, Gauge, MessagesSquare, Monitor, MoreHorizontal, Search, Share, SquarePen, UserRound } from "lucide-react";
 import { currentTaskBot, openBotThread, useStore, visibleMessages, type Bot } from "@/state/store";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { requestChatFind, useChatFindOpen } from "@/lib/chat-find";
@@ -28,15 +28,10 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
   const showThreads = useShowThreads();
   const findOpen = useChatFindOpen(bot.threadId);
   const [copyStatus, setCopyStatus] = useState<"copied" | "failed" | null>(null);
-  const remoteClient = window.ogb?.remoteClient?.active === true;
   const usage = usageSummary(bot, state.instances);
   const hasMessages = messages.length > 0;
   const transcript = () => formatTranscriptMarkdown({ title: bot.name, messages, botName: bot.name, isGroup: false });
   const threads = showThreads ? [] : orderedThreadList((profile.tasks ?? []).filter((task) => !task.routineRunId));
-  const selection = profile.modelSelection;
-  const modelName = phoneHeader && selection
-    ? state.instances.find((candidate) => candidate.instanceId === selection.instanceId)?.models.options.find((option) => option.id === selection.model)?.label ?? selection.model
-    : "";
   // On a phone the header drops the profile pill's click target, the model chip and the Bot's screen button; they live here.
   const phoneItems: SidebarMenuItem[] = phoneHeader ? [
     {
@@ -47,13 +42,6 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
     },
   ] : [];
   const phoneScreen: SidebarMenuItem[] = phoneHeader ? [
-    ...(remoteClient ? [] : [{
-      key: "model",
-      label: t("model.simple.model"),
-      icon: <Cpu size={16} />,
-      value: modelName,
-      onSelect: () => openBotSettings(dispatch, "model"),
-    } satisfies SidebarMenuItem]),
     {
       key: "computer",
       label: t("chat.computer"),
@@ -121,24 +109,8 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
       trailing: <span title={usage.detail} data-testid="usage-chip" className={cn("tabular-nums text-[12px]", usage.tone === "danger" ? "text-danger" : usage.tone === "warning" ? "text-warning" : "text-ink-secondary")}>{usage.short}</span>,
       onSelect: () => openBotSettings(dispatch, "usage"),
     } satisfies SidebarMenuItem] : []),
-    ...(remoteClient ? [] : [{
-      key: "activity",
-      label: t("activity.panel.title"),
-      icon: <ListChecks size={16} />,
-      active: state.settingsOpen && state.botSettingsSection === "usage",
-      separatorBefore: !usage,
-      onSelect: () => openBotSettings(dispatch, "usage", { page: "activity" }),
-    } satisfies SidebarMenuItem, {
-      key: "runlog",
-      label: t("botPanel.page.runLog"),
-      icon: <Bug size={16} />,
-      active: state.settingsOpen && state.botSettingsSection === "usage",
-      // Activity and the run log share the panel's usage page.
-      separatorBefore: false,
-      onSelect: () => openBotSettings(dispatch, "usage", { page: "runlog" }),
-    } satisfies SidebarMenuItem]),
   ];
-  return { items, on: findOpen || state.inspectorOpen || state.activityOpen };
+  return { items, on: findOpen };
 }
 
 function RoundChatMoreMenu({ bot, phoneHeader }: { bot: Bot; phoneHeader: boolean }) {

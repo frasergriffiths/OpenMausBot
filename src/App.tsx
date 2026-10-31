@@ -225,8 +225,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
     drawerOpen ||
     state.settingsOpen ||
     state.computerOpen ||
-    state.inspectorOpen ||
-    state.activityOpen ||
     state.appSettingsOpen ||
     state.pluginsOpen;
 
