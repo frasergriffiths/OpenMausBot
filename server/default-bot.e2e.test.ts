@@ -42,7 +42,7 @@ it("makes MausBot a new install's first bot, never deleted, hidden by its switch
   try {
     const [maus] = await bots();
     // The fixture renames its starter; it is still the new install's MausBot.
-    expect(maus).toMatchObject({ color: "chrome", chiefOfStaff: true, defaultBot: {} });
+    expect(maus).toMatchObject({ color: "green", chiefOfStaff: true, defaultBot: {} });
     expect(maus.messages.map((message: any) => [message.kind, message.helperIntro])).toEqual([["options", true]]);
 
     const refused = await api("DELETE", `/api/bots/${maus.id}`);
