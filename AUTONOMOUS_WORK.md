@@ -36,15 +36,15 @@ and read content with cat. Anything larger must be split or restructured.
 
 ## Current phase
 
-Phase 6 — Threads to Reset Context, in progress.
+Phase 6 — Reset Context: working end to end. POST
+/api/bots/:id/context/reset plus the conversation menu's Start fresh entry.
 
-Landed: POST /api/bots/:id/context/reset (creates a fresh thread, optional
-handover message, leaves memories/instructions/identity untouched) and the
-store's newTask action carrying an optional handover to that route.
+Phase 5 — Settings/Defaults/Team Map: started. The New bot defaults dialog's
+section rail is now a vertical tab list from the shared library, with arrow-key
+movement and aria-selected, instead of a row of buttons with aria-current.
 
-Done: the chat menu entry (labelled with the existing Start fresh string)., Adding a new string would mean regenerating src/locales/source-hashes.json, which is ~6 MB and beyond
-the single-request push limit. Options next session: reuse an existing key, or
-find a push path for that file.
+Remaining in Phase 5: the rest of the Defaults dialog polish, Settings pages,
+Team Map page title icon and its dialogs.
 
 ## Known issues
 

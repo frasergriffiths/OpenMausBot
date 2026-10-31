@@ -18,6 +18,7 @@ export function Tabs({
   ariaLabel,
   className,
   size = "md",
+  orientation = "horizontal",
 }: {
   items: TabItem[];
   active: string;
@@ -25,11 +26,14 @@ export function Tabs({
   ariaLabel: string;
   className?: string;
   size?: "sm" | "md";
+  orientation?: "horizontal" | "vertical";
 }) {
   const refs = useRef(new Map<string, HTMLButtonElement>());
 
   const move = (event: React.KeyboardEvent, index: number) => {
-    const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+    const forward = orientation === "vertical" ? "ArrowDown" : "ArrowRight";
+    const back = orientation === "vertical" ? "ArrowUp" : "ArrowLeft";
+    const step = event.key === forward ? 1 : event.key === back ? -1 : 0;
     if (!step) return;
     event.preventDefault();
     const enabled = items.filter((item) => !item.disabled);
@@ -45,7 +49,8 @@ export function Tabs({
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={cn("flex items-center gap-0.5 rounded-[10px] bg-ink/[0.045] p-0.5", className)}
+      aria-orientation={orientation}
+      className={cn("flex gap-0.5 rounded-[10px] bg-ink/[0.045] p-0.5", orientation === "vertical" ? "flex-col items-stretch" : "items-center", className)}
     >
       {items.map((item, index) => {
         const on = item.id === active;
