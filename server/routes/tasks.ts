@@ -197,6 +197,23 @@ export function createTaskRoutes(deps: TaskRouteDeps): RouteHandler & { deleteTa
       if (auth.kind === "session") threadStarters.set(task.threadId, actorKey(auth));
       return json(res, 201, { bot: publicBot(store.bot(bot.id)!), task: wireTask(task, store.bot(bot.id)!.modelSelection) });
     }
+    // A fresh context keeps the bot and everything it remembers; only the conversation starts again.
+    m = path.match(/^\/api\/bots\/([\w-]+)\/context\/reset$/);
+    if (m && method === "POST") {
+      const bot = store.bot(m[1]);
+      if (!bot) return json(res, 404, { error: "no such bot" });
+      const body = await readBody(req);
+      const handover = body && typeof body === "object" && typeof (body as { handover?: unknown }).handover === "string"
+        ? (body as { handover: string }).handover.trim().slice(0, 2_000)
+        : "";
+      const task = store.createTask(bot.id, "Fresh context", true);
+      if (!task) return json(res, 500, { error: "couldn't start a fresh context" });
+      if (auth.kind === "session") threadStarters.set(task.threadId, actorKey(auth));
+      if (handover) {
+        store.appendMessage(task.threadId, { role: "user", kind: "text", text: "Carrying over: " + handover });
+      }
+      return json(res, 201, { bot: publicBot(store.bot(bot.id)!), task: wireTask(task, store.bot(bot.id)!.modelSelection) });
+    }
     m = path.match(/^\/api\/bots\/([\w-]+)\/tasks\/delete$/);
     if (m && method === "POST") {
       const parsed = bulkDeleteThreadIds(await readBody(req));

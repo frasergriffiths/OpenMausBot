@@ -36,8 +36,16 @@ and read content with cat. Anything larger must be split or restructured.
 
 ## Current phase
 
-Phase 6 — Threads to Reset Context. Not started in code. Only the architecture
-map exists (below). No branch changes yet for this phase.
+Phase 6 — Threads to Reset Context, in progress.
+
+Landed: POST /api/bots/:id/context/reset (creates a fresh thread, optional
+handover message, leaves memories/instructions/identity untouched) and the
+store's newTask action carrying an optional handover to that route.
+
+Blocked: the chat menu entry needs a new user-facing string, and adding one
+means regenerating src/locales/source-hashes.json, which is ~6 MB and beyond
+the single-request push limit. Options next session: reuse an existing key, or
+find a push path for that file.
 
 ## Known issues
 
