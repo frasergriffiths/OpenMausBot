@@ -2,6 +2,7 @@
 // follows its own session, never the return. The emailed code's attempt, the token and the checkout page stay in main.
 import { useEffect, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { IconButton } from "@/components/ui";
 import type { CloudColor } from "../../electron/cloud-buy.mjs";
 import type { CloudAccountState, CloudCheckoutOutcome } from "../../electron/cloud-account.mjs";
 import type { CloudOffer } from "../../electron/cloud-home.mjs";
@@ -94,7 +95,7 @@ export function CloudAddSheet({ kind, staging, onClose, children }: { kind: Clou
   return <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 sm:p-6" onMouseDown={event => event.target === event.currentTarget && !HELD.has(kind) && onClose()}>
     <div role="dialog" aria-modal="true" aria-labelledby="cloud-add-title" data-cloud-add-dialog tabIndex={-1}
       className={cn("relative max-h-full w-full overflow-y-auto overscroll-contain rounded-2xl border border-hairline/70 bg-panel shadow-2xl outline-none", WIDTH[kind] ?? "max-w-[540px]")}>
-      <button type="button" onClick={onClose} aria-label={t("cloudAdd.close")} className="ui-icon-button absolute end-3.5 top-3.5 z-10"><X size={18} /></button>
+      <IconButton label={t("cloudAdd.close")} onClick={onClose} className="absolute end-3.5 top-3.5 z-10"><X size={18} /></IconButton>
       {staging && <StagingMark className="absolute end-14 top-[19px] z-10" />}
       {children}
     </div>

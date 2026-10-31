@@ -4,11 +4,11 @@ import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
 import { t } from "@/lib/i18n";
+import { SettingsCard } from "@/components/ui";
 import { AnthropicEveryClaudeBot, ApiKeyRow, OpenCodeProviderKeys, VpsConnection } from "./ApiKeys";
 import { LmStudioServer, OtherOpenAiCompatServers } from "./OpenAiCompatServers";
 import { CompanionSection } from "./CompanionSection";
 import { ServerPairingCard } from "./ServerPairingCard";
-import { SettingsCard } from "@/components/ui";
 import { Notice } from "./Notice";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { currentPhonePairingTarget, phonePairingSettingsAction } from "@/lib/phone-pairing";
@@ -432,9 +432,9 @@ export function SettingsModal() {
             data-settings-scroll
             className={cn(
               "flex min-h-0 flex-1 flex-col gap-7 overflow-y-auto px-4 pb-8 pt-4 sm:px-8 sm:pb-7 sm:pt-4",
-              "[&_.ui-button]:h-8 [&_.ui-button]:rounded-full [&_.ui-button]:border-0 [&_.ui-button]:px-3 [&_.ui-button]:text-[14px] [&_.ui-button]:font-normal",
-              "[&_.ui-button:not(.ui-button-primary)]:bg-ink/5 [&_.ui-button:not(.ui-button-primary)]:text-ink [&_.ui-button:not(.ui-button-primary):enabled:hover]:bg-ink/10",
-              "[&_.ui-button-primary]:bg-ink [&_.ui-button-primary]:text-app [&_.ui-button-primary:enabled:hover]:bg-ink/85",
+              "[&_[data-ui=button]]:h-8 [&_[data-ui=button]]:rounded-full [&_[data-ui=button]]:border-0 [&_[data-ui=button]]:px-3 [&_[data-ui=button]]:text-[14px] [&_[data-ui=button]]:font-normal",
+              "[&_[data-ui=button]:not([data-variant=primary])]:bg-ink/5 [&_[data-ui=button]:not([data-variant=primary])]:text-ink [&_[data-ui=button]:not([data-variant=primary]):enabled:hover]:bg-ink/10",
+              "[&_[data-ui=button][data-variant=primary]]:bg-ink [&_[data-ui=button][data-variant=primary]]:text-app [&_[data-ui=button][data-variant=primary]:enabled:hover]:bg-ink/85",
               "[&_.uppercase]:normal-case [&_.uppercase]:tracking-normal",
             )}
           >

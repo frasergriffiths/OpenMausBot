@@ -21,9 +21,9 @@ import type { LocaleKey } from "@/locales";
 import { updateMcpServers } from "@/lib/mcp-servers";
 import { completeMcpSignIn, mcpSignInLink, runMcpSignIn, type McpSignInStatus } from "@/lib/mcp-sign-in";
 import { api, useStore } from "@/state/store";
+import { Switch } from "@/components/ui";
 
 import { McpAppsSwitch } from "./McpAppsSwitch";
-import { Switch } from "@/components/ui";
 import { ClaudeCodeSwitches } from "./ClaudeCodeSwitches";
 import { WhopIcon } from "./WhopIcon";
 import type { McpMessage } from "./McpResultBudgetField";

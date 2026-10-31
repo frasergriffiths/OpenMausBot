@@ -28,6 +28,7 @@ import {
   awayFromMainThread,
   openBot,
 } from "@/state/store";
+import { Button, buttonStyles } from "@/components/ui";
 import { EngineSetup } from "./EngineSetup";
 import { ChatPermissionNotice } from "./ChatPermissionNotice";
 import { CHATGPT_USAGE_URL, ManageUsageLink } from "./ChatGptPlanStatus";
@@ -210,7 +211,7 @@ export function ErrorRow({
         </div>
         {headline !== message && <details className="mt-2 text-[12px] text-ink-secondary"><summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("chat.error.details")}</summary><p className="mt-1 break-words">{message}</p></details>}
         {usageUrl ? (
-          <ManageUsageLink href={usageUrl} className="ui-button ui-button-md mt-2 border-transparent bg-ink text-app hover:brightness-110" />
+          <ManageUsageLink href={usageUrl} className={buttonStyles({ size: "xs", className: "mt-2 border-transparent bg-ink text-app hover:brightness-110" })} />
         ) : claudeUpdateInstance ? (
           <ClaudeUpdatePrompt instance={claudeUpdateInstance} onRetry={onRetry} />
         ) : isProviderSafetyBlock(message) ? (
@@ -223,22 +224,22 @@ export function ErrorRow({
           <EngineSetup instance={setupInstance} className="mt-2 text-ink-secondary" />
         ) : action !== undefined ? (
           action && (
-            <button
+            <Button variant="primary" size="xs"
               type="button"
               onClick={action.onClick}
-              className="ui-button ui-button-md mt-1.5 ui-button-primary"
+              className="mt-1.5"
             >
               {action.label}
-            </button>
+            </Button>
           )
         ) : (
           onRetry && (
-            <button
+            <Button size="xs"
               onClick={onRetry}
-              className="ui-button ui-button-md mt-1.5"
+              className="mt-1.5"
             >
               <RefreshCw size={12} /> {t("chat.retry")}
-            </button>
+            </Button>
           )
         )}
       </div>
@@ -1135,9 +1136,9 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
             <>
               <div ref={topSentinelRef} className="h-2 w-full pointer-events-none" aria-hidden="true" />
               <div className="flex justify-center">
-                <button type="button" className="ui-pill" onClick={() => (hiddenCount > 0 ? showEarlier() : loadOlder())}>
+                <Button size="xs" shape="pill" type="button" onClick={() => (hiddenCount > 0 ? showEarlier() : loadOlder())}>
                   {hiddenCount > 0 ? t("chat.showEarlier", { count: hiddenCount }) : t("chat.loadEarlier")}
-                </button>
+                </Button>
               </div>
             </>
           ) : null}
@@ -1166,17 +1167,16 @@ export function ChatView({ bot: profile }: { bot: Bot }) {
           </ChatRowsContext.Provider>
           {laterCount > 0 && (
             <div className="flex justify-center">
-              <button
+              <Button size="xs" shape="pill"
                 onClick={showLater}
-                className="ui-pill"
               >
                 {t("chat.showLater", { count: laterCount })}
-              </button>
+              </Button>
             </div>
           )}
           {computerStarting && (
             <div className="flex justify-start">
-              <div className="ui-pill">
+              <div className={buttonStyles({ size: "xs", shape: "pill", variant: "chip" })}>
                 <WorkingDots size={3.5} />
                 {computerStarting}
               </div>

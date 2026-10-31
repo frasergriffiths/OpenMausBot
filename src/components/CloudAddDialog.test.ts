@@ -223,7 +223,7 @@ describe("each screen of the sheet says one thing and offers one next step", () 
     const sso = panel({ kind: "sign-in", phase: { step: "email", intent: true, problem: "sso" } });
     expect(text(sso.html)).toContain("Your organization uses single sign-on. Continue in browser");
     expect(text(sso.html)).not.toContain("Work account with single sign-on?");
-    expect(sso.tree.find(node => node.type === "button" && label(node) === "Continue in browser")!.props.className).toContain("ui-button-primary");
+    expect(sso.tree.find(node => node.type === "button" && label(node) === "Continue in browser")!.props.className).toContain("bg-accent");
     expect(text(panel(code("two-factor")).html)).toContain("This account uses two-step verification, so it signs in through your browser. Continue in browser");
     expect(text(panel({ kind: "sign-in", phase: { step: "email", intent: true, problem: "invalid-email" } }).html)).toContain("Enter an email address like name@example.com.");
     expect(text(panel({ kind: "sign-in", phase: { step: "done", intent: true } }).html)).toContain("Signed in. Opening secure checkout…");

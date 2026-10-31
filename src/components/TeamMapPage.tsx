@@ -16,6 +16,7 @@ import { cn } from "@/lib/cn";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { useCaptionChrome } from "@/components/DesktopCapabilities";
 import { placeOffered } from "@/lib/place";
+import { Button, buttonStyles, Switch } from "@/components/ui";
 import { TeamBoard } from "./TeamBoard";
 import { MapModeToggle, TeamOrgChart, useMapMode } from "./TeamOrgChart";
 import { useTeamPeople } from "@/state/team-people";
@@ -29,7 +30,6 @@ import { MapComposer } from "./MapComposer";
 import { openBotSettings } from "./bot-panel/panel-link";
 import type { TeamComputer } from "../../shared/team-computer";
 import { Chevron } from "./chevron";
-import { Switch } from "@/components/ui";
 import { MENU_LABEL, MENU_ROW } from "./menu-recipe";
 import { SIMPLE_MENU } from "./SidebarSimpleTop";
 
@@ -409,10 +409,10 @@ export function TeamMapPage() {
           {teamPeople && <MapModeToggle />}
           {!remoteClient && <>
             {sections.length === 1 ? (
-              <button type="button" className="ui-button" ref={(node) => { memoryTrigger.current = node; }}
+              <Button size="sm" type="button" ref={(node) => { memoryTrigger.current = node; }}
                 onClick={() => openMemory(sections[0].key, sections[0].name, true)}>
                 <Brain size={16} className="text-ink-secondary" />{t("canvas.departmentMemory")}
-              </button>
+              </Button>
             ) : sections.length > 1 ? (
               <details ref={memoryMenu} className="relative" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeMemoryMenu(); }}
                 onToggle={(event) => {
@@ -421,7 +421,7 @@ export function TeamMapPage() {
                 }}
                 onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); closeMemoryMenu(true); } }}>
                 <summary ref={(node) => { memoryTrigger.current = node; }} aria-haspopup="menu"
-                  className="ui-button cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  className={buttonStyles({ size: "sm", className: "cursor-pointer list-none [&::-webkit-details-marker]:hidden" })}>
                   <Brain size={16} className="text-ink-secondary" />{t("canvas.departmentMemory")}
                 </summary>
                 <div role="menu" aria-label={t("canvas.departmentMemory")} className={cn("absolute right-0 top-full z-40 mt-2 min-w-[220px]", SIMPLE_MENU)}
@@ -432,20 +432,20 @@ export function TeamMapPage() {
                 </div>
               </details>
             ) : null}
-            <label className="ui-button h-8 cursor-pointer select-none" title={t("canvas.showComputersHint")}>
+            <label className={buttonStyles({ size: "sm", className: "h-8 cursor-pointer select-none" })} title={t("canvas.showComputersHint")}>
               <Switch checked={showComputers} onClick={() => setShowComputers(!showComputers)} aria-label={t("canvas.showComputers")} />
               <span>{t("canvas.showComputers")}</span>
             </label>
-            <button type="button" className="ui-button" aria-expanded={computersOpen} onClick={() => setComputersOpen((value) => !value)}>
+            <Button size="sm" type="button" aria-expanded={computersOpen} onClick={() => setComputersOpen((value) => !value)}>
               <Monitor size={16} className="text-ink-secondary" />{t("canvas.computers")}
-            </button>
+            </Button>
             <details className="relative" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) event.currentTarget.removeAttribute("open"); }}
               onToggle={(event) => {
                 if (!event.currentTarget.open) return;
                 requestAnimationFrame(() => event.currentTarget.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus({ preventScroll: true }));
               }}
               onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); event.currentTarget.removeAttribute("open"); event.currentTarget.querySelector("summary")?.focus(); } }}>
-              <summary aria-label={t("canvas.addToMap")} className="ui-button cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+              <summary aria-label={t("canvas.addToMap")} className={buttonStyles({ size: "sm", className: "cursor-pointer list-none [&::-webkit-details-marker]:hidden" })}>
                 <Plus size={16} className="text-ink-secondary" />{t("common.add")}
               </summary>
               <div role="menu" aria-label={t("canvas.addToMap")} className={cn("absolute right-0 top-full z-40 mt-2 w-[220px]", SIMPLE_MENU)} onKeyDown={moveMenuFocus}>
