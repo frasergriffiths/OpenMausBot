@@ -4,7 +4,7 @@ import { api, useStore, type ConfigStatus } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { formatUsd } from "@/lib/usage";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 
 export interface BudgetState {
   month: string;
@@ -65,7 +65,7 @@ export function BudgetCard({ budget }: { budget: BudgetState | null }) {
 
   const tone = budgetTone(budget);
   return (
-    <Card title={t("usage.budget.title")} subtitle={t("usage.budget.subtitle")}>
+    <SettingsCard title={t("usage.budget.title")} subtitle={t("usage.budget.subtitle")}>
       {budget ? (
         <div className="mb-4">
           <div className="mb-1 flex items-baseline justify-between text-[13px]">
@@ -96,7 +96,7 @@ export function BudgetCard({ budget }: { budget: BudgetState | null }) {
       </form>
       <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("usage.budget.hint")}</p>
       {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -157,7 +157,7 @@ export function PricesCard() {
 
   const cell = "w-full rounded-lg border border-hairline/40 bg-inset px-2 py-1.5 text-[13px] tabular-nums text-ink focus:outline-none disabled:opacity-50";
   return (
-    <Card title={t("usage.prices.title")} subtitle={t("usage.prices.subtitle")}>
+    <SettingsCard title={t("usage.prices.title")} subtitle={t("usage.prices.subtitle")}>
       <div className="mb-3 flex items-center gap-2 text-[12px] text-ink-secondary">
         <label className="flex items-center gap-2">
           {t("usage.prices.currency")}
@@ -188,7 +188,7 @@ export function PricesCard() {
       </div>
       <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("usage.prices.hint")}</p>
       {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
-    </Card>
+    </SettingsCard>
   );
 }
 

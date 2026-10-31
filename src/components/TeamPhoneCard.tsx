@@ -4,7 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { t } from "@/lib/i18n";
 import { lastSeen, minutesLeft } from "@/lib/pairing-time";
 import { api } from "@/state/store";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 
 export const TEAM_PHONE_PAIRING = "/api/team/phone-pairing";
 export const TEAM_PHONES = "/api/team/phones";
@@ -79,7 +79,7 @@ export function TeamPhoneCard({ team }: { team: string }) {
   }
 
   return (
-    <Card title={t("teamPhone.title")} subtitle={t("teamPhone.subtitle", { team })}>
+    <SettingsCard title={t("teamPhone.title")} subtitle={t("teamPhone.subtitle", { team })}>
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button type="button" data-phone-pairing-action onClick={() => void create()} disabled={busy} className="ui-button ui-button-primary">
           {busy ? t("remote.serverPairing.creating") : t("remote.serverPairing.create")}
@@ -133,6 +133,6 @@ export function TeamPhoneCard({ team }: { team: string }) {
         </div>
       ) : null}
       {error ? <p className="mt-3 text-[13px] text-danger">{error}</p> : null}
-    </Card>
+    </SettingsCard>
   );
 }

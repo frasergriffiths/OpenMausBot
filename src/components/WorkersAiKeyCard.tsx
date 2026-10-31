@@ -6,7 +6,7 @@ import { Check, ExternalLink, Loader2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { api, useStore, type ConfigStatus } from "@/state/store";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 
 const TOKEN_URL = "https://dash.cloudflare.com/profile/api-tokens";
 const ACCOUNT_ID = /^[0-9a-f]{32}$/i;
@@ -79,7 +79,7 @@ export function WorkersAiKeyCard({ failureText }: { failureText: (result: { reas
   };
 
   return (
-    <Card title={t("decider.workersAi.title")}>
+    <SettingsCard title={t("decider.workersAi.title")}>
       <p className="mb-2 text-[12px] leading-relaxed text-ink-secondary">{t("decider.workersAi.detail")}</p>
       {saved && (
         <div role="status" className="mb-2 flex items-center gap-2 text-[13px] text-success">
@@ -144,6 +144,6 @@ export function WorkersAiKeyCard({ failureText }: { failureText: (result: { reas
         {t("decider.workersAi.getKey")}
         <ExternalLink size={11} aria-hidden="true" />
       </a>
-    </Card>
+    </SettingsCard>
   );
 }

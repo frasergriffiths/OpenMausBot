@@ -10,7 +10,7 @@ import type { LocaleKey } from "@/locales";
 import { useStore } from "@/state/store";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { useCaptionChrome } from "./DesktopCapabilities";
-import { Switch } from "./SettingsPrimitives";
+import { Switch } from "@/components/ui";
 
 const REFUSAL: Record<string, LocaleKey> = {
   "too-broad": "files.refusal.tooBroad", "app-data": "files.refusal.appData", "already-shared": "files.refusal.alreadyShared",

@@ -9,7 +9,7 @@ import { useUpdaterState } from "@/lib/updater";
 import { brand } from "../lib/brand";
 import { BrowserProfilesManager } from "./BrowserProfilesManager";
 import { NewBrowserSettings } from "./BrowserSettingsRows";
-import { Card, SettingRow, Switch } from "./SettingsPrimitives";
+import { SettingsCard, SettingRow, Switch } from "@/components/ui";
 import { LearnedSkillsSettings } from "./ShareLearnedSkillsSettings";
 import { effortLabel } from "./ModelPicker";
 import { EFFORT_LEVELS, isEffortLevel } from "../../shared/wire";
@@ -344,7 +344,7 @@ export function ExperimentalFeaturesRow() {
   };
 
   return (
-    <Card subtitle={t("settings.experimental.subtitle")}>
+    <SettingsCard subtitle={t("settings.experimental.subtitle")}>
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0">
           <div className="text-[14px] font-medium text-ink">{t("settings.experimental.skillAuthoring")}</div>
@@ -363,7 +363,7 @@ export function ExperimentalFeaturesRow() {
       {error ? <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p> : null}
       <LearnedSkillsSettings />
       <NewBrowserSettings />
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -372,8 +372,8 @@ export function BrowserProfilesRow() {
   const profiles = state.config?.browserProfiles ?? [];
   if (!builtInBrowserEnabled(state.config) && profiles.length === 0) return null;
   return (
-    <Card title={t("settings.profiles.title")} subtitle={t("settings.profiles.sharedSubtitle")}>
+    <SettingsCard title={t("settings.profiles.title")} subtitle={t("settings.profiles.sharedSubtitle")}>
       <BrowserProfilesManager />
-    </Card>
+    </SettingsCard>
   );
 }

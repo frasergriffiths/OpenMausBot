@@ -13,7 +13,7 @@ import { AntigravityFreeSpace } from "./AntigravityFreeSpace";
 import { CacheKeepWarmSettings } from "./CacheKeepWarmSettings";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { Select } from "./Select";
-import { SettingsDisclosureRow, SettingsGroup, SettingsRows } from "./SettingsPrimitives";
+import { SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { InstanceProviderMark } from "./ProviderIcons";
 import { Chevron } from "./chevron";
 import { CompanyModels } from "./CompanyModels";

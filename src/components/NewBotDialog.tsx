@@ -27,7 +27,7 @@ import { BotEditorContext } from "./bot-settings/BotEditorContext";
 import { inputCls } from "./bot-settings/field";
 import { LocalComputerAutoWarning } from "./LocalComputerAutoWarning";
 import { SharePresetDialog } from "./SharePresetDialog";
-import { SettingRow } from "./SettingsPrimitives";
+import { SettingRow } from "@/components/ui";
 import { Select } from "./Select";
 
 const SECTIONS = ["Identity", "Soul", "Skills", "Memory", "Access", "Model", "Permissions", "Voice & alerts"] as const;
