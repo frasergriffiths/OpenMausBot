@@ -240,8 +240,9 @@ describe("thread control placement", () => {
     const retry = renderToStaticMarkup(createElement(ErrorRow, { message: "Network timeout", onRetry: () => {} }));
     const action = renderToStaticMarkup(createElement(ErrorRow, { message: "Network timeout", action: { label: "Open", onClick: () => {} } }));
     for (const markup of [retry, action]) {
-      expect(markup).toContain('class="ui-button ui-button-md ');
-      expect(markup).not.toContain("text-[13px]");
+      expect(markup).toContain('data-ui="button"');
+      expect(markup).toContain("h-7");
+      expect(markup).toContain("text-[13px]");
     }
   });
   it("directs ChatGPT plan limits to usage settings rather than repeatedly retrying", () => {

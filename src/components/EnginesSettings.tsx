@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Check, Loader2, RefreshCw, TriangleAlert } from "lucide-react";
 
 import { api, useStore, type InstanceInfo } from "@/state/store";
+import { Button, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { EngineCard, EngineSections, RefreshEngines, engineReady } from "./EngineLibrary";
 import { cn } from "@/lib/cn";
 import { useMenuMotion } from "./MenuMotion";
@@ -13,7 +14,6 @@ import { AntigravityFreeSpace } from "./AntigravityFreeSpace";
 import { CacheKeepWarmSettings } from "./CacheKeepWarmSettings";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { Select } from "./Select";
-import { SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { InstanceProviderMark } from "./ProviderIcons";
 import { Chevron } from "./chevron";
 import { CompanyModels } from "./CompanyModels";
@@ -403,9 +403,9 @@ function SimpleEngines({ rows, isReady, renderEngine, more }: {
                       <span className="truncate text-[13px] leading-[18px] text-ink-secondary">{simpleStatus(instance, ready)}</span>
                     </span>
                   </span>
-                  <button type="button" aria-expanded={open} className="ui-button ml-auto shrink-0" onClick={() => setOpened(open ? null : instance.instanceId)}>
+                  <Button size="sm" type="button" aria-expanded={open} className="ml-auto shrink-0" onClick={() => setOpened(open ? null : instance.instanceId)}>
                     {t(open ? "common.done" : ready ? "settings.simple.ai.manage" : "settings.simple.ai.setUp")}
-                  </button>
+                  </Button>
                 </div>
                 {open && <div className="px-4 pb-3">{renderEngine(instance, true)}</div>}
               </div>

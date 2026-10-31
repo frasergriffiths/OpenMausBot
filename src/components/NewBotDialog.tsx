@@ -12,6 +12,7 @@ import type { LocaleKey } from "@/locales";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { announceNewBot, reportsToFor, startingTemplate, type BotDefaultsAnswer } from "@/lib/new-bot";
 import { useShowThreads } from "@/lib/thread-preferences";
+import { Button, SettingRow, Tabs } from "@/components/ui";
 import { openServerMenu } from "./DesktopWorkspaceSwitcher";
 import { useTeamPeople } from "@/state/team-people";
 import { visibilityFromForm, type VisibilityMode } from "./bot-settings/VisibilitySection";
@@ -27,7 +28,6 @@ import { BotEditorContext } from "./bot-settings/BotEditorContext";
 import { inputCls } from "./bot-settings/field";
 import { LocalComputerAutoWarning } from "./LocalComputerAutoWarning";
 import { SharePresetDialog } from "./SharePresetDialog";
-import { SettingRow, Tabs } from "@/components/ui";
 import { Select } from "./Select";
 
 const SECTIONS = ["Identity", "Soul", "Skills", "Memory", "Access", "Model", "Permissions", "Voice & alerts"] as const;
@@ -206,10 +206,10 @@ export function NewBotDialog({ defaultsMode = false, onClose, onCreated, readyBo
       {error && <p role="alert" className="max-h-24 overflow-y-auto border-t border-hairline/40 px-5 py-3 text-[13px] text-danger">{error}</p>}
       <div className="flex shrink-0 justify-end gap-2 border-t border-hairline/40 px-5 py-3">
         <button type="button" onClick={() => closeRef.current()} className="rounded-lg px-4 py-2 text-[13px] text-ink-secondary hover:bg-control">{t("common.cancel")}</button>
-        <button type="button" disabled={!ready || saving || (!defaultsMode && !bot.name.trim())} onClick={() => void save()}
-          className="ui-button-primary flex items-center gap-2 rounded-lg bg-accent px-5 py-2 text-[13px] font-medium text-white hover:brightness-110 disabled:opacity-40">
+        <Button variant="primary" size="sm" type="button" disabled={!ready || saving || (!defaultsMode && !bot.name.trim())} onClick={() => void save()}
+          className="flex items-center gap-2 rounded-lg bg-accent px-5 py-2 text-[13px] font-medium text-white hover:brightness-110 disabled:opacity-40">
           {saving && <Loader2 size={15} className="animate-spin" />}{t(defaultsMode ? "newBot.saveDefaults" : "newBot.create")}
-        </button>
+        </Button>
       </div>
       <LocalComputerAutoWarning open={warning === "local"} onCancel={() => setWarning(null)} onConfirm={() => { draft.consent.acknowledgeLocalAuto = true; setWarning(null); void save(); }} />
     </div>

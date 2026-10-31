@@ -3,6 +3,7 @@ import { browserUnavailableReason } from "@/lib/feature-flags";
 import { FolderOpen, Plus } from "lucide-react";
 
 import { api, useStore, type Bot } from "@/state/store";
+import { Button, Switch } from "@/components/ui";
 import { useBotEditor } from "./BotEditorContext";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -12,7 +13,6 @@ import { placeFacts, placeViewFor, usePlaceSeat } from "@/lib/place-view";
 import { shortPath } from "@/lib/short-path";
 import { useDesktopCapabilities } from "../DesktopCapabilities";
 import { CloudBackendPicker } from "../CloudBackendPicker";
-import { Switch } from "@/components/ui";
 import { PhoneAppsCard } from "./PhoneAppsCard";
 import { ProposalStatus } from "./ProposalStatus";
 import { ToolSelectionCard } from "./ToolSelectionCard";
@@ -483,9 +483,9 @@ function ResearchCard({ bot, patch }: { bot: Bot; patch: (patch: { xResearch: bo
         <div className="text-[15px] font-medium text-ink">{t("research.title")}</div>
         <div className="mt-0.5 text-[13px] text-ink-secondary">{line}</div>
         {!available && !connecting && (
-          <button type="button" className="ui-button mt-2" onClick={() => dispatch({ type: "toggleAppSettings", open: true, section: "connections" })}>
+          <Button size="sm" type="button" className="mt-2" onClick={() => dispatch({ type: "toggleAppSettings", open: true, section: "connections" })}>
             {t("research.openKeys")}
-          </button>
+          </Button>
         )}
       </div>
       <Switch

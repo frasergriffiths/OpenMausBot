@@ -8,6 +8,7 @@ import { t } from "@/lib/i18n";
 import { teamMapBotCount, teamMapStatus, type TeamMapSection } from "@/lib/team-map";
 import { COMPUTER_DRAG_TYPE, orderBots, parseBotOrders, reorderBot } from "@/lib/team-canvas";
 import { computerForBot, type ShownFrame } from "@/lib/map-computers";
+import { Button } from "@/components/ui";
 import type { MapComputer } from "../../shared/map-computer";
 import { BotAvatar } from "./Avatar";
 import { InstanceProviderMark, ProviderMark } from "./ProviderIcons";
@@ -319,7 +320,7 @@ export function TeamBoard({ sections, canManage, onMove, onInstructions, onMemor
       <div className="w-full max-w-[360px] rounded-2xl border border-hairline/40 bg-panel p-6 text-center">
         <p className="text-[15px] font-semibold text-ink">{t("canvas.emptyTeam")}</p>
         <p className="mt-1 text-[13px] leading-relaxed text-ink-secondary">{t("canvas.emptyTeamBody")}</p>
-        <button type="button" className="ui-button ui-button-primary mt-4" onClick={() => dispatch({ type: "newBot" })}><Plus size={15} />{t("sidebar.newBot")}</button>
+        <Button variant="primary" size="sm" type="button" className="mt-4" onClick={() => dispatch({ type: "newBot" })}><Plus size={15} />{t("sidebar.newBot")}</Button>
       </div>
     </div>;
   }
