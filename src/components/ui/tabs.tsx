@@ -59,6 +59,7 @@ export function Tabs({
             }}
             type="button"
             role="tab"
+            data-tab={item.id}
             aria-selected={on}
             tabIndex={on ? 0 : -1}
             disabled={item.disabled}
