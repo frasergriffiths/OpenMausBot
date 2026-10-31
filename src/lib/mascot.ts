@@ -89,6 +89,7 @@ export const MAUS_COLOR_LABEL = {
   green: "mascotColor.green", blue: "mascotColor.blue", red: "mascotColor.red", orange: "mascotColor.orange",
   purple: "mascotColor.purple", cyan: "mascotColor.cyan", pink: "mascotColor.pink", yellow: "mascotColor.yellow",
   teal: "mascotColor.teal", coral: "mascotColor.coral",
+  white: "mascotColor.white", black: "mascotColor.black",
 } as const satisfies Record<MausColor, LocaleKey>;
 
 export function colorSwatch(color: MausColor): string {

@@ -301,6 +301,8 @@
   --identity-yellow: #D8A729;
   --identity-teal: #01A492;
   --identity-coral: #E5634E;
+  --identity-white: #F2F2F3;
+  --identity-black: #7c7c89;
 }
 
 /* ── Atelier ───────────────────────────────────────────────────────────────
@@ -366,6 +368,8 @@
   --identity-yellow: #896a19;
   --identity-teal: #017c6f;
   --identity-coral: #cd361e;
+  --identity-white: #6d6d77;
+  --identity-black: #1B1B1E;
 }
 
 /* ── Foundry ───────────────────────────────────────────────────────────────
@@ -436,6 +440,8 @@
   --identity-yellow: #D8A729;
   --identity-teal: #01A492;
   --identity-coral: #E5634E;
+  --identity-white: #F2F2F3;
+  --identity-black: #7a7a87;
 }
 
 /* ── Lagoon ────────────────────────────────────────────────────────────────
@@ -513,6 +519,8 @@
   --identity-yellow: #836518;
   --identity-teal: #01776a;
   --identity-coral: #c3341d;
+  --identity-white: #686871;
+  --identity-black: #1B1B1E;
 }
 
 /* ── Graphite ─────────────────────────────────────────────────────────────
@@ -570,6 +578,8 @@
   --identity-yellow: #D8A729;
   --identity-teal: #01A492;
   --identity-coral: #E5634E;
+  --identity-white: #F2F2F3;
+  --identity-black: #7c7c89;
 }
 
 /* ── Linen ────────────────────────────────────────────────────────────────
@@ -627,6 +637,8 @@
   --identity-yellow: #886819;
   --identity-teal: #017a6d;
   --identity-coral: #c9361e;
+  --identity-white: #6c6c76;
+  --identity-black: #1B1B1E;
 }
 
 /* ── Dusk ─────────────────────────────────────────────────────────────────
@@ -683,6 +695,8 @@
   --identity-yellow: #D8A729;
   --identity-teal: #01A492;
   --identity-coral: #E5634E;
+  --identity-white: #F2F2F3;
+  --identity-black: #7b7b88;
 }
 
 /* ── Daylight ─────────────────────────────────────────────────────────────
@@ -755,6 +769,8 @@
   --identity-yellow: #91701b;
   --identity-teal: #018375;
   --identity-coral: #d83920;
+  --identity-white: #74747e;
+  --identity-black: #1B1B1E;
   --shadow-float: 0 4px 12px -1px rgb(28 28 28 / 0.08), 0 2px 4px -2px rgb(28 28 28 / 0.06);
 }
 
@@ -814,6 +830,8 @@
   --identity-yellow: #93721b;
   --identity-teal: #018577;
   --identity-coral: #db3a20;
+  --identity-white: #75757f;
+  --identity-black: #1B1B1E;
 }
 
 /* ── Pop ──────────────────────────────────────────────────────────────────
@@ -873,6 +891,8 @@
   --identity-yellow: #8d6c1a;
   --identity-teal: #017f72;
   --identity-coral: #d1381f;
+  --identity-white: #70707a;
+  --identity-black: #1B1B1E;
 }
 
 
@@ -2676,6 +2696,8 @@ button:disabled.bg-danger {
 .bot-identity[data-bot-color="yellow"] { color: var(--identity-yellow); }
 .bot-identity[data-bot-color="teal"] { color: var(--identity-teal); }
 .bot-identity[data-bot-color="coral"] { color: var(--identity-coral); }
+.bot-identity[data-bot-color="white"] { color: var(--identity-white); }
+.bot-identity[data-bot-color="black"] { color: var(--identity-black); }
 
 .user-bubble-colored {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16);
