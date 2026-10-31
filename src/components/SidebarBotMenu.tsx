@@ -1,12 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Archive, BellDot, CheckCheck, ChevronRight, ClipboardCopy, Copy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, Pin, PinOff, SquarePen, Trash2, Users } from "lucide-react";
+import { Archive, BellDot, CheckCheck, ChevronRight, ClipboardCopy, Copy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, Pin, PinOff, SquarePen, Users } from "lucide-react";
 import { api, useStore, openBot, type Bot } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { useHeldMenuMotion } from "./MenuMotion";
 import { t } from "@/lib/i18n";
 import { copyText } from "@/lib/copy-text";
-import { allThreadRows, BotDeleteMenuItem, useDeleteAllThreads } from "./BotMenuDelete";
+import { BotDeleteMenuItem } from "./BotMenuDelete";
 import { HideDefaultBotItem } from "./DefaultBotControls";
 import { navigateThreadMenu } from "./BotProjects";
 import { botUnreadThreadIds, markBotRead } from "@/lib/folder-read";
@@ -50,7 +50,7 @@ export function BotContextMenu({
   const shown = motion.value;
   const { state, dispatch } = useStore();
   const showThreads = useShowThreads();
-  const clearThreads = useDeleteAllThreads(true), moveToTeam = useMoveToTeam({ blocked: (bot) => (bot.defaultBot ? t("teamMove.blockedDefault", { name: bot.name }) : bot.chiefOfStaff ? t("teamMove.blockedChief") : state.bots.filter((candidate) => !candidate.hidden).length <= 1 ? t("teamMove.blockedLast") : undefined) });
+  const moveToTeam = useMoveToTeam({ blocked: (bot) => (bot.defaultBot ? t("teamMove.blockedDefault", { name: bot.name }) : bot.chiefOfStaff ? t("teamMove.blockedChief") : state.bots.filter((candidate) => !candidate.hidden).length <= 1 ? t("teamMove.blockedLast") : undefined) });
   const remoteClient = window.ogb?.remoteClient?.active === true;
   const bot = shown ? state.bots.find((b) => b.id === shown.botId) : undefined;
   const team = useTeamPeople();
@@ -128,7 +128,7 @@ export function BotContextMenu({
     flyout.style.top = `${place.top}px`;
   });
 
-  if (!motion.shown || !bot || !shown) return <>{clearThreads.dialog}{moveToTeam.dialog}</>;
+  if (!motion.shown || !bot || !shown) return <>{moveToTeam.dialog}</>;
   const deleting = state.deletingBots[bot.id] === true;
   const engine = state.instances.find((instance) => instance.instanceId === bot.modelSelection.instanceId);
   const canCoordinate = engine?.capabilities?.agentsMcp === true;
@@ -176,7 +176,7 @@ export function BotContextMenu({
       more.openNow("more");
       if (focus) requestAnimationFrame(() => flyoutRef.current?.querySelector<HTMLButtonElement>("button:not([disabled])")?.focus());
     };
-    const copyId = item(<ClipboardCopy size={16} className="text-ink-secondary" />, t("sidebar.copyConversationId"), () => { void copyText(bot.threadId); });
+    const copyId = item(<ClipboardCopy size={16} className="text-ink-secondary" />, t("sidebar.copyBotId"), () => { void copyText(bot.id); });
     const moveToSection = item(<FolderPlus size={16} className="text-ink-secondary" />, t("sidebar.bot.moveToSection"), () => { onClose(); onMoveToSection(bot.id); });
     const rename = onRename && item(<SquarePen size={16} className="text-ink-secondary" />, t("sidebar.bot.rename"), () => onRename(bot.id));
     const editProfile = item(<Pencil size={16} className="text-ink-secondary" />, t("sidebar.bot.simple.editProfile"), () => {
@@ -184,7 +184,6 @@ export function BotContextMenu({
       if (!state.settingsOpen) dispatch({ type: "toggleSettings", open: true });
     });
     const owner = team && mayChangeOwner(bot, team) ? item(<Users size={16} className="text-ink-secondary" />, ownerMenuLabel(bot, team), () => pickOwnerOf([bot], team, shown)) : null;
-    const deleteAll = allThreadRows(bot).length >= 2 ? [divider("more-threads"), item(<Trash2 size={16} />, t("task.deleteAllConversations"), () => clearThreads.ask(bot.id), { danger: true })] : [];
     const readState = readingBotId === bot.id || botUnreadThreadIds(bot).length > 0
       ? item(
         readingBotId === bot.id ? <Loader2 size={16} className="animate-spin text-ink-secondary" /> : <CheckCheck size={16} className="text-ink-secondary" />,
@@ -193,7 +192,7 @@ export function BotContextMenu({
         { disabled: readingBotId !== null, keepOpen: true },
       )
       : item(<BellDot size={16} className="text-ink-secondary" />, t("sidebar.bot.simple.markUnread"), () => dispatch({ type: "markUnread", botId: bot.id }));
-    const moreItems = remoteClient ? [editProfile, owner, ...deleteAll] : [
+    const moreItems = remoteClient ? [editProfile, owner] : [
       editProfile,
       item(
         <Crown size={16} className={bot.chiefOfStaff ? "text-accent" : "text-ink-secondary"} />,
@@ -204,7 +203,6 @@ export function BotContextMenu({
       item(<Copy size={16} className="text-ink-secondary" />, t("sidebar.bot.duplicate"), () => dispatch({ type: "duplicateBot", botId: bot.id })),
       owner,
       ...moveToTeam.items(bot, item),
-      ...deleteAll,
     ];
     const moreRow = (
       <button
@@ -232,7 +230,7 @@ export function BotContextMenu({
       item(<Archive size={16} className="text-ink-secondary" />, t("sidebar.bot.archive"), () => onArchive(bot), { disabled: archiveBlocked, hint: archiveHint }),
       <BotDeleteMenuItem key="delete" deleting={deleting} className={SIMPLE_MENU_ITEM} onClick={() => { onClose(); onDelete(bot); }} />,
     ];
-    return <>{clearThreads.dialog}{moveToTeam.dialog}{createPortal(
+    return <>{moveToTeam.dialog}{createPortal(
       <div
         ref={menuRef}
         data-bot-menu
