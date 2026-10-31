@@ -194,7 +194,8 @@ describe("Settings, the one plain UI", () => {
       'aria-label="Notification sounds"', 'aria-label="Show the notification feed"', 'aria-label="App language"', 'role="radiogroup" aria-label="Theme"']) {
       expect(placement(appearance, shown), shown).toBe("shown");
     }
-    expect(placement(appearance, 'aria-label="Choose sidebar density"')).toBe("folded");
+    // The density setting went with the compact layout: the sidebar's own toggle is the only way to the icons rail.
+    expect(placement(appearance, 'aria-label="Choose sidebar density"')).toBe("missing");
     const ai = open("engines");
     expect(markers(ai)).toEqual(expect.arrayContaining(["engines", "keepWarm", "decisionModel", "mcpCalls", "defaults"]));
     expect(ai).toContain('aria-label="Effort for new bots"');
