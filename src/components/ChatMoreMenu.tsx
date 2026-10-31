@@ -1,5 +1,5 @@
 import { useMemo, useState, type JSX } from "react";
-import { Copy, Download, Gauge, MessagesSquare, Monitor, MoreHorizontal, Search, Share, SquarePen, UserRound } from "lucide-react";
+import { Copy, Download, Gauge, MessagesSquare, Monitor, MoreHorizontal, RotateCcw, Search, Share, SquarePen, UserRound } from "lucide-react";
 import { currentTaskBot, openBotThread, useStore, visibleMessages, type Bot } from "@/state/store";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { requestChatFind, useChatFindOpen } from "@/lib/chat-find";
@@ -100,6 +100,21 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
       icon: <Download size={16} />,
       disabled: !hasMessages,
       onSelect: () => downloadMarkdownTranscript(slugifyTranscriptFilename(bot.name), transcript()),
+    },
+    {
+      key: "reset-context",
+      label: t("cloudWelcome.bring.fresh"),
+      icon: <RotateCcw size={16} />,
+      disabled: !hasMessages,
+      separatorBefore: true,
+      onSelect: () => {
+        const recent = messages.slice(-6).map((message) => {
+          const text = (message.kind === "text" ? message.text : message.tool?.summary) ?? "";
+          const flat = text.replace(/\s+/g, " ").trim().slice(0, 200);
+          return flat ? message.role + ": " + flat : null;
+        }).filter((line): line is string => Boolean(line));
+        dispatch({ type: "newTask", botId: bot.id, handover: recent.join("\n") });
+      },
     },
     ...(usage ? [{
       key: "usage",

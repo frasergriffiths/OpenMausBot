@@ -42,8 +42,7 @@ Landed: POST /api/bots/:id/context/reset (creates a fresh thread, optional
 handover message, leaves memories/instructions/identity untouched) and the
 store's newTask action carrying an optional handover to that route.
 
-Blocked: the chat menu entry needs a new user-facing string, and adding one
-means regenerating src/locales/source-hashes.json, which is ~6 MB and beyond
+Done: the chat menu entry (labelled with the existing Start fresh string)., Adding a new string would mean regenerating src/locales/source-hashes.json, which is ~6 MB and beyond
 the single-request push limit. Options next session: reuse an existing key, or
 find a push path for that file.
 

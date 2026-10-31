@@ -77,7 +77,7 @@ describe("ChatMoreMenu, the round ⋯ for the bot panel", () => {
 
   it("offers every plain item, unlocked", () => {
     const menu = menuOf(createElement(ChatMoreMenu, { bot }));
-    expect(keys(menu.items)).toEqual(["find", "new-thread", "threads", "copy", "download"]);
+    expect(keys(menu.items)).toEqual(["find", "new-thread", "threads", "copy", "download", "reset-context"]);
     for (const item of menu.items) {
       expect(item.disabled, item.key).toBeFalsy();
       expect(item.heading ?? "", item.key).not.toContain("In Advanced mode");
@@ -87,7 +87,7 @@ describe("ChatMoreMenu, the round ⋯ for the bot panel", () => {
 
   it("drops the thread items when the sidebar already shows threads", () => {
     fixture.threadsChosen = true;
-    expect(keys(menuOf(createElement(ChatMoreMenu, { bot })).items)).toEqual(["find", "copy", "download"]);
+    expect(keys(menuOf(createElement(ChatMoreMenu, { bot })).items)).toEqual(["find", "copy", "download", "reset-context"]);
   });
 
   it("starts a new thread with the bot", () => {
@@ -117,7 +117,7 @@ describe("ChatMoreMenu, the round ⋯ for the bot panel", () => {
 
   it("leaves All threads out while the bot has one thread", () => {
     const single = { ...bot, threadId: "main", tasks: [task("main", "Our chat", 1), task("routine", "Morning digest", 5, { routineRunId: "run-1" })] };
-    expect(keys(menuOf(createElement(ChatMoreMenu, { bot: single })).items)).toEqual(["find", "new-thread", "copy", "download"]);
+    expect(keys(menuOf(createElement(ChatMoreMenu, { bot: single })).items)).toEqual(["find", "new-thread", "copy", "download", "reset-context"]);
     expect(keys(menuOf(createElement(ChatMoreMenu, { bot: { ...bot, tasks: undefined } })).items)).not.toContain("threads");
   });
 
@@ -154,7 +154,7 @@ describe("ChatHeaderMenu, the remote client's header ⋯", () => {
 
   it("keeps every plain item, opening on hover below the header", () => {
     const menu = menuOf(createElement(ChatHeaderMenu, { bot }));
-    expect(keys(menu.items)).toEqual(["find", "copy", "download"]);
+    expect(keys(menu.items)).toEqual(["find", "copy", "download", "reset-context"]);
     expect(menu.items.every((item) => !item.disabled && !String(item.heading ?? "").includes("In Advanced mode"))).toBe(true);
     expect(menu).toMatchObject({ placement: "below", openOnHover: true });
     expect(menu.trigger).toMatch(/data-testid="chat-more"/);
