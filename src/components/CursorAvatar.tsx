@@ -1260,6 +1260,11 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
             <stop offset="100%" stopColor={gradient[2]} />
           </linearGradient>
           {/* The fit goes on the clipPath itself: browsers ignore a <g> inside one, which is also why silhouette.clip is pre-flattened. */}
+          <radialGradient id={`${uid}-sheen`} cx="0.34" cy="0.20" r="0.78">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.30" />
+            <stop offset="55%" stopColor="#ffffff" stopOpacity="0.07" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+          </radialGradient>
           <clipPath
             id={`${uid}-clip`}
             transform={silhouette.fit || undefined}
@@ -1272,6 +1277,7 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
           <g ref={bodyContent}>
           {picture ? <image href={picture} x="-15" y="-15" width={VIEW_SPAN} height={VIEW_SPAN} preserveAspectRatio="none" /> : <g transform={silhouette.fit || undefined} dangerouslySetInnerHTML={{ __html: body }} />}
           <g clipPath={`url(#${uid}-clip)`} visibility={picture ? 'hidden' : undefined}>
+            <rect x="-240" y="-240" width="680" height="680" fill={`url(#${uid}-sheen)`} aria-hidden="true" />
             <g transform={anchorTransform(silhouette.anchor)}>
               <path ref={eye0} fill={eyeColor} />
               <path ref={eye1} fill={eyeColor} />
