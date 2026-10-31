@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
+import { Checkbox } from "@/components/ui";
 import { t } from "@/lib/i18n";
 import { readMcpPaste, type McpPasteError } from "@/lib/mcp-paste";
 
@@ -216,9 +217,7 @@ export function McpServerEditor({ server, fixKeys = false, taken, team, busy, on
         <div data-mcp-team-scope className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-lg bg-raised/50 px-3 py-2 text-[12px]">
           <span className="text-ink-secondary">{t(canKeepOwn && onlyMe ? "mcp.team.onlyMeOn" : "mcp.team.everyone")}</span>
           {canKeepOwn && (
-            <label className="flex items-center gap-1.5 text-ink">
-              <input type="checkbox" checked={onlyMe} onChange={(event) => setOnlyMe(event.target.checked)} /> {t("mcp.team.onlyMe")}
-            </label>
+            <Checkbox checked={onlyMe} onChange={setOnlyMe} label={t("mcp.team.onlyMe")} />
           )}
         </div>
       )}

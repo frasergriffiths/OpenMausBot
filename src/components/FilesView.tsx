@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Folder, FolderOpen, MoreHorizontal } from "lucide-react";
 import type { CloudFilesBridge, CloudFilesDisk, CloudFilesState, FolderCheck, SharedFolder } from "../../electron/cloud-sync.mjs";
 import { cn } from "@/lib/cn";
+import { Checkbox } from "@/components/ui";
 import { SIMPLE_MENU, SIMPLE_MENU_ITEM } from "./SidebarSimpleTop";
 import { cloudFilesBridge, useCloudFiles } from "@/lib/cloud-files";
 import { activeLocale, t } from "@/lib/i18n";
@@ -159,14 +160,17 @@ function FilesPage({ bridge }: { bridge: CloudFilesBridge }) {
       <p className="mt-1.5 text-[13px] leading-relaxed text-ink-secondary">{t("files.suggest.body")}</p>
       <ul className="mt-3 flex max-h-72 flex-col gap-1 overflow-y-auto">
         {ask.checks.map((check, index) => <li key={`${index}:${check.pcPath}`}>
-          <label className={cn("flex items-start gap-3 rounded-lg px-2 py-2", check.refusal && "opacity-50")}>
-            <input type="checkbox" className="mt-1" disabled={Boolean(check.refusal)} checked={!check.refusal && ask.chosen.includes(check.token)}
-              onChange={(event) => setAsk({ ...ask, chosen: event.target.checked ? [...ask.chosen, check.token] : ask.chosen.filter((token) => token !== check.token) })} />
-            <span className="flex min-w-0 flex-col">
-              <span className="truncate text-[14px] text-ink" title={check.pcPath}>{check.name}</span>
-              <span className="text-[12px] text-ink-secondary">{check.refusal ? refusalText(check.refusal, true) : folderSize(check)}</span>
-            </span>
-          </label>
+          <div className={cn("px-2 py-2", check.refusal && "opacity-50")}>
+            <Checkbox
+              disabled={Boolean(check.refusal)}
+              checked={!check.refusal && ask.chosen.includes(check.token)}
+              onChange={(next) => setAsk({ ...ask, chosen: next ? [...ask.chosen, check.token] : ask.chosen.filter((token) => token !== check.token) })}
+              label={<span className="flex min-w-0 flex-col">
+                <span className="truncate text-[14px] text-ink" title={check.pcPath}>{check.name}</span>
+                <span className="text-[12px] text-ink-secondary">{check.refusal ? refusalText(check.refusal, true) : folderSize(check)}</span>
+              </span>}
+            />
+          </div>
         </li>)}
       </ul>
     </FilesDialog>}

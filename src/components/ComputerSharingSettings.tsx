@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FolderPlus, X } from "lucide-react";
-import { SettingsCard } from "@/components/ui";
+import { Checkbox, SettingsCard } from "@/components/ui";
 import { useStore } from "@/state/store";
 import { sharedComputersEnabled } from "@/lib/feature-flags";
 import { LendingActivityList } from "./LendingActivity";
@@ -56,7 +56,7 @@ export function ComputerSharingSettings({ workspace, onClose }: { workspace: { i
         {folders.length === 0 && <p className="text-[12px] text-ink-secondary">No folders shared. New folders are read-only by default.</p>}
         {folders.map(folder => <div key={folder.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline/40 p-3">
           <div className="min-w-0 flex-1"><p className="font-medium text-ink">{folder.name}</p><p className="break-all text-[12px] text-ink-secondary">{folder.path}</p></div>
-          <label className="flex items-center gap-2 text-[12px] text-ink-secondary"><input type="checkbox" checked={folder.write} onChange={event => setFolders(current => current.map(entry => entry.id === folder.id ? { ...entry, write: event.target.checked } : entry))} />Allow edits</label>
+          <Checkbox className="text-[12px]" checked={folder.write} onChange={write => setFolders(current => current.map(entry => entry.id === folder.id ? { ...entry, write } : entry))} label="Allow edits" />
           <button type="button" aria-label={`Remove ${folder.name}`} onClick={() => setFolders(current => current.filter(entry => entry.id !== folder.id))} className="rounded p-1 text-ink-secondary hover:bg-control"><X size={14} /></button>
         </div>)}
         <button type="button" disabled={folders.length >= 20} onClick={() => void perform(async () => {

@@ -38,8 +38,8 @@ export function Checkbox({
       <span className="relative flex shrink-0 items-center justify-center pt-[1px]">
         <input
           id={inputId}
-          name={name}
           type="checkbox"
+          name={name}
           className="peer absolute inset-0 z-10 size-[18px] cursor-[inherit] opacity-0"
           checked={checked}
           disabled={disabled}

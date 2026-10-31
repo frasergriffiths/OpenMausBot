@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { cn } from "@/lib/cn";
+import { Checkbox } from "@/components/ui";
 import { t, tFromServer } from "@/lib/i18n";
 import { describePart, describeSkip, preparePictures, saveShareFile, type ShareSkip } from "@/lib/team-share";
 import { api } from "@/state/store";
@@ -205,14 +206,8 @@ export function SharePresetDialog({ onClose }: { onClose: () => void }) {
                 ? <SharePresetContents preview={preview} localSkips={localSkips} />
                 : !error && <div className="flex items-center gap-2 py-6 text-[13px] text-ink-secondary"><Loader2 size={15} className="animate-spin" />{t("presetShare.preparing")}</div>}
               <fieldset className="mt-4 space-y-2 text-[13px]" disabled={saving}>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="size-4 accent-accent" checked={includePicture} onChange={(event) => setIncludePicture(event.target.checked)} />
-                  {t("presetShare.includePicture")}
-                </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" className="size-4 accent-accent" checked={includeNotes} onChange={(event) => setIncludeNotes(event.target.checked)} />
-                  {t("presetShare.includeNotes")}
-                </label>
+                <Checkbox checked={includePicture} onChange={setIncludePicture} label={t("presetShare.includePicture")} />
+                <Checkbox checked={includeNotes} onChange={setIncludeNotes} label={t("presetShare.includeNotes")} />
               </fieldset>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <label className="block text-[13px] text-ink-secondary">{t("presetShare.name")}
