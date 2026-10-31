@@ -87,7 +87,15 @@ export const MASCOT_BODIES: Record<MascotBodyId, MascotBody> = {
   },
 };
 
+/** Shapes the app used before BotKit, so an install that stored one keeps its variety. */
+const LEGACY_BODIES: Record<string, MascotBodyId> = {
+  cursor: "kit", circle: "bun", shield: "lop", hexagon: "tuft", diamond: "imp",
+  star: "hare", sparkle: "nib", wedge: "tuft", cloud: "kit",
+};
+
 /** Runtime-safe read of an untrusted persisted or streamed body id. */
 export function botMascotBody(value: unknown): MascotBodyId {
-  return mascotBodySchema.safeParse(value).data ?? DEFAULT_MASCOT_BODY;
+  const direct = mascotBodySchema.safeParse(value).data;
+  if (direct) return direct;
+  return typeof value === "string" ? LEGACY_BODIES[value] ?? DEFAULT_MASCOT_BODY : DEFAULT_MASCOT_BODY;
 }

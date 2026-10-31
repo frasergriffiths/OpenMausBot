@@ -928,7 +928,7 @@ export const CursorAvatar = React.forwardRef<CursorAvatarHandle, CursorAvatarPro
       flip = false,
       spring = 7,
       eyeScale = 1,
-      showMouth = true,
+      showMouth = false,
       mouthStroke = MOUTH_STROKE,
       motion,
       effects = true,
