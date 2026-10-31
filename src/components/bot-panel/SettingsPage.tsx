@@ -221,15 +221,13 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
             className="min-w-0 flex-1 bg-transparent text-right text-[13px] text-ink-secondary outline-none placeholder:text-ink-tertiary focus:text-ink"
           />
         </label>
-        {derived.botRoutines.length > 0 && (
-          <NavRow
-            data-panel-page="routines"
-            icon={Calendar}
-            title={t("botSettings.simple.routines")}
-            value={routinesOn > 0 ? t("botPanel.routinesOn", { count: routinesOn }) : t("botPanel.none")}
-            onClick={() => onOpen?.("routines")}
-          />
-        )}
+        <NavRow
+          data-panel-page="routines"
+          icon={Calendar}
+          title={t("botSettings.simple.routines")}
+          value={routinesOn > 0 ? t("botPanel.routinesOn", { count: routinesOn }) : t("botPanel.none")}
+          onClick={() => onOpen?.("routines")}
+        />
       </Card>
 
       <DefaultBotHideRow bot={bot} />
