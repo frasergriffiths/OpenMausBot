@@ -20,9 +20,9 @@ const boot = (store: Store) => ensureDefaultBot(store, { dataDir: DATA_DIR });
 const briefChief = (store: Store) => createBrief({ store, dataDir: DATA_DIR, hosted: false, watching: () => true, mainThread: (id) => store.bot(id)?.threadId,
   threadBusy: () => false, notify: () => {}, runs: () => [], needsYou: () => [], engineName: () => "Claude", hostTimeZone: () => "UTC", language: () => undefined, session: () => null,
   address: () => undefined, failRun: () => {}, keep: () => {}, items: () => null }).chief();
-/** A new install from before MausBot was marked: its first bot was MausBot in silver, made its Chief. */
+/** A new install from before MausBot was marked: its first bot was MausBot in the default colour, made its Chief. */
 function seededBefore(store: Store): BotRecord {
-  const seeded = store.createBot({ name: "MausBot", color: "silver" });
+  const seeded = store.createBot({ name: "MausBot" });
   store.setChiefOfStaff(seeded.id);
   return seeded;
 }
@@ -31,7 +31,7 @@ describe("MausBot, every person's helper", () => {
   beforeEach(() => rmSync(DATA_DIR, { recursive: true, force: true }));
   afterEach(() => readTeamRolesWith(() => null));
 
-  it("gives a fresh install one MausBot, its Chief, in chrome, introduced once", () => {
+  it("gives a fresh install one MausBot, its Chief, in the default green, introduced once", () => {
     const store = new Store(selection);
     store.seedIfEmpty();
     boot(store);

@@ -11,7 +11,7 @@ import { botRowProps } from "./Sidebar";
 import { SidebarBotTile, SidebarTileGrid } from "./SidebarTiles";
 
 const bot = (extra: Partial<Bot> = {}): Bot => ({
-  id: "mausbot", threadId: "t", name: "MausBot", title: "", description: "", notifications: true, color: "chrome",
+  id: "mausbot", threadId: "t", name: "MausBot", title: "", description: "", notifications: true, color: "green",
   unread: false, modelSelection: { instanceId: "fake", model: "m" }, messages: [], ...extra,
 });
 const dispatch = vi.fn();

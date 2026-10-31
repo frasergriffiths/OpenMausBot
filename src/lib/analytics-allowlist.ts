@@ -27,7 +27,7 @@ export const SECTION_PROVIDER = {
 
 const CREDENTIAL_PROVIDER = new Map<string, KeyProvider>(Object.entries({
   boxToken: "boat", xaiApiKey: "xai", opencodeGoApiKey: "opencode_go", ttsKey: "elevenlabs", fishAudioKey: "fish_audio",
-  openaiImageApiKey: "openai_image", onePasswordToken: "onepassword",
+  onePasswordToken: "onepassword",
 } satisfies Record<CredentialTargetId, KeyProvider>));
 
 export function credentialProvider(target: unknown): KeyProvider | "other" {

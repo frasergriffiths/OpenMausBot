@@ -18,7 +18,6 @@ const MAPPINGS: Array<[ConfigCredentialTargetId, CredentialConfig]> = [
   ["opencodeGoApiKey", { opencodeGo: { apiKey: "secret" } }],
   ["ttsKey", { tts: { key: "secret" } }],
   ["fishAudioKey", { tts: { fishKey: "secret" } }],
-  ["openaiImageApiKey", { imageGen: { key: "secret" } }],
 ];
 
 describe("credential request allowlist", () => {

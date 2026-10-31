@@ -34,12 +34,6 @@ export const CREDENTIAL_TARGETS = {
     placeholder: "Paste your Fish Audio API key",
     helpUrl: "https://fish.audio/app/api-keys/",
   },
-  openaiImageApiKey: {
-    label: "OpenAI API key",
-    description: "Used only to generate custom bot avatar images.",
-    placeholder: "sk-…",
-    helpUrl: "https://platform.openai.com/api-keys",
-  },
   onePasswordToken: {
     label: "1Password service account token",
     description: "Lets bots sign in with the website logins in the 1Password vault this token can read, the way Settings → Logins does.",
@@ -57,7 +51,6 @@ export type CredentialConfig = {
   box?: { token?: string };
   opencodeGo?: { apiKey?: string };
   tts?: { key?: string; fishKey?: string };
-  imageGen?: { key?: string };
   /** Not in the settings file: the server fills it from its login store. */
   onePassword?: { connected?: boolean };
 };
@@ -89,8 +82,6 @@ export function credentialConfigPatch(id: ConfigCredentialTargetId, value: strin
       return { tts: { key: value } };
     case "fishAudioKey":
       return { tts: { fishKey: value } };
-    case "openaiImageApiKey":
-      return { imageGen: { key: value } };
   }
 }
 
@@ -106,8 +97,6 @@ export function credentialIsConfigured(config: CredentialConfig, id: CredentialT
       return Boolean(config.tts?.key);
     case "fishAudioKey":
       return Boolean(config.tts?.fishKey);
-    case "openaiImageApiKey":
-      return Boolean(config.imageGen?.key);
     case "onePasswordToken":
       return Boolean(config.onePassword?.connected);
   }

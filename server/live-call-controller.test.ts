@@ -1061,7 +1061,7 @@ describe("LiveCallController relay", () => {
 
     it("points at the chat for a credential, and never asks for it aloud", async () => {
       const t = await live();
-      const secret = { target: "openaiImageApiKey", label: "OpenAI image key", description: "", placeholder: "sk-", helpUrl: "", requestKey: "r1" } as never;
+      const secret = { target: "ttsKey", label: "ElevenLabs key", description: "", placeholder: "sk-", helpUrl: "", requestKey: "r1" } as never;
       t.message({ id: "k1", kind: "secret", secret });
       t.message({ id: "k2", kind: "secret", secret: { ...(secret as object), requestKey: "r2", superseded: true } as never });
       await vi.advanceTimersByTimeAsync(0);

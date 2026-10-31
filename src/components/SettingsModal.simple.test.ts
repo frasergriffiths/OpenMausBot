@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { setLocale, t } from "@/lib/i18n";
 import type { AppSettingsSection } from "@/state/store";
-import type { Switch } from "./SettingsPrimitives";
+import type { Switch } from "./ui";
 import { SECTIONS, SIMPLE_FOLDED, SIMPLE_HIDDEN_SECTIONS, SIMPLE_PAGES, SettingsModal, revealSettingsBlock } from "./SettingsModal";
 
 const fixture = vi.hoisted(() => ({
@@ -26,8 +26,8 @@ vi.mock("@/state/store", async (importOriginal) => ({
 }));
 vi.mock("@/lib/analytics", () => ({ analyticsEnabled: () => false, setAnalyticsEnabled: vi.fn() }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => fixture.ownerOrAdmin }));
-vi.mock("./SettingsPrimitives", async (importOriginal) => {
-  const original = await importOriginal<typeof import("./SettingsPrimitives")>();
+vi.mock("./ui", async (importOriginal) => {
+  const original = await importOriginal<typeof import("./ui")>();
   return {
     ...original,
     Switch: (props: ComponentProps<typeof Switch>) => {

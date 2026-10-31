@@ -35,7 +35,8 @@ import type {
   TaskClosedBy, TaskOpenedBy, TaskUsage, WireBot, WireGroup,
   WireMessage, WireTask, BotProject as BotProjectRecord,
 } from "../shared/wire.ts";
-import { movesThreadToTop, nextOpenThread } from "../shared/wire.ts";
+import { isMausColor, movesThreadToTop, nextOpenThread } from "../shared/wire.ts";
+import { DEFAULT_BOT_COLOR } from "../shared/default-bot.ts";
 import { parseConnectorTools } from "./connector-tools.ts";
 import { sameModelSelection } from "../shared/thread-model.ts";
 import { initialGreetingMessage } from "./initial-greeting.ts"; import { createDefaultBot, defaultBotRefusal, type DefaultBotIntro } from "./default-bot.ts";
@@ -352,6 +353,12 @@ export class Store {
       if (b.busy || (b.activity !== undefined && b.activity !== "idle")) botsMigrated = true;
       b.busy = false;
       b.activity = "idle";
+      // A colour the palette no longer has (the retired chrome and silver) reads as the default green, so the
+      // renderer never meets a hue it cannot look up.
+      if (!isMausColor(b.color)) {
+        b.color = DEFAULT_BOT_COLOR;
+        botsMigrated = true;
+      }
       if (typeof b.soul !== "string") {
         b.soul = "";
         botsMigrated = true;

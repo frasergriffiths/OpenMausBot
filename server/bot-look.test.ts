@@ -4,9 +4,8 @@ import { DEFAULT_MASCOT_BODY } from "../shared/mascot-bodies.ts";
 import { freshLook, STARTER_COLORS } from "./bot-look.ts";
 
 describe("a new bot's first look", () => {
-  it("is always the mascot's own shape, never a metal colour", () => {
-    expect(STARTER_COLORS).not.toContain("silver");
-    expect(STARTER_COLORS).not.toContain("chrome");
+  it("is always the mascot's own shape, in one of the ten hues", () => {
+    expect(STARTER_COLORS).toEqual(["green", "blue", "red", "orange", "purple", "cyan", "pink", "yellow", "teal", "coral"]);
     for (const roll of [0, 0.5, 0.999]) expect(freshLook([], () => roll).mascotBody).toBe(DEFAULT_MASCOT_BODY);
   });
 
