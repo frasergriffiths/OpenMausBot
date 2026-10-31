@@ -39,12 +39,10 @@ describe("sidebar bot threads", () => {
     expect(markup).not.toContain("test");
   });
 
-  it("keeps All threads accessible even with one thread so its history actions remain reachable", () => {
+  it("draws no thread picker at all while threads are off", () => {
     const render = (candidate: Bot) => renderToStaticMarkup(createElement(StoreProvider, null, createElement(TaskPicker, { bot: candidate })));
-    expect(render(bot)).toContain('aria-label="All threads"');
-    const single = render({ ...bot, tasks: [bot.tasks![1]!] });
-    expect(single).toContain("All threads");
-    expect(single).not.toContain('disabled=""');
+    expect(render(bot)).toBe("");
+    expect(render({ ...bot, tasks: [bot.tasks![1]!] })).toBe("");
   });
 
   it("shows fresh threads with a relative stamp while the tooltip keeps the full date", () => {
