@@ -126,7 +126,6 @@ const { SoulField } = await import("./SoulField");
 const { ModelPicker } = await import("./ModelPicker");
 const { RoutineList } = await import("./routines/RoutineList");
 const { SignedInSites } = await import("./SignedInSites");
-const { AvatarImageGenerator } = await import("./AvatarImageGenerator");
 const { AvatarFraming } = await import("./avatar-editing");
 const { Switch } = await import("./ui");
 
@@ -548,13 +547,9 @@ describe("the avatar editor", () => {
     expect(patch).toHaveBeenLastCalledWith({ avatarCrop: "mascot", color: "green", mascotExpression: null, mascotBody: "cursor" });
   });
 
-  it("generates with the shared generator, and uploads with shape and framing", () => {
+  it("uploads with shape and framing", () => {
     const bot = makeBot();
-    click(find(editor(bot), "data-avatar-tab", "generate"));
-    const generate = editor(bot);
-    expect(ofType(generate, AvatarImageGenerator)!.props.botLabel).toBe("Researcher");
-
-    click(find(generate, "data-avatar-tab", "upload"));
+    click(find(editor(bot), "data-avatar-tab", "upload"));
     const upload = editor(bot);
     expect(upload.html).toContain("Drop a picture here, or choose one");
     expect(upload.html).toContain("PNG, JPEG, GIF, or WebP · up to 10 MB");

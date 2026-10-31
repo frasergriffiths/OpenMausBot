@@ -93,16 +93,6 @@ export interface ConfigStatus {
   /** Live calls (OpenAI GPT-Live): configured-or-not, never the key. */
   live?: LiveSettings;
   /** Shared write-only credential for on-demand GPT Image avatars. */
-  imageGen?: {
-    configured: boolean;
-    provider?: "openai" | "xai" | "custom";
-    model?: string;
-    customUrl?: string;
-    customModel?: string;
-    openaiConfigured?: boolean;
-    xaiConfigured?: boolean;
-    customKeyConfigured?: boolean;
-  };
   /** who's using the app — collected in onboarding, shown in the sidebar */
   profile?: { name: string; email: string; aboutMe?: string; avatarUrl?: string };
   /** UI language override; "" (or absent) follows the system language. */

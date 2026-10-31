@@ -9,15 +9,13 @@ import type { Bot } from "@/state/store";
 import { MASCOT_BODIES, MASCOT_BODY_IDS } from "../../../shared/mascot-bodies";
 import type { BotBodyId } from "../../../shared/bot-body";
 import { MausAvatar } from "../Avatar";
-import { AvatarImageGenerator } from "../AvatarImageGenerator";
 import { AvatarFraming, OrganizationAvatarIcons, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "../avatar-editing";
 import { Segmented } from "./rows";
 
-export type AvatarEditorTab = "bot" | "generate" | "upload";
+export type AvatarEditorTab = "bot" | "upload";
 
 const TABS: ReadonlyArray<readonly [AvatarEditorTab, LocaleKey]> = [
   ["bot", "botPanel.avatar.tabBot"],
-  ["generate", "botPanel.avatar.tabGenerate"],
   ["upload", "botPanel.avatar.tabUpload"],
 ];
 
@@ -53,7 +51,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
   onClose: () => void;
 }) {
   const image = useAvatarImage(bot, onPatch);
-  const { fileRef, crop, uploading, generating, setSavingConnection, busy, error, upload, removeImage, generate } = image;
+  const { fileRef, crop, uploading, busy, error, upload, removeImage } = image;
   const showsImage = crop !== "mascot" && Boolean(bot.avatarUrl);
   const [tab, setTab] = useState<AvatarEditorTab>(showsImage ? "upload" : "bot");
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -183,18 +181,6 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
               </div>
             )}
           </>
-        )}
-
-        {tab === "generate" && (
-          <div className="[&>div:first-child]:mt-0 [&>div:first-child]:border-0 [&>div:first-child]:pt-0">
-            <AvatarImageGenerator
-              botLabel={bot.title || bot.name}
-              disabled={uploading}
-              generating={generating}
-              onGenerate={generate}
-              onSavingChange={setSavingConnection}
-            />
-          </div>
         )}
 
         {tab === "upload" && (

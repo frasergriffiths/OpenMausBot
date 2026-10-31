@@ -1,6 +1,6 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 
-import { useStore, type Bot } from "@/state/store";
+import type { Bot } from "@/state/store";
 import { imageAttachmentFromFile } from "@/lib/composer-attachments";
 import { useOrganizationBranding } from "@/lib/use-organization-branding";
 import {
@@ -130,17 +130,14 @@ export function OrganizationAvatarIcons({ busy, onUpload }: { busy: boolean; onU
 }
 
 export function useAvatarImage(bot: Bot, onPatch: (patch: AvatarPatch) => void) {
-  const { flushBotPatches } = useStore();
-  const { request: api, uploadAvatar } = useBotEditor();
+  const { uploadAvatar } = useBotEditor();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [savingConnection, setSavingConnection] = useState(false);
-  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const crop = bot.avatarCrop ?? "mascot";
   const cropRef = useRef(crop);
   cropRef.current = crop;
-  const busy = uploading || generating || savingConnection;
+  const busy = uploading;
 
   const upload = async (file: File | undefined) => {
     if (!file || busy) return;
@@ -177,33 +174,6 @@ export function useAvatarImage(bot: Bot, onPatch: (patch: AvatarPatch) => void) 
     });
   };
 
-  const generate = async (direction: string) => {
-    if (busy) return;
-    setGenerating(true);
-    setError(null);
-    try {
-      // Commit debounced profile edits first, then feed the generated avatar back through the same serialized mutation
-      // lane as upload and remove.
-      const cropAtStart = cropRef.current;
-      await flushBotPatches(bot.id);
-      const result: { avatarUrl: string; bot: Bot } = await api(`/api/bots/${bot.id}/avatar/generate`, {
-        method: "POST",
-        body: JSON.stringify({ prompt: direction.trim() }),
-      });
-      const latestCrop = cropRef.current;
-      onPatch({
-        avatarUrl: result.avatarUrl,
-        avatarCrop:
-          latestCrop === cropAtStart
-            ? (result.bot.avatarCrop ?? "circle")
-            : latestCrop,
-      });
-    } catch (generateError) {
-      setError(generateError instanceof Error ? generateError.message : String(generateError));
-    } finally {
-      setGenerating(false);
-    }
-  };
 
-  return { fileRef, crop, uploading, generating, setSavingConnection, busy, error, upload, removeImage, generate };
+  return { fileRef, crop, uploading, busy, error, upload, removeImage };
 }

@@ -14,7 +14,6 @@ import { BOT_AVATAR_CROPS } from "../../shared/bot-avatar";
 import { MASCOT_BODIES, MASCOT_BODY_IDS } from "../../shared/mascot-bodies";
 import type { BotBodyId } from "../../shared/bot-body";
 import { BotAvatar, MausAvatar } from "./Avatar";
-import { AvatarImageGenerator } from "./AvatarImageGenerator";
 import { AvatarFraming, OrganizationAvatarIcons, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "./avatar-editing";
 import { t } from "@/lib/i18n";
 
@@ -29,7 +28,7 @@ export function BotProfileAvatarCard({
   mascotMotion: { kind: Exclude<MausMotion, "none">; nonce: number } | null;
   onPatch: (patch: AvatarPatch) => void;
 }) {
-  const { fileRef, crop, uploading, generating, setSavingConnection, busy, error, upload, removeImage, generate } = useAvatarImage(bot, onPatch);
+  const { fileRef, crop, uploading, busy, error, upload, removeImage } = useAvatarImage(bot, onPatch);
 
   return (
     <div className="overflow-hidden rounded-xl border border-hairline/40 bg-card">
@@ -171,14 +170,6 @@ export function BotProfileAvatarCard({
             </div>
           </>
         )}
-
-        <AvatarImageGenerator
-          botLabel={bot.title || bot.name}
-          disabled={uploading}
-          generating={generating}
-          onGenerate={generate}
-          onSavingChange={setSavingConnection}
-        />
 
         {error && <div role="alert" className="mt-3 text-[12px] text-danger">{error}</div>}
       </div>
