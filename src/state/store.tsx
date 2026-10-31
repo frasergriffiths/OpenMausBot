@@ -535,6 +535,7 @@ export type AppSettingsSection =
   | "appearance"
   | "experimental"
   | "connections"
+  | "sms"
   | "decisionModel"
   | "engines"
   | "companion"

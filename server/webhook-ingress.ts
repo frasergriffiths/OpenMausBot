@@ -88,7 +88,20 @@ function eventName(req: IncomingMessage): string | undefined {
   )?.trim() || undefined;
 }
 
-export function createWebhookIngressHandler(manager: WebhookManager, claimRequest?: () => () => void) {
+/**
+ * An extra receiver that is not an automation webhook: Twilio posts its own
+ * form-encoded message callbacks here, and checks its signature itself. Kept as
+ * one hook so the ingress keeps owning the socket, the body limit and the
+ * request claim rather than opening a second listener.
+ */
+export type WebhookExtra = (
+  req: IncomingMessage,
+  res: ServerResponse,
+  url: URL,
+  readRaw: (req: IncomingMessage) => Promise<string>,
+) => Promise<boolean>;
+
+export function createWebhookIngressHandler(manager: WebhookManager, claimRequest?: () => () => void, extra?: WebhookExtra) {
   return async (req: IncomingMessage, res: ServerResponse) => {
     let url: URL;
     try {
@@ -99,6 +112,7 @@ export function createWebhookIngressHandler(manager: WebhookManager, claimReques
     if (req.method === "GET" && url.pathname === "/health") {
       return json(res, 200, { app: "openmausbot-webhooks", ready: true });
     }
+    if (extra && (await extra(req, res, url, readRawBody))) return;
     const match = url.pathname.match(/^\/hooks\/(wh_[A-Za-z0-9_-]+)(?:\/([^/]+))?$/);
     if (!match) return json(res, 404, { error: "Unknown webhook endpoint" });
     if (req.method !== "POST") return json(res, 405, { error: "Webhooks accept POST requests" });
@@ -166,11 +180,11 @@ export function advertisedWebhookBase(raw: string): string {
 
 export async function listenWebhookIngress(
   manager: WebhookManager,
-  options: { host?: string; port: number; publicBaseUrl?: string; claimRequest?: () => () => void },
+  options: { host?: string; port: number; publicBaseUrl?: string; claimRequest?: () => () => void; extra?: WebhookExtra },
 ): Promise<WebhookIngress> {
   const host = options.host ?? "127.0.0.1";
   const advertised = options.publicBaseUrl === undefined ? undefined : advertisedWebhookBase(options.publicBaseUrl);
-  const handle = createWebhookIngressHandler(manager, options.claimRequest);
+  const handle = createWebhookIngressHandler(manager, options.claimRequest, options.extra);
   const server = createServer((req, res) => {
     handle(req, res).catch((error: unknown) => {
       console.error("webhooks: receiver failed", error);
