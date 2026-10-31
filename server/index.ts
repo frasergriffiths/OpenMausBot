@@ -631,6 +631,7 @@ import { createDevsReports } from "./host/devs-reports.ts"; import { bugReportEn
 import { createCardRequester, linePersonKey } from "./host/thread-person.ts";
 import { createThreadRoutes } from "./routes/threads.ts";
 import { createWebhookRoutes } from "./routes/webhooks.ts";
+import { createTwilioRoutes } from "./routes/twilio.ts"; import { SmsService } from "./twilio/service.ts"; import { createSmsWebhook, SMS_WEBHOOK_PATH } from "./twilio/webhook.ts";
 import { withScopeHint } from "./connector-scope-hint.ts";
 import { connectorRequestItems } from "./connector-request-items.ts";
 import { personAsks as personAskAt } from "./thread-presence.ts";
@@ -9708,12 +9709,34 @@ ROUTES.push(createLimitResetRoutes({ clock: limitClock, routines: routines!, req
   threadTitle: (botId, threadId) => store.bot(botId) && !store.bot(botId)!.hidden ? store.taskByThread(botId, threadId)?.title ?? null : null,
   created: (id, auth) => cloudRoutineAuthors?.wrote(id, auth.kind === "session" ? actorKey(auth) : CLOUD_NOBODY_KEY) }));
 
+// One Twilio integration for the installation: its record lives in the data
+// directory, and only the bot named there answers a text.
+const sms = new SmsService({
+  dataDir: DATA_DIR,
+  bots: () => store.bots.map((bot) => ({ id: bot.id, name: bot.name })),
+  threadFor: (botId) => store.bot(botId)?.threadId ?? null,
+  startTurn: (botId, text, options) => startTurn(botId, text, { threadId: options.threadId }),
+  lastBotText: (threadId) => {
+    const messages = store.messagesFor(threadId);
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index]!;
+      if (message.role === "bot" && message.kind === "text" && typeof message.text === "string" && message.text.trim()) return { id: message.id, text: message.text };
+    }
+    return null;
+  },
+  webhook: () => (WEBHOOK_PUBLIC_URL
+    ? { url: WEBHOOK_PUBLIC_URL.replace(new RegExp("/+$"), "") + SMS_WEBHOOK_PATH, error: null }
+    : { url: null, error: webhookIngressError ?? "OMB_WEBHOOK_PUBLIC_URL is not set, so Twilio cannot reach this server" }),
+  log: (line) => console.log(line),
+});
+
 let webhookIngress: WebhookIngress | null = null;
 let webhookIngressError: string | null = null;
 try {
   webhookIngress = await listenWebhookIngress(webhooks, {
     port: WEBHOOK_PORT, publicBaseUrl: WEBHOOK_PUBLIC_URL,
     claimRequest: () => { moveFreeze.assertTurns(); return workspaceMaintenance.request(); },
+    extra: createSmsWebhook({ sms, publicBaseUrl: () => WEBHOOK_PUBLIC_URL ?? null }),
   });
   const advertised = WEBHOOK_PUBLIC_URL ? ` (advertised as ${webhookIngress.baseUrl})` : "";
   console.log(`openmausbot webhook receiver on http://${webhookIngress.host}:${webhookIngress.port}${advertised}`);
@@ -9728,6 +9751,8 @@ const webhookIngressStatus = () => ({
   ...(webhookIngressError ? { error: webhookIngressError } : {}),
 });
 ROUTES.push(createWebhookRoutes({ webhooks, ingress: webhookIngressStatus, visible: (auth) => visibleTo(viewerFor(auth)) }));
+ROUTES.push(createTwilioRoutes({ sms, bots: () => store.bots.map((bot) => ({ id: bot.id, name: bot.name })) }));
+bus.subscribe((event: RuntimeEvent) => { if (event.type !== "turn.completed") return; void sms.turnCompleted(event.threadId).catch((error: unknown) => console.error("sms: could not send the reply", error)); });
 
 const RUNTIME_KEEP_MS = 30 * 24 * 60 * 60_000;
 let runtimePrunedAt = 0;

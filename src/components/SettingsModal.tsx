@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Archive, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen } from "lucide-react";
+import { Archive, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen, MessageSquareText } from "lucide-react";
 import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
@@ -12,6 +12,7 @@ import { ServerPairingCard } from "./ServerPairingCard";
 import { Notice } from "./Notice";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { currentPhonePairingTarget } from "@/lib/phone-pairing";
+import { SmsSettings } from "./SmsSettings";
 import { CustomDomainSettings } from "./CustomDomainSettings";
 import { RemoteComputerSection } from "./RemoteComputerSection";
 import { ConnectedWorkspacesSettings } from "./ConnectedWorkspacesSettings";
@@ -49,6 +50,7 @@ export const SECTIONS: Array<{
   { id: "companion", group: "you", labelKey: "settings.section.companion", icon: TabletSmartphone, keywords: ["companion", "device", "phone", "desktop", "client", "host", "pair", "pairing", "mobile", "https", "secure", "tailscale", "wifi", "remote", "domain", "dns", "self-hosted", "server", "caddy", "troubleshooting"] },
   { id: "engines", group: "ai", labelKey: "settings.section.engines", icon: Terminal, keywords: ["models", "model providers", "engines", "claude", "codex", "grok", "providers", "cli", "sign in", "subscription"] },
   { id: "connections", group: "keys", labelKey: "settings.section.connections", icon: KeyRound, keywords: ["keys", "api", "api key", "api keys", "connections", "connectors", "composio", "provider keys", "box", "xai", "mistral", "cerebras", "meta", "muse", "vps", "router", "openrouter", "base url", "openai", "anthropic", "groq", "opencode", "deepseek", "provider", "lm studio", "lmstudio", "llm studio", "llmstudio", "bionic"] },
+  { id: "sms", group: "keys", labelKey: "settings.section.sms", icon: MessageSquareText, keywords: ["sms", "text", "texts", "twilio", "phone", "messaging", "messages"] },
   { id: "decisionModel", group: "ai", labelKey: "settings.section.decisionModel", icon: Zap, keywords: ["decision", "extraction", "jev", "typesafe", "cloudflare", "workers ai", "clef", "clairic", "email", "routing", "auto", "rooms", "who answers"] },
   { id: "skills", group: "ai", labelKey: "settings.section.skills", icon: BookOpen, keywords: ["skills", "library", "assign", "agent skills", "skill md"] },
   { id: "desktopWorkspaces", group: "computers", labelKey: "settings.section.desktopWorkspaces", icon: Building2, keywords: ["workspace", "cloud", "hosted", "vps", "server", "servers", "connect", "pair", "switch", "local"] },
@@ -76,7 +78,7 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
     keywords: ["effort", "new bots", "decision", "keep warm", "engines", "model"] },
   { id: "skills", labelKey: "settings.section.experimental", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental"],
     keywords: ["skills", "experimental", "early", "preview", "learn"] },
-  { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
+  { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections", "sms"],
     keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },
   { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["companion", "desktopWorkspaces", "computer", "logins", "workspaces"] },
   { id: "updates", labelKey: "settings.simple.page.updates", descriptionKey: "settings.simple.page.updates.description", icon: CloudDownload, sections: ["updates"],
@@ -246,6 +248,8 @@ export function SettingsModal() {
     switch (id) {
       case "desktopWorkspaces":
         return <ConnectedWorkspacesSettings />;
+      case "sms":
+        return <SmsSettings />;
       case "connections":
         return (
           <SettingsCard title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
