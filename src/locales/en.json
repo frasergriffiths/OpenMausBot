@@ -6700,5 +6700,6 @@
   "settings.sms.replace": "Replace",
   "settings.sms.numberChanged": "The linked phone has been replaced.",
   "settings.sms.disconnectHint": "Disconnecting removes the credentials and the linked phone. Your bots and conversations stay.",
-  "settings.sms.disconnect": "Disconnect"
+  "settings.sms.disconnect": "Disconnect",
+  "settings.sms.group": "Messaging"
 }

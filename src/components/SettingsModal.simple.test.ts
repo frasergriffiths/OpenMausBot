@@ -60,6 +60,7 @@ vi.mock("./CompanionSection", () => ({ CompanionSection: () => null }));
 vi.mock("./ServerPairingCard", () => ({ ServerPairingCard: () => null }));
 vi.mock("./ConnectedWorkspacesSettings", () => ({ ConnectedWorkspacesSettings: marker("desktopWorkspaces") }));
 vi.mock("./LocalComputerSection", () => ({ LocalComputerSection: marker("computer") }));
+vi.mock("./SmsSettings", () => ({ SmsSettings: marker("sms") }));
 vi.mock("./CloudAccountSettings", () => ({ CloudAccountSettings: marker("cloudAccount") }));
 
 vi.mock("./ActivitySection", () => ({ ActivitySection: marker("activity") }));
@@ -247,9 +248,11 @@ describe("Settings, the one plain UI", () => {
     fixture.section = "connections";
     const html = render();
     expect(currentPage(html)).toBe("keys");
-    expect(blocks(html)).toEqual(["connections"]);
+    // Keys and accounts, then the one SMS integration, on the same page.
+    expect(blocks(html)).toEqual(["connections", "sms"]);
     expect(html).toContain("MARKER:apiKey;");
-    expect(groupLabels(html)).toEqual([]);
+    expect(html).toContain("MARKER:sms;");
+    expect(groupLabels(html)).toEqual(["Messaging"]);
   });
 
   it("orders Computer as your bots' computers, your devices, the browser, logins, then Connect from elsewhere", () => {
