@@ -4,11 +4,11 @@ import { QRCodeSVG } from "qrcode.react";
 import { t } from "@/lib/i18n";
 import { copyText, type CopyFeedback } from "@/lib/copy-text";
 import { api } from "@/state/store";
+import { Button, buttonStyles, SettingRow, SettingsCard, SIMPLE_CARD } from "@/components/ui";
 import { isOwnerOrAdmin, readSessionState, type SessionState } from "../lib/session";
 import { readMembership } from "../lib/membership";
 import { lastSeen, minutesLeft } from "../lib/pairing-time";
 import { revealPhonePairing } from "../lib/phone-pairing";
-import { SettingsCard, SettingRow, SIMPLE_CARD } from "@/components/ui";
 import { Select } from "./Select";
 import { cn } from "@/lib/cn";
 import { TeamPhoneCard } from "./TeamPhoneCard";
@@ -46,8 +46,8 @@ export function shownDevices(devices: PairedDevice[], cloudHome: boolean): Paire
   return cloudHome ? devices.filter((device) => device.scopes.includes("admin")) : devices;
 }
 
-const button = "ui-button ui-button-primary";
-const quiet = "ui-button";
+const button = buttonStyles({ variant: "primary", size: "sm" });
+const quiet = buttonStyles({ size: "sm" });
 
 export function ServerPairingCard({ initialSession = null, initialPairingCodes = true, cloudHome = false, focusRequest = 0, team, simple = false }: { initialSession?: SessionState | null; initialPairingCodes?: boolean; cloudHome?: boolean; focusRequest?: number; team?: string; simple?: boolean }) {
   const [session, setSession] = useState<SessionState | null>(initialSession);
@@ -189,9 +189,9 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
                     <option value="client">{t("remote.serverPairing.scope.client")}</option>
                   </Select>
                 )}
-                <button type="button" data-phone-pairing-action onClick={() => void create()} disabled={busy} className="ui-button">
+                <Button size="sm" type="button" data-phone-pairing-action onClick={() => void create()} disabled={busy}>
                   {busy ? t("remote.serverPairing.creating") : t("settings.simple.computer.createCode")}
-                </button>
+                </Button>
               </div>
             ) : null}
           </SettingRow>
@@ -208,7 +208,7 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
                 </span>
               </span>
               {device.id === current ? null : (
-                <button type="button" onClick={() => void signOut(device.id)} className="ui-button ml-auto shrink-0">{t("remote.serverPairing.signOut")}</button>
+                <Button size="sm" type="button" onClick={() => void signOut(device.id)} className="ml-auto shrink-0">{t("remote.serverPairing.signOut")}</Button>
               )}
             </div>
           ))}

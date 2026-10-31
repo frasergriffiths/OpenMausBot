@@ -19,7 +19,7 @@ const PANE_SETTINGS = {
   accessibility: "computer.mac.permission.accessibilitySettings",
 } as const;
 
-// Explicit controls, not .ui-button: Simple Settings rewrites every .ui-button into an ink pill, and this card
+// Explicit controls, not the shared button: Simple Settings restyles every shared button into an ink pill, and this card
 // must look the same in the computer panel, in Settings and in the chat transcript.
 // One filled action at the panel's only button height; 288 cap keeps it from becoming a slab in Settings and chat.
 const PRIMARY = "inline-flex h-8 w-full max-w-[18rem] items-center justify-center gap-1.5 rounded-lg bg-accent px-3 text-[13px] font-medium leading-[18px] text-accent-ink hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50";

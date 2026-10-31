@@ -7,7 +7,7 @@ import { introStaged, stageIntro, useWelcomingBot } from "@/lib/default-bot";
 import { setLocale } from "@/lib/i18n";
 import type { Bot } from "@/state/store";
 
-const f = vi.hoisted(() => ({ state: {} as { bots: Bot[]; instances: unknown[] }, dispatch: vi.fn(), landed: vi.fn(), onDone: vi.fn(), onLeave: vi.fn(), reduced: true }));
+const f = vi.hoisted(() => ({ state: {} as { bots: Bot[]; instances: unknown[] }, dispatch: vi.fn(), landed: vi.fn(), onDone: vi.fn(), onSkip: vi.fn(), onLeave: vi.fn(), reduced: true }));
 vi.mock("@/state/store", () => ({ useStore: () => ({ state: f.state, dispatch: f.dispatch }) }));
 vi.mock("@/components/Avatar", () => ({ BotAvatar: () => null, MausAvatar: () => null }));
 vi.mock("@/components/mascot-clock", () => ({ usePrefersReducedMotion: () => f.reduced }));
@@ -37,7 +37,7 @@ const press = async (label: string) => { await act(async () => { button(label)!.
 const tick = async (ms: number) => { await act(async () => { vi.advanceTimersByTime(ms); }); };
 /** Opens the dialog and waits out its input guard, unless `armed` is false. */
 const show = async (replay = false, armed = true) => {
-  await act(async () => { root.render([createElement(Watch, { key: "w" }), createElement(ChiefIntro, { key: "c", replay, onDone: f.onDone, onLeave: f.onLeave })]); });
+  await act(async () => { root.render([createElement(Watch, { key: "w" }), createElement(ChiefIntro, { key: "c", replay, onDone: f.onDone, onSkip: f.onSkip, onLeave: f.onLeave })]); });
   if (armed) await tick(CHIEF_GUARD_MS);
 };
 /** Presses and lets the dialog finish leaving. */
@@ -54,6 +54,7 @@ beforeEach(() => {
   f.dispatch.mockReset();
   f.landed.mockReset();
   f.onDone.mockReset();
+  f.onSkip.mockReset();
   f.onLeave.mockReset();
   f.reduced = true;
   f.state = { bots: [maus()], instances: [CLAUDE, CHAT_ONLY] };
@@ -130,12 +131,23 @@ describe("Create", () => {
   });
 });
 
+describe("Skipping the Chief", () => {
+  it("leaves MausBot an ordinary bot and finishes without creating a Chief", async () => {
+    await show();
+    await choose("Skip for now");
+    expect(f.onSkip).toHaveBeenCalledOnce();
+    expect(f.onDone).not.toHaveBeenCalled();
+    expect(f.landed).not.toHaveBeenCalled();
+    expect(patches().map((action) => action.patch)).toEqual([{ welcomed: true }]);
+  });
+});
+
 describe("Choose an existing bot", () => {
   it("sits beside Create where the person has bots, with Create still the one focused", async () => {
     f.state = { ...f.state, bots: [maus(), bot("research", "Research")] };
     await show();
     const actions = [...host.querySelectorAll<HTMLButtonElement>("button")].map((node) => node.textContent);
-    expect(actions).toEqual(["Choose an existing bot", "Create Chief of Staff"]);
+    expect(actions).toEqual(["Choose an existing bot", "Create Chief of Staff", "Skip for now"]);
     expect(document.activeElement).toBe(button("Create Chief of Staff"));
   });
 

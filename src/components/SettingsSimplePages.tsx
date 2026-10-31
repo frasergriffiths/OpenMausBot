@@ -4,6 +4,7 @@ import type { AppSettingsSection } from "@/state/store";
 import type { LocaleKey } from "@/locales";
 import { t } from "@/lib/i18n";
 import { appVersion } from "@/lib/app-links";
+import { Button, SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { brand } from "../lib/brand";
 import { AnalyticsRow } from "./AnalyticsRow";
 import { UpdatesConsentRow } from "./UpdatesConsent";
@@ -19,7 +20,6 @@ import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
 import { CloudPlanRow, CloudPlanFootnote, useCloudPlan } from "./ProIntroduction";
 import { CloudUsageDetails, CloudUsageSummaryView, useCloudUsageSettings } from "./CloudUsageMeter";
-import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { UsageSection } from "./UsageSection";
 import { PlanUsageSummary } from "./PlanUsage";
 import { SkinPicker } from "./SkinPicker";
@@ -110,7 +110,7 @@ export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onL
             <LanguageRow simple />
             <SendKeyRow simple />
             <SettingRow title={t("settings.simple.looks.title")}>
-              <button type="button" className="ui-button" onClick={onLooks}>{t("settings.simple.looks.change")}</button>
+              <Button size="sm" type="button" onClick={onLooks}>{t("settings.simple.looks.change")}</Button>
             </SettingRow>
           </SettingsRows>
         </SettingsGroup>
@@ -149,7 +149,7 @@ export function SimpleDataPage({ has, disclose }: { has: Has; disclose: Disclose
 export function SimpleLooksPage({ onBack }: { onBack: () => void }) {
   return (
     <>
-      <div><button type="button" className="ui-button" onClick={onBack}>{t("settings.simple.looks.back")}</button></div>
+      <div><Button size="sm" type="button" onClick={onBack}>{t("settings.simple.looks.back")}</Button></div>
       <div data-settings-block="looks"><SkinPicker /></div>
     </>
   );
@@ -268,7 +268,7 @@ function ServerUpdatesRow() {
       : entry.phase === "checking" ? t("common.checking") : t("settings.updates.check");
   return (
     <SettingRow title={versionTitle()} subtitle={status}>
-      <button type="button" className="ui-button" disabled={entry.item.disabled} onClick={entry.item.onSelect}>{action}</button>
+      <Button size="sm" type="button" disabled={entry.item.disabled} onClick={entry.item.onSelect}>{action}</Button>
     </SettingRow>
   );
 }

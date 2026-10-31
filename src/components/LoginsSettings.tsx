@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { KeyRound, Loader2, LockKeyhole, Plus, RefreshCw, ShieldCheck, Trash2 } from "lucide-react";
+import { Button, Checkbox, SettingsCard } from "@/components/ui";
 
 import type { LoginBots, LoginSummary, OnePasswordStatus, OnePasswordVault } from "../../shared/logins";
 import { t } from "@/lib/i18n";
@@ -8,7 +9,6 @@ import { relativeTime } from "@/lib/memory";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { useStore } from "@/state/store";
 import { LoginBotPicker, LoginForm } from "./LoginForm";
-import { Checkbox, SettingsCard } from "@/components/ui";
 
 // Security: a row never shows the password, which no route returns.
 
@@ -152,10 +152,10 @@ export function LoginsSettings() {
             </LoginForm>
           </div>
         ) : (
-          <button type="button" className="ui-button ui-button-md self-start" disabled={logins === null}
+          <Button size="xs" type="button" className="self-start" disabled={logins === null}
             onClick={() => { setEditing(null); setDeleting(null); setAdding(true); }}>
             <Plus size={14} />{t("settings.logins.add")}
-          </button>
+          </Button>
         )}
         <p className="text-[12px] leading-relaxed text-ink-tertiary">{t("settings.logins.limits")}</p>
         {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
@@ -214,8 +214,8 @@ function VaultAccess({ vault, bots, botNames, disabled, onChange }: {
           <LoginBotPicker value={value} onChange={setValue} bots={bots} disabled={busy} />
           {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
           <div className="flex flex-wrap justify-end gap-2">
-            <button type="button" className="ui-button ui-button-md" disabled={busy} onClick={() => setEditing(false)}>{t("logins.cancel")}</button>
-            <button type="button" className="ui-button ui-button-md ui-button-primary" disabled={busy} onClick={() => void save()}>{t("settings.logins.saveChange")}</button>
+            <Button size="xs" type="button" disabled={busy} onClick={() => setEditing(false)}>{t("logins.cancel")}</Button>
+            <Button variant="primary" size="xs" type="button" disabled={busy} onClick={() => void save()}>{t("settings.logins.saveChange")}</Button>
           </div>
         </div>
       )}
@@ -260,12 +260,12 @@ function OnePasswordConnection({ status, disabled, bots, botNames, onChange }: {
             </ul>
           )}
           <div className="flex flex-wrap gap-2">
-            <button type="button" className="ui-button ui-button-md" disabled={disabled || busy !== null} onClick={() => void run("refresh", refreshOnePassword)}>
+            <Button size="xs" type="button" disabled={disabled || busy !== null} onClick={() => void run("refresh", refreshOnePassword)}>
               {busy === "refresh" ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}{t("settings.logins.onePassword.refresh")}
-            </button>
-            <button type="button" className="ui-button ui-button-md" disabled={disabled || busy !== null} onClick={() => void run("disconnect", disconnectOnePassword)}>
+            </Button>
+            <Button size="xs" type="button" disabled={disabled || busy !== null} onClick={() => void run("disconnect", disconnectOnePassword)}>
               {t("settings.logins.onePassword.disconnect")}
-            </button>
+            </Button>
           </div>
         </>
       ) : (
@@ -276,9 +276,9 @@ function OnePasswordConnection({ status, disabled, bots, botNames, onChange }: {
               onChange={(event) => setToken(event.target.value)} disabled={disabled || busy !== null}
               aria-label={t("settings.logins.onePassword.token")} placeholder={t("settings.logins.onePassword.token")}
               className="min-w-0 flex-1 rounded-lg border border-hairline/60 bg-inset px-3 py-1.5 text-[13px] text-ink outline-none placeholder:text-ink-tertiary focus:border-accent disabled:opacity-60" />
-            <button type="submit" className="ui-button ui-button-md ui-button-primary" disabled={disabled || busy !== null || !token.trim()}>
+            <Button variant="primary" size="xs" type="submit" disabled={disabled || busy !== null || !token.trim()}>
               {busy === "connect" && <Loader2 size={13} className="animate-spin" />}{t("settings.logins.onePassword.connect")}
-            </button>
+            </Button>
           </div>
         </form>
       )}

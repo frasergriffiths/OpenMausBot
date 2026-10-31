@@ -3,6 +3,7 @@ import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
 import { Check, ExternalLink, Loader2 } from "lucide-react";
 import type { CloudSignInPhase, CloudSignInProblem } from "@/lib/cloud-plan";
 import { t } from "@/lib/i18n";
+import { Button } from "@/components/ui";
 import { BackLink, FIELD, Heading, LINK, PRIMARY_WIDE } from "./parts";
 
 const DIGITS = 8;
@@ -98,8 +99,8 @@ export function SignInScreen({ phase, email, code, profileEmail, busy, now, onBa
     </p>}
     {problem && <div id="cloud-add-problem" role="alert" className="flex flex-col items-start gap-2.5 rounded-xl border border-hairline/70 bg-card/70 px-3.5 py-3 text-[13px] text-ink">
       <p>{problemLine(problem, phase.step === "code" ? phase.triesLeft : null)}</p>
-      {browser && <button type="button" className="ui-button ui-button-primary" onClick={onBrowser}>{t("cloudBuy.signIn.continueBrowser")}<ExternalLink size={14} aria-hidden="true" /></button>}
-      {problem === "expired" && phase.step === "code" && <button type="button" className="ui-button" disabled={busy} onClick={onResend}>{t("cloudBuy.signIn.newCode")}</button>}
+      {browser && <Button variant="primary" size="sm" type="button" onClick={onBrowser}>{t("cloudBuy.signIn.continueBrowser")}<ExternalLink size={14} aria-hidden="true" /></Button>}
+      {problem === "expired" && phase.step === "code" && <Button size="sm" type="button" disabled={busy} onClick={onResend}>{t("cloudBuy.signIn.newCode")}</Button>}
     </div>}
     {phase.step !== "done" && !browser && <p className="text-[13px] text-ink-tertiary">{t("cloudBuy.signIn.ssoHint")}{" "}
       <button type="button" className={LINK} onClick={onBrowser}>{t("cloudBuy.signIn.continueBrowser")}</button></p>}
@@ -118,8 +119,8 @@ export function BrowserSignInScreen({ code, checkout, trial, busy, onReopen, onC
       <li>{t(!checkout ? "cloudAdd.signInStep3Connect" : trial ? "cloudAdd.signInStep3Trial" : "cloudAdd.signInStep3")}</li>
     </ol> : <p role="status" className="flex items-center gap-2 text-[13px] text-ink-secondary"><Loader2 size={14} className="animate-spin motion-reduce:animate-none" aria-hidden="true" />{t("cloudAdd.opening")}</p>}
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <button type="button" className="ui-button" disabled={busy} onClick={onCancel}>{t("cloudAdd.cancel")}</button>
-      <button type="button" className="ui-button ui-button-primary" disabled={busy || !code} onClick={onReopen}>{t("cloudAdd.reopenBrowser")}<ExternalLink size={14} aria-hidden="true" /></button>
+      <Button size="sm" type="button" disabled={busy} onClick={onCancel}>{t("cloudAdd.cancel")}</Button>
+      <Button variant="primary" size="sm" type="button" disabled={busy || !code} onClick={onReopen}>{t("cloudAdd.reopenBrowser")}<ExternalLink size={14} aria-hidden="true" /></Button>
     </div>
   </div>;
 }

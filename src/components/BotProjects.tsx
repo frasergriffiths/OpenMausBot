@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, CheckCheck, Folder, MoreHorizontal, Pencil, Plus, X
 import { useStore, type Bot, type BotProject } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
+import { Button } from "@/components/ui";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { SIMPLE_MENU, SIMPLE_MENU_ITEM } from "./SidebarSimpleTop";
 
@@ -169,8 +170,8 @@ export function BotProjectDialog({ bot, project, onClose, onCreated }: {
             </div>}
           </div>
           <div className="mt-5 flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="ui-button">{t("common.cancel")}</button>
-            <button type="submit" disabled={!name.trim() || saving} className="ui-button ui-button-primary">{t(saving ? "folder.saving" : project ? "folder.save" : "folder.create")}</button>
+            <Button size="sm" type="button" onClick={onClose}>{t("common.cancel")}</Button>
+            <Button variant="primary" size="sm" type="submit" disabled={!name.trim() || saving}>{t(saving ? "folder.saving" : project ? "folder.save" : "folder.create")}</Button>
           </div>
         </form>
       </div>

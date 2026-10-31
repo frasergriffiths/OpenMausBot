@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useVisibleInterval } from "@/hooks/use-visible-interval";
 import { Check, Crown, X } from "lucide-react";
+import { IconButton } from "@/components/ui";
 import type { CloudAccountState, CloudPlanSnapshot } from "../../electron/cloud-account.mjs";
 import type { CloudOffer } from "../../electron/cloud-home.mjs";
 import type { DesktopNoticesBridge, DesktopNoticesState } from "../../electron/desktop-prefs.mjs";
@@ -183,7 +184,7 @@ export function CloudProPopup({ view, onPrimary, onSeePlans, onNotNow, onClose }
         <p className="text-[12px] text-ink-secondary">{t("pro.disclaimer")}</p>
         <NotNowButton onClick={onNotNow} />
       </div>
-      <button type="button" onClick={onClose} aria-label={t("cloudAdd.close")} className="ui-icon-button absolute end-4 top-4"><X size={16} /></button>
+      <IconButton label={t("cloudAdd.close")} onClick={onClose} className="absolute end-4 top-4"><X size={16} /></IconButton>
     </div>
   </div>;
 }

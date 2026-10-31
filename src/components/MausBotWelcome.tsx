@@ -11,6 +11,7 @@ import { firstReplyPending } from "@/lib/corner-popup";
 import { launchDialogShown, markLaunchDialog } from "@/lib/launch-dialogs";
 import { welcomeDue, welcomeFinishedThisLaunch, type WelcomeViewer } from "@/lib/onboarding";
 import { useStore, type Bot } from "@/state/store";
+import { Button } from "@/components/ui";
 import { BOT_PROFILE_LIMITS } from "../../shared/bot-profile";
 import { BotAvatar } from "./Avatar";
 import { useAvatarImage } from "./avatar-editing";
@@ -189,14 +190,12 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
         </div>
 
         <div className={cn("mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:items-center", "sm:justify-end")}>
-          <button type="button" data-mausbot-welcome-later="" onClick={() => choose(false)} title={t("mausbotWelcome.notNowHint", { name })}
-            className="ui-button ui-button-pill">
+          <Button size="xs" shape="pill" type="button" data-mausbot-welcome-later="" onClick={() => choose(false)} title={t("mausbotWelcome.notNowHint", { name })}>
             {t("mausbotWelcome.notNow")}
-          </button>
-          <button type="button" data-mausbot-welcome-add="" onClick={() => choose(true)}
-            className="ui-button ui-button-pill ui-button-primary">
+          </Button>
+          <Button variant="primary" size="xs" shape="pill" type="button" data-mausbot-welcome-add="" onClick={() => choose(true)}>
             {t("mausbotWelcome.add", { name })}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
