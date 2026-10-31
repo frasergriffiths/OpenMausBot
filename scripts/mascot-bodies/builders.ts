@@ -214,17 +214,16 @@ function buildHeart(w: number, h: number): string {
  * heart cannot hold the shared face without shrinking every other body. */
 function buildFatHeart(): string {
   return new Path()
-    .moveTo(100, 74)
-    .curveTo([86, 46, 56, 38, 34, 58])
-    .curveTo([10, 80, 18, 112, 42, 132])
-    .curveTo([62, 150, 84, 166, 100, 186])
-    .curveTo([116, 166, 138, 150, 158, 132])
-    .curveTo([182, 112, 190, 80, 166, 58])
-    .curveTo([144, 38, 114, 46, 100, 74])
+    .moveTo(100, 86)
+    .curveTo([92, 62, 66, 52, 48, 68])
+    .curveTo([28, 86, 34, 112, 54, 130])
+    .curveTo([70, 146, 88, 160, 100, 176])
+    .curveTo([112, 160, 130, 146, 146, 130])
+    .curveTo([166, 112, 172, 86, 152, 68])
+    .curveTo([134, 52, 108, 62, 100, 86])
     .close()
 }
 
-/** A cloud: three soft lobes over a rounded base. */
 function buildCloud(): string {
   return new Path()
     .moveTo(50, 74)
@@ -325,7 +324,7 @@ export const BODY_DEFS: BodyDef[] = [
   // A face-fit constraint, not taste: at the classic 0.42 the notches pinch the
   // star to a 50-unit inscribed circle, and the smallest face clamps every body.
   { id: "star", name: "Star", d: buildSoftStar(198, 198, 5, 0.76, 0.42), viewBox: [0, 0, 200, 200] },
-  { id: "sparkle", name: "Sparkle", d: buildSoftStar(200, 200, 6, 0.74, 0.30), viewBox: [0, 0, 200, 200] },
+  { id: "sparkle", name: "Sparkle", d: buildSoftStar(200, 200, 6, 0.80, 0.58), viewBox: [0, 0, 200, 200] },
   { id: "wedge", name: "Wedge", d: buildPolygon(198, 192, 3, 0.82), viewBox: [0, 0, 200, 200] },
   { id: "tablet", name: "Tablet", d: buildRoundedBox(200, 156, 30), viewBox: [0, 0, 200, 200] },
   { id: "heart", name: "Heart", d: buildFatHeart(), viewBox: [0, 0, 200, 200] },
