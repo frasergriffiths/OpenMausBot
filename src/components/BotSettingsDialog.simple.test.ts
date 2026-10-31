@@ -501,9 +501,9 @@ describe("the avatar editor", () => {
     expect(rendered.html.match(/aria-label="Use \w+ mascot color"/g)).toHaveLength(10);
     expect(rendered.html).not.toContain(">Halloween<");
     expect(has(rendered, "data-avatar-face", "idle")).toBe(false);
-    expect(find(rendered, "aria-label", "Use the Cursor body").props["aria-pressed"]).toBe(true);
-    click(find(rendered, "aria-label", "Use the Blob body"));
-    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "blob" });
+    expect(find(rendered, "aria-label", "Use the Mochi body").props["aria-pressed"]).toBe(true);
+    click(find(rendered, "aria-label", "Use the Circle body"));
+    expect(patch).toHaveBeenLastCalledWith({ mascotBody: "circle" });
     click(find(rendered, "aria-label", "Use blue mascot color"));
     expect(patch).toHaveBeenLastCalledWith({ color: "blue" });
     expect(find(rendered, "aria-label", "Use coral mascot color").props.title).toBe("Coral");
