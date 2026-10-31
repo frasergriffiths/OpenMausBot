@@ -15,7 +15,7 @@ import {
   Square,
   Trash2,
 } from "lucide-react";
-import { Card, CommandLine } from "./SettingsPrimitives";
+import { SettingsCard, CommandLine } from "@/components/ui";
 import { MacLocalControl } from "./MacLocalControl";
 import { Select } from "./Select";
 import { PILL_TABS, PILL_TAB, PILL_TAB_ON, PILL_TAB_OFF } from "./pill-tabs";
@@ -326,7 +326,7 @@ export function CloudComputersCard({
   onDelete: (instance: CloudComputerInventoryInstance) => void;
 }) {
   return (
-    <Card
+    <SettingsCard
       title={t("vm.cloud.title")}
       subtitle={t("vm.cloud.subtitle")}
     >
@@ -448,7 +448,7 @@ export function CloudComputersCard({
           );
         })}
       </div>
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -472,7 +472,7 @@ export function LocalVmInventoryCard({
   onDelete: (instance: LocalVmInventoryInstance) => void;
 }) {
   return (
-    <Card
+    <SettingsCard
       title={t("vm.perBot.title")}
       subtitle={t("vm.perBot.subtitle", {
         count: unavailableReason
@@ -585,7 +585,7 @@ export function LocalVmInventoryCard({
           );
         })}
       </div>
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -1207,7 +1207,7 @@ export function LocalComputerSection() {
       <MacLocalControl />
 
       {!cloudHome && <>
-      <Card
+      <SettingsCard
         title={t("vm.main.title")}
         subtitle={perBot
           ? t("vm.main.perBotSubtitle", { host })
@@ -1257,9 +1257,9 @@ export function LocalComputerSection() {
           )}
         </div>
         {error && <div role="alert" className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
-      </Card>
+      </SettingsCard>
 
-      <Card
+      <SettingsCard
         title={t("vm.isolation.title")}
         subtitle={t("vm.isolation.subtitle")}
       >
@@ -1302,9 +1302,9 @@ export function LocalComputerSection() {
           onSave={saveIdleTimeout}
         />
         {policyPending && <div className="mt-2 flex items-center gap-1.5 text-[12px] text-ink-secondary"><Loader2 size={12} className="animate-spin" /> {t("vm.saving")}</div>}
-      </Card>
+      </SettingsCard>
 
-      <Card title={t("vm.setup.title")} subtitle={t("vm.setup.subtitle")}>
+      <SettingsCard title={t("vm.setup.title")} subtitle={t("vm.setup.subtitle")}>
         <div className="flex flex-col gap-4">
           <Step n={1} title={t("vm.setup.step1")} done={Boolean(status?.runtime)}>
             <div className="text-[13px] leading-relaxed text-ink-secondary">
@@ -1389,7 +1389,7 @@ export function LocalComputerSection() {
             {c?.run && <details className="text-[12px] text-ink-secondary"><summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("vm.setup.showCommand")}</summary><div className="mt-2"><CommandLine command={c.run} /></div></details>}
           </Step>
         </div>
-      </Card>
+      </SettingsCard>
 
       {perBot && (
         <LocalVmInventoryCard
@@ -1405,15 +1405,15 @@ export function LocalComputerSection() {
       )}
 
       {unavailable && (
-        <Card>
+        <SettingsCard>
           <div className="flex gap-2 text-[13px] text-ink-secondary">
             <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warning" />
             <span>{t("vm.inspectFailed")}</span>
           </div>
-        </Card>
+        </SettingsCard>
       )}
 
-      <Card
+      <SettingsCard
         title={t("vm.safety.title")}
         subtitle={
           perBot
@@ -1441,7 +1441,7 @@ export function LocalComputerSection() {
           })}
           {status?.base_image_ref ? <> · {t("vm.safety.baseImage", { image: status.base_image_ref })}</> : null}
         </div>
-      </Card>
+      </SettingsCard>
       </>}
     </>
   );

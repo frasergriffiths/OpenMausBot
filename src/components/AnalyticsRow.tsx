@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { analyticsEnabled, setAnalyticsEnabled } from "@/lib/analytics";
 import { t } from "@/lib/i18n";
-import { SettingRow, Switch } from "./SettingsPrimitives";
+import { SettingRow, Switch } from "@/components/ui";
 
 const ANALYTICS_DOC_URL = "https://github.com/milind-soni/OpenMausBot/blob/main/docs/analytics.md";
 

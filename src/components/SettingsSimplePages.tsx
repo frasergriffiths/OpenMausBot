@@ -19,7 +19,7 @@ import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
 import { CloudPlanRow, CloudPlanFootnote, useCloudPlan } from "./ProIntroduction";
 import { CloudUsageDetails, CloudUsageSummaryView, useCloudUsageSettings } from "./CloudUsageMeter";
-import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "./SettingsPrimitives";
+import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { UsageSection } from "./UsageSection";
 import { PlanUsageSummary } from "./PlanUsage";
 import { SkinPicker } from "./SkinPicker";
