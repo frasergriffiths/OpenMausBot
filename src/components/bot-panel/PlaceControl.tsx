@@ -47,12 +47,14 @@ export function PlaceAnswer({ bot }: { bot: Bot }) {
  *  The name, state, consequence and needs come from one table, so no surface invents its own vocabulary; the menu is
  *  the shared sheet (popover-surface, --radius-menu, 240px, 30px rows, 16px icons, shadow-lg, pop-in/pop-out) with the
  *  same arrow-key walk as the sidebar's menus. */
-export function PlaceControl({ bot, patch, approvalMode, className, dataAttr }: {
+export function PlaceControl({ bot, patch, approvalMode, className, dataAttr, disabled = false }: {
   bot: Bot;
   patch: PlaceControlPatch;
   approvalMode?: string;
   className?: string;
   dataAttr?: string;
+  /** Read-only: the card that asks once keeps its answer. */
+  disabled?: boolean;
 }) {
   const { capabilities } = useDesktopCapabilities();
   const platform = capabilities.host?.platform ?? "other";
@@ -146,6 +148,7 @@ export function PlaceControl({ bot, patch, approvalMode, className, dataAttr }: 
           aria-expanded={open}
           aria-label={t("computer.simple.placeAria", { name: bot.name, place: selected.copy.name })}
           title={t("computer.simple.placeChange", { name: bot.name })}
+          disabled={disabled}
           onClick={(event) => { focusRow.current = event.detail === 0; setOpen((value) => !value); }}
           onKeyDown={(event) => {
             if (open || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) return;
