@@ -212,15 +212,14 @@ describe("the phone entries", () => {
   const ready: CloudMachine = { status: "ready", origin: "https://home-7f3k2.fly.dev" };
   const free: CloudAccountState = { ...signedIn, entitlement: { plan: "free", status: "inactive", expiresAt: null, version: 1 } };
   const items = (target: PhonePairingTarget, access: PhonePairingAccess | null, account: CloudAccountState | null = null, connected = false) => {
-    const onConnect = vi.fn(), onGetApp = vi.fn();
+    const onConnect = vi.fn();
     const destinations = phoneDestinations(connectPhoneEntry(target, access), cloudPhoneDestination(account));
-    return { list: phoneMenuItems({ destinations, connected, onConnect, onGetApp }), onConnect, onGetApp };
+    return { list: phoneMenuItems({ destinations, connected, onConnect }), onConnect };
   };
   const shown = (...args: Parameters<typeof items>) => items(...args).list.map((item) => [item.label, item.subtitle ?? null, ...(item.note ? [item.note] : [])]);
-  const APP = ["Get the phone app", null];
 
   it("on this computer: Connect your phone, to this computer, then Get the phone app", () => {
-    expect(shown("computer", null)).toEqual([["Connect your phone", "to this computer"], APP]);
+    expect(shown("computer", null)).toEqual([["Connect your phone", "to this computer"]]);
   });
 
   it("on this computer with a paid Cloud that is Ready: both, the Cloud first", () => {
@@ -228,41 +227,39 @@ describe("the phone entries", () => {
       expect(shown("computer", null, paid(tier, ready))).toEqual([
         ["Connect your phone", "to the Cloud (always on)"],
         ["Connect your phone", "to this computer"],
-        APP,
       ]);
     }
   });
 
   it("on this computer, free or signed out: only this computer", () => {
     for (const account of [free, { status: "signed-out" } as CloudAccountState, null]) {
-      expect(shown("computer", null, account)).toEqual([["Connect your phone", "to this computer"], APP]);
+      expect(shown("computer", null, account)).toEqual([["Connect your phone", "to this computer"]]);
     }
     expect(shown("computer", null, { ...paid("pro", ready), entitlement: { plan: "pro", status: "inactive", expiresAt: null, version: 2 } }))
-      .toEqual([["Connect your phone", "to this computer"], APP]);
+      .toEqual([["Connect your phone", "to this computer"]]);
     expect(shown("computer", null, { status: "unavailable", lastPlan: { tier: "pro", active: true }, machine: ready }))
-      .toEqual([["Connect your phone", "to this computer"], APP]);
+      .toEqual([["Connect your phone", "to this computer"]]);
   });
 
   it("on this computer with a paid Cloud that is not Ready: only this computer, and a hint", () => {
     for (const machine of [undefined, { status: "provisioning" }, { status: "stopped", origin: ready.origin }, { status: "failed", origin: ready.origin }] as Array<CloudMachine | undefined>) {
       expect(shown("computer", null, paid("pro", machine))).toEqual([
         ["Connect your phone", "to this computer", "The Cloud shows here once it's ready."],
-        APP,
       ]);
     }
   });
 
   it("on the person's own Cloud: unchanged, one Connect your phone to My Cloud", () => {
-    expect(shown("cloud", admin)).toEqual([["Connect your phone", "to the Cloud"], APP]);
-    expect(shown("cloud", admin, paid("max", ready))).toEqual([["Connect your phone", "to the Cloud"], APP]);
-    expect(shown("cloud", admin, paid("max"))).toEqual([["Connect your phone", "to the Cloud"], APP]);
+    expect(shown("cloud", admin)).toEqual([["Connect your phone", "to the Cloud"]]);
+    expect(shown("cloud", admin, paid("max", ready))).toEqual([["Connect your phone", "to the Cloud"]]);
+    expect(shown("cloud", admin, paid("max"))).toEqual([["Connect your phone", "to the Cloud"]]);
   });
 
   it("on another server: to this server, and gone for a session that cannot make a pairing code", () => {
-    expect(shown("server", admin, paid("pro", ready))).toEqual([["Connect your phone", "to the bots here"], APP]);
-    expect(shown("server", chatOnly)).toEqual([APP]);
-    expect(shown("server", { ...admin, pairingCodes: false })).toEqual([APP]);
-    expect(shown("cloud", chatOnly)).toEqual([APP]);
+    expect(shown("server", admin, paid("pro", ready))).toEqual([["Connect your phone", "to the bots here"]]);
+    expect(shown("server", chatOnly)).toEqual([]);
+    expect(shown("server", { ...admin, pairingCodes: false })).toEqual([]);
+    expect(shown("cloud", chatOnly)).toEqual([]);
   });
 
   it("never offers the iOS-only entry it replaced", () => {
@@ -272,14 +269,11 @@ describe("the phone entries", () => {
   });
 
   it("each line hands on its own destination", () => {
-    const { list, onConnect, onGetApp } = items("computer", null, paid("pro", ready));
+    const { list, onConnect } = items("computer", null, paid("pro", ready));
     list[0]!.onSelect();
     expect(onConnect).toHaveBeenLastCalledWith(expect.objectContaining({ id: "cloud" }));
     list[1]!.onSelect();
     expect(onConnect).toHaveBeenLastCalledWith(expect.objectContaining({ id: "here", target: "computer" }));
-    expect(onGetApp).not.toHaveBeenCalled();
-    list[2]!.onSelect();
-    expect(onGetApp).toHaveBeenCalledOnce();
   });
 
   it("shows this computer's live phone on this computer's line only", () => {
@@ -367,7 +361,7 @@ describe("Get the phone app", () => {
 describe("profileMenuItems", () => {
   const noop = () => {};
   const build = (patch: Partial<Parameters<typeof profileMenuItems>[0]> = {}) => profileMenuItems({
-    phone: [{ key: "phone-app", label: "Get the phone app", onSelect: noop }],
+    phone: [],
     usage: true,
     update: null,
     account: "OpenMausBot Cloud",
@@ -377,7 +371,7 @@ describe("profileMenuItems", () => {
 
   it("groups usage and the phone, then help and settings, then the account under a divider", () => {
     const items = build();
-    expect(items.map((item) => item.key)).toEqual(["usage", "phone-app", "support", "settings", "account"]);
+    expect(items.map((item) => item.key)).toEqual(["usage", "support", "settings", "account"]);
     expect(items.filter((item) => item.separatorBefore).map((item) => item.key)).toEqual(["account"]);
     expect(items.find((item) => item.key === "support")!.submenu!.map((item) => item.key)).toEqual(["help", "feedback", "shortcuts", "about"]);
     expect(items.find((item) => item.key === "account")!.label).toBe("OpenMausBot Cloud");
@@ -385,13 +379,13 @@ describe("profileMenuItems", () => {
 
   it("only offers what this window has: no usage on a remote server, no account without one", () => {
     const items = build({ usage: false, account: null });
-    expect(items.map((item) => item.key)).toEqual(["phone-app", "support", "settings"]);
+    expect(items.map((item) => item.key)).toEqual(["support", "settings"]);
     expect(items.some((item) => item.separatorBefore)).toBe(false);
   });
 
   it("keeps the update entry beside settings", () => {
     const update = { key: "update", label: "Check for updates", onSelect: noop };
-    expect(build({ update }).map((item) => item.key)).toEqual(["usage", "phone-app", "support", "settings", "update", "account"]);
+    expect(build({ update }).map((item) => item.key)).toEqual(["usage", "support", "settings", "update", "account"]);
   });
 
   it("opens the Usage and account pages of Settings", () => {
@@ -408,7 +402,7 @@ describe("Simple mode's account menu", () => {
   const noop = () => {};
   const tools = toolMenuItems({ activeView: "files", onFiles: noop });
   const build = (patch: Partial<Parameters<typeof profileMenuItems>[0]> = {}) => profileMenuItems({
-    phone: simplePhoneItems({ connected: false, onGetApp: noop }),
+    phone: simplePhoneItems(),
     usage: true,
     update: { key: "update", label: "Check for updates", onSelect: noop },
     account: "MausBot Cloud",
@@ -422,10 +416,10 @@ describe("Simple mode's account menu", () => {
     return all;
   }, []);
 
-  it("leads with usage, the phone app, support and Settings, then Files, then where this window is and Cloud", () => {
+  it("leads with usage, support and Settings, then Files, then where this window is and Cloud", () => {
     const items = build();
     expect(groups(items)).toEqual([
-      ["usage", "phone-app", "support", "settings"],
+      ["usage", "support", "settings"],
       ["files"],
       ["account"],
     ]);
@@ -462,7 +456,7 @@ describe("Simple mode's account menu", () => {
 
   it("keeps Advanced's account menu as it was", () => {
     const items = build({ simple: undefined, usageSummary: { value: "12% used" } });
-    expect(items.map((item) => item.key)).toEqual(["usage", "phone-app", "support", "settings", "update", "account"]);
+    expect(items.map((item) => item.key)).toEqual(["usage", "support", "settings", "update", "account"]);
     expect(items[0]!.chevron).toBeUndefined();
   });
 
@@ -500,10 +494,6 @@ describe("Simple mode's account menu", () => {
     expect(items.map((item) => item.label)).not.toContain("Templates");
   });
 
-  it("shows one Get the phone app row, dotted while this computer's phone is connected", () => {
-    expect(simplePhoneItems({ connected: true, onGetApp: noop }).map((item) => [item.key, Boolean(item.trailing)])).toEqual([["phone-app", true]]);
-    expect(simplePhoneItems({ connected: false, onGetApp: noop })[0]!.trailing).toBeUndefined();
-  });
 });
 
 describe("the usage meta", () => {
