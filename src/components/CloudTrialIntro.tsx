@@ -1,4 +1,5 @@
 import { Check, Cloud } from "lucide-react";
+import { Button } from "@/components/ui";
 import type { CloudOffer } from "../../electron/cloud-home.mjs";
 import { cloudIntroView } from "@/lib/cloud-plan";
 import { t } from "@/lib/i18n";
@@ -22,7 +23,7 @@ export function CloudTrialIntroCard({ offer, onStart, onHowTo, onSignIn, onNotNo
     {view.moneyBack && <p className="text-[12px] text-ink-secondary">{view.moneyBack}</p>}
     <div className="mt-3 flex flex-wrap items-center gap-2">
       <button type="button" className={PRIMARY_BUTTON} onClick={onStart}>{t("cloudIntro.start")}</button>
-      <button type="button" className="ui-button" onClick={onHowTo}>{t("cloudIntro.howTo")}</button>
+      <Button size="sm" type="button" onClick={onHowTo}>{t("cloudIntro.howTo")}</Button>
     </div>
     <div className="mt-1 flex items-center justify-between gap-3">
       {onSignIn ? <button type="button" className="py-2 text-left text-[12px] font-medium text-accent-text underline underline-offset-2 hover:text-ink" onClick={onSignIn}>{t("cloudAccount.signIn")}</button> : <span />}

@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ChatMarkdown } from "@/components/ChatMarkdown";
 import { DigestChip } from "@/components/DigestChip";
+import { Button } from "@/components/ui";
 import type { Message } from "@/state/store";
 
 const src = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -20,25 +21,45 @@ function rule(selector: string): Record<string, string> {
     .map((line) => [line.slice(0, line.indexOf(":")).trim(), line.slice(line.indexOf(":") + 1).trim()]));
 }
 
+const button = (props: Parameters<typeof Button>[0]) => renderToStaticMarkup(createElement(Button, props, "Label"));
+
 describe("control scale", () => {
-  it("steps buttons 32, 28 and 24px with a centered medium label", () => {
-    const base = rule(".ui-button,\n  .ui-icon-button");
-    expect(base).toMatchObject({ "min-height": "2rem", "font-size": "13px", "font-weight": "500", "line-height": "1.25rem", "align-items": "center" });
-    expect(rule(".ui-button")).toMatchObject({ padding: "0.25rem 0.75rem" });
-    expect(rule(".ui-button-md")).toMatchObject({ "min-height": "1.75rem", "font-size": "13px", "line-height": "1.25rem" });
-    expect(rule(".ui-button-sm")).toMatchObject({ "min-height": "1.5rem", "font-size": "12px", "line-height": "1rem" });
-    expect(rule(".ui-button-primary")).toMatchObject({ background: "var(--color-accent)", color: "var(--color-accent-ink)" });
+  it("steps the shared button 28, 32 and 36px with a centered medium label", () => {
+    const xs = button({ size: "xs" });
+    expect(xs).toContain("h-7");
+    expect(xs).toContain("px-2.5");
+    expect(xs).toContain("text-[13px]");
+    const sm = button({ size: "sm" });
+    expect(sm).toContain("h-8");
+    expect(sm).toContain("px-3");
+    const md = button({ size: "md" });
+    expect(md).toContain("h-9");
+    expect(md).toContain("text-[14px]");
+    for (const markup of [xs, sm, md]) {
+      expect(markup).toContain("inline-flex");
+      expect(markup).toContain("items-center");
+      expect(markup).toContain("justify-center");
+      expect(markup).toContain("font-medium");
+    }
   });
 
-  it("gives pills, chips, code and menu rows one size each", () => {
-    expect(rule(".ui-pill")).toMatchObject({ "min-height": "1.75rem", "border-radius": "9999px", "font-size": "13px", "font-weight": "500", "line-height": "1.25rem", "align-items": "center" });
+  it("publishes the shared button under data attributes, never the retired class names", () => {
+    const markup = button({ variant: "primary", size: "sm" });
+    expect(markup).toContain('data-ui="button"');
+    expect(markup).toContain('data-variant="primary"');
+    expect(markup).not.toContain("ui-button");
+    expect(button({ size: "xs", shape: "pill" })).toContain('data-shape="pill"');
+    expect(button({ size: "sm" })).not.toContain('data-shape="pill"');
+  });
+
+  it("gives chips, code and menu rows one size each", () => {
     expect(rule(".ui-chip")).toMatchObject({ "min-height": "1.375rem", "border-radius": "9999px", "font-size": "12px", "font-weight": "500", "line-height": "1rem" });
     expect(rule(".ui-code-chip")).toMatchObject({ "box-decoration-break": "clone", "font-family": "var(--font-mono)", "font-size": "0.86em", "line-height": "1" });
     expect(rule(".ui-menu-row")).toMatchObject({ "min-height": "2.25rem", "font-size": "14px", "line-height": "1.25rem", gap: "0.75rem" });
   });
 
-  it("keeps every step on skin tokens", () => {
-    for (const selector of [".ui-button-md", ".ui-button-sm", ".ui-button-primary", ".ui-pill", ".ui-chip", ".ui-code-chip", ".ui-menu-row"]) {
+  it("keeps every remaining control step on skin tokens", () => {
+    for (const selector of [".ui-chip", ".ui-code-chip", ".ui-menu-row"]) {
       expect(Object.values(rule(selector)).join(" "), selector).not.toMatch(/#[0-9a-f]{3,8}\b/i);
     }
   });
@@ -55,3 +76,4 @@ describe("control scale", () => {
     expect(html).not.toContain("text-[13px]");
   });
 });
+

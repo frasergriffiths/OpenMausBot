@@ -3,6 +3,7 @@
 import type { Message } from "@/state/store";
 import type { TeamPerson } from "@/state/team-people";
 import { t } from "@/lib/i18n";
+import { buttonStyles } from "@/components/ui";
 import { PersonFace } from "./TeamOwner";
 
 export function TeammateChip({ message }: { message: Message }) {
@@ -11,7 +12,7 @@ export function TeammateChip({ message }: { message: Message }) {
   const passed = message.tool?.output?.trim();
   return (
     <div className="flex flex-col items-start gap-1" data-relay="told">
-      <span className="ui-pill" title={t("relay.toldHint", { name: relay.name })}>
+      <span className={buttonStyles({ size: "xs", shape: "pill", variant: "chip" })} title={t("relay.toldHint", { name: relay.name })}>
         <PersonFace person={{ email: relay.email, name: relay.name, role: "member" } satisfies TeamPerson} size={16} />
         <span className="max-w-[480px] truncate">{t("relay.told", { name: relay.name })}</span>
       </span>

@@ -3,11 +3,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Bot, CalendarClock, Gauge, LayoutGrid, MessageSquare, Plus, Search, Settings } from "lucide-react";
+import { buttonStyles, SettingsCard } from "@/components/ui";
 import type { CloudUsage } from "../electron/cloud-home.mjs";
 import { InitialsAvatar } from "@/components/Avatar";
 import { ConfirmDialogCard } from "@/components/ConfirmDialog";
 import { CloudUsageCardView, CloudUsageSettingsView } from "@/components/CloudUsageMeter";
-import { SettingsCard } from "@/components/ui";
 import { cloudPlanLabel } from "@/lib/cloud-plan";
 import { setLocale, t } from "@/lib/i18n";
 import { SKIN_IDS, type SkinId } from "@/lib/skins";
@@ -64,7 +64,7 @@ function SettingsMock({ usage }: { usage: CloudUsage }) {
         <section className="flex items-center justify-between gap-3 rounded-xl border border-hairline/50 p-3">
           <div className="flex items-center gap-3"><Gauge size={18} className="text-ink-secondary" /><div><h3 className="text-[14px] font-semibold">MausBot Cloud</h3>
             <p className="mt-1 text-[12px] text-ink-secondary">{t("cloudAccount.pro", { plan: cloudPlanLabel(usage.tier) })}</p></div></div>
-          <span className="ui-button">{t("pro.openCloudSettings")}</span>
+          <span className={buttonStyles({ size: "sm" })}>{t("pro.openCloudSettings")}</span>
         </section>
         <CloudUsageSettingsView usage={usage} upgrade={{ busy: null, note: null, onUpgrade: noop }} />
         <SettingsCard title={t("settings.profile.title")} subtitle={t("settings.profile.sharedSubtitle")} />

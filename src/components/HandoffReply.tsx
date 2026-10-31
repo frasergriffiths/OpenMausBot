@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { Bot, Message } from "@/state/store";
 import { handoffResult } from "@/lib/handoff-result";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/cn";
+import { Button } from "@/components/ui";
 import { BotAvatar } from "./Avatar";
 
 export function HandoffReply({ message, children }: { message: Message; children: ReactNode }) {
@@ -45,11 +45,12 @@ export function HandoffChip({ message, bots, title, onClick }: { message: Messag
   const withBot = bots.find((bot) => bot.id === comm.withBotId);
   return (
     <HandoffReply message={message}>
-      <button type="button" onClick={onClick} title={title} className={cn("ui-pill", message.tool.ok === false && "text-danger")}>
+      <Button size="xs" shape="pill" variant="chip" type="button" onClick={onClick} title={title}
+        className={message.tool.ok === false ? "text-danger" : undefined}>
         <BotAvatar bot={withBot ?? { name: comm.withName, color: comm.withColor }} state="happy" size={16} animated={false} />
         <span className="max-w-[480px] truncate">{message.tool.name}</span>
         <ChevronRight size={13} />
-      </button>
+      </Button>
     </HandoffReply>
   );
 }

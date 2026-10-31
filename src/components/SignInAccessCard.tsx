@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 import { t } from "@/lib/i18n";
 import { api } from "@/state/store";
+import { buttonStyles, SettingsCard } from "@/components/ui";
 import { readSessionState, type SessionState } from "../lib/session";
 import { canPairDevices } from "./ServerPairingCard";
-import { SettingsCard } from "@/components/ui";
 
 export interface SignInLists {
   admins: string[];
@@ -29,8 +29,8 @@ export function withoutEntry(lists: SignInLists, entry: string): SignInLists {
 }
 
 const input = "w-full rounded-md border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink outline-none focus:border-accent-border";
-const button = "ui-button ui-button-primary";
-const quiet = "ui-button ui-button-sm";
+const button = buttonStyles({ variant: "primary", size: "sm" });
+const quiet = buttonStyles({ size: "xs", className: "h-6 gap-1 px-2 text-[12px]" });
 
 export function SignInAccessCard() {
   const [session, setSession] = useState<SessionState | null>(null);

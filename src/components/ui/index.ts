@@ -1,4 +1,4 @@
-export { Button, IconButton, buttonStyles, type ButtonSize, type ButtonVariant } from "./button";
+export { Button, IconButton, buttonStyles, type ButtonShape, type ButtonSize, type ButtonVariant } from "./button";
 export { Checkbox } from "./checkbox";
 export { Field, Input, Select, Textarea } from "./field";
 export { Dialog } from "./dialog";

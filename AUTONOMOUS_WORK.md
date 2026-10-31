@@ -15,6 +15,11 @@ Boat and self-hosted VPS preserved.
 - Phase 2 — component library (src/components/ui), 21 primitives; 67 settings
   screens migrated; SettingsPrimitives deleted, and its last two test files
   moved onto `src/components/ui` or deleted with the module.
+- Phase 2 rollout finished: all 105 hand-rolled buttons on chat, composer,
+  onboarding, settings, team map and the cloud sheets now render through
+  Button/IconButton/buttonStyles; the legacy .ui-button, .ui-icon-button and
+  .ui-pill rules are deleted from styles.css, and the skins and Simple Settings
+  target the primitive's data-ui/data-variant hooks instead of its class names.
 - Product Hunt launch card removed, with its notice id and queue slot.
 - Activity and run-log side panels removed: pages, nav rows, menu entries, lazy
   chunks, components, store flags, tests.
@@ -40,6 +45,8 @@ Pushes go through the Maus GitHub connection, not a local `git push`: the
 cloud box holds no GitHub credentials. That call takes plain UTF-8 file
 contents, so a file near or over ~1 MB (src/locales/source-hashes.json, 6.3 MB)
 cannot be pushed that way. Do not regenerate the locale hash manifest here.
+(The connector is the write path; `git fetch` from this box is read-only and
+works.)
 
 ## Current state
 
@@ -50,21 +57,18 @@ are still in the tree behind that hard false.
 
 ## Remaining, in order
 
-1. Phase 2 — roll the primitives across the rest of chat, composer and
-   onboarding. About 18 hand-rolled buttons remain in ChatView, ChiefIntro,
-   MeetScreen, SignInPill and ConnectAi, and the legacy `.ui-button` /
-   `.ui-pill` CSS is still the parallel implementation behind them.
-2. Phase 5 — the rest of Settings, the Defaults dialog polish and the Team Map
-   dialogs. Twenty settings screens and eight bot-settings screens still
-   hand-roll buttons, selects or checkboxes.
-3. Phase 6 — delete the Threads UI itself: the thread-list components and their
+1. Phase 5 — the rest of Settings, the Defaults dialog polish and the Team Map
+   dialogs. Buttons now come from the library; selects, checkboxes and a few
+   bespoke rows in twenty settings screens and eight bot-settings screens do
+   not.
+2. Phase 6 — delete the Threads UI itself: the thread-list components and their
    tests, and the `showThreads` parameter threaded through 31 files, now that
    nothing can turn threads on.
-4. Phase 7 — Maus account/sync/mobile/cloud removal, keeping Boat and a
+3. Phase 7 — Maus account/sync/mobile/cloud removal, keeping Boat and a
    self-hosted VPS: CloudAccountSettings, billing, cloud-buy, cloud-plan,
    cloud-send/files, electron/cloud-account.mjs, cloud-home.mjs,
    cloud-team-plan.mjs and their server routes.
-5. Phase 8 — integration, polish, CI green.
+4. Phase 8 — integration, polish, CI green.
 
 ## Known issues
 

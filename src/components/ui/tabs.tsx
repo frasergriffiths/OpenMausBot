@@ -50,7 +50,7 @@ export function Tabs({
       role="tablist"
       aria-label={ariaLabel}
       aria-orientation={orientation}
-      className={cn("flex gap-0.5 rounded-[10px] bg-ink/[0.045] p-0.5", orientation === "vertical" ? "flex-col items-stretch" : "items-center", className)}
+      className={cn("flex gap-0.5 rounded-full bg-ink/[0.045] p-0.5", orientation === "vertical" ? "flex-col items-stretch" : "items-center", className)}
     >
       {items.map((item, index) => {
         const on = item.id === active;
@@ -71,7 +71,7 @@ export function Tabs({
             onClick={() => onChange(item.id)}
             onKeyDown={(event) => move(event, index)}
             className={cn(
-              "relative flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg font-medium",
+              "relative flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full font-medium",
               "transition-[background-color,color,box-shadow] duration-200 ease-out motion-reduce:transition-none",
               "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus",
               "disabled:cursor-not-allowed disabled:opacity-40",

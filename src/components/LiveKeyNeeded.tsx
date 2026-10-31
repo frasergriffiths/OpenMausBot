@@ -5,6 +5,7 @@ import { liveDisclosure } from "@/lib/call-mode";
 import { dismissLiveNotice } from "@/lib/live-call-media";
 import { t } from "@/lib/i18n";
 import { useStore, type Action } from "@/state/store";
+import { Button } from "@/components/ui";
 
 export const OPEN_API_KEYS = { type: "toggleAppSettings", open: true, section: "connections" } as const satisfies Action;
 
@@ -16,7 +17,7 @@ export function LiveKeyNeeded() {
       <KeyRound size={16} className="mt-0.5 shrink-0 text-ink-secondary" aria-hidden="true" />
       <h2 id={titleId} className="text-[14px] font-medium leading-[1.4] text-ink">{t("call.live.needsKey")}</h2>
     </div>
-    <button type="button" className="ui-button ui-button-primary self-start" onClick={() => { dismissLiveNotice(); dispatch(OPEN_API_KEYS); }}>{t("call.live.openApiKeys")}</button>
+    <Button variant="primary" size="sm" type="button" className="self-start" onClick={() => { dismissLiveNotice(); dispatch(OPEN_API_KEYS); }}>{t("call.live.openApiKeys")}</Button>
     <p className="text-[12px] leading-[1.45] text-ink-tertiary">{liveDisclosure({ cloudHome: state.config?.cloudHome === true })} {t("call.live.cost")}</p>
   </section>;
 }

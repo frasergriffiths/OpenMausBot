@@ -43,7 +43,7 @@ type Node = ReactElement<{ children?: ReactNode; onClick?: () => void }>;
 const nodes = (value: ReactNode): Node[] => !isValidElement(value) ? [] : [value as Node, ...Children.toArray((value as Node).props.children).flatMap(nodes)];
 const press = (label: string, Component = ProSettingsCard) => {
   f.index = 0; f.effects = [];
-  const button = nodes(Component()).find(node => node.type === "button" && renderToStaticMarkup(node).includes(`>${label}<`));
+  const button = nodes(Component()).find(node => typeof node.props.onClick === "function" && renderToStaticMarkup(node).includes(`>${label}<`));
   expect(button, label).toBeTruthy(); button!.props.onClick!();
 };
 
@@ -60,7 +60,7 @@ it("for someone who may buy: what Cloud does, the Admin's lowest price and money
   expect(openExternal).not.toHaveBeenCalled();
   press("Sign in to your Cloud plan");
   expect(f.dispatch).toHaveBeenCalledWith({ type: "openCloudAdd", source: "app_settings", signIn: true });
-  expect(html).toMatch(/class="ui-button ui-button-primary"[^>]*>Start free trial</);
+  expect(html).toMatch(/data-variant="primary"[^>]*>Start free trial</);
 });
 
 it("without a trial it says Add a Cloud; signed in, no sign-in link; without the Admin's numbers, no price and no money-back", async () => {

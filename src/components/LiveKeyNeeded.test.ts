@@ -7,6 +7,7 @@ vi.mock("react", async (original) => ({ ...await original<typeof import("react")
 vi.mock("@/state/store", () => ({ useStore: () => ({ state: { config: { cloudHome: f.cloudHome } }, dispatch: f.dispatch }) }));
 vi.mock("@/lib/live-call-media", () => ({ dismissLiveNotice: f.dismiss }));
 import { LiveKeyNeeded, OPEN_API_KEYS } from "./LiveKeyNeeded";
+import { Button } from "@/components/ui";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -29,7 +30,7 @@ it("says one plain thing, names OpenAI, and offers only the way to Settings → 
 });
 
 it("opens Settings at API keys and puts the prompt away", () => {
-  const button = nodes(LiveKeyNeeded()).find((node) => node.type === "button");
+  const button = nodes(LiveKeyNeeded()).find((node) => (node.type === "button" || node.type === Button));
   expect(button).toBeTruthy();
   button!.props.onClick!();
   expect(OPEN_API_KEYS).toEqual({ type: "toggleAppSettings", open: true, section: "connections" });

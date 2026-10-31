@@ -3,6 +3,7 @@ import { Check, FolderMinus } from "lucide-react";
 import { useStore } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
+import { Button } from "@/components/ui";
 import { useHeldMenuMotion } from "./MenuMotion";
 import { anchoredMenuPosition } from "./SidebarPopoverMenu";
 import { MENU_LABEL } from "./menu-recipe";
@@ -131,13 +132,13 @@ export function SectionPicker({
           aria-label={t("sidebar.section.newContextAria")}
           className="ui-field ui-field-sm min-w-0 flex-1"
         />
-        <button
+        <Button variant="primary" size="xs"
           type="submit"
           disabled={!trimmed || trimmed.length > 60}
-          className="ui-button ui-button-primary ui-button-md shrink-0"
+          className="shrink-0"
         >
           {t("common.add")}
-        </button>
+        </Button>
       </form>
       {sectionCurrent && (
         <>

@@ -1,5 +1,6 @@
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 import { Loader2, LockKeyhole } from "lucide-react";
+import { Button } from "@/components/ui";
 
 import type { LoginBots } from "../../shared/logins";
 import { cn } from "@/lib/cn";
@@ -92,11 +93,11 @@ export function LoginForm({
       {error && <p role="alert" className="text-[12px] text-danger">{error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
         {onCancel && (
-          <button type="button" onClick={onCancel} disabled={pending} className="ui-button ui-button-md">{t("logins.cancel")}</button>
+          <Button size="xs" type="button" onClick={onCancel} disabled={pending}>{t("logins.cancel")}</Button>
         )}
-        <button type="submit" disabled={pending} className="ui-button ui-button-md ui-button-primary inline-flex items-center gap-1.5">
+        <Button variant="primary" size="xs" type="submit" disabled={pending} className="inline-flex items-center gap-1.5">
           {pending && <Loader2 size={13} className="animate-spin" />}{submitLabel}
-        </button>
+        </Button>
       </div>
     </form>
   );
