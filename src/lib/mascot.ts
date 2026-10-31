@@ -59,6 +59,8 @@ export const MAUS_COLORS = {
   yellow: "#D8A729",
   teal: "#01A492",
   coral: "#E5634E",
+  white: "#F2F2F3",
+  black: "#1B1B1E",
 } satisfies Record<MausColor, string>;
 
 /** Status spinners mix the mascot hue toward the skin's ink, so the 12px mark clears 3:1 on the active tab
@@ -67,6 +69,8 @@ export const MAUS_COLORS = {
 export const SPINNER_HUE_PERCENT = 65;
 
 export function spinnerColor(color: MausColor): string {
+  // White and black have no hue to carry: the mark reads as ink on the tab instead.
+  if (color === "white" || color === "black") return "color-mix(in oklab, var(--color-ink) 78%, var(--color-app))";
   return `color-mix(in oklab, ${MAUS_COLORS[color]} ${SPINNER_HUE_PERCENT}%, var(--color-ink))`;
 }
 

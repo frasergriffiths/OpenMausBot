@@ -81,8 +81,13 @@ const contrast = (left: [number, number, number], right: [number, number, number
 };
 
 function statusInk(color: MausColor, skin: string): [number, number, number] {
-  const hue = toOklab(rgb(MAUS_COLORS[color]));
   const ink = toOklab(rgb(varFor(skin, "color-ink")));
+  // White and black carry no hue: the mark is ink over the app, as spinnerColor draws it.
+  if (color === "white" || color === "black") {
+    const app = toOklab(rgb(varFor(skin, "color-app")));
+    return fromOklab(ink.map((channel, index) => channel * 0.78 + app[index]! * 0.22) as [number, number, number]);
+  }
+  const hue = toOklab(rgb(MAUS_COLORS[color]));
   const share = SPINNER_HUE_PERCENT / 100;
   return fromOklab(hue.map((channel, index) => channel * share + ink[index]! * (1 - share)) as [number, number, number]);
 }

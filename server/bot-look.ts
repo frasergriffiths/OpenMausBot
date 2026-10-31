@@ -2,7 +2,7 @@ import { MASCOT_BODY_IDS, type MascotBodyId } from "../shared/mascot-bodies.ts";
 import { MAUS_COLOR_NAMES, type MausColor } from "../shared/wire.ts";
 
 export const STARTER_COLORS: readonly MausColor[] = MAUS_COLOR_NAMES;
-const ROTATION: readonly MausColor[] = ["green", "blue", "red", "orange", "purple", "cyan", "pink", "yellow", "teal", "coral"];
+const ROTATION: readonly MausColor[] = ["green", "blue", "red", "orange", "purple", "cyan", "pink", "yellow", "teal", "coral", "white", "black"];
 
 /** The colour of the bot made `index`-th when nothing else picks one. */
 export const rotationColor = (index: number): MausColor => ROTATION[index % ROTATION.length]!;

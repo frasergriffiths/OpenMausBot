@@ -4,8 +4,8 @@ import { MASCOT_BODY_IDS } from "../shared/mascot-bodies.ts";
 import { freshLook, STARTER_COLORS } from "./bot-look.ts";
 
 describe("a new bot's first look", () => {
-  it("wears one of the nine shapes, picked at random, in one of the ten hues", () => {
-    expect(STARTER_COLORS).toEqual(["green", "blue", "red", "orange", "purple", "cyan", "pink", "yellow", "teal", "coral"]);
+  it("wears one of the nine shapes, picked at random, in one of the twelve hues", () => {
+    expect(STARTER_COLORS).toEqual(["green", "blue", "red", "orange", "purple", "cyan", "pink", "yellow", "teal", "coral", "white", "black"]);
     for (const roll of [0, 0.5, 0.999]) expect(MASCOT_BODY_IDS).toContain(freshLook([], () => roll).mascotBody);
     expect(freshLook([], () => 0).mascotBody).not.toBe(freshLook([], () => 0.999).mascotBody);
   });
