@@ -29,7 +29,7 @@ import { MapComposer } from "./MapComposer";
 import { openBotSettings } from "./bot-panel/panel-link";
 import type { TeamComputer } from "../../shared/team-computer";
 import { Chevron } from "./chevron";
-import { Switch } from "./SettingsPrimitives";
+import { Switch } from "@/components/ui";
 import { MENU_LABEL, MENU_ROW } from "./menu-recipe";
 import { SIMPLE_MENU } from "./SidebarSimpleTop";
 

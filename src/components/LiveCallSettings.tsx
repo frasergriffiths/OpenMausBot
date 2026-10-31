@@ -7,6 +7,7 @@ import { api, useStore, type ConfigStatus } from "@/state/store";
 import type { LiveSettings } from "../../shared/wire";
 import { LiveKeySetup } from "./LiveKeySetup";
 import { Select } from "./Select";
+import { Checkbox } from "@/components/ui";
 
 const IDLE_CHOICES = [1, 2, 3, 5, 10, 15, 30, 60];
 
@@ -78,16 +79,16 @@ export function LiveCallSettings({ onClose }: { onClose: () => void }) {
         </Select>
       </label>
       <div className="-mt-2 text-[12px] text-ink-tertiary">{t("call.live.voiceNext")}</div>
-      <label className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-ink-secondary">{t("call.live.readTyped")}</span>
-        <input
-          type="checkbox"
+        <Checkbox
           checked={live.readTypedReplies}
           disabled={saving}
+          aria-label={t("call.live.readTyped")}
           aria-describedby={typedHintId}
-          onChange={(event) => void save({ readTypedReplies: event.target.checked })}
+          onChange={(next) => void save({ readTypedReplies: next })}
         />
-      </label>
+      </div>
       <div id={typedHintId} className="-mt-2 text-[12px] text-ink-tertiary">{t("call.live.readTypedHint")}</div>
       <label className="flex items-center justify-between gap-2">
         <span className="text-ink-secondary">{t("call.live.idle")}</span>

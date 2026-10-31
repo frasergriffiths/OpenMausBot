@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Cloud, Laptop, Loader2, Trash2 } from "lucide-react";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import { ComputerSharingSettings } from "./ComputerSharingSettings";
 import { lendingTitle } from "./CloudLending";
 import { CloudTile } from "./cloud-buy/parts";
@@ -71,7 +71,7 @@ export function ConnectedWorkspacesSettings() {
   const forgetEntry = locals.find(entry => entry.id === envForget);
   return <>
     <p className="text-[13px] leading-relaxed text-ink-secondary">One desktop app, wherever your bots live. Switching servers does not move or replace your bots, conversations, or provider accounts.</p>
-    {saved?.packaged && <Card title="Environments on this computer" subtitle="Separate setups on this computer, each with its own bots, conversations and data folder.">
+    {saved?.packaged && <SettingsCard title="Environments on this computer" subtitle="Separate setups on this computer, each with its own bots, conversations and data folder.">
       {envError && <p role="alert" className="text-[12px] text-danger">{envError}</p>}
       {locals.length > 0 && <ul className="divide-y divide-hairline/40">
         {locals.map((entry) => {
@@ -138,8 +138,8 @@ export function ConnectedWorkspacesSettings() {
           {busy && <Loader2 size={14} className="animate-spin" />}Create
         </button>
       </form>
-    </Card>}
-    <Card title="Your servers" subtitle="Saved on this computer. Your hosted bots keep running when you switch away.">
+    </SettingsCard>}
+    <SettingsCard title="Your servers" subtitle="Saved on this computer. Your hosted bots keep running when you switch away.">
       {!saved ? <p role="status" className="text-[13px] text-ink-secondary">{error ? "Saved servers could not be loaded." : "Loading servers…"}</p> :
         <ul className="divide-y divide-hairline/40">
           {[{ id: "local", name: "This computer", origin: "", color: undefined }, ...saved.environments.filter((entry) => entry.kind !== "local")].map((entry) => {
@@ -160,9 +160,9 @@ export function ConnectedWorkspacesSettings() {
             </li>;
           })}
         </ul>}
-    </Card>
+    </SettingsCard>
     {sharingOffered && computerWorkspace && <ComputerSharingSettings key={computerWorkspace.id} workspace={computerWorkspace} onClose={() => setComputerId(null)} />}
-    <Card title="Connect to a server" subtitle="Already running OpenMausBot on a VPS, server, or another computer? Connect it here.">
+    <SettingsCard title="Connect to a server" subtitle="Already running OpenMausBot on a VPS, server, or another computer? Connect it here.">
       <form className="flex flex-col gap-3" onSubmit={(event) => {
         event.preventDefault();
         if (address.trim()) void perform(() => bridge.addFromLink(address.trim(), name.trim()));
@@ -186,6 +186,6 @@ export function ConnectedWorkspacesSettings() {
           {busy && <Loader2 size={14} className="animate-spin" />}Connect
         </button>
       </form>
-    </Card>
+    </SettingsCard>
   </>;
 }

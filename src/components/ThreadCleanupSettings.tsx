@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, useStore, type ConfigStatus } from "@/state/store";
 import { t } from "@/lib/i18n";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 
 /** Server bounds from server/config.ts, mirrored to reject out-of-range input before the round trip. */
 const MIN_RETENTION_DAYS = 1;
@@ -141,7 +141,7 @@ export function ThreadCleanupSettings() {
   };
 
   return (
-    <Card title={t("settings.threadCleanup.title")} subtitle={t("settings.threadCleanup.subtitle")}>
+    <SettingsCard title={t("settings.threadCleanup.title")} subtitle={t("settings.threadCleanup.subtitle")}>
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <input
@@ -222,6 +222,6 @@ export function ThreadCleanupSettings() {
       </div>
       {pending !== null && <p role="status" className="mt-2 text-[12px] text-ink-secondary">{t("settings.threadCleanup.saving")}</p>}
       {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
-    </Card>
+    </SettingsCard>
   );
 }

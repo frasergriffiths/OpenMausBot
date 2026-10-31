@@ -6,7 +6,7 @@ import { activeLocale, t } from "@/lib/i18n";
 import { localizedRelativeTime } from "@/lib/memory";
 import type { LocaleKey } from "@/locales";
 import { LendingActivityList } from "./LendingActivity";
-import { Switch } from "./SettingsPrimitives";
+import { Switch } from "@/components/ui";
 
 const PROBLEMS: Partial<Record<string, LocaleKey>> = {
   "connect-first": "lending.status.connectFirst",

@@ -3,7 +3,7 @@ import type { ManagedDesktopState } from "../../electron/managed-desktop.mjs";
 import type { WorkspaceBackupSummary } from "../../shared/workspace-backup";
 import { activeLocale, t } from "@/lib/i18n";
 import { collectWorkspaceClientState, WORKSPACE_RESTORE_MARKER } from "@/lib/workspace-backup-client";
-import { Card, Switch } from "./SettingsPrimitives";
+import { SettingsCard, Switch } from "@/components/ui";
 import { WorkspaceBackupRestartNotice, WorkspaceBackupSummaryView } from "./WorkspaceBackupSettings";
 import { Chevron } from "./chevron";
 
@@ -70,7 +70,7 @@ export function SavedCompanyBackupSchedule({ bridge }: { bridge: BackupBridge })
     catch { if (current === generation.current) setError(t("companyBackup.scheduleFailed")); }
     finally { if (current === generation.current) setBusy(false); }
   };
-  return <Card title={t("companyBackup.title")} subtitle={t("companyBackup.savedSchedule")}>
+  return <SettingsCard title={t("companyBackup.title")} subtitle={t("companyBackup.savedSchedule")}>
     <div className="rounded-lg border border-hairline/40 p-3">
       <div className="flex items-center justify-between gap-3">
         <div className="text-[14px] font-medium">{t("companyBackup.daily")}</div>
@@ -79,7 +79,7 @@ export function SavedCompanyBackupSchedule({ bridge }: { bridge: BackupBridge })
       <p role="status" className="mt-2 text-[12px] text-ink-secondary">{t(`companyBackup.scheduleStatus.${schedule.status}`)}</p>
       {error && <p role="alert" className="mt-1 text-[12px] text-danger">{error}</p>}
     </div>
-  </Card>;
+  </SettingsCard>;
 }
 
 /** Security: a new connection identity remounts this panel, clearing passwords and staged previews. */
@@ -241,7 +241,7 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
   const schedule = state?.schedule;
   const scheduledDate = (value: number) => new Intl.DateTimeFormat(activeLocale(), { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
-  return <Card title={t("companyBackup.title")} subtitle={t("companyBackup.account", { organization: connection.organization?.name ?? "", email: connection.email ?? "" })}>
+  return <SettingsCard title={t("companyBackup.title")} subtitle={t("companyBackup.account", { organization: connection.organization?.name ?? "", email: connection.email ?? "" })}>
     <div className="flex flex-col gap-3">
       <p className="text-[13px] text-ink-secondary">{t("companyBackup.managedScope")}</p>
       {bridge.configureSchedule && schedule && <div className="rounded-lg border border-hairline/40 p-3">
@@ -306,5 +306,5 @@ export function ConnectedCompanyBackupSettings({ connection, bridge }: { connect
         <button type="button" autoFocus className="ui-button w-fit" disabled={action !== null} onClick={closeDialog}>{t("companyBackup.cancel")}</button>
       </div>
     </dialog>}
-  </Card>;
+  </SettingsCard>;
 }
