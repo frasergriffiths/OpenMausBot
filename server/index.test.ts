@@ -7739,11 +7739,11 @@ describe("harness HTTP API", () => {
     let id = "";
     try {
       await stream.until((frame) => frame.kind === "hello");
-      const bot = (await api("POST", "/api/bots", { name: "Scout", useDefaults: false, settings: { color: "purple", mascotBody: "star" } })).body.bot;
+      const bot = (await api("POST", "/api/bots", { name: "Scout", useDefaults: false, settings: { color: "purple", mascotBody: "hare" } })).body.bot;
       id = bot.id;
       expect(bot.messages[0].text).toBe("Hi Milind, I'm Scout. What would you like me to do?");
       const announced = await stream.until((frame) => frame.kind === "bot" && frame.bot?.id === id);
-      expect(announced.bot).toMatchObject({ color: "purple", mascotBody: "star" });
+      expect(announced.bot).toMatchObject({ color: "purple", mascotBody: "hare" });
       const plain = (await api("POST", "/api/bots", { name: "Wren", useDefaults: false })).body.bot;
       await api("DELETE", `/api/bots/${plain.id}`);
       const fresh = (await stream.until((frame) => frame.kind === "bot" && frame.bot?.id === plain.id)).bot;
