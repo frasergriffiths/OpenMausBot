@@ -130,7 +130,7 @@ const open = (section: AppSettingsSection) => { fixture.section = section; retur
 describe("Settings, the one plain UI", () => {
   it("draws nine pages in the split order and no section rail", () => {
     const html = render();
-    const order = ["account", "appearance", "data", "ai", "skills", "keys", "computer", "billing", "updates"];
+    const order = ["account", "appearance", "data", "ai", "skills", "keys", "computer", "updates"];
     expect(pages(html)).toEqual(order);
     expect(SIMPLE_PAGES.map((page) => page.id)).toEqual(order);
     expect(html).not.toContain("data-settings-group=");
@@ -148,7 +148,6 @@ describe("Settings, the one plain UI", () => {
       "settings.simple.page.skills.description",
       "settings.simple.page.keys.description",
       "settings.simple.page.computer.description",
-      "settings.simple.page.billing.description",
       "settings.simple.page.updates.description",
     ]);
     expect(render()).toContain(t("settings.simple.page.account.description"));
@@ -157,7 +156,7 @@ describe("Settings, the one plain UI", () => {
   it("places every section on a page, with none left over", () => {
     const placed = SIMPLE_PAGES.flatMap((page) => page.sections);
     expect(new Set(placed).size).toBe(placed.length);
-    const unplaced = SECTIONS.map((entry) => entry.id).filter((id) => !placed.includes(id) && id !== "updates");
+    const unplaced = SECTIONS.map((entry) => entry.id).filter((id) => !placed.includes(id) && id !== "updates" && id !== "usage" && id !== "cloudAccount");
     expect(unplaced).toEqual([]);
     expect(SIMPLE_HIDDEN_SECTIONS).toEqual([]);
   });
@@ -263,22 +262,12 @@ describe("Settings, the one plain UI", () => {
     expect(html).toContain("MARKER:workspaces;");
   });
 
-  it("leads Usage & billing with one usage block, folds the limits, then shows the plan", () => {
-    fixture.section = "cloudAccount";
-    const html = render();
-    expect(currentPage(html)).toBe("billing");
-    expect(blocks(html)).toEqual(["usage", "cloudAccount"]);
-    expect(html.indexOf("See all limits")).toBeLessThan(html.indexOf("MARKER:cloudAccount;"));
-    expect(placement(html, "MARKER:usage;")).toBe("folded");
-    expect(groupLabels(html)).toContain("Plan");
-  });
-
   it("drops People from Account and keeps Activity as its own group on Data for a hosted workspace", () => {
     vi.stubGlobal("window", {});
     fixture.ownerOrAdmin = true;
     fixture.section = "people";
     const html = render();
-    expect(pages(html)).toEqual(["account", "appearance", "data", "ai", "skills", "keys", "computer", "billing", "updates"]);
+    expect(pages(html)).toEqual(["account", "appearance", "data", "ai", "skills", "keys", "computer", "updates"]);
     expect(currentPage(html)).toBe("account");
     expect(placement(html, "MARKER:people;")).toBe("missing");
     expect(placement(html, "MARKER:activity;")).toBe("missing");
@@ -318,8 +307,6 @@ describe("Settings, the one plain UI", () => {
     ["computer", "computer"],
     ["logins", "computer"],
     ["workspaces", "computer"],
-    ["usage", "billing"],
-    ["cloudAccount", "billing"],
     ["updates", "updates"],
   ])("lands a deep link to %s on %s", (section, page) => {
     fixture.section = section;

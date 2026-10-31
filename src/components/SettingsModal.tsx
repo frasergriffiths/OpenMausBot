@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Archive, ChartNoAxesColumn, Cloud, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen } from "lucide-react";
+import { Archive, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen } from "lucide-react";
 import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
@@ -11,16 +11,15 @@ import { CompanionSection } from "./CompanionSection";
 import { ServerPairingCard } from "./ServerPairingCard";
 import { Notice } from "./Notice";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
-import { currentPhonePairingTarget, phonePairingSettingsAction } from "@/lib/phone-pairing";
+import { currentPhonePairingTarget } from "@/lib/phone-pairing";
 import { CustomDomainSettings } from "./CustomDomainSettings";
 import { RemoteComputerSection } from "./RemoteComputerSection";
 import { ConnectedWorkspacesSettings } from "./ConnectedWorkspacesSettings";
-import { CloudAccountSettings } from "./CloudAccountSettings";
 import { shortcutLabel } from "./ShortcutHint";
 import { LicenseExpiryBanner } from "./LicenseExpiryBanner";
 import { WorkspacesSection, workspacesAvailable } from "./WorkspacesSection";
 import { Select } from "./Select";
-import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleBillingPage, SimpleComputerPage, SimpleDataPage, SimpleKeysPage, SimpleLooksPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
+import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleComputerPage, SimpleDataPage, SimpleKeysPage, SimpleLooksPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
 import { cn } from "@/lib/cn";
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { Chevron } from "./chevron";
@@ -55,7 +54,6 @@ export const SECTIONS: Array<{
   { id: "desktopWorkspaces", group: "computers", labelKey: "settings.section.desktopWorkspaces", icon: Building2, keywords: ["workspace", "cloud", "hosted", "vps", "server", "servers", "connect", "pair", "switch", "local"] },
   { id: "computer", group: "computers", labelKey: "settings.section.computer", icon: Monitor, keywords: ["vm", "virtual", "desktop", "browser", "built-in browser", "profiles", "browser profiles"] },
   { id: "logins", group: "computers", labelKey: "settings.section.logins", icon: LockKeyhole, keywords: ["logins", "login", "passwords", "password", "sign in", "2fa", "one-time code", "totp", "fill_login", "1password", "vault"] },
-  { id: "cloudAccount", group: "account", labelKey: "settings.section.cloudAccount", icon: Cloud, keywords: ["cloud", "my cloud", "account", "personal", "sign in", "pro", "subscription", "billing", "sync", "send", "this computer", "bots", "logins", "1password", "lend"] },
   { id: "usage", group: "account", labelKey: "settings.section.usage", icon: Coins, keywords: ["tokens", "cost", "billing", "plan", "quota", "remaining", "weekly", "5-hour", "model", "used"] },
   { id: "backups", group: "account", labelKey: "settings.section.backups", icon: Archive, keywords: ["export", "import", "restore", "full backup", "password", "recovery"] },
   { id: "import", group: "account", labelKey: "settings.section.import", icon: Download, keywords: ["import", "grok", "grok bot", "x.ai", "cursor", "claude code", "codex", "gemini", "skills", "mcp", "tools", "bring"] },
@@ -81,7 +79,6 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
   { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
     keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },
   { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["companion", "desktopWorkspaces", "computer", "logins", "workspaces"] },
-  { id: "billing", labelKey: "settings.simple.page.billing", descriptionKey: "settings.simple.page.billing.description", icon: ChartNoAxesColumn, sections: ["usage", "cloudAccount"], keywords: ["billing", "included", "allowance", "cloud hours", "voice", "keep this computer"] },
   { id: "updates", labelKey: "settings.simple.page.updates", descriptionKey: "settings.simple.page.updates.description", icon: CloudDownload, sections: ["updates"],
     keywords: ["update", "version", "release", "product updates", "newsletter", "email updates", "welcome", "tour", "diagnostics", "logs", "support"] },
 ];
@@ -141,7 +138,6 @@ export function SettingsModal() {
   const baseSections = SECTIONS.filter((entry) => !remoteActive || entry.id === "companion" || entry.id === "appearance" || entry.id === "desktopWorkspaces")
     .filter((entry) => entry.id !== "desktopWorkspaces" || Boolean(window.ogb?.environments))
     .filter((entry) => entry.id !== "import" || Boolean(window.ogb))
-    .filter((entry) => entry.id !== "cloudAccount" || Boolean(window.ogb?.cloudAccount || (window.ogb?.cloudPlan && state.config?.cloudHome === true)))
     .filter((entry) => entry.id !== "workspaces" || workspacesAvailable(state.config))
     .filter((entry) => entry.id !== "people" || (!window.ogb && state.config?.cloudHome !== true))
     .filter((entry) => entry.id !== "activity" || (!window.ogb && ownerOrAdmin === true));
@@ -250,12 +246,6 @@ export function SettingsModal() {
     switch (id) {
       case "desktopWorkspaces":
         return <ConnectedWorkspacesSettings />;
-      case "cloudAccount":
-        return (window.ogb?.cloudAccount || (window.ogb?.cloudPlan && state.config?.cloudHome === true)) && !remoteActive
-          ? <CloudAccountSettings linkRequest={state.appSettingsCloudLink} cloudHome={state.config?.cloudHome === true} teamHome={state.config?.team}
-            onConnectPhone={() => dispatch(phonePairingSettingsAction())}
-            onSignIn={() => dispatch({ type: "openCloudAdd", source: "app_settings", signIn: true })} />
-          : null;
       case "connections":
         return (
           <SettingsCard title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
@@ -314,7 +304,6 @@ export function SettingsModal() {
       case "skills": return <SimpleSkillsPage has={has} />;
       case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} />;
       case "computer": return <SimpleComputerPage has={has} remoteAccess={remoteAccess} servers={renderSection("desktopWorkspaces")} installs={workspacesAvailable(state.config) ? <WorkspacesSection /> : undefined} disclose={disclose} />;
-      case "billing": return <SimpleBillingPage has={has} disclose={disclose} cloudAccount={renderSection("cloudAccount")} />;
       case "updates": return <SimpleUpdatesPage remoteActive={remoteActive} />;
       default:
         return page.sections.map((id) => <section key={id} data-settings-block={id} className="flex scroll-mt-4 flex-col gap-4">{renderSection(id)}</section>);

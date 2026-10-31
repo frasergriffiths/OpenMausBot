@@ -2814,3 +2814,13 @@ details[open] > summary .lucide-chevron-down,
 }
 .mascot-drift { animation: mascot-drift 10s ease-in-out infinite; will-change: transform; }
 @media (prefers-reduced-motion: reduce) { .mascot-drift { animation: none; } }
+/* One shape for every error: a tinted fill, coloured text, no border. Screens mark errors with role="alert"
+   so a message that forgets the shared component still reads like the rest. */
+[role="alert"] {
+  border: 0;
+  border-radius: 0.625rem;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  color: var(--color-danger);
+  padding: 0.375rem 0.625rem;
+}
+[role="alert"]:empty { padding: 0; background: transparent; }
