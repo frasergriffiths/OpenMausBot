@@ -164,18 +164,18 @@ function buildBlob(w: number, h: number, wobble: number): string {
 function buildDrop(w: number, h: number, belly: number): string {
   const hw = w / 2
   const top = 100 - h / 2
-  const b = h * (0.3 + belly * 0.35)
+  const b = h * (0.32 + belly * 0.3)
   const waist = 100 + h / 2 - hw
   return new Path()
-    .moveTo(100, top)
-    .curveTo([100 + hw * 0.78, top + b * 0.75, 100 + hw, top + b, 100 + hw, waist])
+    .moveTo(100 - hw * 0.26, top + 8)
+    .quadTo(100, top - 6, 100 + hw * 0.26, top + 8)
+    .curveTo([100 + hw * 0.82, top + b * 0.8, 100 + hw, top + b, 100 + hw, waist])
     .quarterTo(100 + hw, waist + hw, 100, waist + hw)
     .quarterTo(100 - hw, waist + hw, 100 - hw, waist)
-    .curveTo([100 - hw, top + b, 100 - hw * 0.78, top + b * 0.75, 100, top])
+    .curveTo([100 - hw, top + b, 100 - hw * 0.82, top + b * 0.8, 100 - hw * 0.26, top + 8])
     .close()
 }
 
-/** Blob Studio's `cone`: quadratics via `quadToCubic`, straight runs via `lineToCubic`. */
 function buildCone(w: number, h: number, tip: number, base: number): string {
   const hw = w / 2
   const hh = h / 2
@@ -318,7 +318,6 @@ export const BODY_DEFS: BodyDef[] = [
   // The wobble reaches 4.2 units past the 200x200 stage, so its box is padded:
   // a 200x200 viewBox would let the scanline pass shave the top lobe flat.
   { id: "circle", name: "Circle", d: buildEllipse(200, 200), viewBox: [0, 0, 200, 200] },
-  { id: "capsule", name: "Capsule", d: buildRoundedBox(150, 200, Math.min(150, 200) / 2), viewBox: [0, 0, 200, 200] },
   { id: "drop", name: "Drop", d: buildDrop(168, 190, 0.92), viewBox: [0, 0, 200, 200] },
   { id: "shield", name: "Pebble", d: buildRoundedBox(190, 200, 72), viewBox: [0, 0, 200, 200] },
   { id: "hexagon", name: "Hexagon", d: buildPolygon(196, 196, 6, 0.48), viewBox: [0, 0, 200, 200] },
