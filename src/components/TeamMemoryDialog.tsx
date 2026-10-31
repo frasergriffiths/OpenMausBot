@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { Brain, Check, Loader2, Pin, Plus, Trash2, X } from "lucide-react";
+import { Brain, Check, Loader2, Pin, Plus, Trash2 } from "lucide-react";
 
 
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
 import { cn } from "@/lib/cn";
-import { Select } from "./Select";
+import { Dialog, Select } from "@/components/ui";
+import type { DepartmentsPicker } from "./team/SectionContextDialog";
 import { Chevron } from "./chevron";
 
 type Kind = "person" | "place" | "decision" | "term";
@@ -34,8 +34,7 @@ const KINDS: Array<{ kind: Kind; titleKey: LocaleKey; hintKey: LocaleKey }> = [
   { kind: "term", titleKey: "teamMemory.kind.terms", hintKey: "teamMemory.kind.termsHint" },
 ];
 
-export function TeamMemoryDialog({ section, label, onClose }: { section: string; label: string; onClose: () => void }) {
-  const dialogRef = useRef<HTMLDivElement>(null);
+export function TeamMemoryDialog({ section, label, onClose, picker }: { section: string; label: string; onClose: () => void; picker?: DepartmentsPicker }) {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [loadedIds, setLoadedIds] = useState<string[]>([]);
   const [unsaved, setUnsaved] = useState<Record<string, { name: string; text: string }>>({});
@@ -67,29 +66,6 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
     void load();
     return () => { generation.current += 1; };
   }, [load]);
-
-  useEffect(() => {
-    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    dialogRef.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        onClose();
-      }
-      if (event.key === "Tab") {
-        const controls = dialogRef.current?.querySelectorAll<HTMLElement>("button:enabled, input:enabled, select:enabled");
-        if (!controls?.length) return;
-        const first = controls[0], last = controls[controls.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      previousFocus?.focus();
-    };
-  }, [onClose]);
 
   const run = async (id: string | null, request: () => Promise<{ entries: Entry[]; loadedIds?: string[] }>) => {
     if (busy.current) return false;
@@ -135,42 +111,34 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
 
   const proposed = (entries ?? []).filter((entry) => entry.status === "proposed");
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-[2px] sm:p-6"
-      onMouseDown={(event) => event.target === event.currentTarget && onClose()}
+  return (
+    <Dialog
+      open
+      onClose={onClose}
+      size="lg"
+      title={<span className="flex items-center gap-2"><Brain size={18} className="text-accent" aria-hidden="true" />{t("teamMemory.title", { name: label })}</span>}
+      description={t("teamMemory.description")}
+      closeLabel={t("teamMemory.close")}
     >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="team-memory-title"
-        aria-describedby="team-memory-description"
-        tabIndex={-1}
-        className="flex max-h-[min(720px,calc(100dvh-2rem))] w-full max-w-[720px] flex-col overflow-hidden rounded-2xl border border-hairline/50 bg-panel shadow-2xl shadow-black/50 outline-none"
-      >
-        <header className="flex items-start justify-between gap-4 border-b border-hairline/40 px-6 pb-4 pt-6 sm:px-8 sm:pt-7">
-          <div>
-            <div className="flex items-center gap-2">
-              <Brain size={19} className="text-accent" />
-              <h2 id="team-memory-title" className="text-[20px] font-semibold tracking-[-0.01em] text-ink">
-                {t("teamMemory.title", { name: label })}
-              </h2>
-            </div>
-            <p id="team-memory-description" className="mt-1.5 max-w-[560px] text-[13px] leading-relaxed text-ink-secondary">
-              {t("teamMemory.description")}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            aria-label={t("teamMemory.close")}
-            className="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-secondary hover:bg-raised hover:text-ink"
-          >
-            <X size={19} />
-          </button>
-        </header>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 sm:px-8">
+      <div className="flex flex-col gap-4">
+        {picker && picker.sections.length > 1 && (
+          <label className="flex items-center gap-2 text-[13px] text-ink-secondary">
+            {t("settings.departments.title")}
+            <Select
+              value={section}
+              aria-label={t("settings.departments.title")}
+              onChange={(event) => {
+                const next = picker.sections.find((entry) => entry.key === event.target.value);
+                if (next) picker.onPick(next.key, next.name);
+              }}
+            >
+              {picker.sections.map((entry) => (
+                <option key={entry.key || "general"} value={entry.key}>{entry.name}</option>
+              ))}
+            </Select>
+          </label>
+        )}
+        <div className="flex flex-col gap-3">
           {entries === null && !error && (
             <div className="flex min-h-[200px] items-center justify-center text-ink-secondary">
               <Loader2 size={20} className="animate-spin" aria-label={t("teamMemory.loading")} />
@@ -268,7 +236,7 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
           {adding ? (
             <div className="rounded-xl border border-hairline/40 bg-card p-3">
               <div className="flex flex-wrap items-center gap-2">
-                <Select size="sm"
+                <Select
                   value={draft.kind}
                   onChange={(event) => setDraft({ ...draft, kind: event.target.value as Kind })}
                   aria-label={t("teamMemory.kindLabel")}
@@ -320,7 +288,6 @@ export function TeamMemoryDialog({ section, label, onClose }: { section: string;
           )}
         </div>
       </div>
-    </div>,
-    document.body,
+    </Dialog>
   );
 }

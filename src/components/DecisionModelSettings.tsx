@@ -200,7 +200,7 @@ export function DecisionModelSettings() {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
       <section className="space-y-2 px-4">
         <p className="text-[13px] leading-relaxed text-ink-secondary">{t("decider.intro")}</p>
         <p role="status" data-testid="helpers-status" className="text-[13px] font-medium text-ink">{helpersStatusLine(state.config)}</p>
@@ -366,6 +366,6 @@ export function DecisionModelSettings() {
           ))}
         </ul>
       </SettingsCard>
-    </>
+    </div>
   );
 }

@@ -95,3 +95,40 @@ it("restores a historical name even when its detail is unchanged", async () => {
   expect(JSON.parse(request.mock.calls.find(([, init]) => init?.method === "PATCH")![1].body))
     .toEqual({ name: "Earlier colour", detail: entry.detail, expectedRevision: entry.revision });
 });
+
+it("offers every department once there is more than one, and moves to the one picked", async () => {
+  request.mockImplementation(async () => ({ entries: [], loadedIds: [] }));
+  const picked: Array<[string, string]> = [];
+  flushSync(() => root.render(createElement(TeamMemoryDialog, {
+    section: "Editing",
+    label: "Editing",
+    onClose: () => undefined,
+    picker: {
+      sections: [{ key: "Editing", name: "Editing" }, { key: "Research", name: "Research" }],
+      onPick: (key: string, name: string) => { picked.push([key, name]); },
+    },
+  })));
+  await vi.waitFor(() => expect(document.querySelector('[aria-label="Departments"]')).not.toBeNull());
+  const select = document.querySelector<HTMLSelectElement>('[aria-label="Departments"]')!;
+  expect([...select.options].map((option) => option.value)).toEqual(["Editing", "Research"]);
+  flushSync(() => {
+    select.value = "Research";
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  expect(picked).toEqual([["Research", "Research"]]);
+});
+
+it("keeps the picker out of the way when the installation has one department", async () => {
+  request.mockImplementation(async () => ({ entries: [], loadedIds: [] }));
+  flushSync(() => root.render(createElement(TeamMemoryDialog, {
+    section: "General",
+    label: "General",
+    onClose: () => undefined,
+    picker: { sections: [{ key: "", name: "General" }], onPick: () => undefined },
+  })));
+  await vi.waitFor(() => expect(document.querySelector('[role="dialog"]')).not.toBeNull());
+  expect(document.querySelector('[aria-label="Departments"]')).toBeNull();
+  // The shared dialog, not a hand-rolled one: one title, one description, one close button.
+  expect(document.querySelectorAll('[role="dialog"]')).toHaveLength(1);
+  expect(document.querySelector('[role="dialog"]')?.getAttribute("aria-modal")).toBe("true");
+});
