@@ -13,6 +13,7 @@ import { initAnalytics } from "@/lib/analytics";
 import { parseComputerHelp } from "@/lib/computer-control";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatView } from "@/components/ChatView";
+import { NoBots } from "@/components/NoBots";
 import { GroupView } from "@/components/GroupView";
 import { PHONE_LAYOUT, SIDEBAR_INLINE, TWO_SIDE_PANELS_FIT, useMediaQuery } from "@/lib/use-media-query";
 import { PluginsPanel, preloadConnectedApps } from "@/components/PluginsPanel";
@@ -313,6 +314,8 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
           <CloudIntent />
         ) : firstRun === "sign-in" ? (
           <CloudEngineSignIn />
+        ) : state.bots.filter((candidate) => !candidate.hidden).length === 0 ? (
+          <NoBots onNew={() => dispatch({ type: "newBot" })} />
         ) : noEngines ? (
           <NoEngines />
         ) : chiefStep ? (

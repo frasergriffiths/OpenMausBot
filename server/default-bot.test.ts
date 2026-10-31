@@ -172,22 +172,26 @@ describe("MausBot, every person's helper", () => {
     expect(mdb.attentionRows(0).filter((row) => row.kind === "options")).toEqual([]);
   });
 
-  it("is hidden, never deleted or archived, and a hidden MausBot is never made again", () => {
+  it("is hidden, deletable, and once deleted is never made again", () => {
     const store = new Store(selection);
     const maus = boot(store)!;
     const other = store.createBot({ name: "Writer" });
-    expect(() => store.deleteBot(maus.id)).toThrow(/MausBot can't be deleted or archived/);
-    expect(store.bot(maus.id)).toBeTruthy();
     expect(defaultBotPatchRefusal(maus, { hidden: true })).toMatch(/Show MausBot in the sidebar/);
     expect(defaultBotPatchRefusal(other, { sidebarHidden: true })).toMatch(/Only MausBot/);
     expect(defaultBotPatchRefusal(maus, { sidebarHidden: "yes" })).toBe("sidebarHidden must be true or false");
     expect(defaultBotPatchRefusal(maus, { sidebarHidden: true })).toBeNull();
     store.patchBot(maus.id, { sidebarHidden: true });
-    const restarted = new Store(selection);
-    boot(restarted);
-    expect(placeMausBots(restarted).map((bot) => [bot.id, bot.sidebarHidden])).toEqual([[maus.id, true]]);
-    restarted.patchBot(maus.id, { sidebarHidden: false });
+    const hidden = new Store(selection);
+    boot(hidden);
+    expect(placeMausBots(hidden).map((bot) => [bot.id, bot.sidebarHidden])).toEqual([[maus.id, true]]);
+    hidden.patchBot(maus.id, { sidebarHidden: false });
     expect(new Store(selection).bot(maus.id)?.sidebarHidden).toBe(false);
+
+    expect(hidden.deleteBot(maus.id)).toBe(true);
+    expect(hidden.bot(maus.id)).toBeFalsy();
+    const after = new Store(selection);
+    boot(after);
+    expect(placeMausBots(after)).toEqual([]);
   });
 
   it("is never made twice for one place, even once its mark is gone", () => {

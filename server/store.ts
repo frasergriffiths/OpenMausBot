@@ -39,7 +39,7 @@ import { isMausColor, movesThreadToTop, nextOpenThread } from "../shared/wire.ts
 import { DEFAULT_BOT_COLOR } from "../shared/default-bot.ts";
 import { parseConnectorTools } from "./connector-tools.ts";
 import { sameModelSelection } from "../shared/thread-model.ts";
-import { initialGreetingMessage } from "./initial-greeting.ts"; import { createDefaultBot, defaultBotRefusal, type DefaultBotIntro } from "./default-bot.ts";
+import { initialGreetingMessage } from "./initial-greeting.ts"; import { createDefaultBot, type DefaultBotIntro } from "./default-bot.ts";
 import { appsFromCreator } from "./inherited-apps.ts";
 import { ThreadCache, type ThreadState } from "./thread-cache.ts";
 export type {
@@ -1488,7 +1488,6 @@ export class Store {
   deleteBot(id: string, setupRequest?: TeamSetupRequest): boolean {
     const bot = this.bot(id);
     if (!bot) return false;
-    if (bot.defaultBot) throw Object.assign(new Error(defaultBotRefusal(bot.name)), { status: 409 });
     let nextBots = this.bots.filter((b) => b.id !== id);
     if (setupRequest) {
       const chief = this.bot(setupRequest.botId);

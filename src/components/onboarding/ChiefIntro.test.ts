@@ -132,13 +132,13 @@ describe("Create", () => {
 });
 
 describe("Skipping the Chief", () => {
-  it("leaves MausBot an ordinary bot and finishes without creating a Chief", async () => {
+  it("removes the seeded MausBot and finishes without creating a Chief", async () => {
     await show();
     await choose("Skip for now");
     expect(f.onSkip).toHaveBeenCalledOnce();
     expect(f.onDone).not.toHaveBeenCalled();
     expect(f.landed).not.toHaveBeenCalled();
-    expect(patches().map((action) => action.patch)).toEqual([{ welcomed: true }]);
+    expect(f.dispatch).toHaveBeenCalledWith({ type: "deleteBot", botId: "maus" });
   });
 });
 

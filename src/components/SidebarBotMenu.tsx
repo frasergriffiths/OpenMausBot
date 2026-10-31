@@ -226,7 +226,10 @@ export function BotContextMenu({
         <ChevronRight size={15} aria-hidden="true" className="text-ink-secondary rtl:-scale-x-100" />
       </button>
     );
-    const leave = bot.defaultBot ? [<HideDefaultBotItem key="hide" bot={bot} onDone={onClose} className={SIMPLE_MENU_ITEM} />] : [
+    const leave = bot.defaultBot ? [
+      <HideDefaultBotItem key="hide" bot={bot} onDone={onClose} className={SIMPLE_MENU_ITEM} />,
+      <BotDeleteMenuItem key="delete" deleting={deleting} className={SIMPLE_MENU_ITEM} onClick={() => { onClose(); onDelete(bot); }} />,
+    ] : [
       item(<Archive size={16} className="text-ink-secondary" />, t("sidebar.bot.archive"), () => onArchive(bot), { disabled: archiveBlocked, hint: archiveHint }),
       <BotDeleteMenuItem key="delete" deleting={deleting} className={SIMPLE_MENU_ITEM} onClick={() => { onClose(); onDelete(bot); }} />,
     ];

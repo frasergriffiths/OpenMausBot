@@ -97,7 +97,7 @@ export function ChiefIntro({ replay, onDone, onSkip, onLeave }: { replay: boolea
   const skip = () => {
     if (leaving) return;
     setWelcomingBot(null);
-    if (maus && !maus.welcomed) dispatch({ type: "updateBot", botId: maus.id, patch: { welcomed: true } });
+    if (maus) void dispatch({ type: "deleteBot", botId: maus.id });
     setLeaving(true);
     onLeave?.();
     dialog.current?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: CHIEF_FADE_MS, fill: "forwards" });
