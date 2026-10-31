@@ -494,11 +494,11 @@ describe("the hero", () => {
 describe("the avatar editor", () => {
   const editor = (bot: Bot) => capture(() => AvatarEditorCard({ bot, activeState: "idle", onPatch: patch, onClose }));
 
-  it("shows the nine bodies and ten colors, with the faces behind More looks", () => {
+  it("shows the nine bodies and twelve colours, with the faces behind More looks", () => {
     const bot = makeBot();
     const rendered = editor(bot);
     expect(rendered.html.match(/aria-label="Use the \w+ body"/g)).toHaveLength(9);
-    expect(rendered.html.match(/aria-label="Use \w+ mascot color"/g)).toHaveLength(10);
+    expect(rendered.html.match(/aria-label="Use \w+ mascot color"/g)).toHaveLength(12);
     expect(rendered.html).not.toContain(">Halloween<");
     expect(has(rendered, "data-avatar-face", "idle")).toBe(false);
     expect(find(rendered, "aria-label", "Use the Mochi body").props["aria-pressed"]).toBe(true);
@@ -580,28 +580,24 @@ describe("the Details tab", () => {
     expect(switches(rendered.html)).toBe(0);
   });
 
-  it("offers no Add a routine path while the bot has none, and lists routines once it has some", () => {
-    const empty = botTab(makeBot());
-    expect(empty.html).not.toContain('data-panel-empty="routines"');
-    expect(empty.html).not.toContain("Add a routine");
-    expect(empty.html).not.toContain("Routines are recurring tasks");
-    expect(empty.html).not.toContain('data-panel-page="routines"');
+  it("lists Routines in the Rows card whether or not the bot has any, and opens the routines page", () => {
+    const empty = settingsPage(makeBot());
+    expect(empty.html).toContain('data-panel-page="routines"');
     fixture.derived.botRoutines = [routine()];
-    const some = botTab(makeBot());
+    const some = settingsPage(makeBot());
     expect(some.html).not.toContain('data-panel-empty="routines"');
-    expect(some.html.indexOf('data-panel-row="model"')).toBeLessThan(some.html.indexOf('data-panel-page="routines"'));
     click(find(some, "data-panel-page", "routines"));
     expect(onOpen).toHaveBeenLastCalledWith("routines");
   });
 
   it("values Routines by how many are on, and opens the routines page", () => {
     fixture.derived.botRoutines = [routine(), routine({ id: "r2", enabled: false }), routine({ id: "r3" })];
-    const rendered = botTab(makeBot());
+    const rendered = settingsPage(makeBot());
     expect(rowValue(rendered, "routines")).toBe("2 on");
     click(find(rendered, "data-panel-page", "routines"));
     expect(onOpen).toHaveBeenLastCalledWith("routines");
     fixture.derived.botRoutines = [routine({ enabled: false })];
-    expect(rowValue(botTab(makeBot()), "routines")).toBe("None");
+    expect(rowValue(settingsPage(makeBot()), "routines")).toBe("None");
   });
 });
 
