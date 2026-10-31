@@ -1,4 +1,4 @@
-import { Calendar, Gauge, Sparkles } from "lucide-react";
+import { Gauge, Sparkles } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 import { setupJobAnswer } from "@/lib/setup-answer";
@@ -20,7 +20,6 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
   editingInstructions?: boolean;
   onEditInstructions?: (open: boolean) => void;
 }) {
-  const routinesOn = derived.botRoutines.filter((routine) => routine.enabled).length;
   const job = setupJobAnswer(bot);
 
   return (
@@ -48,18 +47,6 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
       </Card>
 
       <SettingsPage bot={bot} derived={derived} onOpen={onOpen} editingInstructions={editingInstructions} onEditInstructions={onEditInstructions} embedded />
-
-      {derived.botRoutines.length > 0 && (
-        <Card label={t("botSettings.simple.routines")} anchor="routines">
-          <NavRow
-            data-panel-page="routines"
-            icon={Calendar}
-            title={t("botSettings.simple.routines")}
-            value={routinesOn > 0 ? t("botPanel.routinesOn", { count: routinesOn }) : t("botPanel.none")}
-            onClick={() => onOpen("routines")}
-          />
-        </Card>
-      )}
 
       <Card anchor="usage">
         <NavRow data-panel-page="usage" icon={Gauge} title={t("settings.section.usage")} onClick={() => onOpen("usage")} />

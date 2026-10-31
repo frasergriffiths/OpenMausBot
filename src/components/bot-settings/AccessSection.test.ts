@@ -2,6 +2,7 @@ import { Children, createElement, isValidElement, type ReactElement, type ReactN
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { Button } from "@/components/ui";
 import { StoreProvider, type Bot, type ConfigStatus } from "@/state/store";
 import type { useBotSettingsDerived } from "./useBotSettingsDerived";
 
@@ -272,7 +273,7 @@ describe("Research (treg) card", () => {
     expect(html).toContain("Add your treg key in Settings → API keys to let bots research X, companies, people and more.");
     expect(html).toMatch(new RegExp(`${SWITCH}[^>]* disabled=""`));
     expect(html).toMatch(new RegExp(`${SWITCH}[^>]*aria-checked="false"`));
-    const open = capture(makeBot()).card.find((node) => node.type === "button" && typeof node.props.onClick === "function")!;
+    const open = capture(makeBot()).card.find((node) => (node.type === "button" || node.type === Button) && typeof node.props.onClick === "function")!;
     (open.props.onClick as () => void)();
     expect(fixture.dispatch).toHaveBeenCalledWith({ type: "toggleAppSettings", open: true, section: "connections" });
   });

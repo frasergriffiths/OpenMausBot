@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Laptop } from "lucide-react";
-import { SettingsCard, Switch } from "@/components/ui";
 
 import type { PageLending } from "../../electron/cloud-lending-ipc.mjs";
 import { activeLocale, t } from "@/lib/i18n";
@@ -8,6 +7,7 @@ import type { LocaleKey } from "@/locales";
 import { localizedRelativeTime } from "@/lib/memory";
 import { api } from "@/state/store";
 import { lendingFailureKey, lendingProblemKey, lendingTitle, lendsLine, lentWhat } from "./CloudLending";
+import { SettingsCard, Switch } from "@/components/ui";
 
 /** A computer lent to this server, now or before (server/shared-computers.ts KnownLentComputer). */
 export interface KnownLentComputer {

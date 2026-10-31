@@ -18,9 +18,9 @@ import {
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
 import { voiceKeyDraftValue, type VoiceKeyDraft } from "@/lib/voice-key-draft";
-import { Switch } from "@/components/ui";
 import { VoicePicker, type PickerVoice } from "./VoicePicker";
 import { Select } from "./Select";
+import { Switch } from "@/components/ui";
 import { RadioRow } from "./bot-panel/rows";
 
 const SAMPLE = "Morning. Overnight the tests went green, and I left two notes for you in the thread.";

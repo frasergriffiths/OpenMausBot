@@ -60,7 +60,7 @@ describe("the profile photo", () => {
     expect(fixture.dispatch).toHaveBeenCalledWith({ type: "profileSaved", profile: { avatarUrl: undefined } });
   });
 
-  it("never sends the photo with a name or email save, so a stale copy cannot overwrite a newer one", async () => {
+  it("never sends the photo with a name save, so a stale copy cannot overwrite a newer one", async () => {
     fixture.config = { profile: { name: "Ada", email: "", avatarUrl: photo } };
     const sent: unknown[] = [];
     vi.stubGlobal("fetch", (_path: string, init: RequestInit) => {
@@ -71,22 +71,20 @@ describe("the profile photo", () => {
       await act(async () => root.render(createElement(ProfileFields)));
       const name = host.querySelector<HTMLInputElement>('input[aria-label="Your name"]')!;
       await act(async () => name.dispatchEvent(new FocusEvent("focusout", { bubbles: true })));
-      expect(sent).toEqual([{ profile: { name: "Ada", email: "" } }]);
+      expect(sent).toEqual([{ profile: { name: "Ada" } }]);
     } finally {
       vi.unstubAllGlobals();
     }
   });
 
-  it("saves only the signed-in person's own profile on a team, never the server's, and keeps their sign-in address", async () => {
+  it("saves only the signed-in person's own profile on a team, never the server's, and offers no email", async () => {
     fixture.config = { team: { id: "team-acme-1", name: "Acme" }, profile: { name: "Bob", email: "bob@acme.test", avatarUrl: photo } };
     fixture.api.mockResolvedValue({ name: "Bob Builder", email: "bob@acme.test", aboutMe: "" });
     const fetched = vi.fn();
     vi.stubGlobal("fetch", fetched);
     try {
       await act(async () => root.render(createElement(ProfileFields)));
-      const email = host.querySelector<HTMLInputElement>('input[type="email"]')!;
-      expect(email.readOnly).toBe(true);
-      expect(email.value).toBe("bob@acme.test");
+      expect(host.querySelector('input[type="email"]')).toBeNull();
       const name = host.querySelector<HTMLInputElement>('input[aria-label="Your name"]')!;
       await act(async () => name.dispatchEvent(new FocusEvent("focusout", { bubbles: true })));
       expect(fixture.api).toHaveBeenCalledWith("/api/me", { method: "PUT", body: JSON.stringify({ name: "Bob" }), timeoutMs: 10_000 });

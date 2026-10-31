@@ -34,7 +34,7 @@ function canLead(bot: Bot, instances: ReturnType<typeof useStore>["state"]["inst
  * already have bots, one of those (Choose, then Confirm). It shows only where no other bot is the Chief (chiefStepFits)
  * and asks for a choice, so Escape leaves only the list. Create flies MausBot onto its sidebar tile; the chat comes when
  * it lands (`onDone`), and `onLeave` fades the scrim with the dialog. */
-export function ChiefIntro({ replay, onDone, onLeave }: { replay: boolean; onDone: (botId: string | null) => void; onLeave?: () => void }) {
+export function ChiefIntro({ replay, onDone, onSkip, onLeave }: { replay: boolean; onDone: (botId: string | null) => void; onSkip?: () => void; onLeave?: () => void }) {
   const { state, dispatch } = useStore();
   const reduced = usePrefersReducedMotion();
   const viewer = useViewerEmail();
@@ -90,6 +90,18 @@ export function ChiefIntro({ replay, onDone, onLeave }: { replay: boolean; onDon
       },
     });
     leave(maus.id, reduced ? CHIEF_FADE_MS : FLIGHT_MS);
+  };
+
+  // Skipping keeps the MausBot as an ordinary bot: it is not made Chief, nothing is staged, and the first-run
+  // intro will not ask again.
+  const skip = () => {
+    if (leaving) return;
+    setWelcomingBot(null);
+    if (maus && !maus.welcomed) dispatch({ type: "updateBot", botId: maus.id, patch: { welcomed: true } });
+    setLeaving(true);
+    onLeave?.();
+    dialog.current?.animate([{ opacity: 1 }, { opacity: 0 }], { duration: CHIEF_FADE_MS, fill: "forwards" });
+    setTimeout(() => (onSkip ? onSkip() : onDone(null)), CHIEF_FADE_MS);
   };
 
   const keep = (bot: Bot) => {
@@ -190,6 +202,11 @@ export function ChiefIntro({ replay, onDone, onLeave }: { replay: boolean; onDon
             )}
             <button type="button" data-primary="" data-chief-create="" onClick={create} disabled={!maus} className={cn(PRIMARY, "w-full min-w-0")}>
               <span className="truncate">{t("onboarding.chief.create")}</span>
+            </button>
+          </div>
+          <div className="-mt-2 pb-3 text-center">
+            <button type="button" data-chief-skip="" onClick={skip} className="rounded-full px-3 py-1 text-[13px] text-ink-secondary transition-colors hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus motion-reduce:transition-none">
+              {t("onboarding.chief.skip")}
             </button>
           </div>
         </>

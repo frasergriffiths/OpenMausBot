@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { t } from "@/lib/i18n";
 import { Laptop, Loader2, Unplug } from "lucide-react";
-import { SettingsCard } from "@/components/ui";
 import { Select } from "./Select";
+import { SettingsCard } from "@/components/ui";
 
 const inputClass =
   "w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none";

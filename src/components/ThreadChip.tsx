@@ -20,6 +20,7 @@ export function ThreadChip({ message }: { message: Message }) {
     <HandoffReply message={message}>
       <Button size="xs" shape="pill" variant="chip"
         type="button"
+        className={tool.ok === false ? "text-danger" : undefined}
         data-thread-chip={ref.threadId}
         onClick={() => openThread(dispatch, ref, state, showThreads)}
         title={t("chat.openThread", { title: ref.title })}

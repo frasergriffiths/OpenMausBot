@@ -6,7 +6,6 @@ import { IMAGE_MAX_BYTES, imageAttachmentFromFile, isImageFile } from "@/lib/com
 import type { LocaleKey } from "@/locales";
 import { Button } from "@/components/ui";
 import { botAvatarUrlFromStoredPath } from "../../shared/bot-avatar";
-import { AboutMeSettings } from "./AboutMeSettings";
 import { profileInitials } from "./SidebarProfileMenu";
 import { User } from "lucide-react";
 
@@ -153,11 +152,9 @@ function ProfilePhoto() {
 export function ProfileFields() {
   const { state, dispatch } = useStore();
   const [name, setName] = useState(state.config?.profile?.name ?? "");
-  const [email, setEmail] = useState(state.config?.profile?.email ?? "");
   useEffect(() => {
     setName(state.config?.profile?.name ?? "");
-    setEmail(state.config?.profile?.email ?? "");
-  }, [state.config?.profile?.name, state.config?.profile?.email]);
+  }, [state.config?.profile?.name]);
 
   const team = Boolean(state.config?.team);
   const save = () => {
@@ -170,7 +167,7 @@ export function ProfileFields() {
     void fetch("/api/config", {
       method: "PUT",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ profile: { name: name.trim(), email: email.trim().toLowerCase() } }),
+      body: JSON.stringify({ profile: { name: name.trim() } }),
     })
       .then((r) => { if (!r.ok) throw new Error("Profile save failed"); return r.json(); })
       .then((config: ConfigStatus) => {
@@ -185,17 +182,6 @@ export function ProfileFields() {
     <div className="flex flex-col gap-3">
       <ProfilePhoto />
       <input aria-label={t("settings.profile.name")} value={name} onChange={(e) => setName(e.target.value)} onBlur={save} placeholder={t("settings.profile.name")} className={inputClass} />
-      <input
-        type="email"
-        aria-label={t("phone.signIn.email")}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        onBlur={team ? undefined : save}
-        readOnly={team}
-        placeholder="you@example.com"
-        className={inputClass}
-      />
-      <AboutMeSettings />
     </div>
   );
 }
@@ -217,7 +203,6 @@ export function ProfileSummaryRow() {
   const [editing, setEditing] = useState(false);
   const profile = state.config?.profile;
   const name = profile?.name?.trim() ?? "";
-  const email = profile?.email?.trim() ?? "";
   const fieldsId = useId();
   const fields = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -228,13 +213,11 @@ export function ProfileSummaryRow() {
       <div className="flex min-w-0 items-center gap-3">
         <ProfileAvatar profile={profile} />
         <div className="min-w-0 flex-1">
-          {name || email ? <>
-            <div className="truncate text-[14px] leading-5 text-ink">{name || email}</div>
-            {name && email && <div className="truncate text-[13px] leading-[18px] text-ink-secondary">{email}</div>}
-          </> : <div className="truncate text-[14px] leading-5 text-ink-secondary">{t("settings.simple.account.noName")}</div>}
+          {name ? <div className="truncate text-[14px] leading-5 text-ink">{name}</div>
+            : <div className="truncate text-[14px] leading-5 text-ink-secondary">{t("settings.simple.account.noName")}</div>}
         </div>
         <Button size="sm" type="button" aria-expanded={editing} aria-controls={fieldsId} className="shrink-0" onClick={() => setEditing(!editing)}>
-          {editing ? t("common.done") : t(name || email ? "settings.simple.account.edit" : "settings.simple.account.add")}
+          {editing ? t("common.done") : t(name ? "settings.simple.account.edit" : "settings.simple.account.add")}
         </Button>
       </div>
       <div id={fieldsId} ref={fields} hidden={!editing} className="mt-4">

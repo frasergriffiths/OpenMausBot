@@ -23,6 +23,7 @@ import { markIntentSent, reopenCloudIntent } from "@/lib/cloud-intent";
 import { CLOUD_INTENT_ASKED, CLOUD_INTENT_GIVEN, CLOUD_SETUP_HIDDEN, CLOUD_SETUP_MOVE_SKIPPED, CLOUD_WELCOME_DONE, welcomeStepHint } from "@/lib/cloud-setup";
 import { cloudWelcomeShown, resetCloudWelcome, takeWelcomeRequest, useCloudWelcome } from "@/lib/cloud-welcome";
 import { api } from "@/state/store";
+import { Button, IconButton } from "@/components/ui";
 
 type Node = ReactElement<{ children?: ReactNode; onClick?: () => void; "data-status"?: string; "data-cloud-setup-step"?: string }>;
 function nodes(value: ReactNode): Node[] {
@@ -47,8 +48,8 @@ function welcomeNow() {
   return value!;
 }
 const text = (node: Node): string => Children.toArray(node.props.children).map(child => typeof child === "string" || typeof child === "number" ? String(child) : isValidElement(child) ? text(child as Node) : "").join("");
-const button = (label: string) => render().nodes.find(node => node.type === "button" && text(node) === label);
-const expand = (title: string) => render().nodes.find(node => node.type === "button" && text(node).startsWith(title))!.props.onClick!();
+const button = (label: string) => render().nodes.find(node => (node.type === "button" || node.type === Button || node.type === IconButton) && text(node) === label);
+const expand = (title: string) => render().nodes.find(node => (node.type === "button" || node.type === Button || node.type === IconButton) && text(node).startsWith(title))!.props.onClick!();
 const statuses = () => Object.fromEntries(render().nodes.filter(node => node.props["data-cloud-setup-step"]).map(node => [node.props["data-cloud-setup-step"], node.props["data-status"]]));
 async function mount() { render(); for (const effect of f.effects) effect(); await flush(); }
 
@@ -222,7 +223,7 @@ it("minimizes to its progress on this device, and opens again", async () => {
   const setItem = vi.fn();
   vi.stubGlobal("localStorage", { getItem: () => null, setItem });
   await mount();
-  const toggle = () => render().nodes.find(node => node.type === "button" && (node.props as Record<string, unknown>)["aria-controls"] === "cloud-setup-body")!.props.onClick!();
+  const toggle = () => render().nodes.find(node => (node.type === "button" || node.type === Button || node.type === IconButton) && (node.props as Record<string, unknown>)["aria-controls"] === "cloud-setup-body")!.props.onClick!();
   toggle();
   let { html } = render();
   expect(html).toContain("1 of 3 done");

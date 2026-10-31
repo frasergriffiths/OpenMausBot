@@ -3,9 +3,9 @@ import { Check, ChevronLeft, ChevronRight, Trash2, type LucideIcon } from "lucid
 
 import { cn } from "@/lib/cn";
 import type { MausColor } from "@/lib/mascot";
-import { Switch } from "@/components/ui";
 import { PILL_TAB, PILL_TAB_OFF, PILL_TAB_ON, PILL_TABS } from "../pill-tabs";
 import { ELEVATED_CONTROL, ELEVATED_HOVER } from "../elevated";
+import { Switch } from "@/components/ui";
 
 export const rowCls = "flex min-h-[46px] items-center gap-2.5 px-3.5 py-[11px]";
 export const roundButtonCls = `flex size-[34px] shrink-0 items-center justify-center rounded-full text-ink ${ELEVATED_CONTROL} ${ELEVATED_HOVER} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus [:root[data-skin=daylight]_&]:shadow-[0_1px_3px_rgb(28_28_28/0.12)]`;

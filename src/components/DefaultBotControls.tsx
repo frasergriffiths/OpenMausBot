@@ -4,8 +4,8 @@ import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
 import { DEFAULT_BOT_NAME, myDefaultBot, useViewerEmail } from "@/lib/default-bot";
 import { useStore, type Action, type Bot } from "@/state/store";
-import { SettingRow, Switch } from "@/components/ui";
 import { Card, NavRow } from "./bot-panel/rows";
+import { SettingRow, Switch } from "@/components/ui";
 
 /** Hiding MausBot is the Settings switch turned off: one place says whether it is in the sidebar. */
 export function showDefaultBot(dispatch: (action: Action) => void, bot: Pick<Bot, "id" | "name">, shown: boolean): void {
