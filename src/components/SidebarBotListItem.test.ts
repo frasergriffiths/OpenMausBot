@@ -89,10 +89,10 @@ describe("BotListItem", () => {
     expect(preview).not.toContain("waiting-dot");
   });
 
-  it("offers direct New thread and New folder icons and a keyboard-accessible bot menu", () => {
+  it("offers only a keyboard-accessible bot menu in the row, with no New thread or New folder icons", () => {
     const markup = renderRow(bot());
-    expect(markup).toContain('aria-label="New thread"');
-    expect(markup).toContain('aria-label="New folder under Atlas"');
+    expect(markup).not.toContain('aria-label="New thread"');
+    expect(markup).not.toContain('aria-label="New folder under Atlas"');
     expect(markup).toContain('aria-label="Actions for Atlas"');
     expect(markup).toContain('aria-haspopup="menu"');
   });
@@ -100,11 +100,12 @@ describe("BotListItem", () => {
     tasks: [{ threadId: "thread-atlas", title: "Current", createdAt: 2 }, { threadId: "thread-earlier", title: "Earlier", createdAt: 1 }],
   });
 
-  it("shows the thread toggle only once there is a list to open", () => {
+  it("never draws a thread toggle or a thread row, even with many tasks and projects", () => {
     expect(renderRow(bot())).not.toContain("Expand Atlas threads");
     expect(renderRow(bot())).not.toContain('data-sidebar-thread-row=');
-    expect(renderRow(bot(twoThreads()))).toContain("Expand Atlas threads");
-    expect(renderRow(bot({ projects: [{ id: "p1", name: "Research" }] }))).toContain("Expand Atlas threads");
+    expect(renderRow(bot(twoThreads()))).not.toContain("Expand Atlas threads");
+    expect(renderRow(bot(twoThreads()))).not.toContain('data-sidebar-thread-row=');
+    expect(renderRow(bot({ projects: [{ id: "p1", name: "Research" }] }))).not.toContain("Expand Atlas threads");
   });
   it("previews the last reply, not the digest receipt that follows it", () => {
     const markup = renderRow(bot({

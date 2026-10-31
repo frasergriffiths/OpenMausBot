@@ -83,12 +83,12 @@ describe("the header's right side", () => {
       expect(controls).toContain("data-test-model-control");
       expect(fixture.model).toMatchObject({ threadId: "selected" });
       expect(controls).not.toContain('data-tour="computer"');
-      // The bot's computer moved to the panel's Computer tab; find, export, usage, activity and the run log
-      // stay in the header's More menu.
+      // The bot's computer moved to the panel's Computer tab, and the activity and run-log panels are gone;
+      // find, export and Start fresh stay in the header's More menu.
       expect(markup).toContain('data-testid="chat-more"');
       const more = fixture.menus.find((menu) => menu.ariaLabel === "More");
       expect(more).toBeDefined();
-      expect(more!.items.map((item) => item.key)).toEqual(expect.arrayContaining(["find", "copy", "download", "activity", "runlog"]));
+      expect(more!.items.map((item) => item.key)).toEqual(expect.arrayContaining(["find", "copy", "download", "reset-context"]));
       expect(markup).toContain("data-chathead-pill");
     } finally {
       fixture.advanced = true;
