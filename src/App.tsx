@@ -40,7 +40,6 @@ import { CloudEngineSignIn } from "@/components/CloudEngineSignIn";
 import { CloudIntent } from "@/components/CloudIntent";
 import { cloudIntentDue, cloudIntentShown, useCloudIntent } from "@/lib/cloud-intent";
 import { CloudWelcome } from "@/components/cloud-welcome/CloudWelcome";
-import { WelcomeKeeper } from "@/components/cloud-welcome/WelcomeKeeper";
 import { EmptyChatShell } from "@/components/onboarding/EmptyChatShell";
 import { cloudFirstRun, cloudWelcomeVisible, useCloudWelcome } from "@/lib/cloud-welcome";
 import { engineReady } from "@/components/EngineLibrary";
@@ -347,7 +346,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
       {notificationFeed && state.notificationsOpen && <NotificationsPanel />}
       {notificationFeed && <NotificationRail />}
       {state.appSettingsOpen && <SettingsModal />}
-      <WelcomeKeeper viewer={viewer} />
       {state.pluginsOpen && <PluginsPanel />}
       {state.shortcutsOpen && (
         <KeyboardShortcutsModal

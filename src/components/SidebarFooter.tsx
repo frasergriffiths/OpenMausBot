@@ -2,7 +2,6 @@ import { cn } from "@/lib/cn";
 import type { SidebarDensity } from "@/lib/sidebar-preferences";
 import { useStore } from "@/state/store";
 
-import { CloudUsageCard } from "./CloudUsageMeter";
 import { endCloudHowTo, useWorkspacePlace, type WorkspacePlace } from "./DesktopWorkspaceSwitcher";
 import { SidebarAppsButton, SidebarBottomButtons, SidebarFooterNav } from "./SidebarFooterNav";
 import { SidebarConnectApps } from "./SidebarConnectApps";
@@ -27,7 +26,6 @@ function SimpleSidebarFooter({ owner, archived }: { owner: string | null; archiv
   const account = useSimpleAccount(place, owner, archived);
   return (
     <div data-sidebar-footer="simple" className="px-3 pb-3 pt-2">
-      <CloudUsageCard />
       <SidebarPlaceStatus place={place} className="mb-2 px-1" />
       <SidebarConnectApps />
       <div className="flex items-center gap-2 not-first:mt-2">
@@ -64,8 +62,7 @@ export function SidebarFooter({ density, simple = false, owner = null, archived,
         </>
       ) : (
         <>
-          <CloudUsageCard />
-          <div className="flex items-center gap-2 not-first:mt-3">
+              <div className="flex items-center gap-2 not-first:mt-3">
             <div className="min-w-0 flex-1">
               <SidebarProfileMenu />
             </div>
