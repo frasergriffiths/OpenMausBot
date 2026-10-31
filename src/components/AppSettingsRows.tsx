@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api, useStore, type ConfigStatus } from "@/state/store";
 import { builtInBrowserEnabled, skillAuthoringEnabled } from "@/lib/feature-flags";
-import { localeChoices, type LocaleKey } from "@/locales";
+import { localeChoices } from "@/locales";
 import { activeLocale, t } from "@/lib/i18n";
 import { withTourReset } from "@/lib/guided-tour";
 import { completionPatch } from "@/lib/onboarding";
@@ -15,7 +15,7 @@ import { effortLabel } from "./ModelPicker";
 import { EFFORT_LEVELS, isEffortLevel } from "../../shared/wire";
 import { setColorUserBubbles, useColorUserBubbles } from "@/lib/user-bubble-preference";
 import { setShowThreads, useShowThreadsChoice } from "@/lib/thread-preferences";
-import { parseSidebarDensity, setPinnedCircles, setSidebarDensity, setUniversalPins, SIDEBAR_DENSITIES, usePinnedCircles, useSidebarDensity, useUniversalPins, type SidebarDensity } from "@/lib/sidebar-preferences";
+import { setPinnedCircles, setUniversalPins, usePinnedCircles, useUniversalPins } from "@/lib/sidebar-preferences";
 import { parseSendKey, SEND_KEYS, sendKeyLabel, setSendKey, useSendKey } from "@/lib/send-key";
 import { effectiveLanguage, setLanguageChoice, useLanguageChoice } from "@/lib/language-preference";
 import { Select } from "./Select";
@@ -278,31 +278,6 @@ export function PinnedCirclesRow() {
         aria-label={t("settings.pinnedCircles.title")}
         onClick={() => setPinnedCircles(!enabled)}
       />
-    </SettingRow>
-  );
-}
-
-const SIDEBAR_DENSITY_LABEL_KEYS: Record<SidebarDensity, LocaleKey> = {
-  expanded: "sidebar.density.expanded",
-  compact: "sidebar.density.compact",
-  icons: "sidebar.density.iconsOnly",
-};
-
-export function SidebarDensityRow() {
-  const density = useSidebarDensity();
-  return (
-    <SettingRow title={t("sidebar.density.title")} subtitle={t("settings.sidebarDensity.subtitle")}>
-      <Select size="sm" className="w-full max-w-[240px]"
-        value={density}
-        aria-label={t("sidebar.density.chooseAria")}
-        onChange={(event) => setSidebarDensity(parseSidebarDensity(event.target.value))}
-      >
-        {SIDEBAR_DENSITIES.map((option) => (
-          <option key={option} value={option}>{t(SIDEBAR_DENSITY_LABEL_KEYS[option])}</option>
-        ))}
-        {/* Avatars only is the collapsed state, not a normal choice, but the current value must still show when open. */}
-        {density === "icons" && <option value="icons">{t(SIDEBAR_DENSITY_LABEL_KEYS.icons)}</option>}
-      </Select>
     </SettingRow>
   );
 }
