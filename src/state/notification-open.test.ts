@@ -151,10 +151,10 @@ describe("following a notification", () => {
     expect(server.tasks!.find((task) => task.threadId === "left-behind")!.unread).toBe(true);
   });
 
-  it("selects the bot first while threads are shown, as it always has", async () => {
+  it("reads only the thread it opens now that threads are never shown", async () => {
     await threadsShown(true);
     await followNotification();
-    expect(reads()).toEqual(["left-behind", "finished"]);
+    expect(reads()).toEqual(["finished"]);
     expect(sent().filter((request) => request.startsWith("/api/bots/scout/tasks/finished"))).toHaveLength(1);
     expect(scoutNow().threadId).toBe("finished");
     expect(unread("finished")).toBe(false);
@@ -234,10 +234,9 @@ describe("launching the app on a bot", () => {
     expect(threadsWhenTreeHidden(scoutNow(), {}).map((task) => task.threadId)).toContain("left-behind");
   });
 
-  it("keeps the bot where it was while threads are shown, as it always has", async () => {
+  it("opens the bot's one conversation on a relaunch now that threads are never shown", async () => {
     await relaunch(true);
     expect(state.selectedId).toBe("scout");
-    expect(sent().some((request) => request.startsWith("/api/bots/scout/tasks/"))).toBe(false);
-    expect(scoutNow().threadId).toBe("left-behind");
+    expect(scoutNow().threadId).toBe("main-chat");
   });
 });
