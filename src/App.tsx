@@ -5,7 +5,7 @@ import { useShowThreads } from "@/lib/thread-preferences";
 import { useWelcomeViewer, WelcomeGate } from "@/components/onboarding/WelcomeGate";
 import { MausBotWelcome } from "@/components/MausBotWelcome";
 import { CloudTimeZoneSync } from "@/components/CloudTimeZone";
-import { cloudSignInDue, type WelcomeViewer } from "@/lib/onboarding";
+import type { WelcomeViewer } from "@/lib/onboarding";
 import { GuidedTour } from "@/components/onboarding/GuidedTour";
 import { LiveCallHost } from "@/components/LiveCallHost";
 import { ThreadRefsProvider } from "@/components/ThreadRefs";
@@ -36,13 +36,7 @@ import { needsYouVersion, useTeamPeopleLoader } from "@/state/team-people";
 import { DesktopCapabilitiesProvider, SidebarEdgeNotch, useCaptionChrome, useDesktopCapabilities, WindowDragStrip } from "@/components/DesktopCapabilities";
 import { WindowCaptionButtons } from "@/components/WindowCaptionButtons";
 import { NoEngines } from "@/components/NoEngines";
-import { CloudEngineSignIn } from "@/components/CloudEngineSignIn";
-import { CloudIntent } from "@/components/CloudIntent";
-import { cloudIntentDue, cloudIntentShown, useCloudIntent } from "@/lib/cloud-intent";
-import { CloudWelcome } from "@/components/cloud-welcome/CloudWelcome";
 import { EmptyChatShell } from "@/components/onboarding/EmptyChatShell";
-import { cloudFirstRun, cloudWelcomeVisible, useCloudWelcome } from "@/lib/cloud-welcome";
-import { engineReady } from "@/components/EngineLibrary";
 import { setLocale, t } from "@/lib/i18n";
 import { shouldOpenKeyboardShortcuts } from "@/lib/keyboard-shortcuts";
 import { effectiveLanguage, useLanguageChoice } from "@/lib/language-preference";
@@ -133,17 +127,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
     state.connected &&
     state.instances.length > 0 &&
     !state.instances.some((i) => i.snapshot.state === "available");
-  const cloudSignIn = cloudSignInDue(viewer, state, engineReady);
-  const cloudIntent = useCloudIntent();
-  const cloudAsk = cloudIntentShown(cloudIntentDue({
-    viewer, connected: state.connected, enginesKnown: state.instances.length > 0,
-    onboarding: state.config?.onboarding, reopened: false,
-  }), cloudIntent);
-  const cloudJobWaiting = Boolean(viewer?.cloudHome && viewer.canSave && cloudIntent.pending);
-  const welcome = useCloudWelcome();
-  const welcomeOnScreen = cloudWelcomeVisible({ viewer, connected: state.connected, enginesKnown: state.instances.length > 0, onboarding: state.config?.onboarding }, welcome)
-    && state.activeView === "chat" && !(!remoteClient && localVmWorkspaceBotId);
-  const firstRun = cloudFirstRun({ welcome: welcomeOnScreen, intent: cloudAsk, signIn: cloudSignIn || cloudJobWaiting });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -302,12 +285,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
             onClose={() => setLocalVmWorkspaceBotId(null)}
             onOpenComputer={openComputerFromWorkspace}
           />
-        ) : firstRun === "welcome" ? (
-          <CloudWelcome />
-        ) : firstRun === "intent" ? (
-          <CloudIntent />
-        ) : firstRun === "sign-in" ? (
-          <CloudEngineSignIn />
         ) : state.bots.filter((candidate) => !candidate.hidden).length === 0 ? (
           <NoBots onNew={() => dispatch({ type: "newBot" })} />
         ) : noEngines ? (
