@@ -19,7 +19,7 @@ import { PHONE_LAYOUT, SIDEBAR_INLINE, TWO_SIDE_PANELS_FIT, useMediaQuery } from
 import { PluginsPanel, preloadConnectedApps } from "@/components/PluginsPanel";
 import {
   BotSettingsDialog, FilesView, KeyboardShortcutsModal, LocalVmWorkspace,
-  preloadScreens, RemoteAgentSettingsPanel, RoomPanel, SettingsModal, TeamMapPage,
+  preloadScreens, RemoteAgentSettingsPanel, RoomPanel, SettingsModal,
 } from "@/components/lazy-screens";
 import { useRoomPanelShown } from "@/lib/room-panel";
 import { WorkspaceBackupRecovery } from "@/components/WorkspaceBackupSettings";
@@ -295,9 +295,7 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
         }}
       />
       <div className="relative flex min-w-0 flex-1">
-        {state.activeView === "team-map" ? (
-          <TeamMapPage />
-        ) : state.activeView === "files" ? (
+        {state.activeView === "files" ? (
           <FilesView />
         ) : state.activeView === "routines" ? (
           <RoutineRunsPage onBack={() => dispatch({ type: "showChat" })} />

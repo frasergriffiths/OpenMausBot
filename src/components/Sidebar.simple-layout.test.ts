@@ -46,7 +46,6 @@ import { SIDEBAR_COLLAPSED_SECTIONS_KEY, SIDEBAR_DENSITY_KEY, SIDEBAR_SECTION_OR
 import { Sidebar } from "./Sidebar";
 import { TeamContextMenu } from "./SidebarTeamMenu";
 import { SidebarFooter } from "./SidebarFooter";
-import { TeamLibraryPanel } from "./TeamLibraryPanel";
 import { SidebarResizeHandle } from "./SidebarResizeHandle";
 import { SidebarTileGrid } from "./SidebarTiles";
 import { GlassBar, GlassScrollFrame, GlassScroller } from "./GlassScrollFrame";
@@ -317,30 +316,3 @@ describe("Simple-mode sidebar layout", () => {
   });
 });
 
-describe("the footer's places", () => {
-  const footer = (tree: ReactElement<Props>[]) => tree.find((node) => node.type === SidebarFooter)!;
-  const places = (tree: ReactElement<Props>[]) => footer(tree).props.places as NonNullable<Parameters<typeof SidebarFooter>[0]["places"]>;
-
-  it("offers Team map and Templates from the Simple footer and opens each", () => {
-    const shared = places(render().tree);
-    expect(shared).toMatchObject({ teamMapOpen: false, templatesOpen: false });
-    shared.onOpenTeamMap!();
-    expect(fixture.dispatch).toHaveBeenCalledWith({ type: "showTeamMap" });
-    fixture.dispatch.mockClear();
-    shared.onOpenTemplates!();
-    expect(render().tree.some((node) => node.type === TeamLibraryPanel)).toBe(true);
-  });
-
-  it("keeps Templates and Team map out of the + menu", () => {
-    {
-      fixture.values = [];
-      const plus = render().tree.find((node) => node.type === "button" && node.props["aria-label"] === "New or share")!;
-      (plus.props.onClick as () => void)();
-      const labels = nodes(render().tree.find((node) => node.props.role === "menu")!.props.children)
-        .filter((node) => node.type === "button")
-        .map((node) => Children.toArray(node.props.children).filter((part) => typeof part === "string"));
-      expect(labels.flat()).not.toContain("Templates");
-      expect(labels.flat()).not.toContain("Team map");
-    }
-  });
-});

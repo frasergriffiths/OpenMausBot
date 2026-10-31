@@ -24,6 +24,7 @@ import { PlanUsageSummary } from "./PlanUsage";
 import { SkinPicker } from "./SkinPicker";
 import { ChatWidthRow, FontRow, SidebarToolsLayoutRow } from "./AppearanceSelectRows";
 import { ProfileSummaryRow } from "./ProfileSettings";
+import { DepartmentsSettings } from "./DepartmentsSettings";
 import { ImportSettings } from "./ImportSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
@@ -63,6 +64,11 @@ export function SimpleAccountPage({ has }: { has: Has }) {
             <ProfileSummaryRow />
             <CloudPlanRow place="account" />
           </SettingsRows>
+        </SettingsGroup>
+      )}
+      {has("general") && (
+        <SettingsGroup label={t("settings.departments.title")} block="departments">
+          <DepartmentsSettings />
         </SettingsGroup>
       )}
       {has("general") && (

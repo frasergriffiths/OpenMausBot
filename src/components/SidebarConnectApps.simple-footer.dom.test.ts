@@ -82,7 +82,7 @@ function renderFooter() {
 }
 
 describe("the connect-apps prompt in the shipping Simple footer", () => {
-  it("sits in its own row above three 36px squircles, with no app faces in the cluster", async () => {
+  it("sits in its own row above the Apps squircle, with no app faces in the cluster", async () => {
     renderFooter();
     await settle();
     expect(row()).not.toBeNull();
@@ -90,7 +90,7 @@ describe("the connect-apps prompt in the shipping Simple footer", () => {
     expect(dismiss()!.className).toContain("size-6");
 
     const cluster = row()!.nextElementSibling!;
-    for (const nav of ["apps", "team-map", "templates"]) {
+    for (const nav of ["apps"]) {
       const button = cluster.querySelector<HTMLElement>(`[data-sidebar-nav="${nav}"]`)!;
       expect(button).not.toBeNull();
       expect(button.className).toContain("size-9");

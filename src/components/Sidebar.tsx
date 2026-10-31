@@ -1,7 +1,7 @@
 import { OrganizationIdentity } from "./OrganizationIdentity";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch } from "react";
 import { createPortal } from "react-dom";
-import { Archive, Bot as BotIcon, Check, ChevronRight, ClipboardCopy, Crown, FolderPlus, Library, Loader2, MoreHorizontal, Pencil, PanelLeftClose, PanelLeftOpen, Phone, Pin, Plus, Search, TextQuote, Trash2, Users, X } from "lucide-react";
+import { Archive, Bot as BotIcon, Check, ChevronRight, ClipboardCopy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, PanelLeftClose, PanelLeftOpen, Phone, Pin, Plus, Search, TextQuote, Trash2, Users, X } from "lucide-react";
 import { api, useStore, formatTime, visibleMessages, currentTaskBot, openBot, openThread, type Action, type AppState, type Bot, type BotProject, type Group, type InstanceInfo, type Message } from "@/state/store";
 import { approvalModeFor } from "../../shared/approval-mode";
 import { turnNowPhrases } from "@/lib/live-activity";
@@ -28,7 +28,6 @@ import { WorkingDots } from "./WorkingIndicator";
 import { nextRename } from "@/lib/rename";
 import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { MIN_QUERY, SearchResults } from "./SearchResults";
-import { TeamLibraryPanel } from "./TeamLibraryPanel";
 import { ShareTeamDialog } from "./ShareTeamDialog";
 import { TeamSettingsDialog } from "./TeamSettingsDialog";
 import { TeamDialog } from "./TeamDialog";
@@ -986,8 +985,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
     saveSidebarAttentionPinned(pinned);
   };
   const [newRoom, setNewRoom] = useState(false);
-  const [teamLibraryOpen, setTeamLibraryOpen] = useState(false);
-  const [teamInstallUrl, setTeamInstallUrl] = useState<string | null>(null);
   const [archivedBotsOpen, setArchivedBotsOpen] = useState(false);
   const [teamFeedback, setTeamFeedback] = useState<{
     error: boolean;
@@ -1046,14 +1043,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
 
   const plusMenuRef = useRef<HTMLDivElement>(null);
   usePopoverDismiss(plusOpen, plusMenuRef, () => setPlusOpen(false));
-
-  useEffect(() => {
-    if (remoteClient) return;
-    return window.ogb?.onPackageInstall?.((url) => {
-      setTeamInstallUrl(url);
-      setTeamLibraryOpen(true);
-    });
-  }, [remoteClient]);
 
   useEffect(() => {
     if (!teamFeedback) return;
@@ -1278,14 +1267,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             <FolderPlus size={16} className="text-ink-secondary" /> {t("team.create")}
           </button>}
           {!remoteClient && <>
-          {phone && <button
-            onClick={() => { setPlusOpen(false); setTeamLibraryOpen(true); }}
-            role="menuitem"
-            className={plusItem}
-          >
-            <Library size={16} className="text-ink-secondary" />
-            {t("sidebar.teamLibrary")}
-          </button>}
           </>}
         </div>
       </>
@@ -1598,18 +1579,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       {rail ? <SimpleRailFooter
         owner={cloudOwner}
         archived={archivedEntry}
-        places={{
-          teamMapOpen: state.activeView === "team-map",
-          onOpenTeamMap: () => dispatch({ type: "showTeamMap" }),
-          templatesOpen: teamLibraryOpen,
-          onOpenTemplates: () => setTeamLibraryOpen(true),
-        }}
-      /> : phone ? <SidebarPhoneBar query={query} onQuery={setQuery} /> : <SidebarFooter density={density} simple={simpleDesk} owner={cloudOwner} archived={archivedEntry} toolsCollapsed={sectionCollapsed(TOOLS_SECTION_ID)} onToggleTools={layoutInteractive ? () => toggleSection(TOOLS_SECTION_ID) : undefined} places={{
-        teamMapOpen: state.activeView === "team-map",
-        onOpenTeamMap: () => dispatch({ type: "showTeamMap" }),
-        templatesOpen: teamLibraryOpen,
-        onOpenTemplates: () => setTeamLibraryOpen(true),
-      }} />}
+      /> : phone ? <SidebarPhoneBar query={query} onQuery={setQuery} /> : <SidebarFooter density={density} simple={simpleDesk} owner={cloudOwner} archived={archivedEntry} toolsCollapsed={sectionCollapsed(TOOLS_SECTION_ID)} onToggleTools={layoutInteractive ? () => toggleSection(TOOLS_SECTION_ID) : undefined} />}
       </GlassBar>
       </GlassScrollFrame>
 
@@ -1726,30 +1696,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           bots={archivedBots}
           onClose={() => setArchivedBotsOpen(false)}
           onRestored={(message) => setTeamFeedback({ error: false, text: message })}
-        />
-      )}
-      {!remoteClient && teamLibraryOpen && (
-        <TeamLibraryPanel
-          returnFocusRef={importReturnRef}
-          initialUrl={teamInstallUrl ?? undefined}
-          onClose={() => {
-            setTeamLibraryOpen(false);
-            setTeamInstallUrl(null);
-          }}
-          onImported={(result) => {
-            setTeamLibraryOpen(false);
-            setTeamInstallUrl(null);
-            setTeamFeedback({
-              error: false,
-              text:
-                (result.members === 0 && result.presets
-                  ? t("sidebar.presetsImported", { count: result.presets })
-                  : result.members === 1
-                  ? t("sidebar.teamImportedOne")
-                  : t("sidebar.teamImportedMany", { count: result.members })) +
-                (result.connections ? ` · ${t("sidebar.connectionsToFinish", { count: result.connections })}` : ""),
-            });
-          }}
         />
       )}
       {teamFeedback &&

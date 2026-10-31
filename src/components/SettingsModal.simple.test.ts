@@ -165,7 +165,7 @@ describe("Settings, the one plain UI", () => {
   it("opens Account on the profile, the plan, People, System and Limits", () => {
     const html = render();
     expect(currentPage(html)).toBe("account");
-    expect(groupLabels(html)).toEqual(["System", "Limits and recovery"]);
+    expect(groupLabels(html)).toEqual(["Departments", "System", "Limits and recovery"]);
     expect(html).toContain("Add your name");
     expect(html).not.toContain('data-settings-disclosure="general-backups"');
   });

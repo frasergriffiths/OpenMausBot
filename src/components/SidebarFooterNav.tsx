@@ -1,4 +1,4 @@
-import { FolderOpen, Library, Puzzle, UsersRound } from "lucide-react";
+import { FolderOpen, Puzzle } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
@@ -107,40 +107,10 @@ export function SidebarAppsButton() {
 }
 
 /** Team map is a place, so it sits beside Apps rather than inside a menu. */
-export function SidebarTeamMapButton({ open = false, onOpen }: { open?: boolean; onOpen?: () => void }) {
-  const { state } = useStore();
-  return (
-    <FooterIconButton nav="team-map" tour="team-tools" label={t("sidebar.nav.teamMap")} active={open} current={state.activeView === "team-map"} onOpen={onOpen}>
-      <UsersRound size={18} strokeWidth={1.5} />
-    </FooterIconButton>
-  );
-}
-
-/** Templates opens the panel that installs a team, another place that used to hide in the + menu. */
-export function SidebarTemplatesButton({ open = false, onOpen }: { open?: boolean; onOpen?: () => void }) {
-  return (
-    <FooterIconButton nav="templates" label={t("sidebar.teamLibrary")} active={open} haspopup onOpen={onOpen}>
-      <Library size={18} strokeWidth={1.5} />
-    </FooterIconButton>
-  );
-}
-
-export function SidebarBottomButtons({
-  teamMapOpen = false,
-  onOpenTeamMap,
-  templatesOpen = false,
-  onOpenTemplates,
-}: {
-  teamMapOpen?: boolean;
-  onOpenTeamMap?: () => void;
-  templatesOpen?: boolean;
-  onOpenTemplates?: () => void;
-}) {
+export function SidebarBottomButtons() {
   return (
     <div data-sidebar-bottom-buttons="" className="flex shrink-0 items-center gap-2">
       <SidebarAppsButton />
-      <SidebarTeamMapButton open={teamMapOpen} onOpen={onOpenTeamMap} />
-      <SidebarTemplatesButton open={templatesOpen} onOpen={onOpenTemplates} />
       <UpdateIndicator />
     </div>
   );

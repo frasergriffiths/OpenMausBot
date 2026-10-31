@@ -198,8 +198,6 @@ describe("sidebar top row", () => {
     expect(foot).not.toContain('aria-label="Search bots and messages"');
     const positions = [
       at('data-sidebar-nav="apps"'),
-      at('data-sidebar-nav="team-map"'),
-      at('data-sidebar-nav="templates"'),
       at("data-sidebar-account"),
     ];
     expect(positions).toEqual([...positions].sort((a, b) => a - b));
@@ -256,7 +254,7 @@ describe("sidebar glass head and foot", () => {
 });
 
 describe("sidebar foot in Simple mode", () => {
-  it.each(["expanded"] as const)("puts the account avatar, Apps, Team map and Templates in the foot, with Files and Archived in the account menu (%s)", (density) => {
+  it.each(["expanded"] as const)("puts the account avatar and Apps in the foot, with Files and Archived in the account menu (%s)", (density) => {
     fixture.density = density;
     const html = render();
     const foot = html.slice(html.indexOf('data-glass-bar="bottom"'));
@@ -265,8 +263,6 @@ describe("sidebar foot in Simple mode", () => {
     expect(html.match(/data-sidebar-nav="apps"/g)).toHaveLength(1);
     expect(foot.indexOf("data-sidebar-account")).toBeGreaterThan(-1);
     expect(foot.indexOf("data-sidebar-account")).toBeLessThan(foot.indexOf('data-sidebar-nav="apps"'));
-    expect(foot.indexOf('data-sidebar-nav="apps"')).toBeLessThan(foot.indexOf('data-sidebar-nav="team-map"'));
-    expect(foot.indexOf('data-sidebar-nav="team-map"')).toBeLessThan(foot.indexOf('data-sidebar-nav="templates"'));
     expect(foot).toMatch(/data-tour="nav-apps" data-sidebar-nav="apps"[^>]*aria-label="Apps"[^>]*><svg[^>]*lucide-puzzle/);
     const account = foot.slice(foot.indexOf("data-sidebar-account"), foot.indexOf('data-sidebar-nav="apps"'));
     expect(account).toContain("size-9");
