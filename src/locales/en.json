@@ -1557,6 +1557,8 @@
   "noBots.title": "No bots yet",
   "noBots.body": "Make one and it lands here, ready to talk. Here are the shapes a bot can wear.",
   "noBots.new": "New bot",
+  "settings.departments.subtitle": "Shared instructions and memory for this department.",
+  "settings.departments.title": "Departments",
   "sidebar.newChannel.title": "New group chat",
   "sidebar.newChannel.name": "Group chat name (for example, Website launch)",
   "sidebar.newChannel.context": "Department (optional): Work, Personal, Client…",
