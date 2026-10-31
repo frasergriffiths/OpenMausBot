@@ -43,8 +43,10 @@ Phase 5 — Settings/Defaults/Team Map: started. The New bot defaults dialog's
 section rail is now a vertical tab list from the shared library, with arrow-key
 movement and aria-selected, instead of a row of buttons with aria-current.
 
+Done: the Team Map page title no longer carries a person icon.
+
 Remaining in Phase 5: the rest of the Defaults dialog polish, Settings pages,
-Team Map page title icon and its dialogs.
+and the Team Map dialogs.
 
 ## Known issues
 
