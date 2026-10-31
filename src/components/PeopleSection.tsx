@@ -1,6 +1,6 @@
 // Security: the invite link is convenience, not a second door; the one-time code still goes to the address itself.
 import { useCallback, useEffect, useState } from "react";
-import { Check, Copy, ExternalLink, Link2, Loader2, Plus, RefreshCw, X } from "lucide-react";
+import { Check, Copy, ExternalLink, RefreshCw, X } from "lucide-react";
 import { api } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -10,8 +10,7 @@ import { Button, SettingRow, SettingsCard } from "@/components/ui";
 import { readMembership, type Membership } from "../lib/membership";
 import { readSessionState, type SessionState } from "../lib/session";
 import { canPairDevices } from "./ServerPairingCard";
-import { normalizeAccessEntry, withEntry, withoutEntry, type SignInLists } from "./SignInAccessCard";
-import { Select } from "./Select";
+import { withEntry, withoutEntry, type SignInLists } from "./SignInAccessCard";
 
 export type Role = "admin" | "member";
 
@@ -25,11 +24,6 @@ export interface Person {
   turns: number;
   costUsd: number | null;
   estimated?: boolean;
-}
-
-export function inviteLink(base: string, entry: string): string {
-  const origin = base.replace(/\/+$/, "");
-  return entry.startsWith("@") ? `${origin}/pair` : `${origin}/pair?email=${encodeURIComponent(entry)}`;
 }
 
 export function mergePeople(
@@ -90,12 +84,11 @@ export function lastSeenLabel(lastSeenAt: number | null, now = Date.now()): stri
   return new Date(lastSeenAt).toISOString().slice(0, 10);
 }
 
-export function PeopleTable({ people, busy, onRole, onRemove, onLink, readOnly = false }: {
+export function PeopleTable({ people, busy, onRole, onRemove, readOnly = false }: {
   people: Person[];
   busy: boolean;
   onRole: (person: Person, role: Role) => void;
   onRemove: (person: Person) => void;
-  onLink: (person: Person) => void;
   readOnly?: boolean;
 }) {
   if (people.length === 0) return <p className="text-[13px] text-ink-secondary">{t(readOnly ? "people.portal.empty" : "people.empty")}</p>;
@@ -123,7 +116,6 @@ export function PeopleTable({ people, busy, onRole, onRemove, onLink, readOnly =
             {hasFiniteCost(person.costUsd) ? `${person.estimated ? "~" : ""}${formatUsd(person.costUsd)}` : "—"}
           </span>
           {readOnly ? <span /> : <span className="flex items-center justify-end gap-2 text-[12px]">
-            <button type="button" disabled={busy} onClick={() => onLink(person)} aria-label={t("people.link")} title={t("people.link")} className="rounded-md p-1 text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50"><Link2 size={13} /></button>
             <button type="button" disabled={busy} onClick={() => onRole(person, person.role === "admin" ? "member" : "admin")} className="text-ink-secondary hover:text-ink disabled:opacity-50">
               {person.role === "admin" ? t("people.makeMember") : t("people.makeAdmin")}
             </button>
@@ -170,7 +162,7 @@ export function PortalPeople({ peopleUrl, people }: { peopleUrl: string | null; 
         )}
       </div>
       <div className="mt-4">
-        <PeopleTable people={people} busy={false} readOnly onRole={noop} onRemove={noop} onLink={noop} />
+        <PeopleTable people={people} busy={false} readOnly onRole={noop} onRemove={noop} />
       </div>
       <p className="mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("people.portal.note")}</p>
     </SettingsCard>
@@ -179,16 +171,11 @@ export function PortalPeople({ peopleUrl, people }: { peopleUrl: string | null; 
 
 export function PeopleSection({ simple = false, startOpen = false }: { simple?: boolean; startOpen?: boolean }) {
   const [open, setOpen] = useState(startOpen);
-  const [tried, setTried] = useState(false);
   const [session, setSession] = useState<SessionState | null>(null);
   const [membership, setMembership] = useState<Membership | null>(null);
   const [lists, setLists] = useState<SignInLists | null>(null);
   const [people, setPeople] = useState<Person[]>([]);
-  const [base, setBase] = useState<string>(typeof window !== "undefined" ? window.location.origin : "");
   const [emailOffered, setEmailOffered] = useState<boolean | null>(null);
-  const [draft, setDraft] = useState("");
-  const [role, setRole] = useState<Role>("member");
-  const [link, setLink] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -197,7 +184,7 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
     setLoading(true);
     setError(null);
     try {
-      const [config, sessions, usage, domain, environment] = await Promise.all([
+      const [config, sessions, usage, , environment] = await Promise.all([
         api("/api/config"),
         api("/api/auth/sessions").catch(() => ({ sessions: [] })),
         api("/api/usage?groupBy=user").catch(() => ({ groups: [] })),
@@ -214,7 +201,6 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
       const signedIn = Array.isArray(sessions?.sessions) ? sessions.sessions : [];
       const spent = Array.isArray(usage?.groups) ? usage.groups : [];
       setPeople(authority.authority === "portal" ? peopleFromSessions(signedIn, spent) : mergePeople(current, signedIn, spent));
-      if (typeof domain?.publicUrl === "string" && domain.publicUrl) setBase(domain.publicUrl);
       setEmailOffered(environment?.capabilities?.emailSignIn === true ? true : environment ? false : null);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause));
@@ -243,44 +229,14 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
     }
   };
 
-  const invite = async () => {
-    setTried(true);
-    if (!lists || busy) return;
-    const entry = normalizeAccessEntry(draft);
-    if (!entry) {
-      setError(t("remote.signInAccess.invalid"));
-      return;
-    }
-    await save(withEntry(lists, entry, role));
-    setDraft("");
-    setLink(inviteLink(base, entry));
-  };
-
   if (!canPairDevices(session)) return null;
   const portal = membership?.authority === "portal" ? <PortalPeople peopleUrl={membership.peopleUrl} people={people} /> : null;
   const content = (
     <>
-      {emailOffered === false && (!simple || tried) && <p className="mb-3 rounded-lg border border-warning/25 bg-warning/5 px-3 py-2 text-[13px] text-ink-secondary">{t(membership?.pairingCodes === false ? "people.portalSignIn" : "people.notHosted")}</p>}
-      <form className="flex flex-wrap items-center gap-2" onSubmit={(event) => { event.preventDefault(); void invite(); }}>
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder={t("remote.signInAccess.placeholder")}
-          aria-label={t("people.inviteEmail")}
-          disabled={busy}
-          className="min-w-[16rem] flex-1 rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none disabled:opacity-50"
-        />
-        <Select value={role} onChange={(e) => setRole(e.target.value as Role)} aria-label={t("people.colRole")} disabled={busy}>
-          <option value="member">{t("people.roleMember")}</option>
-          <option value="admin">{t("people.roleAdmin")}</option>
-        </Select>
-        <Button variant="primary" size="sm" type="submit" disabled={busy || !draft.trim()}>
-          {busy ? <Loader2 size={13} className="animate-spin" /> : <Plus size={13} />}{t("people.invite")}
-        </Button>
+      {emailOffered === false && !simple && <p className="mb-3 rounded-lg border border-warning/25 bg-warning/5 px-3 py-2 text-[13px] text-ink-secondary">{t(membership?.pairingCodes === false ? "people.portalSignIn" : "people.notHosted")}</p>}
+      <div className="flex items-center justify-end">
         <button type="button" onClick={() => void load()} disabled={loading || busy} aria-label={t("people.refresh")} title={t("people.refresh")} className="rounded-md p-1.5 text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-50"><RefreshCw size={13} className={cn(loading && "animate-spin")} /></button>
-      </form>
-      <p className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("people.inviteHint")}</p>
-      {link && <CopyLink link={link} />}
+      </div>
       {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
       <div className="mt-4">
         <PeopleTable
@@ -288,7 +244,6 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
           busy={busy}
           onRole={(person, next) => { if (lists) void save(withEntry(lists, person.entry, next)); }}
           onRemove={(person) => { if (lists) void save(withoutEntry(lists, person.entry)); }}
-          onLink={(person) => setLink(inviteLink(base, person.entry))}
         />
       </div>
       {!simple && <p className="mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("people.note")}</p>}
