@@ -1,7 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 import type { ConfigStatus } from "@/state/store";
 import { t } from "@/lib/i18n";
-import { cn } from "@/lib/cn";
+import { Callout } from "@/components/ui";
 
 export type LicenseNotice = { tone: "warning" | "danger"; text: string };
 
@@ -18,15 +18,8 @@ export function LicenseExpiryBanner({ config }: { config: ConfigStatus | null | 
   const notice = licenseNotice(config);
   if (!notice) return null;
   return (
-    <div
-      role="status"
-      className={cn(
-        "flex items-start gap-2 rounded-xl border px-3 py-2.5 text-[13px] leading-relaxed",
-        notice.tone === "danger" ? "border-danger/40 bg-danger/10 text-danger" : "border-warning/40 bg-warning/10 text-warning",
-      )}
-    >
-      <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-      <span>{notice.text}</span>
-    </div>
+    <Callout role="status" tone={notice.tone === "danger" ? "danger" : "warning"} icon={<AlertTriangle size={14} />} className="py-2.5">
+      {notice.text}
+    </Callout>
   );
 }

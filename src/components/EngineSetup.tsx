@@ -227,7 +227,7 @@ export function EngineUpdateNotice({
   return (
     <div
       data-engine-update-notice
-      className={cn("rounded-xl border border-warning/25 bg-warning/5 p-2.5", className)}
+      className={cn("rounded-xl bg-warning/10 p-2.5", className)}
     >
       <div className="flex items-start gap-2">
         <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
@@ -253,7 +253,7 @@ export function EngineWarningNotice({
   return (
     <div
       data-engine-warning-notice
-      className={cn("rounded-xl border border-warning/25 bg-warning/5 p-2.5", className)}
+      className={cn("rounded-xl bg-warning/10 p-2.5", className)}
     >
       <div className="flex items-start gap-2">
         <AlertTriangle size={14} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />

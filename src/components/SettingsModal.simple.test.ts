@@ -63,7 +63,7 @@ vi.mock("./ServerPairingCard", () => ({ ServerPairingCard: () => null }));
 vi.mock("./ConnectedWorkspacesSettings", () => ({ ConnectedWorkspacesSettings: marker("desktopWorkspaces") }));
 vi.mock("./LocalComputerSection", () => ({ LocalComputerSection: marker("computer") }));
 vi.mock("./CloudAccountSettings", () => ({ CloudAccountSettings: marker("cloudAccount") }));
-vi.mock("./PeopleSection", () => ({ PeopleSection: marker("people") }));
+
 vi.mock("./ActivitySection", () => ({ ActivitySection: marker("activity") }));
 vi.mock("./UsageSection", () => ({ UsageSection: marker("usage") }));
 vi.mock("./WorkspaceBackupSettings", () => ({ WorkspaceBackupSettings: marker("backups") }));
@@ -275,14 +275,14 @@ describe("Settings, the one plain UI", () => {
     expect(groupLabels(html)).toContain("Plan");
   });
 
-  it("shows a hosted workspace's admins People in Account and Activity as its own group on Data", () => {
+  it("drops People from Account and keeps Activity as its own group on Data for a hosted workspace", () => {
     vi.stubGlobal("window", {});
     fixture.ownerOrAdmin = true;
     fixture.section = "people";
     const html = render();
     expect(pages(html)).toEqual(["account", "appearance", "data", "ai", "skills", "keys", "computer", "billing", "updates"]);
     expect(currentPage(html)).toBe("account");
-    expect(placement(html, "MARKER:people;")).toBe("shown");
+    expect(placement(html, "MARKER:people;")).toBe("missing");
     expect(placement(html, "MARKER:activity;")).toBe("missing");
     const data = open("activity");
     expect(currentPage(data)).toBe("data");

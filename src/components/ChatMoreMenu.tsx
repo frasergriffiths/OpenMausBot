@@ -102,7 +102,7 @@ export function useChatMoreItems(profile: Bot, phoneHeader = false): { items: Si
 }
 
 function RoundChatMoreMenu({ bot, phoneHeader }: { bot: Bot; phoneHeader: boolean }) {
-  const { items, on } = useChatMoreItems(bot, phoneHeader);
+  const { items } = useChatMoreItems(bot, phoneHeader);
   return (
     <SidebarPopoverMenu
       items={items}
@@ -116,7 +116,7 @@ function RoundChatMoreMenu({ bot, phoneHeader }: { bot: Bot; phoneHeader: boolea
             "flex size-8 items-center justify-center rounded-full",
             cn(ELEVATED_CONTROL, ELEVATED_HOVER, open && ELEVATED_OPEN),
             "max-md:size-9 max-md:border max-md:border-hairline max-md:bg-card",
-            open || on ? "text-accent" : "text-ink",
+            open && "outline-none",
           )}
         >
           <MoreHorizontal size={16} />

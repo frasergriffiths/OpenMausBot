@@ -5,6 +5,7 @@ export { Dialog } from "./dialog";
 export { ConfirmDialog } from "./confirm-dialog";
 export { Tabs, type TabItem } from "./tabs";
 export { Badge, Card, EmptyState, Spinner } from "./surface";
+export { Callout, type CalloutTone } from "./callout";
 export { Switch } from "./switch";
 export { Tooltip } from "./tooltip";
 export { DropdownMenu, type MenuItem } from "./menu";

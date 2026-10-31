@@ -14,7 +14,6 @@ import { DiagnosticsRow } from "./DiagnosticsRow";
 import { DecisionModelSettings } from "./DecisionModelSettings";
 import { EnginesSettings } from "./EnginesSettings";
 import { LocalComputerSection } from "./LocalComputerSection";
-import { PeopleSection } from "./PeopleSection";
 import { ActivitySection } from "./ActivitySection";
 import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
@@ -57,7 +56,7 @@ export type Disclose = (id: SimpleDisclosureId) => { id: SimpleDisclosureId; ope
 
 type Has = (id: AppSettingsSection) => boolean;
 
-export function SimpleAccountPage({ has, peopleOpen }: { has: Has; peopleOpen: boolean }) {
+export function SimpleAccountPage({ has }: { has: Has }) {
   return (
     <>
       {has("general") && (
@@ -65,13 +64,6 @@ export function SimpleAccountPage({ has, peopleOpen }: { has: Has; peopleOpen: b
           <SettingsRows>
             <ProfileSummaryRow />
             <CloudPlanRow place="account" />
-          </SettingsRows>
-        </SettingsGroup>
-      )}
-      {has("people") && (
-        <SettingsGroup block="people">
-          <SettingsRows>
-            <PeopleSection simple startOpen={peopleOpen} />
           </SettingsRows>
         </SettingsGroup>
       )}

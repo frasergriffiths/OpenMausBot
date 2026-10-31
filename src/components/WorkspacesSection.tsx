@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 import { formatUsd, hasFiniteCost } from "@/lib/usage";
 import { Button, Checkbox, SettingsCard } from "@/components/ui";
 import { ConfirmDialog } from "./ConfirmDialog";
-import { CopyLink } from "./PeopleSection";
+import { CopyLink } from "./CopyLink";
 
 export interface FleetWorkspaceView {
   slug: string;

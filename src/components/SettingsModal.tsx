@@ -305,7 +305,7 @@ export function SettingsModal() {
   const renderSimplePage = (page: SimpleSettingsPage) => {
     const has = (id: AppSettingsSection) => page.sections.includes(id);
     switch (page.id) {
-      case "account": return <SimpleAccountPage has={has} peopleOpen={section === "people"} />;
+      case "account": return <SimpleAccountPage has={has} />;
       case "appearance": return looks
         ? <SimpleLooksPage onBack={() => { setLooks(false); setReveal("appearance"); }} />
         : <SimpleAppearancePage has={has} onLooks={() => setLooks(true)} disclose={disclose} />;

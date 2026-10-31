@@ -30,7 +30,7 @@ async function callTool(server: McpServer, name: string, args: unknown): Promise
   }
 }
 
-it("makes MausBot a new install's first bot, never deleted, hidden by its switch, with a Chief's tools after the Chief moves on", async () => {
+it("makes MausBot a new install's first bot, deletable, hidden by its switch, with a Chief's tools after the Chief moves on", async () => {
   const fixture = await launchVerificationServer({ ...process.env, FAKE_CLAUDE_MODE: "hang" });
   const api = async (method: string, path: string, body?: unknown) => {
     const response = await fetch(`${fixture.info.url}${path}`, { method, headers: { "content-type": "application/json" },
@@ -45,9 +45,6 @@ it("makes MausBot a new install's first bot, never deleted, hidden by its switch
     expect(maus).toMatchObject({ color: "green", chiefOfStaff: true, defaultBot: {} });
     expect(maus.messages.map((message: any) => [message.kind, message.helperIntro])).toEqual([["options", true]]);
 
-    const refused = await api("DELETE", `/api/bots/${maus.id}`);
-    expect(refused.status).toBe(409);
-    expect(refused.body.error).toBe(`${maus.name} can't be deleted or archived. To take it off the sidebar, choose Hide in its menu, or turn off "Show ${maus.name} in the sidebar" in Settings → General.`);
     expect((await api("PATCH", `/api/bots/${maus.id}`, { hidden: true })).status).toBe(400);
     expect((await api("PATCH", `/api/bots/${maus.id}`, { sidebarHidden: true })).status).toBe(200);
     expect((await bots()).find((bot) => bot.id === maus.id)?.sidebarHidden).toBe(true);
@@ -75,6 +72,8 @@ it("makes MausBot a new install's first bot, never deleted, hidden by its switch
     expect(after.filter((bot) => bot.chiefOfStaff).map((bot) => bot.id)).toEqual([clive.id]);
     expect(after.filter((bot) => bot.defaultBot).map((bot) => bot.id)).toEqual([maus.id]);
     await control(["interrupt", "--bot", maus.id]);
+    expect((await api("DELETE", `/api/bots/${maus.id}`)).status).toBe(200);
+    expect((await bots()).some((bot) => bot.id === maus.id)).toBe(false);
   } finally {
     await fixture.close();
   }
