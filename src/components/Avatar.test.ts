@@ -25,7 +25,7 @@ describe("MausAvatar body", () => {
   });
 
   it("wears the body it is given", () => {
-    const markup = render({ bodyId: "star" });
+    const markup = render({ bodyId: "hare" });
     expect(markup).toContain(MASCOT_BODIES.hare.fit);
   });
 
