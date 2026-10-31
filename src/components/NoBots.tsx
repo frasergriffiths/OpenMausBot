@@ -34,8 +34,7 @@ export function NoBots({ onNew }: { onNew: () => void }) {
               style={{
                 left: `${spot.left}%`,
                 top: `${spot.top}%`,
-                animationDelay: `-${spot.delay}s`,
-                animationDuration: `${spot.duration}s`,
+                animation: `mascot-drift ${spot.duration}s ease-in-out -${spot.delay}s infinite`,
               }}
             >
               <MausAvatar
@@ -50,10 +49,7 @@ export function NoBots({ onNew }: { onNew: () => void }) {
         })}
       </div>
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-5 px-6 text-center">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-[22px] font-semibold tracking-[-0.01em]">{t("noBots.title")}</h1>
-          <p className="max-w-sm text-[13px] leading-relaxed text-ink-secondary">{t("noBots.body")}</p>
-        </div>
+        <h1 className="text-[22px] font-semibold tracking-[-0.01em]">{t("noBots.title")}</h1>
         <Button variant="primary" size="md" type="button" onClick={onNew}>
           <Plus size={15} aria-hidden="true" />
           {t("noBots.new")}
