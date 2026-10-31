@@ -243,7 +243,7 @@ const CURSOR_D = "M0 0 C1.12815992 0.94880479 2.25705591 1.89673511 3.38671875 2
 
 /** Ten outlines, in the order the catalog persists them. `cursor` is the default, so it leads. */
 export const BODY_DEFS: BodyDef[] = [
-  { id: "cursor", name: "Cursor", d: CURSOR_D, viewBox: [0, 0, 512, 512] },
+  { id: "cursor", name: "Mochi", d: buildBlob(200, 200, 0.42), viewBox: [-5, -5, 210, 210] },
   // The wobble reaches 4.2 units past the 200x200 stage, so its box is padded:
   // a 200x200 viewBox would let the scanline pass shave the top lobe flat.
   { id: "blob", name: "Blob", d: buildBlob(200, 200, 0.35), viewBox: [-5, -5, 210, 210] },
@@ -251,12 +251,12 @@ export const BODY_DEFS: BodyDef[] = [
   { id: "squircle", name: "Squircle", d: buildRoundedBox(200, 200, (Math.min(200, 200) / 2) * 0.5), viewBox: [0, 0, 200, 200] },
   { id: "capsule", name: "Capsule", d: buildRoundedBox(150, 200, Math.min(150, 200) / 2), viewBox: [0, 0, 200, 200] },
   { id: "drop", name: "Drop", d: buildDrop(156, 194, 0.62), viewBox: [0, 0, 200, 200] },
-  { id: "shield", name: "Shield", d: buildCone(190, 200, 0.45, 0.9), viewBox: [0, 0, 200, 200] },
+  { id: "shield", name: "Pebble", d: buildRoundedBox(190, 200, 72), viewBox: [0, 0, 200, 200] },
   { id: "hexagon", name: "Hexagon", d: buildPolygon(196, 196, 6, 0.12), viewBox: [0, 0, 200, 200] },
   { id: "diamond", name: "Diamond", d: buildPolygon(196, 196, 4, 0.12), viewBox: [0, 0, 200, 200] },
   // A face-fit constraint, not taste: at the classic 0.42 the notches pinch the
   // star to a 50-unit inscribed circle, and the smallest face clamps every body.
-  { id: "star", name: "Star", d: buildStar(196, 196, 5, 0.55), viewBox: [0, 0, 200, 200] },
+  { id: "star", name: "Star", d: buildStar(196, 196, 5, 0.78), viewBox: [0, 0, 200, 200] },
 ]
 
 export const BODY_IDS: string[] = BODY_DEFS.map(s => s.id)
