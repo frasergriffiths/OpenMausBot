@@ -208,6 +208,31 @@ function buildHeart(w: number, h: number): string {
     .close()
 }
 
+
+/** A star with every point rounded off: vertices alternate out and in, and each
+ * corner is cut back along both edges and arced across, so no point is sharp. */
+function buildSoftStar(w: number, h: number, points: number, inner: number, round: number): string {
+  const n = Math.max(3, Math.round(points))
+  const pts: [number, number][] = []
+  for (let i = 0; i < n * 2; i++) {
+    const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2
+    const k = i % 2 === 0 ? 1 : inner
+    pts.push([100 + Math.cos(a) * (w / 2) * k, 100 + Math.sin(a) * (h / 2) * k])
+  }
+  const p = new Path()
+  for (let i = 0; i < pts.length; i++) {
+    const prev = pts[(i - 1 + pts.length) % pts.length]
+    const cur = pts[i]
+    const next = pts[(i + 1) % pts.length]
+    const a = lerp(cur, prev, round * 0.5)
+    const b = lerp(cur, next, round * 0.5)
+    if (i === 0) p.moveTo(a[0], a[1])
+    else p.lineTo(a[0], a[1])
+    p.quadTo(cur[0], cur[1], b[0], b[1])
+  }
+  return p.close()
+}
+
 const lerp = (a: [number, number], b: [number, number], t: number): [number, number] => [
   a[0] + (b[0] - a[0]) * t,
   a[1] + (b[1] - a[1]) * t,
@@ -263,21 +288,18 @@ export const BODY_DEFS: BodyDef[] = [
   { id: "cursor", name: "Mochi", d: buildBlob(200, 200, 0.42), viewBox: [-5, -5, 210, 210] },
   // The wobble reaches 4.2 units past the 200x200 stage, so its box is padded:
   // a 200x200 viewBox would let the scanline pass shave the top lobe flat.
-  { id: "blob", name: "Blob", d: buildBlob(200, 200, 0.35), viewBox: [-5, -5, 210, 210] },
   { id: "circle", name: "Circle", d: buildEllipse(200, 200), viewBox: [0, 0, 200, 200] },
-  { id: "squircle", name: "Squircle", d: buildRoundedBox(200, 200, (Math.min(200, 200) / 2) * 0.5), viewBox: [0, 0, 200, 200] },
   { id: "capsule", name: "Capsule", d: buildRoundedBox(150, 200, Math.min(150, 200) / 2), viewBox: [0, 0, 200, 200] },
-  { id: "drop", name: "Drop", d: buildDrop(156, 194, 0.62), viewBox: [0, 0, 200, 200] },
+  { id: "drop", name: "Drop", d: buildDrop(168, 190, 0.92), viewBox: [0, 0, 200, 200] },
   { id: "shield", name: "Pebble", d: buildRoundedBox(190, 200, 72), viewBox: [0, 0, 200, 200] },
-  { id: "hexagon", name: "Hexagon", d: buildPolygon(196, 196, 6, 0.12), viewBox: [0, 0, 200, 200] },
-  { id: "diamond", name: "Diamond", d: buildPolygon(196, 196, 4, 0.12), viewBox: [0, 0, 200, 200] },
+  { id: "hexagon", name: "Hexagon", d: buildPolygon(196, 196, 6, 0.48), viewBox: [0, 0, 200, 200] },
+  { id: "diamond", name: "Diamond", d: buildPolygon(196, 196, 4, 0.58), viewBox: [0, 0, 200, 200] },
   // A face-fit constraint, not taste: at the classic 0.42 the notches pinch the
   // star to a 50-unit inscribed circle, and the smallest face clamps every body.
-  { id: "star", name: "Star", d: buildStar(196, 196, 5, 0.78), viewBox: [0, 0, 200, 200] },
-  { id: "sparkle", name: "Sparkle", d: buildStar(198, 198, 4, 0.84), viewBox: [0, 0, 200, 200] },
+  { id: "star", name: "Star", d: buildSoftStar(198, 198, 5, 0.76, 0.42), viewBox: [0, 0, 200, 200] },
+  { id: "sparkle", name: "Sparkle", d: buildSoftStar(200, 200, 6, 0.74, 0.30), viewBox: [0, 0, 200, 200] },
   { id: "wedge", name: "Wedge", d: buildPolygon(198, 192, 3, 0.82), viewBox: [0, 0, 200, 200] },
-  { id: "tablet", name: "Tablet", d: buildRoundedBox(160, 200, 30), viewBox: [0, 0, 200, 200] },
-  { id: "square", name: "Square", d: buildRoundedBox(190, 190, 22), viewBox: [0, 0, 200, 200] },
+  { id: "tablet", name: "Tablet", d: buildRoundedBox(200, 156, 30), viewBox: [0, 0, 200, 200] },
 ]
 
 export const BODY_IDS: string[] = BODY_DEFS.map(s => s.id)

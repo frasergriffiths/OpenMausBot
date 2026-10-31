@@ -4,7 +4,7 @@ import { MASCOT_BODIES, MASCOT_BODY_IDS } from "../shared/mascot-bodies";
 import { MAUS_COLOR_NAMES } from "../shared/wire";
 import "./styles.css";
 
-const COLORS = MAUS_COLOR_NAMES.filter((color) => color !== "silver");
+const COLORS = MAUS_COLOR_NAMES;
 
 function App() {
   return (
