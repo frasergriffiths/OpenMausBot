@@ -21,7 +21,7 @@ const bot = (id: string, name: string, extra: Partial<Bot> = {}): Bot => ({
   id, threadId: `${id}-t`, name, title: "", description: "", notifications: true, color: "blue", unread: false,
   modelSelection: { instanceId: "claude", model: "m" }, messages: [], ...extra,
 });
-const maus = (extra: Partial<Bot> = {}) => bot("maus", "MausBot", { defaultBot: {}, chiefOfStaff: true, color: "chrome", ...extra });
+const maus = (extra: Partial<Bot> = {}) => bot("maus", "MausBot", { defaultBot: {}, chiefOfStaff: true, color: "green", ...extra });
 const CLAUDE = { instanceId: "claude", capabilities: { agentsMcp: true } };
 const CHAT_ONLY = { instanceId: "chat-only", capabilities: { agentsMcp: false } };
 

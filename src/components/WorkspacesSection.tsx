@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 import { formatUsd, hasFiniteCost } from "@/lib/usage";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { CopyLink } from "./PeopleSection";
-import { Card } from "./SettingsPrimitives";
+import { Checkbox, SettingsCard } from "@/components/ui";
 
 export interface FleetWorkspaceView {
   slug: string;
@@ -165,7 +165,7 @@ function UsersForm({ slug, onDone }: { slug: string; onDone: (log: string[]) => 
       <div className="mb-2 text-[13px] font-medium text-ink">{t("workspaces.usersTitle", { slug })}</div>
       <div className="flex flex-wrap items-center gap-2">
         <input value={email} onChange={(e) => setEmail(e.target.value)} type="text" placeholder="person@example.com or @example.com" aria-label={t("workspaces.email")} disabled={busy !== null} className="min-w-[16rem] flex-1 rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[13px] text-ink placeholder:text-ink-secondary focus:outline-none disabled:opacity-50" />
-        <label className="flex items-center gap-1.5 text-[12px] text-ink-secondary"><input type="checkbox" checked={chatOnly} onChange={(e) => setChatOnly(e.target.checked)} disabled={busy !== null} />{t("workspaces.chatOnly")}</label>
+        <Checkbox checked={chatOnly} onChange={setChatOnly} disabled={busy !== null} label={t("workspaces.chatOnly")} />
         <button type="button" disabled={busy !== null || !email.trim()} onClick={() => void run("add")} className="rounded-lg bg-raised px-3 py-1.5 text-[12px] text-ink hover:bg-raised-hover disabled:opacity-50">{busy === "add" ? t("workspaces.working") : t("workspaces.addUser")}</button>
         <button type="button" disabled={busy !== null || !email.trim()} onClick={() => void run("remove")} className="rounded-lg px-3 py-1.5 text-[12px] text-danger hover:underline disabled:opacity-50">{busy === "remove" ? t("workspaces.working") : t("workspaces.removeUser")}</button>
       </div>
@@ -245,7 +245,7 @@ export function WorkspacesSection({ load = fetchFleet }: { load?: () => Promise<
   if (!workspacesAvailable(state.config)) return null;
   return (
     <div className="flex flex-col gap-5">
-      <Card title={t("workspaces.title")} subtitle={t("workspaces.subtitle")}>
+      <SettingsCard title={t("workspaces.title")} subtitle={t("workspaces.subtitle")}>
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <button type="button" onClick={() => void refresh()} disabled={loading || busy !== null} className="flex items-center gap-1 text-[12px] text-ink-secondary hover:text-ink disabled:opacity-50"><RefreshCw size={12} className={cn(loading && "animate-spin")} />{t("workspaces.refresh")}</button>
           <button type="button" onClick={() => setCreating((value) => !value)} disabled={busy !== null} className="ml-auto flex items-center gap-1.5 rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-raised/50 hover:text-ink disabled:opacity-50"><Plus size={13} />{t("workspaces.new")}</button>
@@ -259,7 +259,7 @@ export function WorkspacesSection({ load = fetchFleet }: { load?: () => Promise<
         {log.length > 0 && (
           <pre className="mt-3 max-h-40 overflow-auto rounded-lg bg-inset p-2 text-[12px] text-ink-secondary">{log.join("\n")}</pre>
         )}
-      </Card>
+      </SettingsCard>
       <ConfirmDialog
         open={confirm !== null}
         title={t("workspaces.deleteTitle", { slug: confirm?.slug ?? "" })}
@@ -269,9 +269,7 @@ export function WorkspacesSection({ load = fetchFleet }: { load?: () => Promise<
         onConfirm={() => void remove()}
       />
       {confirm && (
-        <label className="flex items-center gap-2 text-[12px] text-ink-secondary">
-          <input type="checkbox" checked={confirm.keepData} onChange={(e) => setConfirm({ ...confirm, keepData: e.target.checked })} />{t("workspaces.keepData")}
-        </label>
+        <Checkbox checked={confirm.keepData} onChange={(keepData) => setConfirm({ ...confirm, keepData })} label={t("workspaces.keepData")} />
       )}
     </div>
   );

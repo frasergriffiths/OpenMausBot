@@ -176,7 +176,6 @@ type ThreadRowProps = {
   task: ThreadRowTask;
   ownerId: string;
   current: boolean;
-  compact?: boolean;
   folders?: BotProject[];
   activityLabel?: string;
   now?: number;
@@ -209,7 +208,7 @@ type Submenu = "move" | "snooze";
 
 const DANGER_ROW = cn(SIMPLE_MENU_ITEM, "text-danger");
 
-export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, current, compact, folders, onSelect, onRegenerateTitle, onDelete, onMove, onArchive, onSnooze, onLink, onRefreshPermissions, activityLabel, now, panel = false, preview, color }: ThreadRowProps) {
+export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, current, folders, onSelect, onRegenerateTitle, onDelete, onMove, onArchive, onSnooze, onLink, onRefreshPermissions, activityLabel, now, panel = false, preview, color }: ThreadRowProps) {
   const workingColor = color ?? "var(--color-success)";
   const rowFocus = SIMPLE_ROW_FOCUS;
   const [menu, setMenu] = useState<{ left: number; top: number } | null>(null);
@@ -318,7 +317,7 @@ export const SidebarThreadRow = memo(function SidebarThreadRow({ task, ownerId, 
         title={[displayTitle, updatedStamp, status, closed ? t("task.closed") : null, archived ? t("task.archived") : null, snoozed ? t("task.snoozed") : null, task.unread ? t("task.unread") : null].filter(Boolean).join(" · ")}
         onClick={choose} onContextMenu={contextMenu}
         onKeyDown={(event) => { if (opensRowMenuFromKey(event.key, event.shiftKey)) { event.preventDefault(); const rect = event.currentTarget.getBoundingClientRect(); openMenu(rect.left, rect.bottom); } }}
-        className={cn("flex min-w-0 flex-1 items-center gap-2 rounded-md pl-6 pr-1 text-left text-[13px] font-medium", rowFocus, compact ? "min-h-7 py-1" : "min-h-8 py-1.5", current ? "font-semibold text-ink" : "text-ink-secondary hover:text-ink", panel && "rounded-[10px] py-2 pl-3 text-[14px]")}>
+        className={cn("flex min-w-0 flex-1 items-center gap-2 rounded-md pl-6 pr-1 text-left text-[13px] font-medium", rowFocus, "min-h-8 py-1.5", current ? "font-semibold text-ink" : "text-ink-secondary hover:text-ink", panel && "rounded-[10px] py-2 pl-3 text-[14px]")}>
         {panel ? <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           {heading}
           {preview && <span dir="auto" className="truncate text-[13px] font-normal text-ink-secondary">{preview}</span>}

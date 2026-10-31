@@ -11,7 +11,7 @@ import { DEFAULT_OUTBOUND_POLICY, type OutboundPolicy } from "../../../shared/ou
 import { ApprovalModeSelector } from "../ApprovalModeSelector";
 import { CommandAllowlistDialog } from "../CommandAllowlistDialog";
 import { LocalComputerAutoWarning } from "../LocalComputerAutoWarning";
-import { Switch } from "../SettingsPrimitives";
+import { Switch } from "@/components/ui";
 import { ManagedTeamsSettings } from "./ManagedTeamsSettings";
 import { ProposalStatus } from "./ProposalStatus";
 import type { useBotSettingsDerived } from "./useBotSettingsDerived";

@@ -1,62 +1,13 @@
-import { useSyncExternalStore } from "react";
-
+/** Threads are gone: one conversation per bot. The stored key is left alone so
+ * an older install that still has one does not throw while it is read. */
 export const SHOW_THREADS_KEY = "omb-show-threads";
 
-let sessionChoice: boolean | undefined;
-const listeners = new Set<() => void>();
+export function setShowThreads(_enabled: boolean): void {}
 
-function storage(): Storage | undefined {
-  try {
-    return globalThis.localStorage;
-  } catch {
-    return undefined;
-  }
-}
-
-function showThreads(): boolean {
-  if (sessionChoice !== undefined) return sessionChoice;
-  try {
-    return storage()?.getItem(SHOW_THREADS_KEY) !== "0";
-  } catch {
-    return true;
-  }
-}
-
-function notify() {
-  for (const listener of listeners) listener();
-}
-
-function onStorage(event: StorageEvent) {
-  if (event.key !== SHOW_THREADS_KEY && event.key !== null) return;
-  if (event.storageArea && event.storageArea !== storage()) return;
-  sessionChoice = undefined;
-  notify();
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  if (listeners.size === 1 && typeof window !== "undefined") {
-    window.addEventListener("storage", onStorage);
-  }
-  return () => {
-    listeners.delete(listener);
-    if (listeners.size === 0 && typeof window !== "undefined") {
-      window.removeEventListener("storage", onStorage);
-    }
-  };
-}
-
-export function setShowThreads(enabled: boolean): void {
-  sessionChoice = enabled;
-  try {
-    storage()?.setItem(SHOW_THREADS_KEY, enabled ? "1" : "0");
-  } catch {
-  }
-  notify();
-}
-
+/** Threads are gone: one conversation per bot, so nothing may turn them back on.
+ * The stored preference is read only so an older install does not throw. */
 export function useShowThreadsChoice(): boolean {
-  return useSyncExternalStore(subscribe, showThreads, () => true);
+  return false;
 }
 
 export function useShowThreads(): boolean {

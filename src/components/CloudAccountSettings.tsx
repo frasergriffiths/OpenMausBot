@@ -8,7 +8,7 @@ import { activeLocale, t } from "@/lib/i18n";
 import { buyOfferAllowed, cloudCreditLine, cloudPlanLabel, cloudPlanLine, cloudPlanView, cloudTrialView, moneyBackLine, offerTrialDays, trialRunning, type CloudPlanView } from "@/lib/cloud-plan";
 import { useCloudOffer } from "@/lib/use-cloud-offer";
 import type { LocaleKey } from "@/locales";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import { StagingMark } from "./cloud-buy/parts";
 import { CloudKeepHere } from "./CloudKeepHere";
 import { CloudLending } from "./CloudLending";
@@ -58,7 +58,7 @@ function cloudHomeCard({ machine, busy, failed, onConnect, lending, trial = fals
     : machine.status === "failed" && machine.retryAt ? t("cloudHome.failedRetry", { time: time(machine.retryAt) })
     : machine.status === "provisioning" && machine.setup?.slow ? t("cloudHome.slow")
     : team && machine.status === "provisioning" ? t("cloudHome.team.provisioning") : t(MACHINE_TEXT[machine.status]));
-  return <Card title={team ? team.name ?? t("cloudHome.team.title") : t("cloudHome.title")}>
+  return <SettingsCard title={team ? team.name ?? t("cloudHome.team.title") : t("cloudHome.title")}>
     <div data-cloud-home={machine.status} data-cloud-team={team ? true : undefined} data-cloud-unreachable={unreachable?.cause} data-cloud-waking={waking && connectable ? true : undefined} data-cloud-moving={moving && !unreachable ? true : undefined} className="flex flex-col items-start gap-3">
       <p role="status" className={connectable ? "text-[14px] text-ink" : "text-[13px] text-ink-secondary"}>{text}</p>
       {machine.status === "provisioning" && machine.setup && <CloudSetupSteps step={machine.setup.step} />}
@@ -72,11 +72,11 @@ function cloudHomeCard({ machine, busy, failed, onConnect, lending, trial = fals
       {failed && !unreachable && <p role="alert" className="text-[13px] text-danger">{t("cloudHome.connectFailed")}</p>}
       {lending && <CloudLending bridge={lending} moving={Boolean(moving)} />}
     </div>
-  </Card>;
+  </SettingsCard>;
 }
 
 function cloudPhoneCard({ ready, busy, failed, onUse }: { ready: boolean; busy: boolean; failed: boolean; onUse: () => void }) {
-  return <Card title={t("cloudPhone.title")} subtitle={t("cloudPhone.subtitle")}>
+  return <SettingsCard title={t("cloudPhone.title")} subtitle={t("cloudPhone.subtitle")}>
     <div data-cloud-phone={ready ? "open" : "steps"} className="flex flex-col items-start gap-3">
       {ready && <>
         <button type="button" disabled={busy} className="ui-button" onClick={onUse}>{t("cloudPhone.action")}</button>
@@ -91,7 +91,7 @@ function cloudPhoneCard({ ready, busy, failed, onUse }: { ready: boolean; busy: 
         </ol>
       </>}
     </div>
-  </Card>;
+  </SettingsCard>;
 }
 
 export function cloudLinkAction(account: CloudAccountState, link: { arrived: boolean; connected: boolean }): "sign-in" | "connect" | null {
@@ -140,9 +140,9 @@ export function CloudPlanOnCloud({ bridge, onConnectPhone }: { bridge: CloudPlan
     return () => { active = false; };
   }, [bridge]);
   if (refused) {
-    return <Card title={t("settings.section.cloudAccount")}>
+    return <SettingsCard title={t("settings.section.cloudAccount")}>
       <p data-cloud-plan="elsewhere" className="text-[13px] text-ink-secondary">{t("cloudAccount.onCloudNone")}</p>
-    </Card>;
+    </SettingsCard>;
   }
   const label = cloudPlanLabel(plan?.tier);
   const home = plan?.home === true;
@@ -150,7 +150,7 @@ export function CloudPlanOnCloud({ bridge, onConnectPhone }: { bridge: CloudPlan
     : plan?.status === "checking" ? t("cloudAccount.lastPlan", { plan: label }) : plan?.status === "signin" ? (plan.tier ? t("cloudAccount.planName", { plan: label }) : null)
       : plan ? t(home ? "cloudAccount.onCloudNoneHome" : "cloudAccount.onCloudNone") : null;
   const act = (action: () => Promise<void>) => { setFailed(false); void action().catch(() => setFailed(true)); };
-  return <Card title={t("settings.section.cloudAccount")} subtitle={t(home ? "cloudAccount.onCloudHome" : "cloudAccount.onCloud")}>
+  return <SettingsCard title={t("settings.section.cloudAccount")} subtitle={t(home ? "cloudAccount.onCloudHome" : "cloudAccount.onCloud")}>
     <div data-cloud-plan={plan?.status ?? "loading"} className="flex flex-col items-start gap-3">
       {line ? <p role="status" className="text-[15px] font-medium text-ink">{line}</p> : !plan && <p role="status" className="text-[13px] text-ink-secondary">{t("cloudAccount.loading")}</p>}
       {plan?.status === "signin" && <p className="text-[13px] text-ink-secondary">{t("cloudAccount.onCloudSignIn")}</p>}
@@ -162,19 +162,19 @@ export function CloudPlanOnCloud({ bridge, onConnectPhone }: { bridge: CloudPlan
       </div>
       {failed && <p role="alert" className="text-[13px] text-danger">{t("cloudAccount.actionFailed")}</p>}
     </div>
-  </Card>;
+  </SettingsCard>;
 }
 
 /** Security: the public native snapshot carries no credential and cannot activate a plan. */
 /** `onSignIn`: the sheet's email-code sign-in (the browser approval stays for openmausbot://cloud and Sign in again). */
 /** On a Team Cloud: its people and plan live on the Cloud page, where the person signs in with their own email. */
 export function TeamPeopleCard({ team }: { team: { name: string; cloudPage?: string } }) {
-  return <Card title={t("cloudAccount.teamPeopleTitle")}>
+  return <SettingsCard title={t("cloudAccount.teamPeopleTitle")}>
     <div data-cloud-plan="team" className="flex flex-col items-start gap-3">
       <p className="text-[13px] text-ink-secondary">{t("cloudAccount.teamPeopleBody", { team: team.name })}</p>
       {team.cloudPage && <a className="ui-button" href={team.cloudPage} target="_blank" rel="noreferrer">{t("cloudAccount.teamPeopleOpen")}</a>}
     </div>
-  </Card>;
+  </SettingsCard>;
 }
 
 export function CloudAccountSettings({ linkRequest = 0, cloudHome = false, teamHome, onConnectPhone, onAddCloud, onSignIn }: {
@@ -268,7 +268,7 @@ export function CloudAccountSettings({ linkRequest = 0, cloudHome = false, teamH
   </div>;
   return <>
     <p className="text-[13px] leading-relaxed text-ink-secondary">{t("cloudAccount.optional")}</p>
-    <Card title={t("settings.section.cloudAccount")} subtitle={t("cloudAccount.separate")}>
+    <SettingsCard title={t("settings.section.cloudAccount")} subtitle={t("cloudAccount.separate")}>
       {account?.staging && <StagingMark className="mb-3" />}
       {(!account || view.kind === "unknown") && <p role="status" className="text-[13px] text-ink-secondary">{t("cloudAccount.loading")}</p>}
       {message && <p role="status" className="mb-3 text-[13px] text-ink-secondary">{message}</p>}
@@ -312,7 +312,7 @@ export function CloudAccountSettings({ linkRequest = 0, cloudHome = false, teamH
       </div>}
       {error && <p role="alert" className="mt-3 text-[13px] text-danger">{t("cloudAccount.actionFailed")}</p>}
       {!account && <button type="button" disabled={busy} className="ui-button mt-3" onClick={() => void perform(() => bridge.state())}>{t("organization.refresh")}</button>}
-    </Card>
+    </SettingsCard>
     {machine && (onTeamPlan
       ? cloudHomeCard({ machine, busy, failed: homeFailed, onConnect: () => { if (team) openTeam(team.id); }, team: { name: team?.name ?? null } })
       : cloudHomeCard({ machine, busy, failed: homeFailed, onConnect: connectHome, lending: bridge.lending, trial: Boolean(account?.trial), waking: account?.waking === true, moving }))}

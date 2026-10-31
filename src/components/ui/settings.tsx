@@ -1,41 +1,15 @@
-import { useId, type ComponentProps, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { Check, ChevronRight, Copy, X } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { Switch } from "./switch";
+
+export { Switch };
 import { useCopyFeedback } from "@/lib/copy-text";
 import { t } from "@/lib/i18n";
 
 export const SIMPLE_CARD = "rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu py-2";
 
-export function Switch({
-  checked,
-  className,
-  ...props
-}: Omit<ComponentProps<"button">, "children" | "role" | "aria-checked"> & { checked: boolean }) {
-  return (
-    <button
-      {...props}
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      className={cn(
-        "relative cursor-pointer h-6 w-11 shrink-0 rounded-full transition-colors enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 motion-reduce:transition-none",
-        "in-data-[settings-look=simple]:h-5 in-data-[settings-look=simple]:w-8",
-        checked ? "bg-accent" : "bg-control in-data-[settings-look=simple]:bg-ink/[0.12] in-data-[settings-look=simple]:ring-1 in-data-[settings-look=simple]:ring-inset in-data-[settings-look=simple]:ring-ink/45",
-        className,
-      )}
-    >
-      <span
-        className={cn(
-          "absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white transition-[left] motion-reduce:transition-none",
-          "in-data-[settings-look=simple]:top-0.5 in-data-[settings-look=simple]:size-4",
-          checked ? "left-[21px] in-data-[settings-look=simple]:left-[14px]" : "left-[3px] in-data-[settings-look=simple]:left-0.5",
-        )}
-      />
-    </button>
-  );
-}
-
-export function Card({
+export function SettingsCard({
   title,
   subtitle,
   children,

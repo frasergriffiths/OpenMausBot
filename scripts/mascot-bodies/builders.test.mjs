@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { BODY_DEFS, BODY_IDS } from "./builders.ts";
 
 const EXPECTED_IDS = [
-  "cursor", "blob", "circle", "squircle", "capsule",
-  "drop", "shield", "hexagon", "diamond", "star",
+  "cursor", "circle", "shield", "hexagon", "diamond",
+  "star", "sparkle", "wedge", "cloud",
 ];
 
 describe("body builders", () => {
@@ -36,9 +36,10 @@ describe("body builders", () => {
     }
   });
 
-  it("keeps the cursor outline byte-identical to the shipped artwork", () => {
+  it("draws the default body from the shared blob builder, in cubics only", () => {
     const cursor = BODY_DEFS.find(s => s.id === "cursor");
-    expect(cursor.d.startsWith("M0 0 C1.12815992 0.94880479")).toBe(true);
-    expect(cursor.d.trimEnd().endsWith("-21.34867451 -18.24899383 0 0 Z")).toBe(true);
+    expect(cursor.d.trimStart().startsWith("M")).toBe(true);
+    expect(cursor.d.trimEnd().endsWith("Z")).toBe(true);
+    expect(cursor.d).not.toMatch(/[AaQqSsTtLlHhVv]/);
   });
 });

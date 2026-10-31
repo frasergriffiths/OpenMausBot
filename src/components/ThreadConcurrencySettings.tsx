@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { api, useStore, type ConfigStatus } from "@/state/store";
 import { t } from "@/lib/i18n";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import { Select } from "./Select";
 
 export function ThreadConcurrencySettings() {
@@ -29,7 +29,7 @@ export function ThreadConcurrencySettings() {
     }
   };
   return (
-    <Card title={t("settings.threads.title")} subtitle={t("settings.threads.subtitle")}>
+    <SettingsCard title={t("settings.threads.title")} subtitle={t("settings.threads.subtitle")}>
       <label htmlFor="thread-concurrency" className="block text-[13px] font-medium text-ink">{t("settings.threads.label")}</label>
       <Select className="mt-2" id="thread-concurrency" value={pending ?? confirmed} disabled={pending !== null}
         aria-describedby="thread-concurrency-help"
@@ -39,6 +39,6 @@ export function ThreadConcurrencySettings() {
       <p id="thread-concurrency-help" className="mt-2 text-[12px] leading-relaxed text-ink-secondary">{t("settings.threads.help")}</p>
       {pending !== null && <p role="status" className="mt-2 text-[12px] text-ink-secondary">{t("settings.threads.saving")}</p>}
       {error && <p role="alert" className="mt-2 text-[12px] text-danger">{error}</p>}
-    </Card>
+    </SettingsCard>
   );
 }

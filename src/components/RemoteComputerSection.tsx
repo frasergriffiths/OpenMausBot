@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { t } from "@/lib/i18n";
 import { Laptop, Loader2, Unplug } from "lucide-react";
 import { Select } from "./Select";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 
 const inputClass =
   "w-full rounded-lg border border-hairline/40 bg-inset px-3 py-2 text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none";
@@ -99,7 +99,7 @@ export function RemoteComputerSection({ hideWhenUnavailable = false }: { hideWhe
   if (!bridge && !environments && hideWhenUnavailable) return null;
 
   return (
-    <Card
+    <SettingsCard
       title={state.active ? t("remote.client.active") : t("remote.client.idle")}
       subtitle={t("remote.client.subtitle")}
     >
@@ -221,6 +221,6 @@ export function RemoteComputerSection({ hideWhenUnavailable = false }: { hideWhe
         </form>
       )}
       {state.active && error ? <p role="alert" className="mt-3 text-[13px] text-danger">{error}</p> : null}
-    </Card>
+    </SettingsCard>
   );
 }

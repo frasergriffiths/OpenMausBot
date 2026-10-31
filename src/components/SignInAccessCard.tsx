@@ -4,7 +4,7 @@ import { t } from "@/lib/i18n";
 import { api } from "@/state/store";
 import { readSessionState, type SessionState } from "../lib/session";
 import { canPairDevices } from "./ServerPairingCard";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 
 export interface SignInLists {
   admins: string[];
@@ -88,7 +88,7 @@ export function SignInAccessCard() {
   const rows = [...lists.admins.map((entry) => ({ entry, role: "admin" as const })), ...lists.members.map((entry) => ({ entry, role: "member" as const }))];
 
   return (
-    <Card title={t("remote.signInAccess.title")} subtitle={t("remote.signInAccess.subtitle")}>
+    <SettingsCard title={t("remote.signInAccess.title")} subtitle={t("remote.signInAccess.subtitle")}>
       {publicUrl ? (
         <p className="mt-2 text-[13px] text-ink-secondary">
           {t("remote.signInAccess.link")} <code className="select-all text-ink">{publicUrl}/pair</code>
@@ -141,6 +141,6 @@ export function SignInAccessCard() {
       )}
       <p className="mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("remote.signInAccess.note")}</p>
       {error ? <p className="mt-2 text-[13px] text-danger">{error}</p> : null}
-    </Card>
+    </SettingsCard>
   );
 }

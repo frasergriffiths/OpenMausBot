@@ -7,7 +7,7 @@ import type { LocaleKey } from "@/locales";
 import { localizedRelativeTime } from "@/lib/memory";
 import { api } from "@/state/store";
 import { lendingFailureKey, lendingProblemKey, lendingTitle, lendsLine, lentWhat } from "./CloudLending";
-import { Card, Switch } from "./SettingsPrimitives";
+import { SettingsCard, Switch } from "@/components/ui";
 
 /** A computer lent to this server, now or before (server/shared-computers.ts KnownLentComputer). */
 export interface KnownLentComputer {
@@ -119,7 +119,7 @@ export function LentComputersCard() {
   }, []);
   const lending = window.ogb?.cloudLending;
   const here = lending?.state && lending.set ? { state: lending.state, set: lending.set, screen: lending.screen, terminal: lending.terminal } : null;
-  return <Card title={t("lending.cloudSide.title")}>
+  return <SettingsCard title={t("lending.cloudSide.title")}>
     <div data-lent-computers={known === null ? "loading" : known.length} className="flex flex-col gap-3">
       {here && <LendThisComputer bridge={here} />}
       {failed && <p role="alert" className="text-[13px] text-danger">{t("lending.cloudSide.error")}</p>}
@@ -134,5 +134,5 @@ export function LentComputersCard() {
         </li>)}
       </ul>}
     </div>
-  </Card>;
+  </SettingsCard>;
 }

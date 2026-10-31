@@ -37,7 +37,7 @@ describe("asks routed to a person", () => {
     const f = fixture();
     const own = ask("scout", "Scout", "marco-private");
     expect(f.team.route(own)).toBe(own);
-    const mainChief = { id: "nobodys", name: "Nobody's", color: "silver" as const, threadId: "n-main", tasks: [{ threadId: "n-main", title: "Nobody's" }] };
+    const mainChief = { id: "nobodys", name: "Nobody's", color: "green" as const, threadId: "n-main", tasks: [{ threadId: "n-main", title: "Nobody's" }] };
     f.bots.push(mainChief);
     const admins = ask("nobodys", "Nobody's", "n-main");
     expect(f.team.route(admins)).toBe(admins);

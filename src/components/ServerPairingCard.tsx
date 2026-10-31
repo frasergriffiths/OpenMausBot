@@ -8,7 +8,7 @@ import { isOwnerOrAdmin, readSessionState, type SessionState } from "../lib/sess
 import { readMembership } from "../lib/membership";
 import { lastSeen, minutesLeft } from "../lib/pairing-time";
 import { revealPhonePairing } from "../lib/phone-pairing";
-import { Card, SettingRow, SIMPLE_CARD } from "./SettingsPrimitives";
+import { SettingsCard, SettingRow, SIMPLE_CARD } from "@/components/ui";
 import { Select } from "./Select";
 import { cn } from "@/lib/cn";
 import { TeamPhoneCard } from "./TeamPhoneCard";
@@ -105,9 +105,9 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
     if (pairingBlockedReason(session) !== "chat-only") return null;
     return (
       <div ref={root} tabIndex={-1} data-phone-pairing="server" className="scroll-mt-4 rounded-xl focus:outline-none">
-        <Card title={t("remote.serverPairing.title")} subtitle={t(pairingCodes ? "remote.serverPairing.subtitle" : "remote.serverPairing.portalSubtitle")}>
+        <SettingsCard title={t("remote.serverPairing.title")} subtitle={t(pairingCodes ? "remote.serverPairing.subtitle" : "remote.serverPairing.portalSubtitle")}>
           <p data-server-pairing-chat-only className="mt-3 text-[13px] text-ink-secondary">{t(pairingCodes ? "remote.serverPairing.chatOnly" : "remote.serverPairing.portalChatOnly")}</p>
-        </Card>
+        </SettingsCard>
       </div>
     );
   }
@@ -220,7 +220,7 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
 
   return (
     <div ref={root} tabIndex={-1} data-phone-pairing="server" className="scroll-mt-4 rounded-xl focus:outline-none">
-    <Card title={t("remote.serverPairing.title")} subtitle={t(pairingCodes ? "remote.serverPairing.subtitle" : "remote.serverPairing.portalSubtitle")}>
+    <SettingsCard title={t("remote.serverPairing.title")} subtitle={t(pairingCodes ? "remote.serverPairing.subtitle" : "remote.serverPairing.portalSubtitle")}>
       {pairingCodes && cloudHome ? <p data-server-pairing-personal className="mt-3 text-[13px] text-ink-secondary">{t("remote.serverPairing.cloudPersonal")}</p> : null}
       {pairingCodes ? <div className="mt-3 flex flex-wrap items-center gap-3">
         {cloudHome ? null : <>
@@ -266,7 +266,7 @@ export function ServerPairingCard({ initialSession = null, initialPairingCodes =
         </ul>
       )}
       {error ? <p className="mt-3 text-[13px] text-danger">{error}</p> : null}
-    </Card>
+    </SettingsCard>
     </div>
   );
 }

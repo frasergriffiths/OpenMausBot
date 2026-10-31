@@ -5,7 +5,7 @@ import type { Routine, RoutineRun } from "@/lib/routines";
 import { scheduleLabel } from "@/lib/schedule-label";
 import { latestRoutineRun, routineDateTime, routineFinished, routineNextLabel, routineRunLabel, routineRunTone, routineScheduleState } from "@/lib/routine-display";
 import type { Bot } from "@/state/store";
-import { Switch } from "../SettingsPrimitives";
+import { Switch } from "@/components/ui";
 
 export function RoutineList({ routines, runs, bots, loading, error, onOpen, onLogs, onToggle }: {
   routines: Routine[];

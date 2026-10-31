@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Check, ChevronRight, Circle, Loader2, Shield } from "lucide-react";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import { useDesktopCapabilities } from "./DesktopCapabilities";
 import { macCuaPermissionMessage, missingMacCuaPermissions, type MacCuaPermission } from "@/lib/mac-cua-permissions";
 import { cn } from "@/lib/cn";
@@ -126,7 +126,7 @@ export function MacCuaPermissionCard({ permissions, logReason, showCheckAgain = 
   };
 
   return (
-    <Card>
+    <SettingsCard>
       <section data-mac-permission-card="" className="py-4">
         <div className="min-w-0">
           <Shield size={17} className="text-accent-text" aria-hidden="true" />
@@ -208,7 +208,7 @@ export function MacCuaPermissionCard({ permissions, logReason, showCheckAgain = 
           )}
         </div>
       </section>
-    </Card>
+    </SettingsCard>
   );
 }
 

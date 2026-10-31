@@ -1,4 +1,4 @@
-import { ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 import type { Bot } from "@/state/store";
 import { cn } from "@/lib/cn";
@@ -12,11 +12,9 @@ import {
 } from "@/lib/mascot";
 import { BOT_AVATAR_CROPS } from "../../shared/bot-avatar";
 import { MASCOT_BODIES, MASCOT_BODY_IDS } from "../../shared/mascot-bodies";
-import { HALLOWEEN_BODIES, HALLOWEEN_BODY_IDS } from "../../shared/halloween-bodies";
 import type { BotBodyId } from "../../shared/bot-body";
 import { BotAvatar, MausAvatar } from "./Avatar";
-import { AvatarImageGenerator } from "./AvatarImageGenerator";
-import { AvatarFraming, OrganizationAvatarIcons, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "./avatar-editing";
+import { AvatarFraming, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "./avatar-editing";
 import { t } from "@/lib/i18n";
 
 export function BotProfileAvatarCard({
@@ -30,7 +28,7 @@ export function BotProfileAvatarCard({
   mascotMotion: { kind: Exclude<MausMotion, "none">; nonce: number } | null;
   onPatch: (patch: AvatarPatch) => void;
 }) {
-  const { fileRef, crop, uploading, generating, setSavingConnection, busy, error, upload, removeImage, generate } = useAvatarImage(bot, onPatch);
+  const { crop, busy, error, removeImage } = useAvatarImage(bot, onPatch);
 
   return (
     <div className="overflow-hidden rounded-xl border border-hairline/40 bg-card">
@@ -46,7 +44,6 @@ export function BotProfileAvatarCard({
       </div>
 
       <div className="p-3">
-        <OrganizationAvatarIcons busy={busy} onUpload={(file) => void upload(file)} />
         {crop !== "mascot" && bot.avatarUrl ? (
           <AvatarFraming bot={bot} disabled={busy} onPatch={onPatch} />
         ) : (
@@ -61,24 +58,8 @@ export function BotProfileAvatarCard({
           </div>
         )}
 
-        <div className="mt-2 flex gap-2">
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/png,image/jpeg,image/gif,image/webp"
-            className="sr-only"
-            onChange={(event) => void upload(event.target.files?.[0])}
-          />
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={busy}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-control px-3 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-50"
-          >
-            {uploading ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />}
-            {t("botIdentity.uploadImage")}
-          </button>
-          {bot.avatarUrl && (
+        {bot.avatarUrl && (
+          <div className="mt-2 flex gap-2">
             <button
               type="button"
               onClick={removeImage}
@@ -89,8 +70,8 @@ export function BotProfileAvatarCard({
             >
               <Trash2 size={14} />
             </button>
-          )}
-        </div>
+          </div>
+        )}
         <div className="mt-1.5 text-[12px] text-ink-secondary">{t("botIdentity.imageTypes")}</div>
 
         <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
@@ -170,24 +151,8 @@ export function BotProfileAvatarCard({
                 <BodyButton key={id} id={id} name={MASCOT_BODIES[id].name} bot={bot} busy={busy} onPatch={onPatch} />
               ))}
             </div>
-            <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
-              {t("botPanel.avatar.halloween")}
-            </div>
-            <div className="grid grid-cols-5 gap-1.5" data-halloween-bodies>
-              {HALLOWEEN_BODY_IDS.map((id) => (
-                <BodyButton key={id} id={id} name={HALLOWEEN_BODIES[id].name} bot={bot} busy={busy} onPatch={onPatch} />
-              ))}
-            </div>
           </>
         )}
-
-        <AvatarImageGenerator
-          botLabel={bot.title || bot.name}
-          disabled={uploading}
-          generating={generating}
-          onGenerate={generate}
-          onSavingChange={setSavingConnection}
-        />
 
         {error && <div role="alert" className="mt-3 text-[12px] text-danger">{error}</div>}
       </div>

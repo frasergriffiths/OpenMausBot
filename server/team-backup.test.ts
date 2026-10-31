@@ -76,13 +76,13 @@ describe("additive portable team backups", () => {
     expect(() => parseTeamBackup(invalid)).toThrow();
   });
 
-  it("backs up and restores a silver bot in silver", () => {
+  it("backs up and restores a MausBot in its colour", () => {
     const { store, routines } = fixture();
-    const maus = store.createBot({ name: "MausBot", color: "silver" }, { seedMessages: false });
+    const maus = store.createBot({ name: "MausBot", color: "green" }, { seedMessages: false });
     const backup = createTeamBackup(store, routines.listRoutines(), "With MausBot");
-    expect(backup.bots.find((bot) => bot.key === maus.id)?.color).toBe("silver");
+    expect(backup.bots.find((bot) => bot.key === maus.id)?.color).toBe("green");
     const restored = importTeamBackup(store, routines, JSON.parse(JSON.stringify(backup)), selection());
-    expect(restored.bots.find((bot) => bot.name === "MausBot 2")?.color).toBe("silver");
+    expect(restored.bots.find((bot) => bot.name === "MausBot 2")?.color).toBe("green");
   });
 
   it("carries a bot's never-use-the-helper switch through backup and import, so its restored notes and chats stay off the helper", () => {

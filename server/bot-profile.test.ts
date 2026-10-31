@@ -99,16 +99,16 @@ describe("parseBotProfilePatch (both modes)", () => {
 
 describe("mascotBody", () => {
   it("accepts a known body", () => {
-    expect(parseBotProfilePatch({ mascotBody: "blob" } as never, true)).toEqual({
+    expect(parseBotProfilePatch({ mascotBody: "circle" } as never, true)).toEqual({
       ok: true,
-      patch: { mascotBody: "blob" },
+      patch: { mascotBody: "circle" },
     });
   });
 
-  it("accepts a Halloween body", () => {
+  it("turns a retired Halloween body into the readable message, so a stored one falls back", () => {
     expect(parseBotProfilePatch({ mascotBody: "pumpkin" } as never, true)).toEqual({
-      ok: true,
-      patch: { mascotBody: "pumpkin" },
+      ok: false,
+      error: expect.stringContaining("mascotBody must be"),
     });
   });
 
@@ -116,8 +116,7 @@ describe("mascotBody", () => {
     expect(parseBotProfilePatch({ mascotBody: "hexagram" } as never, true)).toEqual({
       ok: false,
       error:
-        "mascotBody must be cursor, blob, circle, squircle, capsule, drop, shield, hexagon, diamond, star, " +
-        "pumpkin, ghost, witch, bat, cat, skull, monster, mummy, vampire, or spider",
+        "mascotBody must be cursor, circle, shield, hexagon, diamond, star, sparkle, wedge, or cloud",
     });
   });
 });

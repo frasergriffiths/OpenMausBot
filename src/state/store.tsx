@@ -422,7 +422,7 @@ export type { BrowserEngineSummary, BrowserProfile, ConfigStatus, ManagedPolicyS
 // A section left out here is wiped from state.config whenever a config frame lands.
 export type ConfigStatusFrame = Pick<
   ConfigStatus,
-  "xai" | "mistral" | "cerebras" | "groq" | "meta" | "deepseek" | "xResearch" | "treg" | "anthropic" | "openai" | "openrouter" | "openaiCompat" | "fleet" | "composio" | "box" | "vps" | "rooms" | "mcp" | "threads" | "automaticRecovery" | "cacheKeepWarm" | "localVm" | "opencodeGo" | "tts" | "decider" | "helpers" | "imageGen" | "live" | "profile" | "language" | "features" | "onboarding" | "browserEngine" | "browserProfiles" | "edition" | "budgets" | "billing" | "managedPolicy" | "cloudHome" | "team"
+  "xai" | "mistral" | "cerebras" | "groq" | "meta" | "deepseek" | "xResearch" | "treg" | "anthropic" | "openai" | "openrouter" | "openaiCompat" | "fleet" | "composio" | "box" | "vps" | "rooms" | "mcp" | "threads" | "automaticRecovery" | "cacheKeepWarm" | "localVm" | "opencodeGo" | "tts" | "decider" | "helpers" | "live" | "profile" | "language" | "features" | "onboarding" | "browserEngine" | "browserProfiles" | "edition" | "budgets" | "billing" | "managedPolicy" | "cloudHome" | "team"
 >;
 
 export function configStatusFromFrame(frame: ConfigStatusFrame): ConfigStatus {
@@ -449,7 +449,6 @@ export function configStatusFromFrame(frame: ConfigStatusFrame): ConfigStatus {
     opencodeGo: frame.opencodeGo,
     tts: frame.tts,
     decider: frame.decider, helpers: frame.helpers,
-    imageGen: frame.imageGen,
     live: frame.live,
     profile: frame.profile,
     language: frame.language,
@@ -599,8 +598,6 @@ export interface AppState {
   pluginsSurface: "apps" | "mcp";
   botCreationPending: boolean;
   computerOpen: boolean;
-  inspectorOpen: boolean;
-  activityOpen: boolean;
   /** Cross-bot, so a bot switch leaves it open; pinned, opening another side panel leaves it open too. */
   notificationsOpen: boolean;
   notificationsPinned: boolean;
@@ -625,7 +622,6 @@ export interface AppState {
   dataTables: Record<string, DataTable[]>;
   dataResultFocus: { botId: string; id: string; requestId: number; consumed: boolean } | null;
   signInFocus: { botId: string; messageId: string; url: string; site: string; place: import("../../shared/wire").Surface; requestId: number; consumed: boolean } | null;
-  dataView: import("@/lib/composer-attachments").DataViewContext | null;
   focusMessage: { threadId: string; messageId: string; matchText?: string; nonce: number; consumed: boolean } | null;
   unreadDivider: { threadId: string; messageId: string } | null;
   connected: boolean;
@@ -732,7 +728,7 @@ export type Action =
       sendId?: string;
       replyToId?: string;
       threadId?: string;
-      dataContext?: import("../../shared/data-context").DataContext; pointed?: import("../../shared/app-frame/point").PointedElement[]; mode?: "chat" | "goal";
+      pointed?: import("../../shared/app-frame/point").PointedElement[]; mode?: "chat" | "goal";
       onError?: () => void;
     }
   | { type: "pendingQueued"; threadId: string; queueId: string; text: string; reason?: SteerQueueReason }
@@ -761,7 +757,7 @@ export type Action =
       rememberCommand?: boolean;
       onError?: (message: string) => void;
     }
-  | { type: "newTask"; botId: string; projectId?: string; cwd?: string; onCreated?: () => void; onError?: (message: string) => void }
+  | { type: "newTask"; botId: string; projectId?: string; cwd?: string; handover?: string; onCreated?: () => void; onError?: (message: string) => void }
   | { type: "switchTask"; botId: string; threadId: string; whole?: true }
   | { type: "switchTaskFailed"; botId: string; threadId: string }
   | { type: "taskSwitched"; bot: Bot }
@@ -789,7 +785,6 @@ export type Action =
   | { type: "computerStart"; botId: string; start: ComputerStart | null }
   | ({ type: "computerControl"; botId: string } & ComputerControlState)
   | { type: "dataSheet"; sheet: DataSheet; tables?: DataTable[] }
-  | { type: "dataView"; view: AppState["dataView"] }
   | { type: "loadDataSheet"; botId: string; onError?: (message: string) => void }
   | { type: "modelVariantRuntime"; event: RuntimeEvent }
   | { type: "setModel"; botId: string; selection: ModelSelection; threadId?: string; updateBotDefault?: boolean; resetApprovalToAsk?: boolean }
@@ -805,8 +800,6 @@ export type Action =
   | { type: "dataResultFocusConsumed"; requestId: number }
   | { type: "openSignIn"; botId: string; messageId: string; url: string; site: string; place: import("../../shared/wire").Surface }
   | { type: "signInFocusConsumed"; requestId: number }
-  | { type: "toggleInspector"; open?: boolean }
-  | { type: "toggleActivity"; open?: boolean }
   | { type: "focusMessage"; threadId: string; messageId: string; matchText?: string }
   | { type: "focusMessageConsumed"; nonce: number }
   | { type: "unreadDividerDone"; threadId: string }
@@ -996,8 +989,6 @@ export function reducer(state: AppState, action: Action): AppState {
         routinesFocus: { section: action.section, view: action.view, botId: action.botId, routineId: action.routineId, runStatus: action.runStatus, nonce: state.routinesFocus.nonce + 1 },
         settingsOpen: false,
         computerOpen: false,
-        inspectorOpen: false,
-        activityOpen: false,
         notificationsOpen: false,
         appSettingsOpen: false,
         pluginsOpen: false,
@@ -1010,7 +1001,7 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         activeView: action.type === "showFiles" ? "files" : "team-map",
         filesSuggest: action.type === "showFiles" && action.suggest?.length ? action.suggest : null,
-        settingsOpen: false, computerOpen: false, inspectorOpen: false, activityOpen: false, appSettingsOpen: false, pluginsOpen: false,
+        settingsOpen: false, computerOpen: false, appSettingsOpen: false, pluginsOpen: false,
       };
     case "routinesHydrated":
       return { ...state, routines: action.routines, routineRuns: trimRoutineRuns(action.runs), routinesLoadState: "ready" };
@@ -1441,7 +1432,6 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         selectedId,
         settingsOpen: open,
-        activityOpen: open ? false : state.activityOpen,
         botSettingsSection: action.section ?? state.botSettingsSection,
         botSettingsExpandAccordion: open ? named || (freshOpen && state.botSettingsSectionStored) : false,
         botSettingsExpandRemembered: open ? !named && freshOpen && state.botSettingsSectionStored : false,
@@ -1503,32 +1493,6 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state, selectedId: action.botId !== undefined && state.bots.some((bot) => bot.id === action.botId) ? action.botId : state.selectedId,
         computerOpen: open,
         settingsOpen: open ? false : state.settingsOpen,
-        inspectorOpen: open ? false : state.inspectorOpen,
-        activityOpen: open ? false : state.activityOpen,
-        appSettingsOpen: open ? false : state.appSettingsOpen,
-        notificationsOpen: open && !state.notificationsPinned ? false : state.notificationsOpen,
-      };
-    }
-    case "toggleInspector": {
-      const open = action.open ?? !state.inspectorOpen;
-      return {
-        ...state,
-        inspectorOpen: open,
-        settingsOpen: open ? false : state.settingsOpen,
-        computerOpen: open ? false : state.computerOpen,
-        activityOpen: open ? false : state.activityOpen,
-        appSettingsOpen: open ? false : state.appSettingsOpen,
-        notificationsOpen: open && !state.notificationsPinned ? false : state.notificationsOpen,
-      };
-    }
-    case "toggleActivity": {
-      const open = action.open ?? !state.activityOpen;
-      return {
-        ...state,
-        activityOpen: open,
-        settingsOpen: open ? false : state.settingsOpen,
-        computerOpen: open ? false : state.computerOpen,
-        inspectorOpen: open ? false : state.inspectorOpen,
         appSettingsOpen: open ? false : state.appSettingsOpen,
         notificationsOpen: open && !state.notificationsPinned ? false : state.notificationsOpen,
       };
@@ -1540,8 +1504,6 @@ export function reducer(state: AppState, action: Action): AppState {
         notificationsOpen: open,
         settingsOpen: open ? false : state.settingsOpen,
         computerOpen: open ? false : state.computerOpen,
-        inspectorOpen: open ? false : state.inspectorOpen,
-        activityOpen: open ? false : state.activityOpen,
         appSettingsOpen: open ? false : state.appSettingsOpen,
       };
     }
@@ -1552,13 +1514,11 @@ export function reducer(state: AppState, action: Action): AppState {
       return {
         ...state,
         appSettingsOpen: open,
-        activityOpen: open ? false : state.activityOpen,
         appSettingsSection: action.section ?? state.appSettingsSection,
         appSettingsCloudLink: action.cloudLink && open ? state.appSettingsCloudLink + 1 : 0,
         appSettingsPhonePairing: action.phonePairing && open ? state.appSettingsPhonePairing + 1 : 0,
         settingsOpen: open ? false : state.settingsOpen,
         computerOpen: open ? false : state.computerOpen,
-        inspectorOpen: open ? false : state.inspectorOpen,
         pluginsOpen: open ? false : state.pluginsOpen,
         notificationsOpen: open && !state.notificationsPinned ? false : state.notificationsOpen,
       };
@@ -1827,8 +1787,6 @@ export function reducer(state: AppState, action: Action): AppState {
         dataSheets: { ...state.dataSheets, [action.sheet.botId]: action.sheet },
         ...(action.tables ? { dataTables: { ...state.dataTables, [action.sheet.botId]: action.tables } } : {}),
       };
-    case "dataView":
-      return { ...state, dataView: action.view };
     case "sendGroup": {
       if (!action.sendId) return state;
       const group = state.groups.find((candidate) => candidate.id === action.groupId);
@@ -1897,8 +1855,6 @@ export const initialState: AppState = {
   pluginsSurface: "apps",
   botCreationPending: false,
   computerOpen: false,
-  inspectorOpen: false,
-  activityOpen: false,
   notificationsOpen: false,
   notificationsPinned: false,
   notifications: [],
@@ -1922,7 +1878,6 @@ export const initialState: AppState = {
   dataTables: {},
   dataResultFocus: null,
   signInFocus: null,
-  dataView: null,
   focusMessage: null,
   unreadDivider: null,
   connected: false,
@@ -2490,7 +2445,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           void waitForExecutionSettings(botBeforeSend ? [botBeforeSend] : [], threadId)
             .then(() => api(`/api/bots/${action.botId}/messages`, {
                 method: "POST",
-                body: JSON.stringify({ text: action.text, replyToId: action.replyToId, threadId, sendId, ...(action.dataContext ? { dataContext: action.dataContext } : {}), ...(action.pointed?.length ? { pointed: action.pointed } : {}), ...(action.mode === "goal" ? { mode: "goal" } : {}) }),
+                body: JSON.stringify({ text: action.text, replyToId: action.replyToId, threadId, sendId, ...(action.pointed?.length ? { pointed: action.pointed } : {}), ...(action.mode === "goal" ? { mode: "goal" } : {}) }),
               }))
             .then((body) => {
               if (body?.message && typeof body.threadId === "string") {
@@ -2875,9 +2830,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           const ready = action.type === "newTask"
             ? botPatchQueue.flush(action.botId)
             : Promise.resolve();
-          void ready.then(() => api<{ bot: Bot }>(action.type === "newTask"
-            ? `/api/bots/${action.botId}/tasks`
-            : `/api/bots/${action.botId}/tasks/${action.threadId}${action.whole ? "" : `?messages=${MESSAGE_PAGE_SIZE}`}`, { method: "POST", body: JSON.stringify(action.type === "newTask" ? { projectId: action.projectId, cwd: action.cwd } : {}) }))
+          const resetUrl = action.type === "newTask" && action.handover !== undefined ? `/api/bots/${action.botId}/context/reset` : null;
+          void ready.then(() => api<{ bot: Bot }>(resetUrl
+            ? resetUrl
+            : action.type === "newTask"
+              ? `/api/bots/${action.botId}/tasks`
+              : `/api/bots/${action.botId}/tasks/${action.threadId}${action.whole ? "" : `?messages=${MESSAGE_PAGE_SIZE}`}`, { method: "POST", body: JSON.stringify(resetUrl ? { handover: action.type === "newTask" ? action.handover : undefined } : action.type === "newTask" ? { projectId: action.projectId, cwd: action.cwd } : {}) }))
             .then((r) => {
               if (action.type === "newTask") action.onCreated?.();
               if (!r?.bot || navigation.get(action.botId) !== revision) return;

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type DragEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { BookOpen, Crown, Pencil, Sparkles, Wand2 } from "lucide-react";
 
@@ -126,13 +126,6 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
     onClose();
   };
 
-  const drop = (event: DragEvent) => {
-    const file = event.dataTransfer.files?.[0];
-    if (!file) return;
-    event.preventDefault();
-    setEditing(true);
-    void image.upload(file);
-  };
 
   return (
     <div ref={overlayRef} className={cn("fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-6 pb-6 pt-[min(6vh,48px)]", "ui-scrim", leaving && "pointer-events-none")} data-mausbot-welcome="">
@@ -160,7 +153,7 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
             data-mausbot-welcome-picture=""
             onClick={() => setEditing(!editing)}
             onDragOver={(event) => { if (event.dataTransfer.types.includes("Files")) event.preventDefault(); }}
-            onDrop={drop}
+           
             className="group relative rounded-full p-1 transition-transform duration-200 ease-out hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0"
           >
             <span className="pointer-events-none absolute inset-1 rounded-full ring-0 ring-accent/35 transition-[box-shadow] duration-200 group-hover:ring-2 group-focus-visible:ring-2" aria-hidden="true" />

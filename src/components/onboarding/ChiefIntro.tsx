@@ -173,7 +173,7 @@ export function ChiefIntro({ replay, onDone, onLeave }: { replay: boolean; onDon
         <>
           <div className="flex flex-col items-center gap-4 px-6 pb-4 pt-6 text-center">
             <span ref={avatar} className="relative flex">
-              {maus ? <BotAvatar bot={maus} size={AVATAR_SIZE} motion="arrive" /> : <MausAvatar color="chrome" size={AVATAR_SIZE} label={DEFAULT_BOT_NAME} />}
+              {maus ? <BotAvatar bot={maus} size={AVATAR_SIZE} motion="arrive" /> : <MausAvatar color="green" size={AVATAR_SIZE} label={DEFAULT_BOT_NAME} />}
               <ChiefBadge />
             </span>
             <div className="flex flex-col gap-2">

@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Card, SettingRow, Switch } from "./SettingsPrimitives";
+import { SettingsCard, SettingRow, Switch } from "@/components/ui";
 
 describe("settings primitives", () => {
   it("lays out a labeled setting and keeps its status outside the control column", () => {
@@ -19,7 +19,7 @@ describe("settings primitives", () => {
   });
 
   it("keeps the form card surface and native switch semantics", () => {
-    const html = renderToStaticMarkup(createElement(Card, {
+    const html = renderToStaticMarkup(createElement(SettingsCard, {
       title: "Profile",
       children: createElement(Switch, { checked: true, disabled: true, "aria-label": "Analytics" }),
     }));

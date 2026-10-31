@@ -20,9 +20,9 @@ const boot = (store: Store) => ensureDefaultBot(store, { dataDir: DATA_DIR });
 const briefChief = (store: Store) => createBrief({ store, dataDir: DATA_DIR, hosted: false, watching: () => true, mainThread: (id) => store.bot(id)?.threadId,
   threadBusy: () => false, notify: () => {}, runs: () => [], needsYou: () => [], engineName: () => "Claude", hostTimeZone: () => "UTC", language: () => undefined, session: () => null,
   address: () => undefined, failRun: () => {}, keep: () => {}, items: () => null }).chief();
-/** A new install from before MausBot was marked: its first bot was MausBot in silver, made its Chief. */
+/** A new install from before MausBot was marked: its first bot was MausBot in the default colour, made its Chief. */
 function seededBefore(store: Store): BotRecord {
-  const seeded = store.createBot({ name: "MausBot", color: "silver" });
+  const seeded = store.createBot({ name: "MausBot" });
   store.setChiefOfStaff(seeded.id);
   return seeded;
 }
@@ -31,7 +31,7 @@ describe("MausBot, every person's helper", () => {
   beforeEach(() => rmSync(DATA_DIR, { recursive: true, force: true }));
   afterEach(() => readTeamRolesWith(() => null));
 
-  it("gives a fresh install one MausBot, its Chief, in chrome, introduced once", () => {
+  it("gives a fresh install one MausBot, its Chief, in the default green, introduced once", () => {
     const store = new Store(selection);
     store.seedIfEmpty();
     boot(store);
@@ -41,7 +41,7 @@ describe("MausBot, every person's helper", () => {
     boot(again);
     expect(again.bots).toHaveLength(1);
     const maus = placeMausBots(again)[0]!;
-    expect(maus).toMatchObject({ name: "MausBot", color: "chrome", chiefOfStaff: true, defaultBot: {} });
+    expect(maus).toMatchObject({ name: "MausBot", color: "green", chiefOfStaff: true, defaultBot: {} });
     expect(intros(again, maus)).toHaveLength(1);
   });
 
@@ -52,7 +52,7 @@ describe("MausBot, every person's helper", () => {
     store.createBot({ name: "Writer", title: "Writer", soul: "Write." });
     const before = structuredClone(store.bot(chief.id));
     const maus = boot(store)!;
-    expect(maus).toMatchObject({ name: "MausBot", color: "chrome", defaultBot: {} });
+    expect(maus).toMatchObject({ name: "MausBot", color: "green", defaultBot: {} });
     expect(maus.chiefOfStaff).toBeFalsy();
     expect(chiefLevel(maus)).toBe(true);
     expect(store.bot(chief.id)).toEqual(before);
@@ -64,7 +64,7 @@ describe("MausBot, every person's helper", () => {
     expect(restarted.bots.filter((bot) => bot.chiefOfStaff).map((bot) => bot.id)).toEqual([chief.id]);
   });
 
-  it("adopts a new install's renamed MausBot with its history instead of making another, and puts the intro on top of a new conversation", () => {
+  it("leaves a pre-mark MausBot that was renamed alone, and adds MausBot beside it, because the metal colour that used to identify it is gone", () => {
     const store = new Store(selection);
     const seeded = seededBefore(store);
     const first = seeded.threadId;
@@ -72,16 +72,15 @@ describe("MausBot, every person's helper", () => {
     store.patchBot(seeded.id, { name: "Jarvis" });
     const history = store.messagesFor(first).map((message) => message.id);
     store.createBot({ name: "Writer" });
-    const adopted = boot(store)!;
-    expect(adopted.id).toBe(seeded.id);
-    expect(adopted).toMatchObject({ name: "Jarvis", color: "chrome", chiefOfStaff: true, defaultBot: {} });
-    expect(store.bots).toHaveLength(2);
-    expect(history).toHaveLength(2);
+    const maus = boot(store)!;
+    expect(maus.id).not.toBe(seeded.id);
+    expect(maus).toMatchObject({ name: "MausBot", color: "green", defaultBot: {} });
+    expect(maus.chiefOfStaff).toBeFalsy();
+    expect(store.bot(seeded.id)).toMatchObject({ name: "Jarvis", chiefOfStaff: true });
     expect(store.messagesFor(first).map((message) => message.id)).toEqual(history);
-    expect(adopted.threadId).not.toBe(first);
-    expect(store.messagesFor(adopted.threadId).map((message) => message.helperIntro)).toEqual([true]);
+    expect(intros(store, maus)).toHaveLength(1);
     boot(new Store(selection));
-    expect(intros(new Store(selection), new Store(selection).bot(seeded.id)!)).toHaveLength(1);
+    expect(placeMausBots(new Store(selection)).map((bot) => bot.name)).toEqual(["MausBot"]);
   });
 
   it("keeps the colour the person gave an adopted MausBot", () => {

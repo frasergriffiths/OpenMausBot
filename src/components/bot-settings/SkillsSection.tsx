@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useStore, type Bot } from "@/state/store";
 import { useBotEditor } from "./BotEditorContext";
 import { skillAuthoringEnabled, skillsLibraryEnabled } from "@/lib/feature-flags";
-import { Switch } from "../SettingsPrimitives";
+import { Switch } from "@/components/ui";
 import { inputCls } from "./field";
 import { OrgSkillsCard } from "./OrgSkillsCard";
 import { WriteCommandCard } from "./WriteCommandCard";

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, BookOpen, Box, Brain, Loader2, Monitor, Plus, Save, Users, UsersRound, X } from "lucide-react";
+import { ArrowRight, BookOpen, Box, Brain, Loader2, Monitor, Plus, Save, Users, X } from "lucide-react";
 
 import { api, formatTime, openBot, openThread, useStore, type Bot } from "@/state/store";
 import {
@@ -29,7 +29,7 @@ import { MapComposer } from "./MapComposer";
 import { openBotSettings } from "./bot-panel/panel-link";
 import type { TeamComputer } from "../../shared/team-computer";
 import { Chevron } from "./chevron";
-import { Switch } from "./SettingsPrimitives";
+import { Switch } from "@/components/ui";
 import { MENU_LABEL, MENU_ROW } from "./menu-recipe";
 import { SIMPLE_MENU } from "./SidebarSimpleTop";
 
@@ -400,7 +400,6 @@ export function TeamMapPage() {
       <header {...dragProps} className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-hairline/40 px-6 py-4 max-md:pl-12">
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
-            <UsersRound size={18} className="text-ink-secondary" />
             <h1 className="text-[17px] font-semibold">{t("canvas.title")}</h1>
             <span className="ml-1 rounded-full bg-control px-2 py-0.5 text-[12px] text-ink-secondary">{teamMapBotCount(bots.length)}</span>
           </div>

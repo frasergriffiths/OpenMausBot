@@ -51,8 +51,8 @@ describe("shared sidebar density store", () => {
     const preference = await import("./sidebar-preferences");
     expect(preference.useSidebarDensity()).toBe("expanded");
     expect(hook.serverSnapshot!()).toBe("expanded");
-    preference.saveSidebarDensity("compact");
-    expect(preference.useSidebarDensity()).toBe("compact");
+    preference.saveSidebarDensity("expanded");
+    expect(preference.useSidebarDensity()).toBe("expanded");
   });
 
   it("persists a choice and notifies every mounted consumer", async () => {
@@ -70,19 +70,19 @@ describe("shared sidebar density store", () => {
     expect(hook.snapshot!()).toBe("icons");
 
     unsubscribeSidebar();
-    preference.setSidebarDensity("compact");
+    preference.setSidebarDensity("expanded");
     expect(sidebar).toHaveBeenCalledOnce();
     expect(settings).toHaveBeenCalledTimes(2);
     unsubscribeSettings();
 
     vi.resetModules();
     const reloaded = await import("./sidebar-preferences");
-    expect(reloaded.useSidebarDensity()).toBe("compact");
+    expect(reloaded.useSidebarDensity()).toBe("expanded");
   });
 
   it("follows another window's change, ignoring unrelated storage", async () => {
     const preference = await import("./sidebar-preferences");
-    preference.setSidebarDensity("compact");
+    preference.setSidebarDensity("expanded");
     const listener = vi.fn();
     const unsubscribe = hook.subscribe!(listener);
 

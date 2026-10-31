@@ -1,4 +1,4 @@
-import { Calendar, Gauge, ListChecks, Sparkles } from "lucide-react";
+import { Calendar, Gauge, Sparkles } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 import { setupJobAnswer } from "@/lib/setup-answer";
@@ -63,7 +63,6 @@ export function DetailsTab({ bot, derived, onOpen, editingInstructions, onEditIn
 
       <Card anchor="usage">
         <NavRow data-panel-page="usage" icon={Gauge} title={t("settings.section.usage")} onClick={() => onOpen("usage")} />
-        <NavRow data-panel-page="activity" icon={ListChecks} title={t("activity.panel.title")} onClick={() => onOpen("activity")} />
       </Card>
 
       <TryAsking bot={bot} />

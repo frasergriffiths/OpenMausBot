@@ -1,10 +1,9 @@
 import { useSyncExternalStore } from "react";
 import { z } from "zod";
 
-export type SidebarDensity = "expanded" | "compact" | "icons";
+export type SidebarDensity = "expanded" | "icons";
 export type SidebarToolsLayout = "rows" | "toolbar";
 
-export const SIDEBAR_DENSITIES: readonly SidebarDensity[] = ["expanded", "compact"];
 export const SIDEBAR_TOOLS_LAYOUTS: readonly SidebarToolsLayout[] = ["rows", "toolbar"];
 
 export const SIDEBAR_DENSITY_KEY = "openmausbot.sidebarDensity";
@@ -21,12 +20,8 @@ export const PINNED_CIRCLE_ORDER_KEY = "openmausbot.pinnedCircleOrder.v1";
 /** The expanded row is the default; a value stored by the old Comfortable option reads as expanded. */
 export function parseSidebarDensity(value: string | null): SidebarDensity {
   switch (value) {
-    case "expanded":
-    case "compact":
     case "icons":
-      return value;
-    case "comfortable":
-      return "expanded";
+      return "icons";
     default:
       return "expanded";
   }

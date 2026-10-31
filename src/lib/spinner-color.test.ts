@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { MAUS_COLORS, SPINNER_HUE_PERCENT, spinnerColor, type MausColor } from "./mascot";
 
 const css = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
-const SKINS = ["midnight", "atelier", "foundry", "lagoon", "graphite", "linen", "dusk", "daylight", "meadow", "pop", "halloween"] as const;
+const SKINS = ["midnight", "atelier", "foundry", "lagoon", "graphite", "linen", "dusk", "daylight", "meadow", "pop"] as const;
 const DEFAULTS = css.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
 
 function rawVar(skin: string, name: string): string {
@@ -108,7 +108,7 @@ describe("the running mark on a tab", () => {
   });
 
   it("clears 3:1 against every skin's active tab fill, for every mascot colour", () => {
-    expect(new Set(SKINS).size).toBe(11);
+    expect(new Set(SKINS).size).toBe(10);
     const failures: string[] = [];
     for (const skin of SKINS) {
       const raised = rgb(varFor(skin, "color-raised"));

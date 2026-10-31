@@ -6,7 +6,7 @@ import { t } from "@/lib/i18n";
 import { StoreProvider, type Bot } from "@/state/store";
 import { draftOf, MausBotWelcomeCard, mausBotWelcomeDue, welcomeName, welcomePatch } from "./MausBotWelcome";
 
-const maus = { id: "maus", threadId: "t1", name: "MausBot", title: "", description: "", notifications: true, color: "chrome", mascotBody: null,
+const maus = { id: "maus", threadId: "t1", name: "MausBot", title: "", description: "", notifications: true, color: "green", mascotBody: null,
   avatarUrl: null, unread: false, modelSelection: { instanceId: "claude", model: "sonnet" }, createdAt: 1, defaultBot: {} } as unknown as Bot;
 
 describe("MausBot's first-launch welcome", () => {
@@ -23,8 +23,8 @@ describe("MausBot's first-launch welcome", () => {
   });
 
   it("Add saves the person's changes, pins MausBot and keeps it in the sidebar", () => {
-    expect(welcomePatch(maus, { ...draftOf(maus), name: " Jarvis ", color: "blue", mascotBody: "blob" }, true))
-      .toEqual({ name: "Jarvis", color: "blue", mascotBody: "blob", welcomed: true, sidebarHidden: false, pinned: true });
+    expect(welcomePatch(maus, { ...draftOf(maus), name: " Jarvis ", color: "blue", mascotBody: "cursor" }, true))
+      .toEqual({ name: "Jarvis", color: "blue", welcomed: true, sidebarHidden: false, pinned: true });
   });
 
   it("Add with the panel never opened keeps the chrome-steel defaults", () => {

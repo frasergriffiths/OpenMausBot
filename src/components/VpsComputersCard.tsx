@@ -1,7 +1,7 @@
 import { AlertTriangle, Loader2, RefreshCw, Server, Trash2 } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { cn } from "@/lib/cn";
-import { Card } from "./SettingsPrimitives";
+import { SettingsCard } from "@/components/ui";
 import {
   computerStateLabel,
   vpsComputerInventoryStateKind,
@@ -32,7 +32,7 @@ export function VpsComputersCard({
   onRemove: (instance: VpsComputerInventoryInstance) => void;
 }) {
   return (
-    <Card
+    <SettingsCard
       title={t("vm.vps.title")}
       subtitle={t("vm.vps.subtitle")}
     >
@@ -150,6 +150,6 @@ export function VpsComputersCard({
           );
         })}
       </div>
-    </Card>
+    </SettingsCard>
   );
 }

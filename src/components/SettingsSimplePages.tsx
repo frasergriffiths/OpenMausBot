@@ -19,7 +19,7 @@ import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
 import { CloudPlanRow, CloudPlanFootnote, useCloudPlan } from "./ProIntroduction";
 import { CloudUsageDetails, CloudUsageSummaryView, useCloudUsageSettings } from "./CloudUsageMeter";
-import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "./SettingsPrimitives";
+import { SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { UsageSection } from "./UsageSection";
 import { PlanUsageSummary } from "./PlanUsage";
 import { SkinPicker } from "./SkinPicker";
@@ -28,7 +28,7 @@ import { ProfileSummaryRow } from "./ProfileSettings";
 import { ImportSettings } from "./ImportSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
-import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, SendKeyRow, ShowThreadsRow, SidebarDensityRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
+import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, SendKeyRow, ShowThreadsRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
 import { SkillsSection } from "./SkillsSection";
 import { WorkspacesSection } from "./WorkspacesSection";
 import { WorkspaceBackupSettings } from "./WorkspaceBackupSettings";
@@ -118,7 +118,6 @@ export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onL
       {has("appearance") && (
         <SettingsDisclosureRow title={t("settings.simple.group.sidebar")} subtitle={t("settings.simple.sidebar.subtitle")} block="sidebar" {...disclose("general-sidebar")}>
           <SettingsRows>
-            <SidebarDensityRow />
             <SidebarToolsLayoutRow />
             <ShowThreadsRow />
             <PinnedCirclesRow />

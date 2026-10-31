@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { ChevronDown, ImagePlus, Loader2, Trash2 } from "lucide-react";
+import {ChevronDown, Trash2} from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -7,20 +7,16 @@ import type { LocaleKey } from "@/locales";
 import { colorSwatch, MAUS_COLOR_LABEL, MAUS_COLOR_NAMES, PICKABLE_STATES, type MausState } from "@/lib/mascot";
 import type { Bot } from "@/state/store";
 import { MASCOT_BODIES, MASCOT_BODY_IDS } from "../../../shared/mascot-bodies";
-import { HALLOWEEN_BODIES, HALLOWEEN_BODY_IDS } from "../../../shared/halloween-bodies";
-import { isHalloweenBody, type BotBodyId } from "../../../shared/bot-body";
-import { useHalloweenDressed, wornBody } from "@/lib/halloween-dress";
+import type { BotBodyId } from "../../../shared/bot-body";
 import { MausAvatar } from "../Avatar";
-import { AvatarImageGenerator } from "../AvatarImageGenerator";
-import { AvatarFraming, OrganizationAvatarIcons, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "../avatar-editing";
+import { AvatarFraming, RESET_MASCOT_PATCH, useAvatarImage, type AvatarPatch } from "../avatar-editing";
 import { Segmented } from "./rows";
 
-export type AvatarEditorTab = "bot" | "generate" | "upload";
+export type AvatarEditorTab = "bot" | "picture";
 
 const TABS: ReadonlyArray<readonly [AvatarEditorTab, LocaleKey]> = [
   ["bot", "botPanel.avatar.tabBot"],
-  ["generate", "botPanel.avatar.tabGenerate"],
-  ["upload", "botPanel.avatar.tabUpload"],
+  ["picture", "botPanel.avatar.tabUpload"],
 ];
 
 const IMAGE_CROPS = ["circle", "rounded", "square"] as const;
@@ -55,9 +51,9 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
   onClose: () => void;
 }) {
   const image = useAvatarImage(bot, onPatch);
-  const { fileRef, crop, uploading, generating, setSavingConnection, busy, error, upload, removeImage, generate } = image;
+  const { crop, busy, error, removeImage } = image;
   const showsImage = crop !== "mascot" && Boolean(bot.avatarUrl);
-  const [tab, setTab] = useState<AvatarEditorTab>(showsImage ? "upload" : "bot");
+  const [tab, setTab] = useState<AvatarEditorTab>(showsImage ? "picture" : "bot");
   const tabsRef = useRef<HTMLDivElement>(null);
   // The card is a dialog: focus moves into it, onto the tab it opened on, so Escape and Tab work from the start.
   useEffect(() => {
@@ -65,10 +61,7 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
   }, []);
   const pickMascot = (patch: AvatarPatch) => onPatch(crop === "mascot" ? patch : { ...patch, avatarCrop: "mascot" });
   const body = bot.mascotBody ?? "cursor";
-  const dressed = useHalloweenDressed();
-  const costume = wornBody(bot.mascotBody, bot.color, dressed);
-  const [moreLooks, setMoreLooks] = useState(() => dressed || isHalloweenBody(body) || Boolean(bot.mascotExpression && bot.mascotExpression !== "idle"));
-  const dressedAs = costume !== body && isHalloweenBody(costume) ? HALLOWEEN_BODIES[costume].name : null;
+  const [moreLooks, setMoreLooks] = useState(() => Boolean(bot.mascotExpression && bot.mascotExpression !== "idle"));
   const bodyButton = (id: BotBodyId, name: string) => (
     <button
       key={id}
@@ -166,13 +159,6 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
             </button>
             {moreLooks && (
               <div data-avatar-more-looks>
-                <div className="flex flex-wrap items-baseline gap-x-2 px-1 pb-1.5 pt-2 text-[12px] text-ink-tertiary">
-                  <span>{t("botPanel.avatar.halloween")}</span>
-                  {dressedAs && <span data-avatar-costume>{t("botPanel.avatar.costume", { name: dressedAs })}</span>}
-                </div>
-                <div className="grid grid-cols-5 gap-1.5" data-halloween-bodies>
-                  {HALLOWEEN_BODY_IDS.map((id) => bodyButton(id, HALLOWEEN_BODIES[id].name))}
-                </div>
                 <div className="flex flex-wrap items-center justify-center gap-1.5 pt-2.5" role="group" aria-label={t("botPanel.avatar.face")}>
                   <span className="mr-0.5 text-[12px] text-ink-tertiary">{t("botPanel.avatar.face")}</span>
                   {PICKABLE_STATES.map((expression) => (
@@ -197,45 +183,9 @@ export function AvatarEditorCard({ bot, activeState, onPatch, onClose }: {
           </>
         )}
 
-        {tab === "generate" && (
-          <div className="[&>div:first-child]:mt-0 [&>div:first-child]:border-0 [&>div:first-child]:pt-0">
-            <AvatarImageGenerator
-              botLabel={bot.title || bot.name}
-              disabled={uploading}
-              generating={generating}
-              onGenerate={generate}
-              onSavingChange={setSavingConnection}
-            />
-          </div>
-        )}
-
-        {tab === "upload" && (
+        {tab === "picture" && (
           <>
-            <OrganizationAvatarIcons busy={busy} onUpload={(file) => void upload(file)} />
             {showsImage && <AvatarFraming bot={bot} disabled={busy} onPatch={onPatch} />}
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/png,image/jpeg,image/gif,image/webp"
-              className="sr-only"
-              onChange={(event) => void upload(event.target.files?.[0])}
-            />
-            <button
-              type="button"
-              data-avatar-drop
-              disabled={busy}
-              onClick={() => fileRef.current?.click()}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => {
-                event.preventDefault();
-                void upload(event.dataTransfer.files?.[0]);
-              }}
-              className="flex w-full flex-col items-center gap-1.5 rounded-xl border-[1.5px] border-dashed border-ink/15 px-3 py-6 text-center text-[13px] text-ink-secondary hover:border-ink/25 hover:text-ink disabled:opacity-50"
-            >
-              {uploading ? <Loader2 size={22} className="animate-spin" /> : <ImagePlus size={22} />}
-              <span>{t("botPanel.avatar.drop")}</span>
-              <span className="text-[12px] text-ink-tertiary">{t("botPanel.avatar.types")}</span>
-            </button>
             <div className="mt-2.5 flex items-center gap-2.5">
               <span className="shrink-0 text-[12px] text-ink-secondary">{t("botPanel.avatar.shape")}</span>
               <Segmented

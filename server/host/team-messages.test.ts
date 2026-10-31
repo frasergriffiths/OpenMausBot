@@ -96,7 +96,7 @@ describe("message_person", () => {
 
   it("uses the person's own MausBot when they crowned no Chief", () => {
     const f = fixture({ noChiefFor: [MARCO.email] });
-    f.bots.push({ id: "marcos-mausbot", name: "MausBot", color: "silver", threadId: "mm-main", defaultBot: { person: MARCO.email }, tasks: [{ threadId: "mm-main", title: "MausBot" }] });
+    f.bots.push({ id: "marcos-mausbot", name: "MausBot", color: "green", threadId: "mm-main", defaultBot: { person: MARCO.email }, tasks: [{ threadId: "mm-main", title: "MausBot" }] });
     f.team.pass("scout", "philipp-private", "Marco", "Ping");
     expect(f.inboxOf(MARCO).bot.id).toBe("marcos-mausbot");
   });
@@ -177,7 +177,7 @@ describe("Marco's assistant", () => {
 
   it("answers a free/busy question itself, says so where it was asked and in his inbox, and notifies him once", async () => {
     const { f, generate, busy } = assistant('{"answer": "Marco is busy on Thursday 14:00–15:00 and free after."}');
-    f.bots.push({ id: "marcos-mausbot", name: "MausBot", color: "silver", threadId: "mm-main", defaultBot: { person: MARCO.email }, visibility: { people: [MARCO.email] }, tasks: [{ threadId: "mm-main", title: "MausBot" }] });
+    f.bots.push({ id: "marcos-mausbot", name: "MausBot", color: "green", threadId: "mm-main", defaultBot: { person: MARCO.email }, visibility: { people: [MARCO.email] }, tasks: [{ threadId: "mm-main", title: "MausBot" }] });
     f.said("philipp-private", "Ask Marco if he's free Thursday at 2. My bonus is private.", PHILIPP);
     f.team.pass("scout", "philipp-private", "Marco", "Are you free on Thursday at 2pm?");
     await vi.waitFor(() => expect(f.notified).toHaveLength(1));

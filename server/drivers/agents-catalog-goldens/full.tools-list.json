@@ -886,7 +886,6 @@
               "opencodeGoApiKey",
               "ttsKey",
               "fishAudioKey",
-              "openaiImageApiKey",
               "onePasswordToken"
             ],
             "description": "The credential the current task requires."

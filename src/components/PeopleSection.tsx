@@ -10,7 +10,7 @@ import { readMembership, type Membership } from "../lib/membership";
 import { readSessionState, type SessionState } from "../lib/session";
 import { canPairDevices } from "./ServerPairingCard";
 import { normalizeAccessEntry, withEntry, withoutEntry, type SignInLists } from "./SignInAccessCard";
-import { Card, SettingRow } from "./SettingsPrimitives";
+import { SettingsCard, SettingRow } from "@/components/ui";
 import { Select } from "./Select";
 
 export type Role = "admin" | "member";
@@ -155,7 +155,7 @@ export function CopyLink({ link }: { link: string }) {
 export function PortalPeople({ peopleUrl, people }: { peopleUrl: string | null; people: Person[] }) {
   const noop = () => {};
   return (
-    <Card title={t("people.title")} subtitle={t("people.portal.subtitle")}>
+    <SettingsCard title={t("people.title")} subtitle={t("people.portal.subtitle")}>
       <div data-people-portal className="flex flex-col gap-3 text-[13px] leading-relaxed text-ink-secondary">
         <p>{t("people.portal.managed")}</p>
         {peopleUrl && (
@@ -173,7 +173,7 @@ export function PortalPeople({ peopleUrl, people }: { peopleUrl: string | null; 
         <PeopleTable people={people} busy={false} readOnly onRole={noop} onRemove={noop} onLink={noop} />
       </div>
       <p className="mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("people.portal.note")}</p>
-    </Card>
+    </SettingsCard>
   );
 }
 
@@ -306,5 +306,5 @@ export function PeopleSection({ simple = false, startOpen = false }: { simple?: 
       </div>
     );
   }
-  return portal ?? <Card title={t("people.title")} subtitle={t("people.subtitle")}>{content}</Card>;
+  return portal ?? <SettingsCard title={t("people.title")} subtitle={t("people.subtitle")}>{content}</SettingsCard>;
 }

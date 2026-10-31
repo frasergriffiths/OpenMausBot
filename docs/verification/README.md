@@ -217,9 +217,6 @@ Active Threads popover's width and inset at each expanded sidebar density in a
 headless Electron window, including the compact-density case where the menu
 used to cross the window's left edge and lose its title.
 
-The [avatar provider fixture](avatar-providers.md) checks image-provider settings,
-keyless local generation, saved-key handling, and safe errors with a local fake API.
-
 The [independent threads fixture](threads.md) checks nested sidebar navigation,
 per-thread models, simultaneous direct conversations and thread-scoped Stop.
 

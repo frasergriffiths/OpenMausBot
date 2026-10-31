@@ -87,7 +87,7 @@ export function MeetScreen({ hosted, onNext }: { hosted: boolean; onNext: () => 
         ) : maus ? (
           <BotAvatar bot={maus} size={MASCOT_SIZE} state={face} animated={!reduced} />
         ) : (
-          <MausAvatar color="chrome" size={MASCOT_SIZE} state={face} animated={!reduced} label={DEFAULT_BOT_NAME} />
+          <MausAvatar color="green" size={MASCOT_SIZE} state={face} animated={!reduced} label={DEFAULT_BOT_NAME} />
         )}
       </span>
       <DemoComposer reduced={reduced} onTyping={setTyping} />

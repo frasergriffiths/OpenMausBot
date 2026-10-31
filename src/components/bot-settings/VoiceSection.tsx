@@ -1,7 +1,7 @@
 import { requestNotificationPermission } from "@/lib/notify";
 import { t } from "@/lib/i18n";
 import type { Bot } from "@/state/store";
-import { Switch } from "../SettingsPrimitives";
+import { Switch } from "@/components/ui";
 import { VoiceSettings } from "../VoiceSettings";
 import type { useBotSettingsDerived } from "./useBotSettingsDerived";
 import { useBotEditor } from "./BotEditorContext";
