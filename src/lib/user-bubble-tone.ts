@@ -192,8 +192,23 @@ export function userBubbleTone(color: MausColor): UserBubbleTone {
   return h >= YELLOW_HUES.from && h <= YELLOW_HUES.to ? darkInkTone(palette) : whiteInkTone(palette);
 }
 
-export function mentionChipBackground(mention: string, inset: string): string {
-  return mixSrgb(mention, inset, MENTION_CHIP_MIX);
+export function mentionChipBackground(mention: string, inset: string, ink = INK): string {
+  const base = mixSrgb(mention, inset, MENTION_CHIP_MIX);
+  if (contrastRatio(ink, base) >= BUBBLE_TEXT_MIN) return base;
+  // A bright mention colour can lift the chip until the bubble's own ink stops reading.
+  // Walk back toward the inset, which the ink already clears, until it does.
+  let lo = 0;
+  let hi = 1;
+  let best = inset;
+  for (let step = 0; step < 22; step += 1) {
+    const mid = (lo + hi) / 2;
+    const candidate = mixSrgb(base, inset, mid);
+    if (contrastRatio(ink, candidate) >= BUBBLE_TEXT_MIN) {
+      best = candidate;
+      hi = mid;
+    } else lo = mid;
+  }
+  return contrastRatio(ink, best) >= BUBBLE_TEXT_MIN ? best : inset;
 }
 
 export function selectionBackground(background: string): string {

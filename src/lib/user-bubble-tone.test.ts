@@ -91,7 +91,7 @@ describe("user bubble tone", () => {
       expect(contrastRatio(tone.selectionInk, tone.selection), "selection").toBeGreaterThanOrEqual(BUBBLE_TEXT_MIN);
       if (tone.ink === "#ffffff") expect(tone.selection).toBe(selectionBackground(tone.background));
       for (const mention of MAUS_COLOR_NAMES) {
-        const chip = mentionChipBackground(MAUS_COLORS[mention], tone.inset);
+        const chip = mentionChipBackground(MAUS_COLORS[mention], tone.inset, tone.ink);
         expect(contrastRatio(tone.ink, chip), `mention ${mention}`).toBeGreaterThanOrEqual(BUBBLE_TEXT_MIN);
       }
     },
