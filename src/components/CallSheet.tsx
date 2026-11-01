@@ -117,7 +117,7 @@ export function CallSheet({ message, transcript, botName, threadId, busy, partia
       >
         <header className="flex items-start justify-between gap-4 border-b border-hairline/40 px-5 pb-3.5 pt-4">
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-text">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.08em] text-accent-text">
               <AudioLines size={13} aria-hidden="true" />
               <span>{t("chat.callSheet.kicker")}</span>
             </div>

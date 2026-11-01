@@ -74,7 +74,7 @@ export function BotProfileAvatarCard({
         )}
         <div className="mt-1.5 text-[12px] text-ink-secondary">{t("botIdentity.imageTypes")}</div>
 
-        <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
+        <div className="mb-2 mt-4 text-[12px] font-medium tracking-[0.08em] text-ink-secondary">
           {t("botIdentity.shape")}
         </div>
         <div className="grid grid-cols-4 overflow-hidden rounded-lg border border-hairline/40">
@@ -98,7 +98,7 @@ export function BotProfileAvatarCard({
 
         {crop === "mascot" && (
           <>
-            <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
+            <div className="mb-2 mt-4 text-[12px] font-medium tracking-[0.08em] text-ink-secondary">
               {t("botIdentity.expression")}
             </div>
             <div className="grid grid-cols-5 gap-2">
@@ -121,7 +121,7 @@ export function BotProfileAvatarCard({
               ))}
             </div>
 
-            <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
+            <div className="mb-2 mt-4 text-[12px] font-medium tracking-[0.08em] text-ink-secondary">
               {t("botIdentity.color")}
             </div>
             <div className="flex flex-wrap gap-2.5">
@@ -143,7 +143,7 @@ export function BotProfileAvatarCard({
               ))}
             </div>
 
-            <div className="mb-2 mt-4 text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
+            <div className="mb-2 mt-4 text-[12px] font-medium tracking-[0.08em] text-ink-secondary">
               {t("botIdentity.body")}
             </div>
             <div className="grid grid-cols-5 gap-1.5">
