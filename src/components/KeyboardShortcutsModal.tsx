@@ -48,8 +48,8 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
       onClose={onClose}
       size="lg"
       title={
-        <span className="flex items-center gap-2">
-          <Keyboard size={16} aria-hidden="true" className="text-ink-secondary" />
+        <span className="flex flex-col items-start gap-1.5">
+          <Keyboard size={18} aria-hidden="true" className="text-ink-secondary" />
           Keyboard shortcuts
         </span>
       }
