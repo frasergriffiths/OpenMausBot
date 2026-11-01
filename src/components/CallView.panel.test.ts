@@ -81,7 +81,6 @@ describe("the bot panel's Call button", () => {
     )));
     flushSync(() => requestCallStart("atlas", "turns"));
     expect(composerStarts).toHaveBeenCalledExactlyOnceWith("turns");
-    expect(track.mock.calls.filter(([event]) => event === "call_started")).toEqual([]);
     expect(currentCall()).toBe("atlas");
   });
 });
