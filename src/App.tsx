@@ -22,7 +22,6 @@ import {
   preloadScreens, RemoteAgentSettingsPanel, RoomPanel, SettingsModal,
 } from "@/components/lazy-screens";
 import { useRoomPanelShown } from "@/lib/room-panel";
-import { WorkspaceBackupRecovery } from "@/components/WorkspaceBackupSettings";
 import { NotificationRail, NotificationsPanel } from "@/components/NotificationsPanel";
 import { RoutineRunsPage } from "@/components/RoutineRunsPage";
 import { useNotificationFeed } from "@/lib/notification-preferences";
@@ -368,5 +367,5 @@ function Application() {
 }
 
 export default function App() {
-  return <WorkspaceBackupRecovery><Application /></WorkspaceBackupRecovery>;
+  return <Application />;
 }
