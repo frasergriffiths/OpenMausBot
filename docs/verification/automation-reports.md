@@ -99,10 +99,6 @@ consecutive minutes (13:59 to 14:03 IST): runs 1, 3 and 5 found nothing and
 left nothing, runs 2 and 4 reported, and run 4's question was answered in the
 chat 1.8 seconds after it appeared:
 
-![Run 2's report in Pepper's chat](evidence/automation-reports/report-in-chat.png)
 
-![Run 4's question, copied into the chat and answerable there](evidence/automation-reports/question-in-chat.png)
 
-![After five runs: two reports and the answered question; the quiet runs left nothing](evidence/automation-reports/after-five-runs.png)
 
-![See run: the run's own conversation, with Back to results](evidence/automation-reports/see-run.png)

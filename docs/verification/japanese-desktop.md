@@ -56,11 +56,8 @@ image selected Noto Sans CJK JP. Actual PNGs were reviewed: page text, tab title
 XFCE window title and top-panel task title all show Japanese on both newly
 created patched desktops.
 
-![Before: missing glyphs in page and desktop chrome](evidence/japanese-desktop/before.png)
 
-![After: Japanese text on all four surfaces](evidence/japanese-desktop/after.png)
 
-![Another fresh desktop: Japanese rendering remains correct](evidence/japanese-desktop/recreated.png)
 
 - Managed image build with `--format docker`: passed, including both checksums.
 - Container tests: 45 passed; server TypeScript and targeted lint: passed.

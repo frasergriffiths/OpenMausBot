@@ -89,8 +89,5 @@ fake provider CLIs; it does not claim another native Cline execution.
 
 | Before: Cline absent from the engine catalog | After: Cline setup and configured default |
 | --- | --- |
-| ![Original engine settings](assets/cline/before.png) | ![Cline in engine settings](assets/cline/after.png) |
 
-![Cline settings in a narrow viewport](assets/cline/after-mobile.png)
 
-![Configured Cline model in the real chat picker with fake provider CLIs](assets/cline/after-picker.png)

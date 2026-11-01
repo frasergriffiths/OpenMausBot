@@ -79,7 +79,6 @@ PDF), then `attach_file`. The file exists under the VM home, the thread holds on
 message-scoped route returns the complete file (`%PDF-1.4` … `%%EOF`, 5,844 bytes,
 `attachment; filename="nekoneko_kessan.pdf"`). Nothing was staged.
 
-![The request, the attached PDF and the bot's summary](kessan-in-chat.jpg)
 
 ## Eight file types
 
@@ -88,7 +87,6 @@ and gif from `ffmpeg` test sources, a 3 second 440 Hz mp3, an mp4, and pdf, xlsx
 pptx fixtures. The bot was told the names and asked to attach them. **The bot's part is
 real**: GLM-5.3 called `attach_file` for each and the server copied each out of the VM.
 
-![The eight attachments](eight-attachments.jpg)
 
 | Check | Result |
 | --- | --- |
@@ -97,7 +95,6 @@ real**: GLM-5.3 called `attach_file` for each and the server copied each out of 
 | Video (click load) | loaded as a blob, controls shown, duration 3 s |
 | Browser console | no errors in any capture |
 
-![Video and audio after clicking](audio-video-playing.jpg)
 
 ## The same request in English and in Japanese (final build)
 
@@ -114,13 +111,9 @@ route and checked.
 
 English, PDF then PNG:
 
-![English: the PDF](real-en-1-pdf.jpg)
-![English: the PNG](real-en-2-png.jpg)
 
 Japanese, PDF then PNG:
 
-![Japanese: the PDF](real-ja-1-pdf.jpg)
-![Japanese: the PNG](real-ja-2-png.jpg)
 
 What happened that is not a clean pass:
 
@@ -150,10 +143,8 @@ The server hands it out as `audio/mpeg`, so the failure happens in the browser's
 | After the fix | back | yes (a second click loads it again and shows the same message) |
 
 Before:
-![No play button after a decode error](audio-error-before-fix.jpg)
 
 After:
-![The play button is back](audio-error-retry.jpg)
 
 ## Found only by running it for real
 

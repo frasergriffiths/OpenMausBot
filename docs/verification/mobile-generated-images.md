@@ -91,6 +91,4 @@ performed. The preview protocol and fleet selection are compiled only in DEBUG.
 
 | Before | After |
 | --- | --- |
-| ![Original iOS renderer omits the attached image](assets/mobile-generated-images/before.png) | ![iOS now displays the generated image](assets/mobile-generated-images/after.png) |
 
-![Full-screen preview of the synthetic image](assets/mobile-generated-images/preview.png)

@@ -98,9 +98,7 @@ keyboard, Enter on a focused **Add reaction** opens the row, Arrow keys move,
 Enter chooses and focus returns to the button. The console has no `error`
 entries.
 
-![The reaction row open over a bot's question](evidence/reactions/open.png)
 
-![The question with a 👍 under it and the bot's reply after it](evidence/reactions/answered.png)
 
 The components themselves:
 
