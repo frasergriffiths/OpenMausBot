@@ -14,7 +14,7 @@ export function SimpleRailFooter({ owner = null, archived }: {
   const place = useSimplePlace();
   const account = useSimpleAccount(place, owner, archived);
   return (
-    <div data-sidebar-rail-footer="" className="relative flex flex-col items-center gap-2 px-2 pb-3 pt-2">
+    <div data-sidebar-rail-footer="" className="relative flex flex-col items-start gap-2 px-3 pb-3 pt-2">
       <SidebarAppsButton />
       <UpdateIndicator />
       <SidebarProfileMenu iconOnly rail simple={account} />
