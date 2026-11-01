@@ -1,6 +1,6 @@
 export { Button, IconButton, buttonStyles, type ButtonShape, type ButtonSize, type ButtonVariant } from "./button";
 export { Checkbox } from "./checkbox";
-export { Field, Input, Select, Textarea } from "./field";
+export { Field, Input, Textarea } from "./field";
 export { Dialog } from "./dialog";
 export { ConfirmDialog } from "./confirm-dialog";
 export { Tabs, type TabItem } from "./tabs";

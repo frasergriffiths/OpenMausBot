@@ -1,4 +1,4 @@
-import { Select } from "@/components/ui";
+import { Select } from "@/components/Select";
 import { t } from "@/lib/i18n";
 
 /**
