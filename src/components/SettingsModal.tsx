@@ -4,7 +4,6 @@ import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
 import { t } from "@/lib/i18n";
-import { SettingsCard } from "@/components/ui";
 import { AnthropicEveryClaudeBot, ApiKeyRow, OpenCodeProviderKeys, VpsConnection } from "./ApiKeys";
 import { LmStudioServer, OtherOpenAiCompatServers } from "./OpenAiCompatServers";
 import { Notice } from "./Notice";
@@ -236,13 +235,11 @@ export function SettingsModal() {
         return <DecisionModelSettings />;
       case "connections":
         return (
-          <SettingsCard title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
+          <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4">
               {state.config?.composio.mode === "managed" ? (
                 <Notice tone="ready">{t("settings.connections.ready")}</Notice>
               ) : null}
-              <div className="text-[12px] font-medium tracking-wide text-ink-secondary">{t("keys.providers.title")}</div>
-              <p className="-mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("keys.providers.subtitle")}</p>
               <ApiKeyRow section="openai" testProvider="openai" />
               <ApiKeyRow section="anthropic" testProvider="anthropic" />
               <AnthropicEveryClaudeBot />
@@ -273,7 +270,7 @@ export function SettingsModal() {
                 </div>
               </details>
             </div>
-          </SettingsCard>
+          </div>
         );
       default:
         return null;
