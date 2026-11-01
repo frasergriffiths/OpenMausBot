@@ -620,7 +620,7 @@ export function MemoryFileRows({
 }) {
   return (
     <div>
-      <div className="text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{title}</div>
+      <div className="text-[12px] font-medium tracking-[0.08em] text-ink-secondary">{title}</div>
       <div className="mt-0.5 text-[12px] text-ink-secondary">{hint}</div>
       {files.length === 0 ? (
         <div className="mt-2 text-[13px] text-ink-secondary">{t("memory.noneYet")}</div>

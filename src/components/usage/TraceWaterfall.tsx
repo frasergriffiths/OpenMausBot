@@ -36,7 +36,7 @@ export function StatStrip({ items }: { items: Array<{ label: string; value: stri
           className={cn("min-w-0 px-4 py-3.5 sm:px-5", index % 3 !== 0 && "border-l border-hairline/40", index >= 3 && "border-t border-hairline/40 sm:border-t-0", index === 3 && "sm:border-l")}
           title={item.hint}
         >
-          <dt className="truncate text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{item.label}</dt>
+          <dt className="truncate text-[11px] font-medium tracking-[0.08em] text-ink-secondary">{item.label}</dt>
           <dd className={cn("mt-1 truncate text-[20px] font-medium tabular-nums sm:text-[22px]", item.tone === "danger" ? "text-danger" : "text-ink")}>{item.value}</dd>
         </div>
       ))}
@@ -130,7 +130,7 @@ function barClass(row: TraceRow): string {
 function Badge({ kind }: { kind: "slowest" | "costliest" }) {
   return (
     <span className={cn(
-      "ml-2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.06em]",
+      "ml-2 rounded-md px-1.5 py-0.5 text-[11px] font-semibold tracking-[0.06em]",
       kind === "slowest" ? "bg-warning/15 text-warning" : "bg-accent/12 text-accent",
     )}>{t(kind === "slowest" ? "trace.slowest" : "trace.costliest")}</span>
   );
@@ -221,7 +221,7 @@ export function TraceWaterfall({ detail, now, actions }: { detail: TraceDetail; 
       <StatStrip items={totalsStats(root, t("trace.stat.duration"))} />
       <div role="tree" aria-label={t("trace.spans")} className="border-t border-hairline/40">
         <div className="grid grid-cols-1 border-b border-hairline/40 sm:grid-cols-[minmax(220px,38%)_1fr]">
-          <div className="hidden px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary sm:block">{t("trace.span")}</div>
+          <div className="hidden px-5 py-2.5 text-[11px] font-medium tracking-[0.08em] text-ink-secondary sm:block">{t("trace.span")}</div>
           <div ref={track} className="relative mx-4 h-9 sm:ml-0 sm:mr-6 sm:border-l sm:border-hairline/40">
             {axis.ticks.map((tick, index) => (
               <span
