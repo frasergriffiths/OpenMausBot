@@ -5,7 +5,8 @@ import { Check, Pin, Plus, Trash2 } from "lucide-react";
 import { api } from "@/state/store";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
-import { Button, Callout, Dialog, Select, Spinner } from "@/components/ui";
+import { Button, Callout, Dialog, Input, Spinner } from "@/components/ui";
+import { Select } from "./Select";
 import { DepartmentPicker } from "./team/DepartmentPicker";
 import type { DepartmentsPicker } from "./team/SectionContextDialog";
 import { Chevron } from "./chevron";
@@ -147,7 +148,7 @@ export function TeamMemoryDialog({ section, label, onClose, picker }: { section:
 
           {proposed.length > 0 && (
             <section className="mb-5 rounded-xl border border-accent/30 bg-accent/5 p-3">
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-accent">{t("teamMemory.waiting")}</h3>
+              <h3 className="text-[11px] font-semibold tracking-[0.08em] text-accent">{t("teamMemory.waiting")}</h3>
               <ul className="mt-2 space-y-2">
                 {proposed.map((entry) => (
                   <li key={entry.id} className="flex items-start gap-3 text-[13px]">
@@ -189,7 +190,7 @@ export function TeamMemoryDialog({ section, label, onClose, picker }: { section:
             if (rows.length === 0) return null;
             return (
               <section key={kind} className="mb-5">
-                <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary" title={t(hintKey)}>
+                <h3 className="text-[11px] font-semibold tracking-[0.08em] text-ink-secondary" title={t(hintKey)}>
                   {t(titleKey)}
                 </h3>
                 <ul className="mt-2 divide-y divide-hairline/20 rounded-xl bg-inset">
@@ -244,15 +245,15 @@ export function TeamMemoryDialog({ section, label, onClose, picker }: { section:
                     </option>
                   ))}
                 </Select>
-                <input
+                <Input
                   value={draft.name}
                   onChange={(event) => setDraft({ ...draft, name: event.target.value })}
                   placeholder={t("teamMemory.namePlaceholder")}
                   aria-label={t("teamMemory.nameLabel")}
-                  className="min-w-[140px] flex-1 rounded-lg border border-hairline/40 bg-inset px-2 py-1 text-[13px] text-ink outline-none focus:border-accent"
+                  className="min-w-[140px] flex-1"
                 />
               </div>
-              <input
+              <Input
                 value={draft.detail}
                 onChange={(event) => setDraft({ ...draft, detail: event.target.value })}
                 onKeyDown={(event) => {
@@ -260,7 +261,7 @@ export function TeamMemoryDialog({ section, label, onClose, picker }: { section:
                 }}
                 placeholder={t("teamMemory.detailPlaceholder")}
                 aria-label={t("teamMemory.detailLabel")}
-                className="mt-2 w-full rounded-lg border border-hairline/40 bg-inset px-2 py-1 text-[13px] text-ink outline-none focus:border-accent"
+                className="mt-2 w-full"
               />
               <div className="mt-2 flex items-center gap-2">
                 <button

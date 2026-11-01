@@ -1,7 +1,7 @@
 import type { LocaleKey } from "@/locales";
 import type { BotSettingsSection } from "@/state/store";
 
-export const PANEL_TABS = ["profile", "library", "computer"] as const;
+export const PANEL_TABS = ["computer", "profile", "library"] as const;
 export type PanelTab = (typeof PANEL_TABS)[number];
 
 export const TAB_LABEL: Record<PanelTab, LocaleKey> = {

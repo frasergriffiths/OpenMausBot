@@ -71,6 +71,11 @@ export function SimpleAccountPage({ has }: { has: Has }) {
         </SettingsGroup>
       )}
       {has("general") && (
+        <SettingsGroup label={t("notifications.title")} block="notifications">
+          <SettingsRows><NotificationRows simple /></SettingsRows>
+        </SettingsGroup>
+      )}
+      {has("general") && (
         <SettingsGroup label={t("settings.simple.group.limits")} block="limits">
           <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4"><RoomTurnTimeoutSettings /></div>
           <AutomaticRecoverySettings />
@@ -93,11 +98,6 @@ export function SimpleAppearancePage({ has }: { has: Has }) {
             <LanguageRow simple />
             <SendKeyRow simple />
           </SettingsRows>
-        </SettingsGroup>
-      )}
-      {has("appearance") && (
-        <SettingsGroup label={t("notifications.title")}>
-          <SettingsRows><NotificationRows simple /></SettingsRows>
         </SettingsGroup>
       )}
     </>
@@ -154,22 +154,47 @@ function CardBlock({ children }: { children: ReactNode }) {
   return <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4">{children}</div>;
 }
 
-export function SimpleKeysPage({ has, connections }: { has: Has; connections: ReactNode }) {
-  if (!has("connections")) return null;
-  return <div data-settings-block="connections" className="scroll-mt-4">{connections}</div>;
+export function SimpleBrowserPage({ has }: { has: Has }) {
+  return (
+    <div className="flex flex-col gap-7">
+      {has("browser") && (
+        <SettingsGroup label={t("settings.experimental.browser")} block="browser">
+          <div data-settings-block="browser" className="scroll-mt-4">
+            <SettingsRows><BuiltInBrowserRow /></SettingsRows>
+            <BrowserProfilesRow />
+          </div>
+        </SettingsGroup>
+      )}
+      {has("logins") && (
+        <SettingsGroup label={t("settings.section.logins")} block="logins">
+          <div data-settings-block="logins" className="scroll-mt-4"><LoginsSettings /></div>
+        </SettingsGroup>
+      )}
+    </div>
+  );
+}
+
+export function SimpleKeysPage({ has, connections, decisionModel }: { has: Has; connections: ReactNode; decisionModel?: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-7">
+      {has("connections") && (
+        <SettingsGroup label={t("settings.keys.providers")} block="connections">
+          <div data-settings-block="connections" className="scroll-mt-4">{connections}</div>
+        </SettingsGroup>
+      )}
+      {has("decisionModel") && (
+        <SettingsGroup label={t("settings.keys.decisionModel")} block="decisionModel">
+          <div data-settings-block="decisionModel" className="scroll-mt-4">{decisionModel}</div>
+        </SettingsGroup>
+      )}
+    </div>
+  );
 }
 
 export function SimpleComputerPage({ has, servers, installs, disclose }: { has: Has; servers: ReactNode; installs?: ReactNode; disclose: Disclose }) {
   return (
     <>
       {has("computer") && <SettingsGroup label={t("settings.simple.computer.bots")} block="computer"><LocalComputerSection /></SettingsGroup>}
-      {has("computer") && (
-        <SettingsGroup label={t("settings.experimental.browser")} block="browser">
-          <SettingsRows><BuiltInBrowserRow /></SettingsRows>
-          <BrowserProfilesRow />
-        </SettingsGroup>
-      )}
-      {has("logins") && <div data-settings-block="logins" className="scroll-mt-4"><LoginsSettings /></div>}
       {(has("desktopWorkspaces") || installs) && (
         <SettingsDisclosureRow title={t("settings.simple.computer.elsewhere")} block="elsewhere" {...disclose("computer-elsewhere")}>
           {has("desktopWorkspaces") && <div data-settings-block="desktopWorkspaces" className="flex scroll-mt-4 flex-col gap-4">{servers}</div>}

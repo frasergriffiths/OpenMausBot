@@ -103,7 +103,7 @@ export function DecisionModelSettings() {
   const sharedKey = openrouter && decider?.sharedKey === true;
   const ownKey = configured && !included && !usingShared;
   const enabled = decider?.enabled ?? false;
-  const roomRouting = decider?.jobs.roomRouting ?? true;
+  const roomRouting = decider?.jobs?.roomRouting ?? true;
   const [value, setValue] = useState("");
   const [saving, setSaving] = useState(false);
   const [switching, setSwitching] = useState(false);
@@ -359,7 +359,7 @@ export function DecisionModelSettings() {
           {COMING_SOON.map((label) => (
             <li key={label} data-testid="decider-coming-soon" aria-disabled="true" className="flex items-center justify-between gap-4 border-t border-hairline/40 py-2 opacity-50">
               <span className="text-[13px] text-ink-secondary">{t(label)}</span>
-              <span className="rounded bg-control px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-secondary">
+              <span className="rounded bg-control px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-ink-secondary">
                 {t("decider.jobs.comingSoon")}
               </span>
             </li>

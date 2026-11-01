@@ -161,10 +161,10 @@ export function PricesCard() {
       <div className="mb-3 flex items-center gap-2 text-[12px] text-ink-secondary">
         <label className="flex items-center gap-2">
           {t("usage.prices.currency")}
-          <input value={currency} onChange={(e) => setCurrency(e.target.value)} maxLength={3} aria-label={t("usage.prices.currency")} disabled={saving} className="w-16 rounded-lg border border-hairline/40 bg-inset px-2 py-1.5 text-[13px] uppercase text-ink focus:outline-none disabled:opacity-50" />
+          <input value={currency} onChange={(e) => setCurrency(e.target.value)} maxLength={3} aria-label={t("usage.prices.currency")} disabled={saving} className="w-16 rounded-lg border border-hairline/40 bg-inset px-2 py-1.5 text-[13px] text-ink focus:outline-none disabled:opacity-50" />
         </label>
       </div>
-      <div className="grid grid-cols-[1fr_5rem_5rem_5rem_auto] items-center gap-x-2 gap-y-1.5 text-[12px] font-medium uppercase tracking-wide text-ink-secondary">
+      <div className="grid grid-cols-[1fr_5rem_5rem_5rem_auto] items-center gap-x-2 gap-y-1.5 text-[12px] font-medium tracking-wide text-ink-secondary">
         <span>{t("usage.prices.colModel")}</span>
         <span>{t("usage.prices.colInput")}</span>
         <span>{t("usage.prices.colOutput")}</span>

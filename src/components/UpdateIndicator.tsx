@@ -195,7 +195,7 @@ export function UpdateCard({
 
         {highlights.length > 0 && (
           <div className="mt-5">
-            <h3 className="text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-secondary">{t("update.card.whatsNew")}</h3>
+            <h3 className="text-[12px] font-semibold tracking-[0.06em] text-ink-secondary">{t("update.card.whatsNew")}</h3>
             <ul className="mt-2 space-y-2">
               {highlights.map((line) => (
                 <li key={line} className="flex gap-2.5 text-[14px] leading-5 text-ink">

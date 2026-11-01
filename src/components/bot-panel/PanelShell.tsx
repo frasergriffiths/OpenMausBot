@@ -20,13 +20,13 @@ import { roundButtonCls } from "./rows";
 
 /** The top-level tab is remembered per device: switching bots remounts the panel, but should land on the same tab's
  * root. A new named open still wins. */
-let lastPanelTab: PanelTab = "profile";
+let lastPanelTab: PanelTab = "computer";
 let lastLinkNonce: number | null = null;
 let lastBotId: string | null = null;
 
 /** Test seam: the tab is device memory in the app; tests start each case as a fresh device. */
 export function resetPanelTabMemory(): void {
-  lastPanelTab = "profile";
+  lastPanelTab = "computer";
   lastLinkNonce = null;
   lastBotId = null;
 }

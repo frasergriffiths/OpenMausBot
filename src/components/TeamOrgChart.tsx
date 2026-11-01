@@ -78,12 +78,12 @@ function Column({ column, team, over, onOver, onDrop, onDragStart }: {
         </span>
       </header>
       {person && (column.chief
-        ? <div className="flex flex-col gap-1"><span className="text-[11px] font-medium uppercase tracking-[0.08em] text-ink-tertiary">{t("orgChart.chief")}</span>
+        ? <div className="flex flex-col gap-1"><span className="text-[11px] font-medium tracking-[0.08em] text-ink-tertiary">{t("orgChart.chief")}</span>
             <BotRow bot={column.chief} team={team} onDragStart={onDragStart} /></div>
         : <span className="text-[12px] text-ink-tertiary">{t("orgChart.noChief")}</span>)}
       {column.departments.map((department) => (
         <div key={department.key} data-org-department={department.key} className="flex flex-col gap-1">
-          <span className="truncate text-[11px] font-medium uppercase tracking-[0.08em] text-ink-tertiary">{department.key || t("teamSettings.general")}</span>
+          <span className="truncate text-[11px] font-medium tracking-[0.08em] text-ink-tertiary">{department.key || t("teamSettings.general")}</span>
           {department.bots.map((bot) => <BotRow key={bot.id} bot={bot} team={team} onDragStart={onDragStart} />)}
         </div>
       ))}

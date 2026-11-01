@@ -14,7 +14,7 @@ const TUNNEL_LABELS: Record<SmsTunnelOption["id"], string> = {
   ngrok: "ngrok",
 };
 
-const GROUP = "text-[12px] font-medium uppercase tracking-wide text-ink-secondary";
+const GROUP = "text-[12px] font-medium tracking-wide text-ink-secondary";
 const ROW = "flex items-center justify-between gap-4 text-[13px]";
 
 /** Settings → Experimental → SMS: one Twilio account, one sending number, one phone and one bot. */

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, Sparkles, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen, MessageSquareText } from "lucide-react";
+import { CloudDownload, Coins, Globe, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, Sparkles, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen, MessageSquareText } from "lucide-react";
 import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
@@ -14,7 +14,8 @@ import { shortcutLabel } from "./ShortcutHint";
 import { LicenseExpiryBanner } from "./LicenseExpiryBanner";
 import { WorkspacesSection, workspacesAvailable } from "./WorkspacesSection";
 import { Select } from "./Select";
-import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleComputerPage, SimpleImportPage, SimpleKeysPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
+import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleComputerPage, SimpleImportPage, SimpleKeysPage, SimpleBrowserPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
+import { DecisionModelSettings } from "./DecisionModelSettings";
 import { cn } from "@/lib/cn";
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { Chevron } from "./chevron";
@@ -43,11 +44,12 @@ export const SECTIONS: Array<{
   { id: "appearance", group: "you", labelKey: "settings.section.appearance", icon: Palette, keywords: ["skin", "theme", "appearance", "chat width", "width", "wide", "full width", "bubble", "bubbles", "tools", "tool calls", "threads", "show threads", "hide threads", "sidebar", "density", "compact", "avatars", "display", "run", "this run", "run card", "commands", "notifications", "sound", "sounds", "mute", "silent", "chime", "pinned", "circles", "universal", "groups", "top", "send", "enter", "return", "shift+enter", "ctrl+enter", "cmd+enter", "⌘+enter", "new line", "keyboard", "ime", "japanese", "message color", "my messages", "toolbar", "tools layout", "footer", "team map"] },
   { id: "engines", group: "ai", labelKey: "settings.section.engines", icon: Terminal, keywords: ["models", "model providers", "engines", "claude", "codex", "grok", "providers", "cli", "sign in", "subscription"] },
   { id: "connections", group: "keys", labelKey: "settings.section.connections", icon: KeyRound, keywords: ["keys", "api", "api key", "api keys", "connections", "connectors", "composio", "provider keys", "box", "xai", "mistral", "cerebras", "meta", "muse", "vps", "router", "openrouter", "base url", "openai", "anthropic", "groq", "opencode", "deepseek", "provider", "lm studio", "lmstudio", "llm studio", "llmstudio", "bionic"] },
-  { id: "sms", group: "keys", labelKey: "settings.section.sms", icon: MessageSquareText, keywords: ["sms", "text", "texts", "twilio", "phone", "messaging", "messages"] },
+  { id: "sms", group: "ai", labelKey: "settings.section.sms", icon: MessageSquareText, keywords: ["sms", "text", "texts", "twilio", "phone", "messaging", "messages"] },
   { id: "decisionModel", group: "ai", labelKey: "settings.section.decisionModel", icon: Zap, keywords: ["decision", "extraction", "jev", "typesafe", "cloudflare", "workers ai", "clef", "clairic", "email", "routing", "auto", "rooms", "who answers"] },
   { id: "skills", group: "ai", labelKey: "settings.section.skills", icon: BookOpen, keywords: ["skills", "library", "assign", "agent skills", "skill md"] },
   { id: "desktopWorkspaces", group: "computers", labelKey: "settings.section.desktopWorkspaces", icon: Building2, keywords: ["workspace", "cloud", "hosted", "vps", "server", "servers", "connect", "pair", "switch", "local"] },
   { id: "computer", group: "computers", labelKey: "settings.section.computer", icon: Monitor, keywords: ["vm", "virtual", "desktop", "browser", "built-in browser", "profiles", "browser profiles"] },
+  { id: "browser", group: "computers", labelKey: "settings.section.browser", icon: Globe, keywords: ["browser", "chrome", "built-in browser", "browser profiles", "downloads", "driver"] },
   { id: "logins", group: "computers", labelKey: "settings.section.logins", icon: LockKeyhole, keywords: ["logins", "login", "passwords", "password", "sign in", "2fa", "one-time code", "totp", "fill_login", "1password", "vault"] },
   { id: "usage", group: "account", labelKey: "settings.section.usage", icon: Coins, keywords: ["tokens", "cost", "billing", "plan", "quota", "remaining", "weekly", "5-hour", "model", "used"] },
   { id: "import", group: "account", labelKey: "settings.section.import", icon: Download, keywords: ["import", "grok", "grok bot", "x.ai", "bring", "transfer"] },
@@ -65,13 +67,15 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
     keywords: ["theme", "looks", "sidebar", "density", "notifications", "font", "chat width", "language", "send key"] },
   { id: "import", labelKey: "settings.section.import", descriptionKey: "settings.simple.page.import.description", icon: Download, sections: ["import"],
     keywords: ["import", "grok", "grok bot", "x.ai", "bring", "transfer"] },
-  { id: "ai", labelKey: "settings.group.ai", descriptionKey: "settings.simple.page.ai.description", icon: Sparkles, sections: ["engines", "decisionModel"],
+  { id: "ai", labelKey: "settings.group.ai", descriptionKey: "settings.simple.page.ai.description", icon: Sparkles, sections: ["engines"],
     keywords: ["effort", "new bots", "decision", "keep warm", "engines", "model"] },
   { id: "skills", labelKey: "settings.section.experimental", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental", "sms"],
-    keywords: ["skills", "experimental", "early", "preview", "learn", "sms", "text", "texts", "twilio", "phone", "messaging"] },
-  { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
-    keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },
-  { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["desktopWorkspaces", "computer", "logins", "workspaces"] },
+    keywords: ["skills", "experimental", "early", "preview", "learn"] },
+  { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections", "decisionModel"],
+    keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys", "sms", "text", "texts", "twilio", "phone", "messaging"] },
+  { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["desktopWorkspaces", "computer", "workspaces"] },
+  { id: "browser", labelKey: "settings.section.browser", descriptionKey: "settings.simple.page.browser.description", icon: Globe, sections: ["browser", "logins"],
+    keywords: ["browser", "chrome", "profiles", "downloads", "driver"] },
   { id: "updates", labelKey: "settings.simple.page.updates", descriptionKey: "settings.simple.page.updates.description", icon: CloudDownload, sections: ["updates"],
     keywords: ["update", "version", "release", "product updates", "newsletter", "email updates", "welcome", "tour", "diagnostics", "logs", "support"] },
 ];
@@ -222,13 +226,14 @@ export function SettingsModal() {
   const openSection = (id: AppSettingsSection) => dispatch({ type: "toggleAppSettings", open: true, section: id });
 
 
-
   const renderSection = (id: AppSettingsSection) => {
     switch (id) {
       case "desktopWorkspaces":
         return <ConnectedWorkspacesSettings />;
       case "sms":
         return <SmsSettings />;
+      case "decisionModel":
+        return <DecisionModelSettings />;
       case "connections":
         return (
           <SettingsCard title={t("settings.connections.title")} subtitle={t("settings.connections.subtitle")}>
@@ -236,7 +241,7 @@ export function SettingsModal() {
               {state.config?.composio.mode === "managed" ? (
                 <Notice tone="ready">{t("settings.connections.ready")}</Notice>
               ) : null}
-              <div className="text-[12px] font-medium uppercase tracking-wide text-ink-secondary">{t("keys.providers.title")}</div>
+              <div className="text-[12px] font-medium tracking-wide text-ink-secondary">{t("keys.providers.title")}</div>
               <p className="-mt-3 text-[12px] leading-relaxed text-ink-secondary">{t("keys.providers.subtitle")}</p>
               <ApiKeyRow section="openai" testProvider="openai" />
               <ApiKeyRow section="anthropic" testProvider="anthropic" />
@@ -250,7 +255,7 @@ export function SettingsModal() {
               <ApiKeyRow section="deepseek" />
               <LmStudioServer />
               <OtherOpenAiCompatServers />
-              <div className="pt-2 text-[12px] font-medium uppercase tracking-wide text-ink-secondary">{t("keys.integrations.title")}</div>
+              <div className="pt-2 text-[12px] font-medium tracking-wide text-ink-secondary">{t("keys.integrations.title")}</div>
               <ApiKeyRow section="treg" testProvider="treg" /><ApiKeyRow section="box" />
               <VpsConnection />
               <ApiKeyRow section="opencodeGo" />
@@ -283,8 +288,9 @@ export function SettingsModal() {
       case "import": return <SimpleImportPage has={has} />;
       case "ai": return <SimpleAiPage has={has} disclose={disclose} />;
       case "skills": return <SimpleSkillsPage has={has} sms={renderSection("sms")} />;
-      case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} />;
+      case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} decisionModel={renderSection("decisionModel")} />;
       case "computer": return <SimpleComputerPage has={has} servers={renderSection("desktopWorkspaces")} installs={workspacesAvailable(state.config) ? <WorkspacesSection /> : undefined} disclose={disclose} />;
+      case "browser": return <SimpleBrowserPage has={has} />;
       case "updates": return <SimpleUpdatesPage remoteActive={remoteActive} />;
       default:
         return page.sections.map((id) => <section key={id} data-settings-block={id} className="flex scroll-mt-4 flex-col gap-4">{renderSection(id)}</section>);

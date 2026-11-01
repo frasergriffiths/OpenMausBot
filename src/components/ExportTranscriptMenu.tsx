@@ -117,7 +117,7 @@ export function ExportTranscriptMenu({
           aria-label="Export options"
           className={cn("absolute right-0 top-full z-40 mt-1 w-[220px] max-h-[calc(100dvh-16px)] overflow-y-auto overscroll-contain", SIMPLE_MENU, motion.className)} {...motion.exitProps}
         >
-          <div className="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-ink-tertiary">
+          <div className="px-3 py-1 text-[11px] font-semibold tracking-wider text-ink-tertiary">
             Export Conversation
           </div>
 

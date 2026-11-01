@@ -75,7 +75,7 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
           <div className="flex max-h-[52vh] flex-col gap-4 overflow-y-auto pe-1">
             {groups.map((group) => (
               <section key={group.category} className="flex flex-col gap-1">
-                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-ink-tertiary">{group.category}</h3>
+                <h3 className="text-[11px] font-semibold tracking-wider text-ink-tertiary">{group.category}</h3>
                 <div className="flex flex-col divide-y divide-hairline/20 rounded-xl bg-ink/[0.03] px-3 py-1">
                   {group.items.map((item) => (
                     <ShortcutRow key={item.id} item={item} isMac={isMac} />

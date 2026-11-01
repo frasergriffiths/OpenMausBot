@@ -101,7 +101,7 @@ export function OwnerPicker({ target, onClose }: { target: OwnerPickerTarget | n
   return createPortal(
     <div data-owner-picker role="menu" aria-label={shown.title} style={{ top, left }}
       className={cn("popover-surface fixed z-50 w-[248px] overflow-hidden rounded-xl border border-hairline/50 bg-menu py-2 shadow-2xl shadow-black/60", motion.className)} {...motion.exitProps}>
-      <div className="px-3.5 pb-1 text-[10px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{shown.title}</div>
+      <div className="px-3.5 pb-1 text-[10px] font-medium tracking-[0.08em] text-ink-secondary">{shown.title}</div>
       <div className="flex max-h-[260px] flex-col gap-0.5 overflow-y-auto px-1.5 py-1">
         {team.people.map((person) => (
           <button key={person.email} type="button" role="menuitemradio" aria-checked={person.email === shown.current} disabled={busy}

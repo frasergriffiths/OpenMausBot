@@ -260,7 +260,7 @@ export function PlanUsage() {
                   ))}
                   {(provider.models ?? []).length > 0 && (
                     <div className="mt-1 flex flex-col gap-2">
-                      <div className="text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{t("planUsage.byModel")}</div>
+                      <div className="text-[11px] font-medium tracking-[0.08em] text-ink-secondary">{t("planUsage.byModel")}</div>
                       {(provider.models ?? []).map((model) => (
                         <div key={model.name} className="flex flex-col gap-1">
                           <div className="truncate text-[13px] font-medium text-ink">{model.name}</div>

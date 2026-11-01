@@ -473,7 +473,7 @@ export function EnginesSettings({ simple = false, more }: { simple?: boolean; mo
       </div>
       {company.some((provider) => provider.configured) && (
         <div data-company-models className="mx-4 flex flex-col gap-2 rounded-xl border border-hairline/40 bg-card p-3">
-          <div className="text-[12px] font-medium uppercase tracking-wide text-ink-secondary">{t("settings.companyModels.title")}</div>
+          <div className="text-[12px] font-medium tracking-wide text-ink-secondary">{t("settings.companyModels.title")}</div>
           <CompanyModels providers={company} />
         </div>
       )}

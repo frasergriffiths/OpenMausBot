@@ -77,7 +77,7 @@ export function BotInstructionsDialog({ bot, onClose, inline = false }: { bot: B
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-accent-text">
                 <BookOpen size={15} />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.08em]">{t("botIdentity.dialog.title")}</span>
+                <span className="text-[11px] font-semibold tracking-[0.08em]">{t("botIdentity.dialog.title")}</span>
               </div>
               <h2 id="bot-instructions-title" className="mt-0.5 truncate text-[20px] font-semibold tracking-[-0.01em] text-ink">
                 {bot.name}

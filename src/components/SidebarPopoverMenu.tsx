@@ -107,7 +107,7 @@ export function MenuRows({
       {items.map((item) => (
         <div key={item.key} className={look === "compact" ? "flex flex-col gap-1" : undefined}>
           {item.separatorBefore && <div role="separator" className={look === "compact" ? SIMPLE_MENU_SEPARATOR : cn("h-px bg-hairline/50", look === "roomy" ? "mx-3 my-1.5" : "my-1.5")} />}
-          {item.heading && <div className={look === "compact" ? "px-2 pb-1 pt-2 text-[12px] font-medium leading-4 text-ink-secondary" : "px-3 pb-0.5 pt-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-secondary"}>{item.heading}</div>}
+          {item.heading && <div className={look === "compact" ? "px-2 pb-1 pt-2 text-[12px] font-medium leading-4 text-ink-secondary" : "px-3 pb-0.5 pt-1.5 text-[10px] font-semibold tracking-[0.08em] text-ink-secondary"}>{item.heading}</div>}
           <button
             type="button"
             role="menuitem"
