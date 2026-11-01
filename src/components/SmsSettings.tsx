@@ -4,9 +4,15 @@ import { Check, Copy, Send } from "lucide-react";
 import { Button, Callout, Checkbox, Field, Input, SettingsCard, StatePill } from "@/components/ui";
 import { Select } from "@/components/Select";
 import { t } from "@/lib/i18n";
-import { clearSmsWebhook, connectSms, designateSmsBot, disconnectSms, linkSmsNumber, readSms, saveSmsWebhook, sendFirstSms } from "@/lib/sms";
+import { clearSmsWebhook, connectSms, designateSmsBot, disconnectSms, linkSmsNumber, readSms, readSmsTunnels, saveSmsWebhook, sendFirstSms, type SmsTunnelOption } from "@/lib/sms";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { maskSid, type SmsStatus } from "../../shared/twilio";
+
+const TUNNEL_LABELS: Record<SmsTunnelOption["id"], string> = {
+  cloudflare: "Cloudflare Tunnel",
+  tailscale: "Tailscale Funnel",
+  ngrok: "ngrok",
+};
 
 const GROUP = "text-[12px] font-medium uppercase tracking-wide text-ink-secondary";
 const ROW = "flex items-center justify-between gap-4 text-[13px]";
@@ -28,6 +34,7 @@ export function SmsSettings() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [tunnels, setTunnels] = useState<{ port: number; options: SmsTunnelOption[] } | null>(null);
 
   const apply = (next: SmsStatus) => { setStatus(next); setWebhook(next.webhookUrl ?? ""); };
 
@@ -38,6 +45,7 @@ export function SmsSettings() {
       setBots(answer.bots);
       setBotId((current) => current || answer.sms.botId || answer.bots[0]?.id || "");
       setError(null);
+      setTunnels(await readSmsTunnels().catch(() => null));
     } catch (cause) {
       setError(cause instanceof Error && cause.message ? cause.message : t("settings.sms.loadError"));
     }
@@ -142,6 +150,25 @@ export function SmsSettings() {
           <Field label={t("settings.sms.webhookAddress")} hint={t("settings.sms.webhookAddressHint")} htmlFor="sms-webhook-address">
             <Input id="sms-webhook-address" value={webhook} onChange={(event) => setWebhook(event.target.value)} placeholder="https://bots.example.com" spellCheck={false} />
           </Field>
+          <details className="rounded-xl bg-inset p-3">
+            <summary className="cursor-pointer text-[13px] font-medium text-ink">{t("settings.sms.tunnelTitle")}</summary>
+            <p className="mt-1 text-[12px] leading-relaxed text-ink-secondary">{t("settings.sms.tunnelHint", { port: tunnels?.port ?? 0 })}</p>
+            {tunnels ? <ul className="mt-2 flex flex-col gap-2">
+              {tunnels.options.map((option) => (
+                <li key={option.id} className="rounded-lg bg-card p-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[13px] font-medium text-ink">{TUNNEL_LABELS[option.id]}</span>
+                    <StatePill tone={option.installed ? "success" : "neutral"}>{option.installed ? t("settings.sms.tunnelInstalled") : t("settings.sms.tunnelMissing")}</StatePill>
+                    <a href={option.docs} target="_blank" rel="noreferrer" className="ml-auto text-[12px] text-ink-secondary underline">{t("settings.sms.tunnelDocs")}</a>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <code className="min-w-0 flex-1 truncate font-mono text-[12px] text-ink-secondary">{option.command}</code>
+                    <Button size="xs" variant="ghost" aria-label={t("settings.sms.tunnelCopy")} onClick={() => void navigator.clipboard?.writeText(option.command)}><Copy size={13} /></Button>
+                  </div>
+                </li>
+              ))}
+            </ul> : null}
+          </details>
           <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" variant="primary" loading={busy} disabled={busy || !webhook.trim()}
               onClick={() => void run(async () => { apply(await saveSmsWebhook({ url: webhook.trim() })); setNotice(t("settings.sms.webhookSaved")); })}>

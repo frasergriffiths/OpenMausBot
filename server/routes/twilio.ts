@@ -4,12 +4,15 @@
 import { ownerOrAdmin } from "../request-auth.ts";
 import { describeTwilioError } from "../twilio/client.ts";
 import type { SmsService } from "../twilio/service.ts";
+import { detectTunnels } from "../twilio/tunnels.ts";
 import { PASS, type RouteHandler } from "./table.ts";
 
 export interface TwilioRouteDeps {
   sms: SmsService;
   /** The bots a person may point SMS at, by name. */
   bots: () => ReadonlyArray<{ id: string; name: string }>;
+  /** The port Twilio actually posts to, for tunnel commands. */
+  webhookPort: number;
 }
 
 const text = (value: unknown): string => (typeof value === "string" ? value : "");
@@ -31,7 +34,7 @@ function failure(error: unknown): { status: number; error: string } {
   };
 }
 
-export function createTwilioRoutes({ sms, bots }: TwilioRouteDeps): RouteHandler {
+export function createTwilioRoutes({ sms, bots, webhookPort }: TwilioRouteDeps): RouteHandler {
   return async ({ req, res, path, method, auth, json, readBody }) => {
     if (path !== "/api/twilio" && !path.startsWith("/api/twilio/")) return PASS;
     // Twilio's callback never reaches this module: it lands on the webhook
@@ -40,6 +43,10 @@ export function createTwilioRoutes({ sms, bots }: TwilioRouteDeps): RouteHandler
 
     if (path === "/api/twilio" && method === "GET") {
       return json(res, 200, { sms: sms.status(), bots: bots() });
+    }
+
+    if (path === "/api/twilio/tunnels" && method === "GET") {
+      return json(res, 200, { port: webhookPort, options: await detectTunnels(webhookPort) });
     }
 
     if (path === "/api/twilio/connect" && method === "POST") {

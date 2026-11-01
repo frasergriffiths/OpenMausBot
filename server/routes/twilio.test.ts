@@ -42,7 +42,7 @@ async function serve(who: keyof typeof AUTH = "owner"): Promise<{ base: string; 
       setSmsWebhook: async () => ({ updated: true }),
     }),
   });
-  const routes = [createTwilioRoutes({ sms, bots: () => [{ id: "bot-1", name: "MausBot" }] })];
+  const routes = [createTwilioRoutes({ sms, webhookPort: 8800, bots: () => [{ id: "bot-1", name: "MausBot" }] })];
   const server = createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://localhost");
     try {

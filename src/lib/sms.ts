@@ -1,6 +1,18 @@
 import type { SmsStatus } from "../../shared/twilio";
 import { api } from "@/state/store";
 
+export interface SmsTunnelOption {
+  id: "cloudflare" | "tailscale" | "ngrok";
+  command: string;
+  installed: boolean;
+  docs: string;
+}
+
+/** The tunnel clients this computer could use to give Twilio a public address. */
+export async function readSmsTunnels(): Promise<{ port: number; options: SmsTunnelOption[] }> {
+  return await api<{ port: number; options: SmsTunnelOption[] }>("/api/twilio/tunnels");
+}
+
 /** Settings → SMS: one integration, one linked phone, one bot that answers. */
 export async function readSms(): Promise<{ sms: SmsStatus; bots: Array<{ id: string; name: string }> }> {
   return await api<{ sms: SmsStatus; bots: Array<{ id: string; name: string }> }>("/api/twilio");
