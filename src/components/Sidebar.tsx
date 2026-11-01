@@ -93,7 +93,7 @@ import { showWhoReportsToWhom, TeamContextMenu, TeamMenuItems, type TeamMenuAnch
 import { departmentOwner, useTeamPeople } from "@/state/team-people";
 export { TeamMenuItems };
 import { SidebarResizeHandle, useSidebarWidth } from "./SidebarResizeHandle";
-import { PHONE_TOP_BUTTON, SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_ROW_FOCUS, SIMPLE_TOP_BUTTON, SidebarEdgeToggle, SidebarSearchPill } from "./SidebarSimpleTop";
+import { PHONE_TOP_BUTTON, SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_ROW_FOCUS, SIMPLE_TOP_BUTTON, SidebarEdgeToggle } from "./SidebarSimpleTop";
 import { isSidebarToggle } from "@/lib/keyboard-shortcuts";
 import { SidebarRailSeparator, SimpleRailFooter } from "./SidebarSimpleRail";
 import { useShowThreads } from "@/lib/thread-preferences";
@@ -1000,7 +1000,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const sidePanelOpen = state.computerOpen;
   const sizing = useSidebarWidth({ sidePanelOpen, sidebarRef });
   /** Simple mode keeps the field on screen; the toggle and the close button are gone. */
-  const clearSearch = () => setQuery("");
   const [lastExpandedDensity, setLastExpandedDensity] = useState<Exclude<SidebarDensity, "icons">>(
     () => density === "icons" ? "expanded" : density,
   );
@@ -1373,19 +1372,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
 
       {density === "icons" && !rail && <DesktopWorkspaceSwitcher compact cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "computer" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />}
       <OrganizationIdentity compact={density === "icons"} />
-      {phone ? null : simple ? <SidebarSearchPill query={query} onQuery={setQuery} onClear={clearSearch} /> : <div className={cn("pt-1 pb-3", density === "icons" ? "hidden" : "px-3")}>
-        <div className="flex h-8 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1 focus-within:ring-1 focus-within:ring-accent">
-          <Search size={14} className="text-ink-secondary" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Escape" && setQuery("")}
-            placeholder={t("sidebar.search")}
-            aria-label={t("sidebar.searchAria")}
-            className="w-full bg-transparent text-[14px] text-ink placeholder:text-ink-secondary focus:outline-none"
-          />
-        </div>
-      </div>}
       {universalPins && pinnedBots.length > 0 && !simpleDesk && (
         <div
           data-sidebar-universal-pins=""
