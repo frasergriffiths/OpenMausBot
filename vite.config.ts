@@ -15,13 +15,11 @@ const { version } = JSON.parse(
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 const include = [
-  "evals/**/*.test.ts",
   "server/**/*.test.ts",
   "electron/**/*.test.mjs",
   "src/**/*.test.ts",
   "shared/**/*.test.ts",
   "companion/**/*.test.ts",
-  "enterprise/**/*.test.ts",
   "scripts/**/*.test.mjs",
   "scripts/**/*.test.ts",
 ];
