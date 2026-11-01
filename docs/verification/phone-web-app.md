@@ -54,7 +54,6 @@ phone screenshot.
 
 | Before: no explicit phone safe areas | After: controls inside the usable area |
 | --- | --- |
-| ![Original phone layout](assets/phone-web-app/before-390.png) | ![Phone layout with safe-area padding](assets/phone-web-app/after-390.png) |
 
 ## iOS simulator qualification
 
@@ -77,9 +76,6 @@ The keyboard check caught Safari's automatic zoom of the original 15px editor.
 The touch editor and its mention mirror now use 16px; user zoom is still enabled.
 A production-renderer regression test failed at 15px and passed after this fix.
 
-![Safari Home Screen installation](assets/phone-web-app/installed-ios.png)
-![Standalone chat after keyboard dismissal](assets/phone-web-app/chat-ios.png)
-![Standalone landscape chat](assets/phone-web-app/landscape-ios.png)
 
 This was a simulator, not a physical iPhone. Physical iPhone and Android
 installation, remote HTTPS pairing/revocation and interrupted-network recovery

@@ -4,7 +4,6 @@ The same two synthetic utterances in the isolated browser fixture:
 
 | Before: the first sentence is lost | After: both sentences and the stop control remain |
 | --- | --- |
-| ![Original composer](../screenshots/dictation/before.png) | ![Fixed composer](../screenshots/dictation/after.png) |
 
 Run the regression tests with synthetic Japanese text:
 

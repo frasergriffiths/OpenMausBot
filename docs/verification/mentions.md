@@ -192,5 +192,5 @@ roster; historical names no longer in that roster stay plain text.
 
 | Skin | Before | After |
 | --- | --- | --- |
-| Midnight | ![Before: plain mentions](evidence/mentions/before-dark.png) | ![After: highlighted mentions](evidence/mentions/after-dark.png) |
-| Atelier | ![Before: plain mentions](evidence/mentions/before-light.png) | ![After: highlighted mentions](evidence/mentions/after-light.png) |
+| Midnight | Before: plain mentions | After: highlighted mentions |
+| Atelier | Before: plain mentions | After: highlighted mentions |

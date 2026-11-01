@@ -8,29 +8,11 @@
 
 <sub>OpenMausBot is an open-source Grok Bot alternative: an independent project inspired by **Grok Bot**, and the open-source alternative to **Meta Muse**, **OpenAI dots** and **Cue by Manus** — bring-your-own-agent, local-first, on the models you already have. Also known as **MausBot**; formerly **OpenGrokBot**. Not affiliated with xAI, Meta, OpenAI or Manus.</sub>
 
-## Screenshots
-
-<p align="center">
-  <img src="docs/assets/screenshots/settings-account-dark.png" alt="Settings: Account, dark mode" width="49%">
-  <img src="docs/assets/screenshots/settings-api-keys-dark.png" alt="Settings: API keys, dark mode" width="49%">
-</p>
-
-<p align="center">
-  <img src="docs/assets/screenshots/settings-browser-dark.png" alt="Settings: Browser, dark mode" width="72%">
-</p>
-
-More in [docs/screenshots.md](docs/screenshots.md).
-
 Every bot in the sidebar is a real agent — Claude or Codex running locally under the hood — with its own
 personality, its own model, its own cloud computer, and its own connected apps.
 Talk to them like contacts. Watch them work. Approve what matters.
 
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
-![Electron](https://img.shields.io/badge/Electron-macOS%20%C2%B7%20Windows%20%C2%B7%20Ubuntu-2B2E3A?logo=electron&logoColor=9FEAF9)
-![Agents](https://img.shields.io/badge/agents-Claude%20·%20Codex-d97757)
-[![Release](https://img.shields.io/github/v/release/milind-soni/OpenMausBot?label=release&color=1084fe&cacheSeconds=300)](https://github.com/milind-soni/OpenMausBot/releases/latest)
-![PRs](https://img.shields.io/badge/PRs-welcome-38d591)
+[](https://github.com/milind-soni/OpenMausBot/releases/latest)
 
 <br>
 
@@ -251,19 +233,6 @@ expressions · screenshots of the bot's work folded into the transcript.
 
 <div align="center">
 
-![Claude](https://img.shields.io/badge/Claude-d97757?logo=claude&logoColor=white)
-![Codex](https://img.shields.io/badge/Codex-000000)
-![Grok](https://img.shields.io/badge/Grok%20CLI-000000?logo=x&logoColor=white)
-![Electron](https://img.shields.io/badge/Electron-2B2E3A?logo=electron&logoColor=9FEAF9)
-![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-0F172A?logo=tailwindcss&logoColor=38BDF8)
-![Composio](https://img.shields.io/badge/Composio-e6493a)
-![Boat](https://img.shields.io/badge/Boat-sponsor-111111)
-![Cua](https://img.shields.io/badge/Cua%20Driver-1f2937)
-![ElevenLabs](https://img.shields.io/badge/ElevenLabs-000000?logo=elevenlabs&logoColor=white)
-![Fish Audio](https://img.shields.io/badge/Fish%20Audio-2563eb)
-![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-ea4aaa)
 
 </div>
 

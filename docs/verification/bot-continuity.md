@@ -94,11 +94,8 @@ the Electron shell, and it is not a production qualification. The Electron
 picker smoke's assertions were updated for these rules but were not run for
 this change.
 
-![Pepper's signed-out Claude in the picker](evidence/model-picker-signed-out/signed-out.png)
 
-![Opening local models re-probes local servers](evidence/model-picker-signed-out/looking-for-local-models.png)
 
-![Pepper's Claude with a missing CLI keeps its install card](evidence/model-picker-signed-out/missing-cli.png)
 
 ## Live Claude smoke — 2026-09-12
 

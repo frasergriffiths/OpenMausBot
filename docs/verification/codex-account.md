@@ -23,11 +23,9 @@ request being required. Reload and confirm it remains signed out.
 
 Before retry (the synthetic failure leaves the account intact):
 
-![Recoverable sign-out error](evidence/codex-account/retry.png)
 
 After successful retry:
 
-![Ready to connect another account](evidence/codex-account/signed-out.png)
 
 ## Checks
 

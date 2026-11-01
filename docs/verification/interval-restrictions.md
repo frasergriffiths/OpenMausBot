@@ -25,11 +25,9 @@ date. Save, reopen, and confirm that the restrictions are retained.
 
 Before (main-equivalent renderer):
 
-![Original interval editor](evidence/interval-restrictions/before.png)
 
 After:
 
-![Day, hour, and end-date restrictions](evidence/interval-restrictions/after.png)
 
 Restrictions follow the scheduler computer's local timezone, matching existing
 daily schedules. Time windows must end on the same day; overnight windows are

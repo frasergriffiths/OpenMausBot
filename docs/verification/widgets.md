@@ -68,6 +68,4 @@ What it looks like when the recipe passes: the list in Midnight
 (`evidence/widgets/form-midnight.png`), and the settled form's Details in
 Meadow (`evidence/widgets/settled-details-meadow.png`).
 
-![A pull-request list widget with two buttons under it](evidence/widgets/list-midnight.png)
 
-![The settled routine form, opened read-only with the values that were sent](evidence/widgets/settled-details-meadow.png)
