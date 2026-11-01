@@ -3,6 +3,7 @@ import { Check, Copy, Send } from "lucide-react";
 
 import { Button, Callout, Checkbox, Field, Input, SettingsCard, StatePill } from "@/components/ui";
 import { Select } from "@/components/Select";
+import { copyText } from "@/lib/copy-text";
 import { t } from "@/lib/i18n";
 import { clearSmsWebhook, connectSms, designateSmsBot, disconnectSms, linkSmsNumber, readSms, readSmsTunnels, saveSmsWebhook, sendFirstSms, type SmsTunnelOption } from "@/lib/sms";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
@@ -141,7 +142,7 @@ export function SmsSettings() {
             <div className="flex items-center gap-2">
               <Input id="sms-webhook" readOnly value={status.webhookUrl} onFocus={(event) => event.currentTarget.select()} className="font-mono text-[12px]" />
               <Button size="sm" variant="ghost" aria-label={t("settings.sms.copy")}
-                onClick={() => void navigator.clipboard?.writeText(status.webhookUrl ?? "").then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1500); })}>
+                onClick={() => void copyText(status.webhookUrl ?? "").then(() => { setCopied(true); window.setTimeout(() => setCopied(false), 1500); })}>
                 {copied ? <Check size={14} /> : <Copy size={14} />}
               </Button>
             </div>
@@ -163,7 +164,7 @@ export function SmsSettings() {
                   </div>
                   <div className="mt-1.5 flex items-center gap-2">
                     <code className="min-w-0 flex-1 truncate font-mono text-[12px] text-ink-secondary">{option.command}</code>
-                    <Button size="xs" variant="ghost" aria-label={t("settings.sms.tunnelCopy")} onClick={() => void navigator.clipboard?.writeText(option.command)}><Copy size={13} /></Button>
+                    <Button size="xs" variant="ghost" aria-label={t("settings.sms.tunnelCopy")} onClick={() => void copyText(option.command)}><Copy size={13} /></Button>
                   </div>
                 </li>
               ))}

@@ -19,7 +19,7 @@ vi.mock("@/state/store", async (importOriginal) => {
     useStore: () => ({
       state: {
         ...original.initialState,
-        appSettingsSection: "computer",
+        appSettingsSection: "browser",
         config: { box: { configured: false }, ...fixture.config },
         instances: [{
           instanceId: "fixture", driverKind: "claudeAgent", displayName: "Fixture",
