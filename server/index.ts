@@ -631,7 +631,7 @@ import { createDevsReports } from "./host/devs-reports.ts"; import { bugReportEn
 import { createCardRequester, linePersonKey } from "./host/thread-person.ts";
 import { createThreadRoutes } from "./routes/threads.ts";
 import { createWebhookRoutes } from "./routes/webhooks.ts";
-import { createTwilioRoutes } from "./routes/twilio.ts"; import { SmsService } from "./twilio/service.ts"; import { createSmsWebhook, SMS_WEBHOOK_PATH } from "./twilio/webhook.ts";
+import { createTwilioRoutes } from "./routes/twilio.ts"; import { SmsService } from "./twilio/service.ts"; import { createSmsWebhook, SMS_WEBHOOK_PATH } from "./twilio/webhook.ts"; import { readWebhookBaseUrl } from "./twilio/webhook-url.ts";
 import { withScopeHint } from "./connector-scope-hint.ts";
 import { connectorRequestItems } from "./connector-request-items.ts";
 import { personAsks as personAskAt } from "./thread-presence.ts";
@@ -9724,9 +9724,14 @@ const sms = new SmsService({
     }
     return null;
   },
-  webhook: () => (WEBHOOK_PUBLIC_URL
-    ? { url: WEBHOOK_PUBLIC_URL.replace(new RegExp("/+$"), "") + SMS_WEBHOOK_PATH, error: null }
-    : { url: null, error: webhookIngressError ?? "OMB_WEBHOOK_PUBLIC_URL is not set, so Twilio cannot reach this server" }),
+  webhook: () => {
+    const saved = readWebhookBaseUrl(DATA_DIR);
+    const base = saved ?? WEBHOOK_PUBLIC_URL ?? null;
+    const source = saved ? "saved" : WEBHOOK_PUBLIC_URL ? "environment" : "none";
+    return base
+      ? { url: base.replace(new RegExp("/+$"), "") + SMS_WEBHOOK_PATH, error: webhookIngressError, source }
+      : { url: null, error: webhookIngressError ?? "No public address is set for this server", source };
+  },
   log: (line) => console.log(line),
 });
 
@@ -9736,7 +9741,7 @@ try {
   webhookIngress = await listenWebhookIngress(webhooks, {
     port: WEBHOOK_PORT, publicBaseUrl: WEBHOOK_PUBLIC_URL,
     claimRequest: () => { moveFreeze.assertTurns(); return workspaceMaintenance.request(); },
-    extra: createSmsWebhook({ sms, publicBaseUrl: () => WEBHOOK_PUBLIC_URL ?? null }),
+    extra: createSmsWebhook({ sms, publicBaseUrl: () => readWebhookBaseUrl(DATA_DIR) ?? WEBHOOK_PUBLIC_URL ?? null }),
   });
   const advertised = WEBHOOK_PUBLIC_URL ? ` (advertised as ${webhookIngress.baseUrl})` : "";
   console.log(`openmausbot webhook receiver on http://${webhookIngress.host}:${webhookIngress.port}${advertised}`);
@@ -9751,7 +9756,7 @@ const webhookIngressStatus = () => ({
   ...(webhookIngressError ? { error: webhookIngressError } : {}),
 });
 ROUTES.push(createWebhookRoutes({ webhooks, ingress: webhookIngressStatus, visible: (auth) => visibleTo(viewerFor(auth)) }));
-ROUTES.push(createTwilioRoutes({ sms, bots: () => store.bots.map((bot) => ({ id: bot.id, name: bot.name })) }));
+ROUTES.push(createTwilioRoutes({ sms, webhookPort: WEBHOOK_PORT, bots: () => store.bots.map((bot) => ({ id: bot.id, name: bot.name })) }));
 bus.subscribe((event: RuntimeEvent) => { if (event.type !== "turn.completed") return; void sms.turnCompleted(event.threadId).catch((error: unknown) => console.error("sms: could not send the reply", error)); });
 
 const RUNTIME_KEEP_MS = 30 * 24 * 60 * 60_000;
