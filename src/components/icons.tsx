@@ -1,5 +1,6 @@
 // Heroicons stand-ins for the lucide icon names the app uses, so no lucide code ships.
 import type { ComponentType, SVGProps } from "react";
+import { UserPlusIcon as HUserPlus } from "@heroicons/react/24/outline";
 import { AcademicCapIcon as H0 } from "@heroicons/react/24/outline";
 import { AdjustmentsHorizontalIcon as H1 } from "@heroicons/react/24/outline";
 import { ArchiveBoxArrowDownIcon as H2 } from "@heroicons/react/24/outline";
@@ -335,8 +336,13 @@ export const Pencil = make(H116);
 export const PencilLine = make(H116);
 export const Phone = make(H118);
 export const PhoneOff = make(H119);
-export const Pin = make(H106);
-export const PinOff = make(H106);
+const PushPin = ({ size = 24, className, color, style, ...rest }: IconProps) => (
+  <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" className={className} style={{ color, ...style }} {...rest}>
+    <path d="M9.4 3.7h5.2l-.7 5.8 3.3 2.7v1.4h-4.7V19l-1.4 2.2L9.7 19v-5.4H5.1v-1.4l3.3-2.7-.7-5.8Z" />
+  </svg>
+);
+export const Pin = PushPin as LucideIcon;
+export const PinOff = PushPin as LucideIcon;
 export const Play = make(H121);
 export const Plug = make(H123);
 export const PlugZap = make(H29);
@@ -403,3 +409,4 @@ export const X = make(H153);
 export const XCircle = make(H152);
 export const Zap = make(H29);
 export const ZoomIn = make(H104);
+export const UserPlus = make(HUserPlus);
