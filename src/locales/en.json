@@ -5667,7 +5667,7 @@
   "settings.group.account": "Account",
   "settings.simple.page.computer": "Computer",
   "settings.simple.page.account": "Account",
-  "settings.simple.page.account.description": "Your profile, your plan, and the people who use this Maus.",
+  "settings.simple.page.account.description": "Your profile and the people who use this Maus.",
   "settings.simple.page.import": "Import",
   "settings.simple.page.import.description": "Bring a Grok bot’s work across.",
   "settings.simple.page.appearance.description": "Theme, text, chat width, the sidebar, and notifications.",
