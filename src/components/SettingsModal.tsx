@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen, MessageSquareText } from "lucide-react";
+import { CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, Sparkles, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen, MessageSquareText } from "lucide-react";
 import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
@@ -7,13 +7,8 @@ import { t } from "@/lib/i18n";
 import { SettingsCard } from "@/components/ui";
 import { AnthropicEveryClaudeBot, ApiKeyRow, OpenCodeProviderKeys, VpsConnection } from "./ApiKeys";
 import { LmStudioServer, OtherOpenAiCompatServers } from "./OpenAiCompatServers";
-import { CompanionSection } from "./CompanionSection";
-import { ServerPairingCard } from "./ServerPairingCard";
 import { Notice } from "./Notice";
-import { currentPhonePairingTarget } from "@/lib/phone-pairing";
 import { SmsSettings } from "./SmsSettings";
-import { CustomDomainSettings } from "./CustomDomainSettings";
-import { RemoteComputerSection } from "./RemoteComputerSection";
 import { ConnectedWorkspacesSettings } from "./ConnectedWorkspacesSettings";
 import { shortcutLabel } from "./ShortcutHint";
 import { LicenseExpiryBanner } from "./LicenseExpiryBanner";
@@ -46,7 +41,6 @@ export const SECTIONS: Array<{
 }> = [
   { id: "general", group: "you", labelKey: "settings.section.general", icon: User, keywords: ["profile", "name", "email", "about me", "about", "suggestions", "suggested", "memory", "analytics", "updates", "product updates", "newsletter", "email updates", "effort", "new bots", "reasoning", "threads", "parallel", "concurrency", "cleanup", "retention", "event log", "event-log", "log size", "automatic recovery", "backup model", "fallback", "conversation", "usage", "limit", "plan", "upgrade", "cloud desktop hours", "storage"] },
   { id: "appearance", group: "you", labelKey: "settings.section.appearance", icon: Palette, keywords: ["skin", "theme", "appearance", "chat width", "width", "wide", "full width", "bubble", "bubbles", "tools", "tool calls", "threads", "show threads", "hide threads", "sidebar", "density", "compact", "avatars", "display", "run", "this run", "run card", "commands", "notifications", "sound", "sounds", "mute", "silent", "chime", "pinned", "circles", "universal", "groups", "top", "send", "enter", "return", "shift+enter", "ctrl+enter", "cmd+enter", "⌘+enter", "new line", "keyboard", "ime", "japanese", "message color", "my messages", "toolbar", "tools layout", "footer", "team map"] },
-  { id: "companion", group: "you", labelKey: "settings.section.companion", icon: TabletSmartphone, keywords: ["companion", "device", "phone", "desktop", "client", "host", "pair", "pairing", "mobile", "https", "secure", "tailscale", "wifi", "remote", "domain", "dns", "self-hosted", "server", "caddy", "troubleshooting"] },
   { id: "engines", group: "ai", labelKey: "settings.section.engines", icon: Terminal, keywords: ["models", "model providers", "engines", "claude", "codex", "grok", "providers", "cli", "sign in", "subscription"] },
   { id: "connections", group: "keys", labelKey: "settings.section.connections", icon: KeyRound, keywords: ["keys", "api", "api key", "api keys", "connections", "connectors", "composio", "provider keys", "box", "xai", "mistral", "cerebras", "meta", "muse", "vps", "router", "openrouter", "base url", "openai", "anthropic", "groq", "opencode", "deepseek", "provider", "lm studio", "lmstudio", "llm studio", "llmstudio", "bionic"] },
   { id: "sms", group: "keys", labelKey: "settings.section.sms", icon: MessageSquareText, keywords: ["sms", "text", "texts", "twilio", "phone", "messaging", "messages"] },
@@ -77,7 +71,7 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
     keywords: ["skills", "experimental", "early", "preview", "learn", "sms", "text", "texts", "twilio", "phone", "messaging"] },
   { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
     keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },
-  { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["companion", "desktopWorkspaces", "computer", "logins", "workspaces"] },
+  { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["desktopWorkspaces", "computer", "logins", "workspaces"] },
   { id: "updates", labelKey: "settings.simple.page.updates", descriptionKey: "settings.simple.page.updates.description", icon: CloudDownload, sections: ["updates"],
     keywords: ["update", "version", "release", "product updates", "newsletter", "email updates", "welcome", "tour", "diagnostics", "logs", "support"] },
 ];
@@ -125,7 +119,7 @@ export function SettingsModal() {
   const requested = state.appSettingsSection;
   const section: AppSettingsSection =
     (remoteActive && !["appearance", "desktopWorkspaces"].includes(requested)) || requested === "remote"
-      ? "companion"
+      ? "appearance"
       : requested;
   const dialogRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -133,7 +127,7 @@ export function SettingsModal() {
   useEffect(() => window.ogb?.environments?.onOpenSettings?.(() => setQuery("")), []);
   useEffect(() => window.ogb?.onOpenAppSettings?.(() => setQuery("")), []);
   const q = query.trim().toLowerCase();
-  const baseSections = SECTIONS.filter((entry) => !remoteActive || entry.id === "companion" || entry.id === "appearance" || entry.id === "desktopWorkspaces")
+  const baseSections = SECTIONS.filter((entry) => !remoteActive || entry.id === "appearance" || entry.id === "desktopWorkspaces")
     .filter((entry) => entry.id !== "desktopWorkspaces" || Boolean(window.ogb?.environments))
     .filter((entry) => entry.id !== "workspaces" || workspacesAvailable(state.config))
     .filter((entry) => entry.id !== "people" || (!window.ogb && state.config?.cloudHome !== true))
@@ -227,15 +221,7 @@ export function SettingsModal() {
 
   const openSection = (id: AppSettingsSection) => dispatch({ type: "toggleAppSettings", open: true, section: id });
 
-  const phoneFocus = state.appSettingsPhonePairing;
-  const computerPairs = currentPhonePairingTarget(state.config?.cloudHome === true) === "computer";
-  const remoteAccess = {
-    client: <RemoteComputerSection hideWhenUnavailable />,
-    domain: remoteActive ? null : <CustomDomainSettings />,
-    // Security: the server decides who may pair (an owner or admin session), not this gate.
-    pairing: <ServerPairingCard cloudHome={state.config?.cloudHome === true} focusRequest={computerPairs ? 0 : phoneFocus} team={state.config?.team?.name} simple />,
-    companion: remoteActive ? null : <CompanionSection profileEmail={state.config?.profile?.email} focusRequest={computerPairs ? phoneFocus : 0} />,
-  };
+
 
   const renderSection = (id: AppSettingsSection) => {
     switch (id) {
@@ -298,7 +284,7 @@ export function SettingsModal() {
       case "ai": return <SimpleAiPage has={has} disclose={disclose} />;
       case "skills": return <SimpleSkillsPage has={has} sms={renderSection("sms")} />;
       case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} />;
-      case "computer": return <SimpleComputerPage has={has} remoteAccess={remoteAccess} servers={renderSection("desktopWorkspaces")} installs={workspacesAvailable(state.config) ? <WorkspacesSection /> : undefined} disclose={disclose} />;
+      case "computer": return <SimpleComputerPage has={has} servers={renderSection("desktopWorkspaces")} installs={workspacesAvailable(state.config) ? <WorkspacesSection /> : undefined} disclose={disclose} />;
       case "updates": return <SimpleUpdatesPage remoteActive={remoteActive} />;
       default:
         return page.sections.map((id) => <section key={id} data-settings-block={id} className="flex scroll-mt-4 flex-col gap-4">{renderSection(id)}</section>);
