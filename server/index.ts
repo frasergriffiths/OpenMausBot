@@ -512,8 +512,6 @@ import { acquireDataDirLeaseForProcess } from "./data-dir-lease.ts";
 import { createWorkspaceAccess, describeEdition, editionForSettings, editionStatus, entitled, hostedWorkspaceConfiguration, hostedWorkspaceConfigured, licenseWarning, sharedWorkspaceFullAccessConfigured, loadEnterpriseLayer, workspaceMembership, type WorkspaceAccess } from "./enterprise.ts";
 import { environmentDescriptor, loadEnvironmentId, serverVersion } from "./environment.ts";
 import { WorkspaceBackupMaintenance } from "./workspace-backup-maintenance.ts";
-import { createWorkspaceBackupRoutes, isWorkspaceBackupSessionControl } from "./workspace-backup-http.ts";
-import { applyPendingWorkspaceRestore, readLastWorkspaceRestore, type WorkspaceRestoreResult } from "./workspace-backup.ts";
 import { repairMovedWorkspacePaths } from "./moved-paths-repair.ts";
 import { createCustomDomainVerifier, customDomainIpv4, normalizeCustomDomain } from "./custom-domain.ts";
 import { allowedScopes, createEmailSignIn, parseAllowList } from "./account-signin.ts";
@@ -655,14 +653,6 @@ function releaseDataDirLeaseAtExit(): void {
   }
 }
 process.once("exit", releaseDataDirLeaseAtExit);
-// Restore before constructing any long-lived config, Store, session or provider objects.
-let workspaceRestore: WorkspaceRestoreResult = { restored: false };
-let restoredAtStart: string | undefined;
-if (existsSync(join(DATA_DIR, ".backups"))) {
-  workspaceRestore = applyPendingWorkspaceRestore(DATA_DIR);
-  if (workspaceRestore.restored) restoredAtStart = workspaceRestore.id;
-  if (!workspaceRestore.restored && !workspaceRestore.rolledBack) workspaceRestore = readLastWorkspaceRestore(DATA_DIR) ?? workspaceRestore;
-}
 const workspaceMaintenance = new WorkspaceBackupMaintenance(), moveFreeze = createMoveFreeze({ dataDir: DATA_DIR, exportOnly: (process.env.OMB_CLOUD_ROLE === "home" || process.env.OMB_CLOUD_ROLE === "team") && process.env.OMB_CLOUD_EXPORT_ONLY === "1" });
 // Only after ensureDirs(), whose one-time legacy data-dir rename must not find ~/.openmausbot already there.
 const ENVIRONMENT_ID = loadEnvironmentId(DATA_DIR);
@@ -9073,7 +9063,6 @@ phones.adoptRoutines();
 if (CLOUD_HOME && CLOUD_OWNER_KEY && cloudRoutineAuthors) {
   cloudHome = settleCloudHome({ file: join(DATA_DIR, "cloud-owner.json"), machineId: CLOUD_HOME.machineId, ownerKey: CLOUD_OWNER_KEY, nobodyKey: CLOUD_NOBODY_KEY,
     sessions, personKey, starters: threadStarters, authors: cloudRoutineAuthors, routines: () => routines, store, linePersonKey, asSchedule,
-    ...(restoredAtStart ? { restoredNow: restoredAtStart } : {}), ...(workspaceRestore.restored && workspaceRestore.id ? { lastRestore: workspaceRestore.id } : {}),
     settled: (ownership) => { cloudEarlierOwners = ownership; }, provenPerson: cloudProvenOwnerPerson, threadStarters: cloudThreadStarters, cardAnswerer: cloudCardAnswerer,
     ownersOrNone: (key) => [CLOUD_OWNER_KEY, CLOUD_NOBODY_KEY, CLOUD_OUTSIDE_KEY].includes(key) || cloudOwnerDevice(key),
     reportFromOthers: cloudReportFromOthers, ownersRoutine: cloudOwnersRoutine, log: (line) => console.log(line) });
@@ -12471,44 +12460,6 @@ let providerConfigBusy = false;
 const providerInstancesChanging = new Set<string>();
 let mcpConfigBusy = false;
 
-const workspaceBackupAccess = {
-  authorized: (req: IncomingMessage, original: RequestAuth) => {
-    const current = resolveRequestAuth(req, {
-      sessions, cookieName: SESSION_COOKIE, streamPath: "/api/events",
-      url: new URL(req.url ?? "/", `http://localhost:${PORT}`),
-      loopbackMutationToken: desktopMutationToken, companionMutationToken, loopbackTrust: LOOPBACK.trust, cliOwnerToken, trustLocalBrowser: LOOPBACK.localBrowsers,
-    }).auth;
-    return Boolean(current?.scopes.includes("admin") && current.kind === original.kind &&
-      (current.kind !== "session" || (original.kind === "session" && current.session.id === original.session.id)));
-  },
-  exclusive: <T>(work: () => Promise<T>, keepLocked?: boolean) => workspaceMaintenance.run(async () => {
-    // Recheck inside the exclusive gate: another client may assign a computer while the restore body arrives.
-    if (keepLocked && teamComputers.list().some(computer => computer.section !== null)) {
-      throw Object.assign(new Error("Unassign team computers before restoring this workspace"), { status: 409 });
-    }
-    return work();
-  }, {
-    idle: () => !providerFleetReloading && !providerAuthSessions.active && !browserEngineInstall &&
-      !routines?.isTicking && !calendarCalls?.isTicking &&
-      !localVmImageBusy && !localVmProvisionBusy && !localVmModeChangeBusy &&
-      !localVmLifecycleBusy.size && !boatLifecycleBusyBots.size && !computerPreviews.size && !orphanBoatLifecycleBusyIds.size &&
-      !computerProviderConfigTransitions.size &&
-      teamComputers.list().every(computer => !teamComputerInUse(computer)) &&
-      store.bots.every((bot) => !botHasActiveTurn(bot.id) && !routines?.activeRunForBot(bot.id) && !botComputerControlSnapshot(bot.id).held) &&
-      store.groups.every((group) => !groupIsWorking(group)),
-    pause: () => { routines?.stop(); calendarCalls?.stop(); watchdog.stop(); memoryUpkeep.pause(); },
-    resume: () => { if (!moveFreeze.frozen()) { routines?.start(); calendarCalls?.start(); } watchdog.start(); memoryUpkeep.resume(); },
-    flush: async () => {
-      await Promise.all([flushAllProfileHistory(), flushAllMemoryJournals(), flushUsageLedger(DATA_DIR), flushDecisionLog(DATA_DIR), flushAdminActivity(DATA_DIR)]);
-      // Writers gated and work idle: release the WAL connection for a consistent snapshot; Store reopens it lazily.
-      await closeMessageSearch();
-      closeMessageDb();
-    },
-  }, keepLocked),
-  status: () => ({ busy: workspaceMaintenance.active, pendingRestore: workspaceMaintenance.pendingRestore }),
-};
-const workspaceCopyAccess = { dataDir: DATA_DIR, appVersion: serverVersion(), readBody, restored: workspaceRestore, ...workspaceBackupAccess };
-const workspaceBackupRoutes = createWorkspaceBackupRoutes(workspaceCopyAccess);
 let restartRequested = false;
 const cloudMoveRoutes = createCloudMoveRoutes();
 
@@ -13154,13 +13105,9 @@ const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     if (viewer.kind === "member" || visible.filtersThreads) onJsonBody(res, (body) => memberBody(body, visible));
     beginAdminAudit(req, res, method, path, auth);
 
-    if (method === "POST" && path === "/api/workspace-backup/restore" && teamComputers.list().some(computer => computer.section !== null)) {
-      return json(res, 409, { error: "Unassign team computers before restoring a workspace; restored team names must not gain access to existing desktops" });
-    }
-    if (await workspaceBackupRoutes(req, res, path, auth)) return;
     if (cloudMoveRoutes(res, path)) return;
     // Count requests until their handler returns, not until the browser disconnects: a cancelled upload can still write.
-    if (path.startsWith("/api/") && path !== "/api/events" && path !== "/api/health" && path !== "/api/sync/changes" && !isLongPollPath(path) && !isWorkspaceBackupSessionControl(method, path)) {
+    if (path.startsWith("/api/") && path !== "/api/events" && path !== "/api/health" && path !== "/api/sync/changes" && !isLongPollPath(path)) {
       releaseWorkspaceRequest = workspaceMaintenance.request();
     }
 
