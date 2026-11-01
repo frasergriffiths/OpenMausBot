@@ -14,10 +14,9 @@ import {
   RefreshCw,
   Settings as SettingsIcon,
   Smartphone,
-  UserRound,
 } from "lucide-react";
 
-import { InitialsAvatar } from "./Avatar";
+import { UserAvatar } from "./UserAvatar";
 import { DiscordIcon } from "./DiscordIcon";
 import { AboutDialog } from "./AboutDialog";
 import { usageBridge } from "./CloudUsageMeter";
@@ -535,8 +534,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
     onAccount: () => dispatch({ type: "toggleAppSettings", open: true, section: "cloudAccount" }),
   });
   const noteworthy = update && updateNoteworthy(update.phase, update.pending) && !updateHasButton(update.phase);
-  const initials = profileInitials(profile);
-  const nameless = initials === "?" ? <UserRound size={18} strokeWidth={1.75} aria-hidden /> : undefined;
+  const avatarSeed = profile?.email || profile?.name || "person";
   const label = simple ? accountLabel(name, { update: noteworthy && update ? update.label : null }) : name;
 
   return (
@@ -555,7 +553,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
             data-sidebar-account=""
             className={cn("relative flex size-9 items-center justify-center rounded-full ring-2 transition-shadow", open ? "ring-ink/15" : "ring-transparent hover:ring-ink/10")}
           >
-            <InitialsAvatar initials={initials} avatarUrl={profile?.avatarUrl} size={36} fallback={nameless} fontSize={14} className="ring-1 ring-inset ring-ink/[0.04]" />
+            <UserAvatar seed={avatarSeed} size={36} className="ring-1 ring-inset ring-ink/[0.04]" />
             {noteworthy && (
               <span
                 aria-hidden
@@ -576,7 +574,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
               open ? "bg-raised" : "hover:bg-raised/50",
             )}
           >
-            <InitialsAvatar initials={initials} avatarUrl={profile?.avatarUrl} size={rail ? 30 : circle ? 26 : 28} />
+            <UserAvatar seed={avatarSeed} size={rail ? 30 : circle ? 26 : 28} />
             {noteworthy && (
               <span
                 aria-hidden
@@ -597,7 +595,7 @@ export function SidebarProfileMenu({ iconOnly = false, rail = false, circle = fa
             )}
           >
             <span className="relative flex size-6 shrink-0 items-center justify-center">
-              <InitialsAvatar initials={initials} avatarUrl={profile?.avatarUrl} size={24} fallback={nameless} fontSize={12} className="ring-1 ring-inset ring-ink/[0.04]" />
+              <UserAvatar seed={avatarSeed} size={24} className="ring-1 ring-inset ring-ink/[0.04]" />
               {noteworthy && (
                 <span
                   title={update.label}

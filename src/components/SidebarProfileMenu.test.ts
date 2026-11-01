@@ -36,7 +36,6 @@ import type { CloudMachine } from "../../electron/cloud-home.mjs";
 import { PHONE_APPS, PhoneAppDialog, type PhoneAppConnect } from "./PhoneAppDialog";
 import type { UpdaterState } from "@/lib/updater";
 import type { SidebarMenuItem } from "./SidebarPopoverMenu";
-import { InitialsAvatar } from "./Avatar";
 
 const state = (patch: Partial<UpdaterState>): UpdaterState => ({ status: "idle", ...patch }) as UpdaterState;
 
@@ -472,15 +471,6 @@ describe("Simple mode's account menu", () => {
   it("names the account button after the person and whatever its dot is raised for", () => {
     expect(accountLabel("You", { update: null })).toBe("You");
     expect(accountLabel("Ada", { update: "Update failed — try again" })).toBe("Ada · Update failed — try again");
-  });
-
-  it("draws a person instead of a question mark for someone with no name, at the trigger's own size", () => {
-    const glyph = createElement("svg", { "data-glyph": "" });
-    const nameless = renderToStaticMarkup(createElement(InitialsAvatar, { initials: profileInitials({}), size: 36, fallback: glyph, fontSize: 14 }));
-    expect(nameless).toContain("data-glyph");
-    expect(nameless).not.toContain("?");
-    expect(nameless).toContain("font-size:14px");
-    expect(renderToStaticMarkup(createElement(InitialsAvatar, { initials: "AL", size: 50 }))).toContain("font-size:19px");
   });
 
   it("offers Files alone in the tools group", () => {
