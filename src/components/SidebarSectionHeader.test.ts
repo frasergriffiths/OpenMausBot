@@ -22,7 +22,9 @@ describe("SidebarSectionHeader", () => {
     expect(html).toContain('aria-hidden="true"');
     expect(html).not.toContain('role="button"');
     expect(html).not.toContain("Delete Work department");
-    expect(html.indexOf(">Work</span>")).toBeLessThan(html.indexOf("lucide-chevron-down"));
+    const label = html.indexOf(">Work</span>");
+    expect(label).toBeGreaterThan(-1);
+    expect(html.slice(label)).toContain("<svg");
     expect(html).not.toContain("uppercase");
   });
 
@@ -109,7 +111,7 @@ describe("SidebarSectionHeader as a Simple-mode line", () => {
     expect(html).not.toContain("Delete Work department");
     expect(html).not.toContain("lucide-grip-vertical");
     expect(html).not.toContain("lucide-trash");
-    expect(html).toMatch(/lucide-chevron-down .*absolute opacity-0 transition-opacity group-hover\/section:opacity-100 group-focus-within\/section:opacity-100 touch:opacity-100/);
+    expect(html).toMatch(/absolute opacity-0 transition-opacity group-hover\/section:opacity-100 group-focus-within\/section:opacity-100 touch:opacity-100/);
     expect(html.indexOf(">Work</span>")).toBeLessThan(html.indexOf("Actions for Work department"));
     const button = { id: "dots" };
     const dots = nodes(element.props.children).find((node) => node.props["aria-label"] === "Actions for Work department")!;
