@@ -1,4 +1,3 @@
-import { directMessageSent, roomMessageSent } from "@/lib/product-events";
 import { useComposerDictation } from "@/lib/use-composer-dictation";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type SetStateAction } from "react";
 import { ArrowUp, Clock, Mic, Square, X } from "lucide-react";
@@ -644,7 +643,6 @@ export function Composer({
         onError: () => { autoSteerAfterSendRef.current = false; restoreDraft(sentDraft); },
       });
       autoSteerAfterSendRef.current = autoSteer;
-      roomMessageSent(effectiveChannelMode, busy);
     } else if (bot) {
       const points = effectiveChannelMode === "goal" ? null : takePointedChips(threadId);
       const deliver = () => {
@@ -653,7 +651,6 @@ export function Composer({
           ...(points ? { pointed: points.pointed } : {}),
           onError: () => { autoSteerAfterSendRef.current = false; points?.restore(); restoreDraft(sentDraft); },
         });
-        directMessageSent(state.instances, bot.modelSelection?.instanceId, interruptFirst ? false : busy && !canSteer);
       };
       autoSteerAfterSendRef.current = autoSteer;
       if (joinsPendingSend) {
