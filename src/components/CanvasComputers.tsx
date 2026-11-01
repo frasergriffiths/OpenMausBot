@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
-import { Box, ExternalLink, Loader2, Monitor, Plus, RefreshCw, X } from "lucide-react";
+import { Box, ExternalLink, Loader2, Monitor, Plus, X } from "lucide-react";
 import { api, useStore } from "@/state/store";
 import type { TeamComputer } from "../../shared/team-computer";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -33,7 +33,7 @@ export function CanvasComputers({ open, createRequest, drop, sections, onClose, 
 }) {
   const { dispatch } = useStore();
   const [inventory, setInventory] = useState<Inventory | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [readError, setReadError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
@@ -192,7 +192,6 @@ export function CanvasComputers({ open, createRequest, drop, sections, onClose, 
     {open && <aside ref={shelf} aria-label={t("canvasComputers.title")} onKeyDown={(event) => { if (event.key === "Escape" && !assignment) { event.stopPropagation(); if (pointer.current) clearDrag(); else onClose(); } }} className="flex w-[300px] max-w-[90vw] shrink-0 flex-col border-l border-hairline/50 bg-panel max-sm:absolute max-sm:inset-y-0 max-sm:right-0 max-sm:z-30 max-sm:shadow-xl">
       <header className="flex items-center gap-2 border-b border-hairline/40 px-4 py-3">
         <Monitor size={16} className="text-ink-secondary" /><h2 className="flex-1 text-[13px] font-semibold">{t("canvasComputers.title")}</h2>
-        <button aria-label={t("canvasComputers.refresh")} className={control} disabled={loading || busy !== null} onClick={() => { setError(""); void refresh(); }}><RefreshCw size={14} className={loading ? "animate-spin" : ""} /></button>
         <button ref={closeButton} aria-label={t("canvasComputers.close")} className={control} onClick={onClose}><X size={15} /></button>
       </header>
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">

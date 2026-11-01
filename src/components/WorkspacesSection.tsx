@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, Plus, RefreshCw } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { api, useStore, type ConfigStatus } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -247,7 +247,6 @@ export function WorkspacesSection({ load = fetchFleet }: { load?: () => Promise<
     <div className="flex flex-col gap-5">
       <SettingsCard title={t("workspaces.title")} subtitle={t("workspaces.subtitle")}>
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <button type="button" onClick={() => void refresh()} disabled={loading || busy !== null} className="flex items-center gap-1 text-[12px] text-ink-secondary hover:text-ink disabled:opacity-50"><RefreshCw size={12} className={cn(loading && "animate-spin")} />{t("workspaces.refresh")}</button>
           <button type="button" onClick={() => setCreating((value) => !value)} disabled={busy !== null} className="ml-auto flex items-center gap-1.5 rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-raised/50 hover:text-ink disabled:opacity-50"><Plus size={13} />{t("workspaces.new")}</button>
           <button type="button" onClick={() => void upgrade()} disabled={busy !== null || !fleet?.workspaces.length} className="rounded-lg border border-hairline/40 px-3 py-1.5 text-[12px] text-ink-secondary hover:bg-raised/50 hover:text-ink disabled:opacity-50">{busy === "*" ? t("workspaces.working") : t("workspaces.upgradeAll")}</button>
         </div>

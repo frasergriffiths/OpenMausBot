@@ -10,7 +10,6 @@ import {
   ExternalLink,
   Loader2,
   Moon,
-  RefreshCw,
   RotateCcw,
   Square,
   Trash2,
@@ -167,6 +166,17 @@ const stateLabelKeys: Record<ComputerStateKind, LocaleKey> = {
   removing: "vm.state.removing",
   paused: "vm.state.paused",
 };
+
+/** Keeps a live inventory current in the background; the page has no refresh button. */
+function AutoRefresh({ onRefresh, every }: { onRefresh: () => void; every: number }) {
+  const latest = useRef(onRefresh);
+  useEffect(() => { latest.current = onRefresh; }, [onRefresh]);
+  useEffect(() => {
+    const timer = window.setInterval(() => latest.current(), every);
+    return () => window.clearInterval(timer);
+  }, [every]);
+  return null;
+}
 
 export function computerStateLabel(kind: ComputerStateKind): string {
   return t(stateLabelKeys[kind]);
@@ -338,15 +348,7 @@ export function CloudComputersCard({
               ? t("vm.cloud.needsKey")
               : t("vm.cloud.refreshHint")}
         </div>
-        <button
-          type="button"
-          onClick={onRefresh}
-          disabled={loading || pending !== null}
-          aria-label={t("vm.cloud.refreshAria")}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
-        >
-          <RefreshCw size={12} className={cn(loading && "animate-spin")} /> {t("vm.refresh")}
-        </button>
+        <AutoRefresh onRefresh={onRefresh} every={15_000} />
       </div>
 
       {error && <div role="alert" className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
@@ -484,15 +486,7 @@ export function LocalVmInventoryCard({
         <div className="text-[12px] text-ink-secondary">
           {t("vm.perBot.deleteHint")}
         </div>
-        <button
-          type="button"
-          onClick={onRefresh}
-          disabled={loading || deletingBotId !== null}
-          aria-label={t("vm.perBot.refreshAria")}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1.5 text-[12px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
-        >
-          <RefreshCw size={12} className={cn(loading && "animate-spin")} /> {t("vm.refresh")}
-        </button>
+        <AutoRefresh onRefresh={onRefresh} every={15_000} />
       </div>
 
       {error && <div role="alert" className="mt-3 rounded-xl bg-danger/10 px-3 py-2 text-[13px] text-danger">{error}</div>}
@@ -1234,17 +1228,7 @@ export function LocalComputerSection() {
                     ? t("vm.main.ready")
                     : (status?.problem ?? t("vm.main.notReady"))}
           </span>
-          <button
-            onClick={() => {
-              setLoading(true);
-              setRefreshKey((key) => key + 1);
-              setInventoryRefreshKey((key) => key + 1);
-            }}
-            disabled={loading || pending !== null}
-            className="flex items-center gap-1.5 rounded-lg border border-hairline/40 px-2.5 py-1 text-[13px] text-ink-secondary hover:bg-control hover:text-ink disabled:opacity-40"
-          >
-            <RefreshCw size={12} /> {t("vm.main.recheck")}
-          </button>
+          <AutoRefresh every={10_000} onRefresh={() => { setRefreshKey((key) => key + 1); setInventoryRefreshKey((key) => key + 1); }} />
           {ready && !perBot && (
             <a
               href={status?.viewer_url ?? c?.view}
