@@ -1,5 +1,5 @@
-import { ArrowUpRight, KeyRound, Loader2, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { ArrowUpRight, KeyRound } from "lucide-react";
+import { useEffect } from "react";
 import { useStore } from "@/state/store";
 import { EngineGroupLabel } from "@/components/EngineGroupLabel";
 import { EngineSetup, installCommandFor } from "@/components/EngineSetup";
@@ -12,15 +12,11 @@ import { brand } from "../lib/brand";
 export function NoEngines() {
   const { state, dispatch, refreshInstances } = useStore();
   const remoteClient = window.ogb?.remoteClient?.active === true;
-  const [rechecking, setRechecking] = useState(false);
-  const recheck = async () => {
-    setRechecking(true);
-    try {
-      await refreshInstances();
-    } finally {
-      setRechecking(false);
-    }
-  };
+  // Notice an engine the moment it is installed, without a Check again button.
+  useEffect(() => {
+    const timer = window.setInterval(() => { void refreshInstances(); }, 10_000);
+    return () => window.clearInterval(timer);
+  }, [refreshInstances]);
 
   if (remoteClient) {
     return (
@@ -31,9 +27,6 @@ export function NoEngines() {
           <p className="mt-2 text-[14px] leading-relaxed text-ink-secondary">
             Configure Claude, ACP, or another supported engine in OpenMausBot on the host computer, then return here.
           </p>
-          <button onClick={() => void recheck()} disabled={rechecking} className="mt-5 rounded-lg bg-raised px-3 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-60">
-            {rechecking ? "Checking…" : "Check again"}
-          </button>
         </div>
       </main>
     );
@@ -97,15 +90,6 @@ export function NoEngines() {
             );
           })()}
         </div>
-
-        <button
-          onClick={recheck}
-          disabled={rechecking}
-          className="mt-6 flex items-center gap-2 rounded-lg bg-raised px-3 py-2 text-[13px] text-ink hover:bg-raised-hover disabled:opacity-60"
-        >
-          {rechecking ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-          {rechecking ? t("common.checking") : t("common.checkAgain")}
-        </button>
       </div>
     </main>
   );

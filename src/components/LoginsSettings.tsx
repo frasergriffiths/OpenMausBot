@@ -1,10 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { KeyRound, Loader2, LockKeyhole, Plus, RefreshCw, ShieldCheck, Trash2 } from "lucide-react";
+import { KeyRound, Loader2, LockKeyhole, Plus, ShieldCheck, Trash2 } from "lucide-react";
 import { Button, Checkbox, SettingsCard } from "@/components/ui";
 
 import type { LoginBots, LoginSummary, OnePasswordStatus, OnePasswordVault } from "../../shared/logins";
 import { t } from "@/lib/i18n";
-import { addLogin, changeLogin, connectOnePassword, deleteLogin, disconnectOnePassword, grantVault, listLogins, refreshOnePassword } from "@/lib/logins";
+import { addLogin, changeLogin, connectOnePassword, deleteLogin, disconnectOnePassword, grantVault, listLogins } from "@/lib/logins";
 import { relativeTime } from "@/lib/memory";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { useStore } from "@/state/store";
@@ -260,9 +260,6 @@ function OnePasswordConnection({ status, disabled, bots, botNames, onChange }: {
             </ul>
           )}
           <div className="flex flex-wrap gap-2">
-            <Button size="xs" type="button" disabled={disabled || busy !== null} onClick={() => void run("refresh", refreshOnePassword)}>
-              {busy === "refresh" ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}{t("settings.logins.onePassword.refresh")}
-            </Button>
             <Button size="xs" type="button" disabled={disabled || busy !== null} onClick={() => void run("disconnect", disconnectOnePassword)}>
               {t("settings.logins.onePassword.disconnect")}
             </Button>

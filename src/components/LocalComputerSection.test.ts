@@ -212,7 +212,7 @@ describe("Local VM inventory UI", () => {
     expect(markup).not.toContain("No per-bot desktops have been created");
   });
 
-  it("disables deletion while refreshing an existing inventory", () => {
+  it("disables deletion while an inventory loads", () => {
     const markup = renderToStaticMarkup(createElement(LocalVmInventoryCard, {
       instances: [cloudVm],
       maxInstances: 4,
@@ -224,7 +224,7 @@ describe("Local VM inventory UI", () => {
       onDelete: vi.fn(),
     }));
 
-    expect(markup.match(/disabled=""/g)).toHaveLength(2);
+    expect(markup.match(/disabled=""/g)).toHaveLength(1);
   });
 
   it("shows unmanaged containers without offering an unsafe delete action", () => {
@@ -301,10 +301,10 @@ describe("cloud computer inventory UI", () => {
     expect(markup.match(/disabled=""/g)).toHaveLength(2);
   });
 
-  it("disables lifecycle actions while refreshing an existing inventory", () => {
+  it("disables lifecycle actions while an inventory loads", () => {
     const markup = renderCard({ instances: [ownedCloudComputer], loading: true });
 
-    expect(markup.match(/disabled=""/g)).toHaveLength(3);
+    expect(markup.match(/disabled=""/g)).toHaveLength(2);
   });
 
   it("keeps disconnected, unavailable, and empty states distinct", () => {
