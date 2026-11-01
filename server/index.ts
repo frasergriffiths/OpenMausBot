@@ -9756,7 +9756,7 @@ const webhookIngressStatus = () => ({
   ...(webhookIngressError ? { error: webhookIngressError } : {}),
 });
 ROUTES.push(createWebhookRoutes({ webhooks, ingress: webhookIngressStatus, visible: (auth) => visibleTo(viewerFor(auth)) }));
-ROUTES.push(createTwilioRoutes({ sms, bots: () => store.bots.map((bot) => ({ id: bot.id, name: bot.name })) }));
+ROUTES.push(createTwilioRoutes({ sms, webhookPort: WEBHOOK_PORT, bots: () => store.bots.map((bot) => ({ id: bot.id, name: bot.name })) }));
 bus.subscribe((event: RuntimeEvent) => { if (event.type !== "turn.completed") return; void sms.turnCompleted(event.threadId).catch((error: unknown) => console.error("sms: could not send the reply", error)); });
 
 const RUNTIME_KEEP_MS = 30 * 24 * 60 * 60_000;
