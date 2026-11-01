@@ -14,7 +14,7 @@ import { z } from "zod";
 import type { CloudOwner } from "./cloud-owner-lines.ts";
 import type { RequestAuth } from "./request-auth.ts";
 import type { RouteContext } from "./routes/table.ts";
-import { omittedFromWorkspaceBackup } from "./workspace-backup.ts";
+import { omittedFromWorkspaceBackup } from "./cloud-send-exclusions.ts";
 import { validRelative } from "./workspace-backup-paths.ts";
 
 /** A part of a file, well under My Cloud's request limits. */

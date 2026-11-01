@@ -2,9 +2,7 @@
 
 ## User path
 
-This is the legacy partial team-copy format. The sidebar no longer offers it;
-use **Settings → Backups** for a [full workspace backup](workspace-backups.md).
-Existing `.mausbackup.json` files remain importable through
+This is the legacy partial team-copy format. Existing `.mausbackup.json` files remain importable through
 Teams → Import → choose the file → review → **Import backup**.
 Import always adds independent copies; existing bots, Chiefs, rooms and chats
 are never archived, overwritten or merged. Repeated imports number copies.
