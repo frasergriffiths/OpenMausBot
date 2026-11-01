@@ -10,7 +10,16 @@
 
 ## Screenshots
 
-Dark-mode screenshots of the app: [chat and settings](docs/screenshots.md).
+<p align="center">
+  <img src="docs/assets/screenshots/settings-account-dark.png" alt="Settings: Account, dark mode" width="49%">
+  <img src="docs/assets/screenshots/settings-api-keys-dark.png" alt="Settings: API keys, dark mode" width="49%">
+</p>
+
+<p align="center">
+  <img src="docs/assets/screenshots/settings-browser-dark.png" alt="Settings: Browser, dark mode" width="72%">
+</p>
+
+More in [docs/screenshots.md](docs/screenshots.md).
 
 Every bot in the sidebar is a real agent — Claude or Codex running locally under the hood — with its own
 personality, its own model, its own cloud computer, and its own connected apps.

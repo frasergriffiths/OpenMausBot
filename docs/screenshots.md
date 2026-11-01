@@ -1,15 +1,19 @@
 # Screenshots
 
-Taken from OpenMausBot running locally on Linux, in dark mode, after the settings and UI clean-up.
+Taken from OpenMausBot running on Linux, in dark mode, against the current `main`.
 
-## Chat
+## Settings: Account
 
-A bot's conversation, with the composer, the model picker and the sidebar.
+![Settings, Account page in dark mode](assets/screenshots/settings-account-dark.png)
 
-![Chat in dark mode](assets/screenshots/chat-dark.png)
+## Settings: API keys
 
-## Settings
+Provider keys, the Jev decision-model key and the other services, in one page.
 
-Settings is a single panel with one page per area: Account, Appearance, Import, AI, Experimental, API keys, Computer, Browser and Updates.
+![Settings, API keys page in dark mode](assets/screenshots/settings-api-keys-dark.png)
 
-![Settings in dark mode](assets/screenshots/settings-dark.png)
+## Settings: Browser
+
+The built-in browser, browser profiles, saved logins and the 1Password vault.
+
+![Settings, Browser page in dark mode](assets/screenshots/settings-browser-dark.png)
