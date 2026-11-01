@@ -1,4 +1,5 @@
-import { Globe2, Monitor, Plus, Smartphone } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Globe2, Maximize2, Minimize2, Monitor, Plus, Smartphone } from "lucide-react";
 
 import { t } from "@/lib/i18n";
 import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
@@ -34,10 +35,27 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
 
   const screen = [...bot.messages].reverse().find((message) => message.kind === "screen" && (message.hasImage || message.png));
   const screenSrc = screen ? screenFramePreview({ threadId: bot.threadId, messageId: screen.id }, screen.mime).src : null;
+  const [full, setFull] = useState(false);
+
+  useEffect(() => {
+    if (!full) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setFull(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [full]);
 
   return (
     <div data-panel-tabpanel="computer" className="[&>*:first-child]:mt-0">
+      {full && screenSrc && (
+        <div role="dialog" aria-modal="true" aria-label={screenOf} onClick={() => setFull(false)} className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-6">
+          <img src={screenSrc} alt="" onClick={(event) => event.stopPropagation()} className="max-h-full max-w-full rounded-lg object-contain shadow-2xl" />
+          <button type="button" aria-label={t("common.close")} onClick={() => setFull(false)} className="absolute right-5 top-5 flex size-9 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20">
+            <Minimize2 size={18} aria-hidden="true" />
+          </button>
+        </div>
+      )}
       <LinuxLocalControl />
+      <div className="relative">
       <button
         type="button"
         data-panel-action="open-computer"
@@ -66,6 +84,17 @@ export function ComputerTab({ bot, derived, onOpen }: { bot: Bot; derived: Deriv
           {t("place.action.watch")}
         </span>
       </button>
+      {screenSrc && (
+        <button
+          type="button"
+          aria-label={t("botPanel.screen.fullscreen")}
+          onClick={() => setFull(true)}
+          className="absolute right-2 top-2 z-10 flex size-7 items-center justify-center rounded-full bg-panel/85 text-ink shadow-sm ring-1 ring-ink/10 backdrop-blur-sm hover:bg-panel"
+        >
+          <Maximize2 size={13} aria-hidden="true" />
+        </button>
+      )}
+      </div>
       <div className="mt-3 text-center text-[13px] text-ink-tertiary">{screenOf}</div>
 
       <Card label={t("computer.simple.whereWorks", { name: bot.name })}>
