@@ -1477,7 +1477,7 @@ export function ComputerPanel({
           ? () => phase === "vm" || cloudPreviewReady ? void takeControl() : void controlAction("take")
           : undefined)}
         {(cloudPreviewReady || phase === "vm" || currentTeamComputer) && control.held && (
-          <div className="mt-3 rounded-xl border border-accent/25 bg-accent/10 p-4">
+          <div className="mt-3 rounded-xl bg-accent/10 p-4">
             <div className="text-[13px] leading-relaxed text-ink">
               {t("computer.youHaveWheel")}
               {cloudPreviewReady && !liveTarget && ` ${t("computer.simple.useFullScreen")}`}
