@@ -567,7 +567,7 @@ an email sign-in list, say), or `OMB_LOOPBACK_TRUST=owner` to opt a hosted
 workspace back into the old behaviour (the log then warns). Any other value
 means `service`. The desktop app ignores the setting: its local changes
 already need the app's own per-launch capability. MausBot Cloud ignores
-it too and is always `service` (docs/cloud-pro.md).
+it too and is always `service`.
 
 With `service` on a self-hosted server:
 
