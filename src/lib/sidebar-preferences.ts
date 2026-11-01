@@ -57,13 +57,9 @@ export function parseSidebarToolsLayout(value: string | null): SidebarToolsLayou
   }
 }
 
-export function loadSidebarToolsLayout(storage?: Pick<Storage, "getItem"> | null): SidebarToolsLayout {
-  try {
-    const target = storage === undefined ? (globalThis.localStorage ?? null) : storage;
-    return parseSidebarToolsLayout(target?.getItem(SIDEBAR_TOOLS_LAYOUT_KEY) ?? null);
-  } catch {
-    return "rows";
-  }
+export function loadSidebarToolsLayout(_storage?: Pick<Storage, "getItem"> | null): SidebarToolsLayout {
+  // One layout for everyone: older stored choices are ignored so the sidebar always looks the same.
+  return "rows";
 }
 
 export function saveSidebarToolsLayout(

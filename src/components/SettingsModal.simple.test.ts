@@ -62,12 +62,9 @@ vi.mock("./LocalComputerSection", () => ({ LocalComputerSection: marker("compute
 vi.mock("./SmsSettings", () => ({ SmsSettings: marker("sms") }));
 vi.mock("./CloudAccountSettings", () => ({ CloudAccountSettings: marker("cloudAccount") }));
 
-vi.mock("./ActivitySection", () => ({ ActivitySection: marker("activity") }));
 vi.mock("./UsageSection", () => ({ UsageSection: marker("usage") }));
-vi.mock("./WorkspaceBackupSettings", () => ({ WorkspaceBackupSettings: marker("backups") }));
+vi.mock("./GrokImportSettings", () => ({ GrokImportSettings: marker("import") }));
 vi.mock("./RoomTurnTimeoutSettings", () => ({ RoomTurnTimeoutSettings: marker("roomTurns") }));
-vi.mock("./CompanyBackupSettings", () => ({ CompanyBackupSettings: () => null }));
-vi.mock("./ImportSettings", () => ({ ImportSettings: marker("import") }));
 vi.mock("./WorkspacesSection", () => ({ WorkspacesSection: marker("workspaces"), workspacesAvailable: () => true }));
 vi.mock("./UpdatesConsent", async (importOriginal) => ({
   ...await importOriginal<typeof import("./UpdatesConsent")>(),
@@ -130,7 +127,7 @@ const open = (section: AppSettingsSection) => { fixture.section = section; retur
 describe("Settings, the one plain UI", () => {
   it("draws nine pages in the split order and no section rail", () => {
     const html = render();
-    const order = ["account", "appearance", "data", "ai", "skills", "keys", "computer", "updates"];
+    const order = ["account", "appearance", "import", "ai", "skills", "keys", "computer", "updates"];
     expect(pages(html)).toEqual(order);
     expect(SIMPLE_PAGES.map((page) => page.id)).toEqual(order);
     expect(html).not.toContain("data-settings-group=");
@@ -143,7 +140,7 @@ describe("Settings, the one plain UI", () => {
     expect(SIMPLE_PAGES.map((page) => page.descriptionKey)).toEqual([
       "settings.simple.page.account.description",
       "settings.simple.page.appearance.description",
-      "settings.simple.page.data.description",
+      "settings.simple.page.import.description",
       "settings.simple.page.ai.description",
       "settings.simple.page.skills.description",
       "settings.simple.page.keys.description",
@@ -169,17 +166,16 @@ describe("Settings, the one plain UI", () => {
     expect(html).not.toContain('data-settings-disclosure="general-backups"');
   });
 
-  it("keeps Appearance, Sidebar, notifications and Backups on their own pages", () => {
+  it("keeps Appearance, Sidebar and notifications on their own page, and Grok import on Import", () => {
     const appearance = open("appearance");
     expect(currentPage(appearance)).toBe("appearance");
     expect(groupLabels(appearance)).toEqual(["Notifications"]);
-    expect(appearance).toContain("Sidebar");
-    expect(appearance).toContain('data-settings-disclosure="general-sidebar"');
-    const data = open("backups");
-    expect(currentPage(data)).toBe("data");
+    expect(appearance).not.toContain("Sidebar layout");
+    expect(appearance).not.toContain('data-settings-disclosure="general-sidebar"');
+    const data = open("import");
+    expect(currentPage(data)).toBe("import");
     expect(groupLabels(data)).toEqual(["Import"]);
-    expect(data).toContain('data-settings-disclosure="general-backups"');
-    expect(data).toContain("Export or restore every bot, chat and setting in one encrypted file.");
+    expect(placement(data, "MARKER:import;")).toBe("shown");
   });
 
   it("keeps the everyday rows and every merged control reachable by its own page", () => {
@@ -263,19 +259,15 @@ describe("Settings, the one plain UI", () => {
     expect(html).toContain("MARKER:workspaces;");
   });
 
-  it("drops People from Account and keeps Activity as its own group on Data for a hosted workspace", () => {
+  it("drops People from Account for a hosted workspace and offers no Activity page", () => {
     vi.stubGlobal("window", {});
     fixture.ownerOrAdmin = true;
     fixture.section = "people";
     const html = render();
-    expect(pages(html)).toEqual(["account", "appearance", "data", "ai", "skills", "keys", "computer", "updates"]);
+    expect(pages(html)).toEqual(["account", "appearance", "import", "ai", "skills", "keys", "computer", "updates"]);
     expect(currentPage(html)).toBe("account");
     expect(placement(html, "MARKER:people;")).toBe("missing");
     expect(placement(html, "MARKER:activity;")).toBe("missing");
-    const data = open("activity");
-    expect(currentPage(data)).toBe("data");
-    expect(placement(data, "MARKER:activity;")).toBe("shown");
-    expect(groupLabels(data)).toContain("Activity");
   });
 
   it("keeps a paired remote client's reduced set: Appearance, and Computer with your devices and Connect from elsewhere", () => {
@@ -296,8 +288,7 @@ describe("Settings, the one plain UI", () => {
   it.each<[AppSettingsSection, string]>([
     ["general", "account"],
     ["appearance", "appearance"],
-    ["import", "data"],
-    ["backups", "data"],
+    ["import", "import"],
     ["experimental", "skills"],
     ["decisionModel", "ai"],
     ["engines", "ai"],
