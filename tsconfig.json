@@ -17,7 +17,8 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "lucide-react": ["src/components/icons.tsx"]
     }
   },
   "include": ["src", "vite.config.ts"]

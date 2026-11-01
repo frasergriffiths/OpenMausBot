@@ -52,6 +52,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "lucide-react": fileURLToPath(new URL("./src/components/icons.tsx", import.meta.url)),
     },
   },
   server: {
