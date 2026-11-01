@@ -115,12 +115,18 @@
 @media (pointer: fine) { .table-plate .table-action { width: 24px; height: 24px; min-width: 24px; min-height: 24px; } }
 
 @theme {
-  --animate-panel-in: panel-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
-  --animate-workspace-in: workspace-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
-  --animate-pop-in: pop-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
-  --animate-pop-out: pop-out 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* One motion scale: fast for small feedback, base for controls, slow for
+     surfaces. Every animation uses the same curve so nothing feels off-beat. */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 240ms;
+  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-panel-in: panel-in var(--motion-slow) var(--motion-ease);
+  --animate-workspace-in: workspace-in var(--motion-base) var(--motion-ease);
+  --animate-pop-in: pop-in var(--motion-base) var(--motion-ease);
+  --animate-pop-out: pop-out var(--motion-fast) var(--motion-ease) forwards;
   --animate-caret: caret-blink 1s step-end infinite;
-  --animate-msg-in: msg-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-msg-in: msg-in var(--motion-base) var(--motion-ease);
   --animate-shimmer: shimmer 2s linear infinite;
   --animate-status-pulse: status-pulse 1.6s steps(2, jump-none) infinite;
   /* onboarding: a block of copy or a row arriving in a beat; `.stagger`
