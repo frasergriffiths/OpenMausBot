@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="electron/resources/app-icon.png" alt="OpenMausBot app icon" width="112" height="112">
+</p>
+
 # OpenMausBot
 
 OpenMausBot (also published as **MausBot**) is the closest open-source alternative to
