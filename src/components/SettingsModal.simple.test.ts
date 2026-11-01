@@ -124,7 +124,7 @@ const open = (section: AppSettingsSection) => { fixture.section = section; retur
 describe("Settings, the one plain UI", () => {
   it("draws nine pages in the split order and no section rail", () => {
     const html = render();
-    const order = ["account", "appearance", "import", "ai", "skills", "keys", "computer", "updates"];
+    const order = ["account", "appearance", "import", "ai", "skills", "keys", "computer", "browser", "updates"];
     expect(pages(html)).toEqual(order);
     expect(SIMPLE_PAGES.map((page) => page.id)).toEqual(order);
     expect(html).not.toContain("data-settings-group=");
@@ -142,6 +142,7 @@ describe("Settings, the one plain UI", () => {
       "settings.simple.page.skills.description",
       "settings.simple.page.keys.description",
       "settings.simple.page.computer.description",
+      "settings.simple.page.browser.description",
       "settings.simple.page.updates.description",
     ]);
     expect(render()).toContain(t("settings.simple.page.account.description"));
@@ -158,7 +159,7 @@ describe("Settings, the one plain UI", () => {
   it("opens Account on the profile, the plan, People, System and Limits", () => {
     const html = render();
     expect(currentPage(html)).toBe("account");
-    expect(groupLabels(html)).toEqual(["Departments", "System", "Limits and recovery"]);
+    expect(groupLabels(html)).toEqual(["Departments", "System", "Notifications", "Limits and recovery"]);
     expect(html).toContain("Add your name");
     expect(html).not.toContain('data-settings-disclosure="general-backups"');
   });
@@ -166,7 +167,7 @@ describe("Settings, the one plain UI", () => {
   it("keeps Appearance, Sidebar and notifications on their own page, and Grok import on Import", () => {
     const appearance = open("appearance");
     expect(currentPage(appearance)).toBe("appearance");
-    expect(groupLabels(appearance)).toEqual(["Notifications"]);
+    expect(groupLabels(appearance)).toEqual([]);
     expect(appearance).not.toContain("Sidebar layout");
     expect(appearance).not.toContain('data-settings-disclosure="general-sidebar"');
     const data = open("import");
@@ -180,13 +181,16 @@ describe("Settings, the one plain UI", () => {
     expect(markers(account)).toEqual(expect.arrayContaining(["roomTurns", "recovery"]));
     const appearance = open("appearance");
     for (const shown of ['aria-label="Color my messages with the bot&#x27;s color"', 'aria-label="Send messages with"',
-      'aria-label="Notification sounds"', 'aria-label="Show the notification feed"', 'aria-label="App language"', 'role="radiogroup" aria-label="Theme"']) {
+      'aria-label="App language"', 'role="radiogroup" aria-label="Theme"']) {
       expect(placement(appearance, shown), shown).toBe("shown");
+    }
+    for (const shown of ['aria-label="Notification sounds"', 'aria-label="Show the notification feed"']) {
+      expect(placement(account, shown), shown).toBe("shown");
     }
     // The density setting went with the compact layout: the sidebar's own toggle is the only way to the icons rail.
     expect(placement(appearance, 'aria-label="Choose sidebar density"')).toBe("missing");
     const ai = open("engines");
-    expect(markers(ai)).toEqual(expect.arrayContaining(["engines", "keepWarm", "decisionModel", "mcpCalls", "defaults"]));
+    expect(markers(ai)).toEqual(expect.arrayContaining(["engines", "keepWarm", "mcpCalls", "defaults"]));
     expect(ai).toContain('aria-label="Effort for new bots"');
     expect(open("updates")).toContain("MARKER:updatesConsent;");
   });
@@ -237,7 +241,7 @@ describe("Settings, the one plain UI", () => {
     fixture.section = "connections";
     const html = render();
     expect(currentPage(html)).toBe("keys");
-    expect(blocks(html)).toEqual(["connections"]);
+    expect(blocks(html)).toContain("connections");
     expect(html).toContain("MARKER:apiKey;");
     expect(html).not.toContain("MARKER:sms;");
     fixture.section = "sms";
@@ -253,7 +257,7 @@ describe("Settings, the one plain UI", () => {
     fixture.ownerOrAdmin = true;
     fixture.section = "people";
     const html = render();
-    expect(pages(html)).toEqual(["account", "appearance", "import", "ai", "skills", "keys", "computer", "updates"]);
+    expect(pages(html)).toEqual(["account", "appearance", "import", "ai", "skills", "keys", "computer", "browser", "updates"]);
     expect(currentPage(html)).toBe("account");
     expect(placement(html, "MARKER:people;")).toBe("missing");
     expect(placement(html, "MARKER:activity;")).toBe("missing");
@@ -265,12 +269,12 @@ describe("Settings, the one plain UI", () => {
     ["appearance", "appearance"],
     ["import", "import"],
     ["experimental", "skills"],
-    ["decisionModel", "ai"],
+    ["decisionModel", "keys"],
     ["engines", "ai"],
     ["connections", "keys"],
     ["desktopWorkspaces", "computer"],
     ["computer", "computer"],
-    ["logins", "computer"],
+    ["logins", "browser"],
     ["workspaces", "computer"],
     ["updates", "updates"],
   ])("lands a deep link to %s on %s", (section, page) => {
@@ -296,10 +300,10 @@ describe("Settings, the one plain UI", () => {
 describe("the built-in browser switch", () => {
   const browserSwitch = () => fixture.switches.find((props) => props["aria-label"] === "Enable the built-in browser");
 
-  it("writes features.browser from Computer, below your bots' computers", async () => {
-    fixture.section = "computer";
+  it("writes features.browser from the Browser page", async () => {
+    fixture.section = "browser";
     const html = render();
-    expect(html.indexOf("MARKER:computer;")).toBeLessThan(html.indexOf('aria-label="Enable the built-in browser"'));
+    expect(html).toContain('aria-label="Enable the built-in browser"');
     const toggle = browserSwitch()!;
     expect(toggle.checked).toBe(false);
     toggle.onClick!({} as never);
