@@ -1266,10 +1266,6 @@
   "settings.diagnostics.openFailed": "Could not open the logs folder. It is {folder}.",
   "settings.diagnostics.logsHelp": "Logs stay on this computer. Export Diagnostics saves their most recent part with keys, passwords and sign-ins removed, ready to send to support.",
   "settings.diagnostics.elsewhere": "Logs are kept where OpenMausBot runs. To open or export this computer's, use Settings in the desktop app on it. MausBot Cloud support can read the Cloud's.",
-  "settings.analytics.title": "Usage analytics",
-  "settings.analytics.subtitle": "Anonymous product events and a once-a-day count of what's set up: which providers have a key (never the key) and how many bots, rooms, routines and computers. Never conversations, prompts, file contents, names or addresses. Your email is only attached if you shared it during setup, or if you choose upgrade, manage or compare plans on the Cloud Pro popup while signed in to MausBot Cloud (your Cloud account's email).",
-  "settings.analytics.link": "See everything it sends",
-  "settings.analytics.aria": "Send usage analytics",
   "updatesConsent.title": "Get MausBot updates?",
   "updatesConsent.body": "We'll email you about new features and tips, about twice a month. You can unsubscribe any time.",
   "updatesConsent.yes": "Yes, send me updates",
@@ -5710,8 +5706,6 @@
   "settings.simple.notificationFeed": "A bell on the right that keeps your last 500 notifications.",
   "settings.simple.openAtLogin": "Starts when you sign in, so your bots are ready.",
   "settings.simple.defaultBot": "Your helper. Hidden, it keeps working and search still finds it.",
-  "settings.simple.analytics": "Anonymous usage events. Never your messages, files or keys. Your email only if you shared it at setup or on a Cloud plan screen.",
-  "settings.simple.analyticsLink": "See everything it sends",
   "settings.simple.diagnostics": "A file for support, with secrets removed. Check it before you send it.",
   "settings.simple.ai.yours": "Your AI",
   "settings.simple.ai.more": "More AI providers ({count})",
@@ -6690,7 +6684,6 @@
   "settings.sms.recommendation": "We recommend connecting SMS to your Chief of Staff. It can coordinate with your other bots and delegate requests, so one text can reach everything this installation can do.",
   "settings.sms.webhook": "Twilio webhook",
   "settings.sms.webhookHint": "Paste this into the Twilio number's Messaging webhook (HTTP POST). Twilio signs every message, so nothing else is accepted.",
-  "settings.sms.webhookMissing": "Twilio cannot reach this server yet, so replies from your phone will not arrive. Set OMB_WEBHOOK_PUBLIC_URL to this server's public address and restart.",
   "settings.sms.firstSent": "First text sent",
   "settings.sms.firstConfirm": "I understand this sends a real SMS to my phone, and Twilio may charge for it.",
   "settings.sms.sendFirst": "Send the first text",
@@ -6701,5 +6694,6 @@
   "settings.sms.numberChanged": "The linked phone has been replaced.",
   "settings.sms.disconnectHint": "Disconnecting removes the credentials and the linked phone. Your bots and conversations stay.",
   "settings.sms.disconnect": "Disconnect",
-  "settings.sms.group": "Messaging"
+  "settings.sms.group": "Messaging",
+  "settings.sms.webhookMissing": "Twilio cannot reach this server yet, so replies from your phone will not arrive. Set OMB_WEBHOOK_PUBLIC_URL to this server's public address and restart."
 }
