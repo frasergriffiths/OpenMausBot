@@ -117,10 +117,10 @@
 @theme {
   /* One motion scale: fast for small feedback, base for controls, slow for
      surfaces. Every animation uses the same curve so nothing feels off-beat. */
-  --motion-fast: 120ms;
-  --motion-base: 180ms;
-  --motion-slow: 240ms;
-  --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-fast: 140ms;
+  --motion-base: 200ms;
+  --motion-slow: 260ms;
+  --motion-ease: cubic-bezier(0.32, 0.72, 0, 1);
   --animate-panel-in: panel-in var(--motion-slow) var(--motion-ease);
   --animate-workspace-in: workspace-in var(--motion-base) var(--motion-ease);
   --animate-pop-in: pop-in var(--motion-base) var(--motion-ease);
@@ -133,14 +133,14 @@
   /* onboarding: a block of copy or a row arriving in a beat; `.stagger`
      spaces siblings out. Rare, first-time motion, so it may run past the
      300ms UI ceiling. */
-  --animate-rise: rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-rise: rise 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
   --animate-fade-in: fade-in 0.2s ease-out both;
   --animate-meet-caret: meet-caret 1s linear infinite;
   /* onboarding: a spotlight card or a first-sight hint scaling in from its
      anchor. Never from zero; nothing appears from nothing. */
-  --animate-spot-in: spot-in 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-spot-in: spot-in 0.24s cubic-bezier(0.32, 0.72, 0, 1) both;
   /* onboarding: a surface reacting once to an event (a routine firing) */
-  --animate-ripple: ripple 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-ripple: ripple 0.9s cubic-bezier(0.32, 0.72, 0, 1) both;
   /* onboarding: a bolt travelling from a webhook address to the bot */
   --animate-bolt: bolt 0.9s cubic-bezier(0.77, 0, 0.175, 1) infinite;
   /* Team map: a computer whose bot is acting breathes; its link to the bot carries a slow flow of dashes. */
@@ -1601,7 +1601,7 @@ body {
   to { transform: none; opacity: 1; }
 }
 .reply-bubble-in {
-  animation: bubble-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: bubble-in 0.22s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 /* mascot arrives at the tail */
 @keyframes turn-mascot-in {
@@ -1689,7 +1689,7 @@ body {
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.28s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 /* Cloud setup (CloudEngineSignIn, CloudSetup) shares the welcome flow's
    rare, first-time motion. A step's details open on grid rows, the one

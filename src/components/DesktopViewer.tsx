@@ -104,7 +104,7 @@ export function DesktopViewer() {
   // After the commit that clears `inert`, so focus is not dropped to <body>.
   const focusSoon = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus());
   const togglePanel = (next: "keyboard" | "clipboard") => setPanel(value => value === next ? null : next);
-  const slide = "transition-[width,translate,opacity] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none";
+  const slide = "transition-[width,translate,opacity] duration-[240ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none";
   const action = buttonStyles({ size: "sm", className: "min-h-11 rounded-xl focus-visible:outline-2 focus-visible:outline-focus" });
 
   return (
