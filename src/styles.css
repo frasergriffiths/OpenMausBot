@@ -150,8 +150,8 @@
   --animate-sent-border: sent-border 1.2s ease-out forwards;
 
   /* Defaults = Midnight. Kept here so the app is never unstyled. */
-  --color-app: #121212;
-  --color-panel: #0e0e0e;
+  --color-app: #242423;
+  --color-panel: #151514;
   --color-raised: #202020;
   --color-raised-hover: #2c2c2c;
   /* the composer pill. Every skin but Daylight paints it in `raised`; there
@@ -264,8 +264,8 @@
    ───────────────────────────────────────────────────────────────────────── */
 [data-skin="midnight"] {
   --code-color-scheme: dark;
-  --color-app: #121212;
-  --color-panel: #0e0e0e;
+  --color-app: #242423;
+  --color-panel: #151514;
   --color-raised: #202020;
   --color-raised-hover: #2c2c2c;
   --color-composer: #1f1f1f;
