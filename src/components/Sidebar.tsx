@@ -1,7 +1,7 @@
 import { OrganizationIdentity } from "./OrganizationIdentity";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch } from "react";
 import { createPortal } from "react-dom";
-import { Archive, Check, ChevronRight, ClipboardCopy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, PanelLeftClose, PanelLeftOpen, Phone, Pin, Plus, UserPlus, Search, TextQuote, Trash2, Users, X } from "lucide-react";
+import { Archive, Check, ChevronRight, ClipboardCopy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, PanelLeftClose, PanelLeftOpen, Phone, Pin, Plus, UserPlus, TextQuote, Trash2, Users, X } from "lucide-react";
 import { api, useStore, formatTime, visibleMessages, currentTaskBot, openBot, openThread, type Action, type AppState, type Bot, type BotProject, type Group, type InstanceInfo, type Message } from "@/state/store";
 import { approvalModeFor } from "../../shared/approval-mode";
 import { turnNowPhrases } from "@/lib/live-activity";
@@ -1210,13 +1210,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const attention = crossBotAttentionThreads(state.bots, state.pendingQueued, undefined, state.groups);
   const pendingBotUndo = teamFeedback?.restoreBot;
   const botRow = (bot: Bot): BotRowProps => ({ ...botRowProps(state, dispatch, bot, { density, query: q, onMenu: setMenu, renameRequest: renameRequest?.botId === bot.id ? renameRequest.nonce : 0 }), menuOpen: menu?.botId === bot.id });
-  const railSearch = () => {
-    toggleCollapsed();
-    // The field is always mounted once the sidebar is wide; put the caret in it after the rail has expanded.
-    if (typeof requestAnimationFrame === "function") {
-      requestAnimationFrame(() => document.querySelector<HTMLInputElement>("[data-sidebar-search-pill] input")?.focus());
-    }
-  };
+
   const plusItem = cn(SIMPLE_MENU_ITEM, "[&>*]:pointer-events-none text-ink hover:bg-menu-hover");
   const plusControl = (
     <div ref={plusMenuRef} className="contents">
@@ -1323,9 +1317,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
           </div>
         ) : null}
         {rail && <div data-sidebar-rail-top className="flex flex-col items-center gap-2 pt-1" style={windowNoDragStyle}>
-          {!collapseToIcons && <button type="button" onClick={railSearch} aria-label={t("sidebar.searchAria")} title={t("sidebar.searchAria")} className={SIMPLE_TOP_BUTTON}>
-            <Search size={18} strokeWidth={1.5} aria-hidden="true" />
-          </button>}
           <div className="relative flex">{plusControl}</div>
         </div>}
         {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center justify-end">
@@ -1356,15 +1347,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             title={density === "icons" ? t("sidebar.density.expand") : t("sidebar.density.collapse")}
           >
             {density === "icons" ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={17} />}
-          </button>}
-          {!collapseToIcons && density === "icons" && <button
-            type="button"
-            onClick={railSearch}
-            aria-label={t("sidebar.searchAria")}
-            title={t("sidebar.searchAria")}
-            className="flex size-[46px] shrink-0 items-center justify-center rounded-xl text-ink-secondary hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            <Search size={20} strokeWidth={2} />
           </button>}
           {plusControl}
         </div>}
