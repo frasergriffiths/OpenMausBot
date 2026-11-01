@@ -48,14 +48,12 @@ Talk to them like contacts. Watch them work. Approve what matters.
 <a href="https://boat.dev">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/sponsors/boat-logo-white.svg">
-    <img src="docs/assets/sponsors/boat-logo.svg" alt="Boat (boat.dev)" height="34">
   </picture>
 </a>
 
 <br>
 <br>
 
-<img src="docs/screenshots/hero.png" alt="OpenMausBot — a Telegram-style chat app where every chat is a real AI agent" width="900">
 
 </div>
 
@@ -110,7 +108,6 @@ and a decision guide in five questions: [Which AI agent should I use?](https://w
 A model picker with a provider rail — Claude and Codex models side by side, defaults marked, unavailable
 providers dimmed with the reason. Switch a bot's model mid-conversation.
 
-<img src="docs/screenshots/model-picker.png" alt="Model picker with provider rail" width="100%">
 
 </td>
 <td width="50%" valign="top">
@@ -120,7 +117,6 @@ providers dimmed with the reason. Switch a bot's model mid-conversation.
 Open the Computer panel and the bot's cloud desktop spins up on its own — live screen preview while it
 works, "Open desktop" to take over in your browser, or point the bot at *this Mac* instead.
 
-<img src="docs/screenshots/computer-panel.png" alt="Computer panel with live screen preview" width="100%">
 
 </td>
 </tr>
@@ -132,7 +128,6 @@ works, "Open desktop" to take over in your browser, or point the bot at *this Ma
 Shell commands, file edits, and questions surface as inline cards — Allow / Deny / answer in chat. A
 permission broker turns every risky action into a decision you make, for cloud and local computers alike.
 
-<img src="docs/screenshots/approval-card.png" alt="Approval and question cards in chat" width="100%">
 
 </td>
 <td width="50%" valign="top">
@@ -142,7 +137,6 @@ permission broker turns every risky action into a decision you make, for cloud a
 A one-click marketplace over Composio Sessions: Gmail, Slack, GitHub, Notion, Linear and hundreds more.
 OAuth once, and every bot can use them as tools.
 
-<img src="docs/screenshots/marketplace.png" alt="Connected apps marketplace" width="100%">
 
 </td>
 </tr>
@@ -154,7 +148,6 @@ OAuth once, and every bot can use them as tools.
 Right-click any bot: pin, mark unread, edit profile, duplicate, copy conversation ID, hide, delete. It's a
 messaging app — your agents behave like contacts.
 
-<img src="docs/screenshots/context-menu.png" alt="Bot context menu" width="100%">
 
 </td>
 <td width="50%" valign="top">
@@ -164,7 +157,6 @@ messaging app — your agents behave like contacts.
 Paste credentials in App Settings — they persist locally and the provider fleet hot-reloads instantly.
 Secrets are write-only: the UI only ever sees "configured" flags.
 
-<img src="docs/screenshots/app-settings.png" alt="App-level settings with API keys" width="100%">
 
 </td>
 </tr>
