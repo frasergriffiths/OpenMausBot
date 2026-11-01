@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, ChevronRight, Loader2, RefreshCw, Search, Server, TriangleAlert, X } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, Loader2, RefreshCw, Server, TriangleAlert, X } from "lucide-react";
 import { api, useStore, type Bot, type InstanceInfo } from "@/state/store";
 import { cn } from "@/lib/cn";
 import { Notice } from "./Notice";
@@ -558,7 +558,6 @@ export function PluginsPanel() {
           </div>
           <div className="flex items-center gap-2">
             <label data-field-shell="" className="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-[var(--radius-lg)] bg-control/70 pl-2.5 pr-1 focus-within:ring-1 focus-within:ring-accent">
-              <Search size={15} className="shrink-0 text-ink-secondary" />
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}

@@ -93,7 +93,7 @@ import { showWhoReportsToWhom, TeamContextMenu, TeamMenuItems, type TeamMenuAnch
 import { departmentOwner, useTeamPeople } from "@/state/team-people";
 export { TeamMenuItems };
 import { SidebarResizeHandle, useSidebarWidth } from "./SidebarResizeHandle";
-import { PHONE_TOP_BUTTON, SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_ROW_FOCUS, SIMPLE_TOP_BUTTON, SidebarEdgeToggle } from "./SidebarSimpleTop";
+import { PHONE_TOP_BUTTON, SIMPLE_MENU, SIMPLE_MENU_ITEM, SIMPLE_ROW_FOCUS, SidebarEdgeToggle } from "./SidebarSimpleTop";
 import { isSidebarToggle } from "@/lib/keyboard-shortcuts";
 import { SidebarRailSeparator, SimpleRailFooter } from "./SidebarSimpleRail";
 import { useShowThreads } from "@/lib/thread-preferences";
@@ -808,15 +808,15 @@ export const BotListItem = memo(function BotListItem(props: BotRowProps) {
             {!simpleList && title && !renaming && <SidebarBotRole role={title} />}
           </span>
           {last && !renaming && !expanded && (
-            <span className={cn(
-              "shrink-0 text-[12px] tabular-nums text-ink-secondary transition-opacity",
-              // Phones show the time on every row; elsewhere only the selected row, until its actions appear.
-              selected && !simpleList ? "group-hover:opacity-0 group-focus-within:opacity-0 touch:opacity-0 max-md:touch:opacity-100" : "hidden max-md:inline",
-            )}>
+            <span className="shrink-0 text-[12px] tabular-nums text-ink-secondary transition-opacity group-hover:opacity-0 group-focus-within:opacity-0">
               {formatTime(last.at)}
             </span>
           )}
-          {!simpleList && !railTile && <BotModelMark bot={bot} instances={instances} />}
+          {!simpleList && !railTile && (
+            <span className="pointer-events-none flex shrink-0 items-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+              <BotModelMark bot={bot} instances={instances} />
+            </span>
+          )}
           {expanded && unread && <span className="size-1.5 shrink-0 rounded-full bg-accent" aria-label={t("task.unreadMany")} />}
           {!renaming && <span className="flex shrink-0 self-center"><OwnerFace bot={bot} /></span>}
         </div>
@@ -1212,13 +1212,15 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
   const botRow = (bot: Bot): BotRowProps => ({ ...botRowProps(state, dispatch, bot, { density, query: q, onMenu: setMenu, renameRequest: renameRequest?.botId === bot.id ? renameRequest.nonce : 0 }), menuOpen: menu?.botId === bot.id });
 
   const plusItem = cn(SIMPLE_MENU_ITEM, "[&>*]:pointer-events-none text-ink hover:bg-menu-hover");
+  // The rail and Simple layouts want the mark without a plate behind it.
+  const PLAIN_TOP_BUTTON = "flex size-9 shrink-0 items-center justify-center rounded-full text-ink/90 hover:bg-raised/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
   const plusControl = (
     <div ref={plusMenuRef} className="contents">
     <button
       ref={importReturnRef}
       onClick={() => setPlusOpen((o) => !o)}
       aria-label={remoteClient ? t("sidebar.new") : t("sidebar.newOrShare")}
-      className={phone ? PHONE_TOP_BUTTON : rail || simple ? SIMPLE_TOP_BUTTON : cn(
+      className={phone ? PHONE_TOP_BUTTON : rail || simple ? PLAIN_TOP_BUTTON : cn(
         "flex items-center justify-center text-ink-secondary hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
         density === "icons" ? "size-[46px] shrink-0 rounded-xl" : "size-8 rounded-md",
       )}
@@ -1283,7 +1285,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       style={{ "--sidebar-width": `${sizing.width}px` } as CSSProperties}
       className={cn(
         "relative flex h-full shrink-0 flex-col overflow-x-clip border-r border-ink/[0.04] bg-panel max-md:[--scroll-fade-surface:var(--color-app)]",
-        "transition-[width] duration-[240ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-[width] motion-reduce:transition-none",
+        "transition-[width] duration-[240ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-[width] motion-reduce:transition-none",
         density === "icons" ? rail ? "w-[92px]" : "w-[80px]" : "w-[272px] md:w-[var(--sidebar-width)]",
         sidePanelOpen ? "md:max-w-[280px]" : "md:max-w-[calc(100vw-320px)]",
         // max-md: rather than an md: cancel: Tailwind v4 emits the native `translate`, and any value but `none` makes
@@ -1316,9 +1318,6 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             <span className="size-3 rounded-full bg-[#28c840]" />
           </div>
         ) : null}
-        {rail && <div data-sidebar-rail-top className="flex flex-col items-center gap-2 pt-1" style={windowNoDragStyle}>
-          <div className="relative flex">{plusControl}</div>
-        </div>}
         {density !== "icons" && (simpleDesk ? <div data-sidebar-top-slot className="@container/sidebar-top flex min-w-0 flex-1 items-center justify-end">
           <div data-sidebar-top-switcher className="flex min-w-0 items-center">
             <DesktopWorkspaceSwitcher inline pill cloudHome={state.config?.cloudHome === true} owner={cloudOwner} howTo={state.cloudHowTo} onMenuClosed={endHowTo} onConnectServer={() => dispatch({ type: "toggleAppSettings", open: true, section: "computer" })} onAddCloud={() => dispatch({ type: "openCloudAdd", source: "app_menu" })} />
@@ -1390,7 +1389,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       </GlassBar>
 
       {density !== "icons" && <SidebarResizeHandle sizing={sizing} sidebarRef={sidebarRef} style={windowNoDragStyle} />}
-      {!collapseToIcons && <SidebarEdgeToggle collapsed={rail} shown={rail || edgeShown} onHover={showEdge} onToggle={toggleCollapsed} style={windowNoDragStyle} />}
+      <SidebarEdgeToggle collapsed={rail} shown={rail || edgeShown} onHover={showEdge} onToggle={toggleCollapsed} style={windowNoDragStyle} />
 
       <GlassScroller className={rail ? "[scrollbar-gutter:stable_both-edges]" : simpleDesk ? "px-3" : "px-2"}>
         <div className={cn("flex flex-col", simpleDesk ? cn("gap-0.5 pb-2", !tiles && "pt-2") : "gap-1 pb-2 pt-2")}>
@@ -1546,6 +1545,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
       />
 
       {rail ? <SimpleRailFooter
+        plus={plusControl}
         owner={cloudOwner}
         archived={archivedEntry}
       /> : phone ? <SidebarPhoneBar query={query} onQuery={setQuery} /> : <SidebarFooter density={density} simple={simpleDesk} owner={cloudOwner} archived={archivedEntry} toolsCollapsed={sectionCollapsed(TOOLS_SECTION_ID)} onToggleTools={layoutInteractive ? () => toggleSection(TOOLS_SECTION_ID) : undefined} />}
