@@ -6,8 +6,7 @@ import { cn } from "@/lib/cn";
 import { useMenuMotion } from "./MenuMotion";
 import { t } from "@/lib/i18n";
 import type { LocaleKey } from "@/locales";
-import { SECTION_PROVIDER, type KeyResult, type KeyVia } from "@/lib/analytics-allowlist";
-import { keyRemoved, keySaved, keySaveFailure, keyTestResult, savedKeyResult } from "@/lib/product-events";
+import { type KeyResult, keyTestResult } from "@/lib/key-results";
 import { Chevron } from "./chevron";
 
 export type ConfigSection = "composio" | "box" | "opencodeGo" | "anthropic" | "openai" | "openrouter" | "openaiCompat" | "xai" | "mistral" | "cerebras" | "groq" | "meta" | "treg" | "deepseek";
@@ -298,12 +297,10 @@ export function ApiKeyRow({
   section,
   onSaved,
   testProvider,
-  via = "settings",
 }: {
   section: ConfigSection;
   onSaved?: (configured: boolean) => void;
   testProvider?: TestableProvider;
-  via?: KeyVia;
 }) {
   const { state, dispatch } = useStore();
   const [value, setValue] = useState("");
@@ -367,15 +364,10 @@ export function ApiKeyRow({
         setValue("");
         const nowConfigured = SECTIONS[section].flag(status);
         onSaved?.(nowConfigured);
-        const provider = SECTION_PROVIDER[section];
-        if (!next) {
-          if (configured) keyRemoved(provider, via);
-        } else if (testProvider && nowConfigured) void test().then((result) => keySaved(provider, via, result));
-        else keySaved(provider, via, savedKeyResult(provider));
+        if (next && testProvider && nowConfigured) void test();
       })
       .catch((e) => {
         setError(e.message);
-        if (next) keySaved(SECTION_PROVIDER[section], via, keySaveFailure(e));
       })
       .finally(() => { savingRef.current = false; setSaving(false); });
   };

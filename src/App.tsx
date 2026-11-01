@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, Loader2, Menu } from "lucide-react";
-import { CLOUD_LINK_SETTINGS, openBot, StoreProvider, useStore } from "@/state/store";
+import { CLOUD_LINK_SETTINGS, openBot, StoreProvider, useStore, type AppSettingsSection } from "@/state/store";
 import { useShowThreads } from "@/lib/thread-preferences";
 import { useWelcomeViewer, WelcomeGate } from "@/components/onboarding/WelcomeGate";
 import { MausBotWelcome } from "@/components/MausBotWelcome";
@@ -9,7 +9,6 @@ import type { WelcomeViewer } from "@/lib/onboarding";
 import { GuidedTour } from "@/components/onboarding/GuidedTour";
 import { LiveCallHost } from "@/components/LiveCallHost";
 import { ThreadRefsProvider } from "@/components/ThreadRefs";
-import { initAnalytics } from "@/lib/analytics";
 import { parseComputerHelp } from "@/lib/computer-control";
 import { Sidebar } from "@/components/Sidebar";
 import { ChatView } from "@/components/ChatView";
@@ -43,7 +42,6 @@ import { effectiveLanguage, useLanguageChoice } from "@/lib/language-preference"
 import { botShowsUnread, showBrowserUnread } from "@/lib/bot-unread";
 import { phonePairingSettingsAction, takePhonePairingRequest } from "@/lib/phone-pairing"; import { takeConnectRequest } from "@/lib/connect-link";
 import { useExternalChatLinks } from "@/hooks/use-external-chat-links";
-import { useUsageSnapshot } from "@/hooks/use-usage-snapshot";
 import { useReadShownChatOnFocus } from "@/hooks/use-read-shown-chat";
 import { usePresence } from "@/hooks/use-presence";
 import { ChatNotice } from "@/components/ChatErrorBanner";
@@ -172,7 +170,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
     if (!state.connected) return;
     void preloadConnectedApps().catch(() => {});
   }, [state.connected]);
-  useUsageSnapshot();
 
   useEffect(() => preloadScreens(), []);
 
@@ -206,6 +203,14 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
     state.computerOpen ||
     state.appSettingsOpen ||
     state.pluginsOpen;
+
+  // Dev-only deep link: /?settings=computer opens that page, so a browser build can be checked page by page.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    const wanted = new URLSearchParams(window.location.search).get("settings");
+    if (!wanted) return;
+    dispatch({ type: "toggleAppSettings", open: true, section: wanted as AppSettingsSection });
+  }, [dispatch]);
 
   useEffect(() => {
     return window.ogb?.onOpenAppSettings?.(section => dispatch((section === "cloud-add" || section === "cloud-add-howto") && window.ogb?.cloudAccount && !remoteClient
@@ -347,9 +352,6 @@ function Shell({ viewer }: { viewer: WelcomeViewer | null }) {
 }
 
 function Application() {
-  useEffect(() => {
-    initAnalytics();
-  }, []);
   const viewer = useWelcomeViewer();
   return (
     <DesktopCapabilitiesProvider>

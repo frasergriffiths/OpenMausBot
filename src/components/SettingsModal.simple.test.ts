@@ -24,7 +24,6 @@ vi.mock("@/state/store", async (importOriginal) => ({
   api: fixture.api,
   useStore: () => ({ state: { appSettingsSection: fixture.section, instances: [], bots: [], config: fixture.config }, dispatch: fixture.dispatch }),
 }));
-vi.mock("@/lib/analytics", () => ({ analyticsEnabled: () => false, setAnalyticsEnabled: vi.fn() }));
 vi.mock("@/lib/use-owner-or-admin", () => ({ useOwnerOrAdmin: () => fixture.ownerOrAdmin }));
 vi.mock("./ui", async (importOriginal) => {
   const original = await importOriginal<typeof import("./ui")>();
@@ -185,7 +184,6 @@ describe("Settings, the one plain UI", () => {
 
   it("keeps the everyday rows and every merged control reachable by its own page", () => {
     const account = open("general");
-    expect(placement(account, 'aria-label="Send usage analytics"')).toBe("shown");
     expect(markers(account)).toEqual(expect.arrayContaining(["roomTurns", "recovery"]));
     const appearance = open("appearance");
     for (const shown of ['aria-label="Color my messages with the bot&#x27;s color"', 'aria-label="Send messages with"',

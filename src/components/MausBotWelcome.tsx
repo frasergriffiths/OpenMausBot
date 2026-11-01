@@ -4,7 +4,7 @@ import { BookOpen, Crown, Pencil, Sparkles, Wand2 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
-import { emailGateDone } from "@/lib/analytics";
+import { emailGateDone } from "@/lib/welcome-record";
 import { DEFAULT_BOT_NAME, myDefaultBot, setWelcomingBot, useViewerEmail } from "@/lib/default-bot";
 import { landInSidebar } from "@/lib/mausbot-landing";
 import { firstReplyPending } from "@/lib/corner-popup";

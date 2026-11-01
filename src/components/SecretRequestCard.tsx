@@ -2,9 +2,7 @@ import { useState, type FormEvent } from "react";
 import { ExternalLink, KeyRound, Loader2, LockKeyhole, RefreshCw, X } from "lucide-react";
 
 import { credentialResumeOutcome, credentialSaveRequest, isConfigCredentialTarget } from "../../shared/credential-request";
-import { credentialProvider } from "@/lib/analytics-allowlist";
 import { cn } from "@/lib/cn";
-import { keySaved, keySaveFailure, savedKeyResult } from "@/lib/product-events";
 import { api, useStore, type ConfigStatus, type Message } from "@/state/store";
 import { ASK_FIELD, ASK_PRIMARY_BUTTON, ASK_QUIET_BUTTON, AskCard, AskSettledLine, returnFocusToComposer } from "./AskCard";
 
@@ -84,8 +82,6 @@ export function SecretRequestCard({
     if (saving || (!value.trim() && !savedLocally)) return;
     setSaving(true);
     setLocalError(null);
-    const provider = credentialProvider(secret.target);
-    let saved = savedLocally;
     try {
       if (!savedLocally) {
         const next = value.trim();
@@ -98,15 +94,12 @@ export function SecretRequestCard({
             : await api(request.path, { method: request.method, body: JSON.stringify(request.body) });
           dispatch({ type: "configStatus", config: status });
         } else await api(request.path, { method: request.method, body: JSON.stringify(request.body) });
-        saved = true;
-        keySaved(provider, "chat_request", savedKeyResult(provider));
         setValue("");
         setSavedLocally(true);
       }
       await notifyProvided();
       returnFocusToComposer();
     } catch (error) {
-      if (!saved) keySaved(provider, "chat_request", keySaveFailure(error));
       setLocalError(error instanceof Error ? error.message : String(error));
     } finally {
       setSaving(false);
