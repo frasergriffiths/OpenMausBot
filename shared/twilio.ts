@@ -35,6 +35,8 @@ export interface SmsStatus {
   webhookUrl: string | null;
   /** Why the receiver cannot be reached, when it cannot. */
   webhookError: string | null;
+  /** Where the address came from: saved in settings, the server environment, or nowhere. */
+  webhookSource: "saved" | "environment" | "none";
   linkedAt: number | null;
   /** When the first message was sent, or null while it never has been. */
   firstMessageAt: number | null;

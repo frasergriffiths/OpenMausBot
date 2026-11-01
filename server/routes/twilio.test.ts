@@ -35,13 +35,14 @@ async function serve(who: keyof typeof AUTH = "owner"): Promise<{ base: string; 
     threadFor: () => "thread-1",
     startTurn: async () => ({}),
     lastBotText: () => null,
-    webhook: () => ({ url: "https://bots.example.com/twilio/sms", error: null }),
+    webhook: () => ({ url: "https://bots.example.com/twilio/sms", error: null, source: "environment" }),
     client: () => ({
       validate: async () => ({ sid: SID, name: "Acme Texts", status: "active" }),
       send: async (message) => { sent.push(message.body); return { sid: "SM1", status: "queued", numSegments: 1 }; },
+      setSmsWebhook: async () => ({ updated: true }),
     }),
   });
-  const routes = [createTwilioRoutes({ sms, bots: () => [{ id: "bot-1", name: "MausBot" }] })];
+  const routes = [createTwilioRoutes({ sms, webhookPort: 8800, bots: () => [{ id: "bot-1", name: "MausBot" }] })];
   const server = createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://localhost");
     try {

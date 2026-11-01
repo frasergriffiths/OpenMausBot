@@ -23,6 +23,7 @@ export class TwilioError extends Error {
 const account = z.object({ sid: z.string(), friendly_name: z.string().nullable().optional(), status: z.string().nullable().optional() });
 const message = z.object({ sid: z.string(), status: z.string().nullable().optional(), num_segments: z.string().nullable().optional() });
 const failure = z.object({ code: z.number().nullable().optional(), message: z.string().nullable().optional() });
+const numberPage = z.object({ incoming_phone_numbers: z.array(z.object({ sid: z.string(), phone_number: z.string() })) });
 
 export interface TwilioClientOptions {
   apiBase?: string;
@@ -44,6 +45,8 @@ export interface TwilioSendResult {
 export interface TwilioClient {
   validate(): Promise<TwilioAccount>;
   send(input: { from: string; to: string; body: string }): Promise<TwilioSendResult>;
+  /** Points the sending number at the webhook, so replies arrive without a console visit. */
+  setSmsWebhook(input: { from: string; url: string }): Promise<{ updated: boolean }>;
 }
 
 /** A friendly sentence for the screen, keeping Twilio's own wording when it has any. */
@@ -99,6 +102,21 @@ export function createTwilioClient(credentials: { accountSid: string; authToken:
       if (!parsed.success) throw new TwilioError("Twilio's account answer did not look like an account");
       if (parsed.data.sid !== credentials.accountSid) throw new TwilioError("That SID belongs to a different account");
       return { sid: parsed.data.sid, name: parsed.data.friendly_name ?? parsed.data.sid, status: parsed.data.status ?? "active" };
+    },
+
+    async setSmsWebhook(input) {
+      const query = new URLSearchParams({ PhoneNumber: input.from });
+      const page = numberPage.safeParse(await call("/2010-04-01/Accounts/" + encodeURIComponent(credentials.accountSid) + "/IncomingPhoneNumbers.json?" + query));
+      if (!page.success) throw new TwilioError("Twilio number list did not look like a number list");
+      const number = page.data.incoming_phone_numbers.find((candidate) => candidate.phone_number === input.from);
+      if (!number) throw new TwilioError("That sending number is not in this Twilio account");
+      const form = new URLSearchParams({ SmsUrl: input.url, SmsMethod: "POST" });
+      await call("/2010-04-01/Accounts/" + encodeURIComponent(credentials.accountSid) + "/IncomingPhoneNumbers/" + encodeURIComponent(number.sid) + ".json", {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body: form.toString(),
+      });
+      return { updated: true };
     },
 
     async send(input) {

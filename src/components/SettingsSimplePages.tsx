@@ -140,11 +140,12 @@ export function SimpleAiPage({ has, disclose }: { has: Has; disclose: Disclose }
   );
 }
 
-export function SimpleSkillsPage({ has }: { has: Has }) {
+export function SimpleSkillsPage({ has, sms }: { has: Has; sms?: ReactNode }) {
   return (
     <>
       {has("skills") && <div data-settings-block="skills" className="scroll-mt-4"><SkillsSection /></div>}
       {has("experimental") && <div data-settings-block="experimental" className="scroll-mt-4"><ExperimentalFeaturesRow /></div>}
+      {has("sms") && <SettingsGroup label={t("settings.sms.group")} block="sms">{sms}</SettingsGroup>}
     </>
   );
 }
@@ -153,14 +154,9 @@ function CardBlock({ children }: { children: ReactNode }) {
   return <div className="rounded-[var(--radius-card)] border-[0.5px] border-(--settings-edge) bg-menu p-4">{children}</div>;
 }
 
-export function SimpleKeysPage({ has, connections, sms }: { has: Has; connections: ReactNode; sms?: ReactNode }) {
-  if (!has("connections") && !has("sms")) return null;
-  return (
-    <>
-      {has("connections") && <div data-settings-block="connections" className="scroll-mt-4">{connections}</div>}
-      {has("sms") && <SettingsGroup label={t("settings.sms.group")} block="sms">{sms}</SettingsGroup>}
-    </>
-  );
+export function SimpleKeysPage({ has, connections }: { has: Has; connections: ReactNode }) {
+  if (!has("connections")) return null;
+  return <div data-settings-block="connections" className="scroll-mt-4">{connections}</div>;
 }
 
 export type RemoteAccessCards = Record<"client" | "domain" | "pairing" | "companion", ReactNode>;

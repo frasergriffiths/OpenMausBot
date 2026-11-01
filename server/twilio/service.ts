@@ -8,6 +8,8 @@
 import { normalisePhone, splitSms, TWILIO_SID, type SmsStatus } from "../../shared/twilio.ts";
 import { createTwilioClient, describeTwilioError, type TwilioClient } from "./client.ts";
 import { clearIntegration, hasSeen, publicIntegration, readIntegration, rememberSeen, writeIntegration, type StoredIntegration } from "./store.ts";
+import { normaliseBaseUrl, readWebhookBaseUrl, writeWebhookBaseUrl } from "./webhook-url.ts";
+import { SMS_WEBHOOK_PATH } from "./webhook.ts";
 import { verifyTwilioSignature } from "./signature.ts";
 
 export interface SmsBot {
@@ -28,7 +30,7 @@ export interface SmsServiceDeps {
   /** The newest text the bot wrote on a thread, or null before it has. */
   lastBotText: (threadId: string) => { id: string; text: string } | null;
   /** Where Twilio should post inbound messages, and why it cannot be reached. */
-  webhook: () => { url: string | null; error: string | null };
+  webhook: () => { url: string | null; error: string | null; source: "saved" | "environment" | "none" };
   log?: (line: string) => void;
 }
 
@@ -105,6 +107,7 @@ export class SmsService {
       botName: bot?.name ?? null,
       webhookUrl: reach.url,
       webhookError: reach.error,
+      webhookSource: reach.source,
       linkedAt: value?.linkedAt ?? null,
       firstMessageAt: value?.firstMessageAt ?? null,
       lastError: value?.lastError ?? null,
@@ -189,6 +192,34 @@ export class SmsService {
     const at = this.now();
     this.save({ ...value, botId, updatedAt: at });
     return this.status();
+  }
+
+  /** Saves where Twilio should post, and points the sending number at it when asked. */
+  async saveWebhook(input: { url: string | null; apply?: boolean }): Promise<SmsStatus> {
+    const value = this.read();
+    if (!value) throw Object.assign(new Error("Connect Twilio first"), { status: 409 });
+    const url = input.url === null ? null : normaliseBaseUrl(input.url);
+    if (input.url !== null && !url) throw Object.assign(new Error("Enter an address such as https://bots.example.com"), { status: 400 });
+    writeWebhookBaseUrl(this.deps.dataDir, url);
+    if (input.apply !== false && url) {
+      const target = url.replace(new RegExp("/+$"), "") + SMS_WEBHOOK_PATH;
+      try {
+        await this.clientFor(value).setSmsWebhook({ from: value.fromNumber, url: target });
+        this.note(value, null);
+      } catch (error) {
+        this.note(value, describeTwilioError(error));
+        throw Object.assign(new Error("The address was saved, but Twilio refused it: " + describeTwilioError(error)), { status: 502 });
+      }
+    }
+    return this.status();
+  }
+
+  /** The saved address wins over the environment's, so a tunnel can be set without a restart. */
+  webhookBaseUrl(environment: string | null): { base: string | null; source: "saved" | "environment" | "none" } {
+    const saved = readWebhookBaseUrl(this.deps.dataDir);
+    if (saved) return { base: saved, source: "saved" };
+    if (environment) return { base: environment, source: "environment" };
+    return { base: null, source: "none" };
   }
 
   disconnect(): SmsStatus {

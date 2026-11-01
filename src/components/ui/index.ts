@@ -17,3 +17,4 @@ export { ToastRegion, type ToastMessage, type ToastTone } from "./toast";
 export { SearchField } from "./search";
 export { Kbd, VisuallyHidden } from "./a11y";
 export { CommandLine, SettingRow, SettingsCard, SettingsDisclosureRow, SettingsGroup, SettingsRows, SIMPLE_CARD } from "./settings";
+export { StatePill, type StateTone } from "./state-pill";
