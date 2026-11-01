@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   BotAvatar,
   MausAvatar,
+  mascotEyeColor,
   resolveBotAvatarOutcome,
   type BotAvatarProps,
   type MausAvatarProps,
@@ -18,6 +19,19 @@ const renderBot = (bot: Partial<BotAvatarProps["bot"]>) =>
   renderToStaticMarkup(
     createElement(BotAvatar, { bot: { color: "green", ...bot }, animated: false }),
   );
+
+describe("mascotEyeColor", () => {
+  it("gives the white mascot black eyes and the black mascot white eyes", () => {
+    expect(mascotEyeColor("white")).toBe("#111111");
+    expect(mascotEyeColor("black")).toBe("#ffffff");
+  });
+
+  it("keeps light eyes on the saturated bodies", () => {
+    for (const color of ["green", "blue", "red", "purple", "teal", "yellow"] as const) {
+      expect(mascotEyeColor(color)).toBe("#ffffff");
+    }
+  });
+});
 
 describe("MausAvatar body", () => {
   it("wears the cursor when no body is given", () => {

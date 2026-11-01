@@ -54,6 +54,25 @@ function mix(hex: string, toward: string, t: number): string {
     .join("")}`;
 }
 
+/** Relative luminance of a hex colour, WCAG 2.1. */
+function relativeLuminance(hex: string): number {
+  const value = Number.parseInt(hex.slice(1), 16);
+  const channel = (shift: number) => {
+    const part = ((value >> shift) & 0xff) / 255;
+    return part <= 0.03928 ? part / 12.92 : ((part + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * channel(16) + 0.7152 * channel(8) + 0.0722 * channel(0);
+}
+
+/** A pale mascot gets dark eyes, every other body keeps the light ones. The threshold sits above the yellow and
+ *  cyan bodies so only the near-white bodies flip. */
+export const EYE_INK_THRESHOLD = 0.6;
+
+export function mascotEyeColor(color: MausColor): string {
+  const fill = MAUS_COLORS[color] ?? MAUS_COLORS.green;
+  return relativeLuminance(fill) > EYE_INK_THRESHOLD ? "#111111" : "#ffffff";
+}
+
 const gradientFor = (color: MausColor): [string, string, string] => {
   const fill = MAUS_COLORS[color] ?? MAUS_COLORS.green;
   return [mix(fill, "#ffffff", 0.55), fill, mix(fill, "#000000", 0.42)];
@@ -168,6 +187,7 @@ function GradientAvatarComponent(
         turn={turn}
         spring={spring}
         eyeScale={eyeScale}
+        eyeColor={mascotEyeColor(color)}
         paused={!animated}
       />
     </span>
