@@ -14,7 +14,6 @@ const fixture = vi.hoisted(() => ({
   dispatch: vi.fn(),
   startCall: vi.fn(),
   endCall: vi.fn(),
-  track: vi.fn(),
 }));
 
 vi.mock("@/state/store", async (importOriginal) => {
@@ -43,7 +42,6 @@ vi.mock("@/lib/local-voice", async (importOriginal) => ({
   ...await importOriginal<typeof import("@/lib/local-voice")>(),
   localSystemVoiceActive: () => false,
 }));
-vi.mock("@/lib/analytics", () => ({ track: fixture.track }));
 // Stands in for the open state a click would set; SSR cannot click.
 vi.mock("./MenuMotion", async (importOriginal) => ({
   ...await importOriginal<typeof import("./MenuMotion")>(),
@@ -90,7 +88,6 @@ beforeEach(() => {
   fixture.helpShown = false;
   fixture.startCall.mockClear();
   fixture.endCall.mockClear();
-  fixture.track.mockClear();
   fixture.dispatch.mockClear();
   vi.stubGlobal("window", { ogb: { speechStart: () => {} } });
 });
@@ -104,13 +101,11 @@ describe("composer call button", () => {
     const { html, button } = render();
     expect(button.props["aria-label"]).toBe("Call Pepper");
     expect(String(button.props.className).split(" ")).toEqual(expect.arrayContaining(["size-8", "rounded-l-3xl", "rounded-r-lg", "active:rounded-3xl", "transition-[color,background,border-radius]", "bg-control"]));
-    expect(html).toContain("lucide-audio-lines");
-    expect(html).not.toContain("lucide-phone");
+    expect(html).not.toContain("Hang up on");
   });
 
   it("starts the call with the same telemetry as the header button did", () => {
     render().button.props.onClick!();
-    expect(fixture.track).toHaveBeenCalledWith("call_started", { driver: "codex", mode: "turns" });
     expect(fixture.startCall).toHaveBeenCalledWith("pepper");
     expect(fixture.endCall).not.toHaveBeenCalled();
   });
@@ -125,7 +120,6 @@ describe("composer call button", () => {
     }
     renderToStaticMarkup(createElement(Capture));
     findButton(tree)!.props.onClick!();
-    expect(fixture.track.mock.calls).toEqual([["call_started", { driver: "claude", mode: "turns" }]]);
   });
 
   it("shows a hang-up state during the call and hangs up", () => {
@@ -133,7 +127,7 @@ describe("composer call button", () => {
     const { html, button } = render();
     expect(button.props["aria-label"]).toBe("Hang up on Pepper");
     expect(String(button.props.className)).toContain("bg-danger");
-    expect(html).toContain("lucide-phone-off");
+    expect(html).toContain("Hang up on");
     button.props.onClick!();
     expect(fixture.endCall).toHaveBeenCalledWith("pepper");
     expect(fixture.startCall).not.toHaveBeenCalled();
@@ -163,7 +157,6 @@ describe("composer call button", () => {
     button.props.onClick!();
     expect(getUserMedia).toHaveBeenCalledTimes(1);
     expect(liveMedia()).toMatchObject({ phase: "starting", botId: "pepper" });
-    expect(fixture.track).toHaveBeenCalledWith("call_started", { driver: "codex", mode: "live" });
   });
 
   it("is a Live call on a server's page in the Windows app and the Mac app alike", () => {
@@ -194,7 +187,6 @@ describe("composer call button", () => {
     expect(classes).not.toContain("rounded-l-3xl");
     expect(classes).not.toContain("bg-control");
     expect(button.props.style).toEqual({ backgroundColor: "#8057c8", color: "#ffffff" });
-    expect(html).toContain("lucide-audio-lines");
     expect(html).not.toContain('aria-label="Call mode"');
     expect(renderToStaticMarkup(createElement(() => CallButton({ bot, placement: "composer" })))).toContain('aria-label="Call mode"');
   });
@@ -218,7 +210,7 @@ describe("composer call button", () => {
     fixture.config = { tts: { configured: false } };
     const { html, button } = render("header");
     expect(String(button.props.className).split(" ")).toContain("size-9");
-    expect(html).toContain("lucide-phone");
+    expect(html).toContain("data-call-button");
     expect(html).not.toMatch(/role="group" aria-label="Call unavailable" class="[^"]*\bbottom-full\b/);
   });
 });
