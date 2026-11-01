@@ -1,9 +1,17 @@
 # OpenMausBot
 
-OpenMausBot (also published as **MausBot**) is a desktop app for running a team of AI
-agents as chats. Every bot in the sidebar is a real agent, driven by a command-line
-engine you already have on your machine, with its own working folder, instructions,
-skills and memory. Open source under the Apache License 2.0.
+OpenMausBot (also published as **MausBot**) is the closest open-source alternative to
+**Grok Bot**: a desktop app for running a team of AI agents as chats, built around the
+same visual idea — a sidebar of bots, a familiar chat window, and an agent working in
+the background of every conversation. Every bot is a real agent, driven by a
+command-line engine you already have on your machine, with its own working folder,
+instructions, skills and memory. Open source under the Apache License 2.0.
+
+## Why OpenMausBot
+
+If you want **Grok Bot's** interface — bots as chats, a sidebar roster, an agent that
+works while you watch — but open source and running on models you already pay for,
+OpenMausBot is the closest match available today.
 
 ## What it does
 
