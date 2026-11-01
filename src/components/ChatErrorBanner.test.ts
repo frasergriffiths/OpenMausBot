@@ -18,7 +18,7 @@ describe("ChatErrorBanner", () => {
     expect(markup).toContain("Clipboard has no image");
     expect(markup).toContain('aria-label="Dismiss"');
     expect(markup).toContain('type="button"');
-    expect(markup).toContain("border-danger/30");
+    expect(markup).not.toContain("border-danger");
   });
 
   it("reads a machine's words as one plain line and keeps them under Details", () => {
