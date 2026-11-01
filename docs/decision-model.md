@@ -141,7 +141,7 @@ The log stays on this machine: workspace backups leave it out.
   always wins; clearing it falls back to the included decisions. The relay
   speaks Jev's API only, so the included decisions are Jev's: with OpenRouter
   selected nothing is included and you need an OpenRouter key. See
-  [cloud-pro.md](cloud-pro.md), "Included Boat computers, voice and
+  "Included Boat computers, voice and
   decisions".
 
 The keys are write-only: `GET /api/config` reports only whether one is saved,

@@ -2,7 +2,7 @@
 
 A **Team Cloud** is one Cloud machine several people use: the shared home of a team's bots. The Admin
 (openmaus-cloud, `docs/team-cloud.md` there) makes it, invites people and signs each person's pairing. This page is the
-machine's side: what the `team` role changes against a My Cloud ([cloud-pro.md](cloud-pro.md)), and the one rule that
+machine's side: what the `team` role changes, and the one rule that
 keeps people apart on it. The bot box ([bot-box.md](bot-box.md)) is what makes that rule hold against a bot with a shell.
 
 ## What a team sees
