@@ -2,7 +2,7 @@
 // language.
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
 import { setLocale } from "@/lib/i18n";
 import { en, locales } from "@/locales";
@@ -19,10 +19,6 @@ beforeAll(() => {
 
 // Pinned to Advanced: these cover the Advanced rail. Analytics (mocked below) boots PostHog on import, which wants a
 // real browser.
-vi.mock("@/lib/analytics", () => ({
-  analyticsEnabled: () => false,
-  setAnalyticsEnabled: () => {},
-}));
 
 async function renderSettings(): Promise<string> {
   const { SettingsModal } = await import("./SettingsModal");
@@ -38,7 +34,7 @@ describe("Settings → General", () => {
     setLocale("pt-br");
     const pt = await renderSettings();
     expect(pt).toContain("Configurações");
-    expect(pt).toContain("Análise de uso");
+    expect(pt).toContain("Recuperação automática");
     expect(pt).toContain("Duração máxima do turno");
 
     // Same module instance, no reload: a frozen label would still say "Provedores de modelos" here.

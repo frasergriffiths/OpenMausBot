@@ -6,7 +6,6 @@ import { t } from "@/lib/i18n";
 import { appVersion } from "@/lib/app-links";
 import { Button, SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
 import { brand } from "../lib/brand";
-import { AnalyticsRow } from "./AnalyticsRow";
 import { UpdatesConsentRow } from "./UpdatesConsent";
 import { OpenAtLoginRow } from "./OpenAtLoginRow";
 import { DefaultBotSidebarRow } from "./DefaultBotControls";
@@ -72,7 +71,6 @@ export function SimpleAccountPage({ has }: { has: Has }) {
             <OpenAtLoginRow simple />
             <BusySendRow simple />
             <DefaultBotSidebarRow simple />
-            <AnalyticsRow simple />
           </SettingsRows>
         </SettingsGroup>
       )}
