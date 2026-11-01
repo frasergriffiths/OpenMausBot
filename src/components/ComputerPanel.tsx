@@ -1438,7 +1438,7 @@ export function ComputerPanel({
         {phase === "unconfigured" && cloudView.action?.id === "add-boat-key" && (
           <div className="mt-3 rounded-xl bg-card p-4">
             <ApiKeyRow
-              section="box" via="computer_panel"
+              section="box"
               onSaved={(configured) => configured && setRetry((n) => n + 1)}
             />
           </div>

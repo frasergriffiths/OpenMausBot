@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Loader2, Plus, RotateCw, Trash2 } from "lucide-react";
 import { api, useStore, type InstanceInfo } from "@/state/store";
 import { t } from "@/lib/i18n";
-import { keySaved } from "@/lib/product-events";
 import { addedServers } from "@/lib/openai-compat-endpoints";
 import { ApiKeyRow, OpenAiCompatUrl } from "./ApiKeys";
 import { Chevron } from "./chevron";
@@ -58,10 +57,7 @@ function AddedServers({ servers }: { servers: Array<InstanceInfo & { url?: strin
     () => api("/api/instances/openai-compat", {
       method: "POST",
       body: JSON.stringify({ displayName: name.trim(), url: url.trim(), key: key.trim(), ...(modelIds(models).length ? { models: modelIds(models) } : {}) }),
-    }).then(
-      (added) => { keySaved("custom_endpoint", "settings", "unverified"); return added; },
-      (cause: unknown) => { keySaved("custom_endpoint", "settings", "error"); throw cause; },
-    ),
+    }),
     () => { setName(""); setUrl(""); setKey(""); setModels(""); },
   );
 
@@ -157,13 +153,11 @@ export function LmStudioServer() {
       }),
     }).then(
       async (created) => {
-        keySaved("custom_endpoint", "settings", "unverified");
         if (Array.isArray(created.instances)) dispatch({ type: "instances", instances: created.instances as InstanceInfo[] });
         else await refreshInstances({ reportErrors: true });
         setToken("");
       },
       (cause: unknown) => {
-        keySaved("custom_endpoint", "settings", "error");
         setError(cause instanceof Error && cause.message ? cause.message : t("apiInstances.failed"));
       },
     ).finally(() => setBusy(false));
