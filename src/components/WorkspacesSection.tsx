@@ -34,7 +34,7 @@ export function WorkspacesTable({ fleet, onAct, busy }: { fleet: FleetView; onAc
   if (fleet.workspaces.length === 0) return <div className="text-[13px] text-ink-secondary">{t("workspaces.empty", { domain: fleet.domain })}</div>;
   return (
     <div className="flex flex-col">
-      <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-5 border-b border-hairline/40 pb-2 text-[12px] font-medium uppercase tracking-wide text-ink-secondary">
+      <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-5 border-b border-hairline/40 pb-2 text-[12px] font-medium tracking-wide text-ink-secondary">
         <span>{t("workspaces.colWorkspace")}</span>
         <span className="text-right">{t("workspaces.colState")}</span>
         <span className="text-right">{t("workspaces.colMonth")}</span>

@@ -76,7 +76,7 @@ export function AvatarFraming({
         <BotAvatar bot={bot} size={FRAME_SIZE} animated={false} label={`${bot.name} avatar preview`} />
       </div>
       <div className="mb-1.5 mt-4 flex items-baseline justify-between">
-        <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">Zoom</span>
+        <span className="text-[12px] font-medium tracking-[0.08em] text-ink-secondary">Zoom</span>
         <span className="tabular-nums text-[12px] text-ink-secondary">{Math.round(zoom * 100)}%</span>
       </div>
       <input

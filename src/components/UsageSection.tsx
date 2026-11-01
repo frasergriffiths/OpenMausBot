@@ -115,7 +115,7 @@ function WhereItWent({ range, version, onBudget }: { range: { from: string; to: 
       <h3 className="text-[15px] font-medium text-ink">{t("usage.page.where")}</h3>
       <div className="mt-4 grid gap-6 md:grid-cols-2">
         <div>
-          <div className="mb-3 text-[11px] font-medium uppercase tracking-[0.08em] text-ink-secondary">{t(GROUP_LABEL_KEYS.bot)}</div>
+          <div className="mb-3 text-[11px] font-medium tracking-[0.08em] text-ink-secondary">{t(GROUP_LABEL_KEYS.bot)}</div>
           {byBot ? <GroupBars groupBy="bot" groups={byBot.groups} /> : <Loader2 size={14} className="animate-spin text-ink-secondary" />}
         </div>
         <div>

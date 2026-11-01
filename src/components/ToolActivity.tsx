@@ -8,7 +8,7 @@ import { toolStepLabel } from "@/lib/tool-step-label";
 import { StatusDot, type StatusState } from "@/components/ui";
 import { PlaceIcon } from "./PlaceIcon";
 
-const FIELD_LABEL = "mb-1 text-[11px] font-medium uppercase tracking-[0.04em] text-ink-tertiary";
+const FIELD_LABEL = "mb-1 text-[11px] font-medium tracking-[0.04em] text-ink-tertiary";
 
 export function ToolActivity({ tool, place = null, live = false }: { tool: NonNullable<Message["tool"]>; place?: Place | null; live?: boolean }) {
   const [expanded, setExpanded] = useState(false);
