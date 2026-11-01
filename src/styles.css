@@ -125,6 +125,7 @@
   --animate-workspace-in: workspace-in var(--motion-base) var(--motion-ease);
   --animate-pop-in: pop-in var(--motion-base) var(--motion-ease);
   --animate-pop-out: pop-out var(--motion-fast) var(--motion-ease) forwards;
+  --animate-fade-out: fade-out var(--motion-fast) var(--motion-ease) forwards;
   --animate-caret: caret-blink 1s step-end infinite;
   --animate-msg-in: msg-in var(--motion-base) var(--motion-ease);
   --animate-shimmer: shimmer 2s linear infinite;
@@ -1564,6 +1565,9 @@ body {
 @keyframes pop-in {
   from { transform: scale(0.96) translateY(6px); opacity: 0; }
   to { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes fade-out {
+  to { opacity: 0; }
 }
 @keyframes pop-out {
   from { transform: scale(1) translateY(0); opacity: 1; }

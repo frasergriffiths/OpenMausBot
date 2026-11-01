@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
@@ -33,6 +33,14 @@ export function Dialog({
   onCloseRef.current = onClose;
   const titleId = useId();
   const descriptionId = useId();
+  // Keep the panel mounted for one short beat so closing has motion instead of a snap.
+  const [phase, setPhase] = useState<"open" | "closing" | "closed">(open ? "open" : "closed");
+  useEffect(() => {
+    if (open) { setPhase("open"); return; }
+    setPhase(current => (current === "open" ? "closing" : current));
+    const timer = window.setTimeout(() => setPhase("closed"), 140);
+    return () => window.clearTimeout(timer);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -64,12 +72,12 @@ export function Dialog({
     };
   }, [open]);
 
-  if (!open) return null;
+  if (phase === "closed") return null;
 
   const content = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 max-sm:items-end max-sm:p-0">
       <div
-        className="absolute inset-0 bg-black/45 backdrop-blur-[2px] animate-fade-in motion-reduce:animate-none"
+        className={cn("absolute inset-0 bg-black/45 backdrop-blur-[2px] motion-reduce:animate-none", phase === "closing" ? "animate-fade-out" : "animate-fade-in")}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -82,7 +90,7 @@ export function Dialog({
         className={cn(
           "relative flex max-h-[min(88vh,46rem)] w-full flex-col overflow-hidden",
           "rounded-[18px] border-[0.5px] border-hairline bg-panel shadow-2xl",
-          "animate-pop-in motion-reduce:animate-none max-sm:rounded-b-none max-sm:rounded-t-[20px]",
+          phase === "closing" ? "animate-pop-out motion-reduce:animate-none max-sm:rounded-b-none max-sm:rounded-t-[20px]" : "animate-pop-in motion-reduce:animate-none max-sm:rounded-b-none max-sm:rounded-t-[20px]",
           size === "sm" ? "max-w-sm" : size === "lg" ? "max-w-2xl" : "max-w-lg",
           className,
         )}
