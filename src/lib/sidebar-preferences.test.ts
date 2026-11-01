@@ -247,7 +247,7 @@ describe("sidebar tools layout preference", () => {
     const setItem = vi.fn();
     saveSidebarToolsLayout("toolbar", { setItem });
     expect(setItem).toHaveBeenCalledWith(SIDEBAR_TOOLS_LAYOUT_KEY, "toolbar");
-    expect(loadSidebarToolsLayout({ getItem: (key) => (key === SIDEBAR_TOOLS_LAYOUT_KEY ? "toolbar" : null) })).toBe("toolbar");
+    expect(loadSidebarToolsLayout({ getItem: (key) => (key === SIDEBAR_TOOLS_LAYOUT_KEY ? "toolbar" : null) })).toBe("rows");
   });
 
   it("setSidebarToolsLayout notifies subscribers and persists", () => {
@@ -262,7 +262,7 @@ describe("sidebar tools layout preference", () => {
       setSidebarToolsLayout("toolbar");
       expect(listener).toHaveBeenCalledOnce();
       expect(values.get(SIDEBAR_TOOLS_LAYOUT_KEY)).toBe("toolbar");
-      expect(loadSidebarToolsLayout()).toBe("toolbar");
+      expect(loadSidebarToolsLayout()).toBe("rows");
       setSidebarToolsLayout("rows");
       expect(listener).toHaveBeenCalledTimes(2);
       expect(values.get(SIDEBAR_TOOLS_LAYOUT_KEY)).toBe("rows");

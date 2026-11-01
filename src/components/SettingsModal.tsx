@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Archive, CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, ScrollText, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen, MessageSquareText } from "lucide-react";
+import { CloudDownload, Coins, Download, FlaskConical, KeyRound, LockKeyhole, Monitor, Palette, Sparkles, TabletSmartphone, Terminal, User, UserRound, Users, X, Building2, Zap, BookOpen, MessageSquareText } from "lucide-react";
 import { useStore, type AppSettingsSection } from "@/state/store";
 import { skillsLibraryEnabled } from "@/lib/feature-flags";
 import { type LocaleKey } from "@/locales";
@@ -10,7 +10,6 @@ import { LmStudioServer, OtherOpenAiCompatServers } from "./OpenAiCompatServers"
 import { CompanionSection } from "./CompanionSection";
 import { ServerPairingCard } from "./ServerPairingCard";
 import { Notice } from "./Notice";
-import { useOwnerOrAdmin } from "@/lib/use-owner-or-admin";
 import { currentPhonePairingTarget } from "@/lib/phone-pairing";
 import { SmsSettings } from "./SmsSettings";
 import { CustomDomainSettings } from "./CustomDomainSettings";
@@ -20,7 +19,7 @@ import { shortcutLabel } from "./ShortcutHint";
 import { LicenseExpiryBanner } from "./LicenseExpiryBanner";
 import { WorkspacesSection, workspacesAvailable } from "./WorkspacesSection";
 import { Select } from "./Select";
-import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleComputerPage, SimpleDataPage, SimpleKeysPage, SimpleLooksPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
+import { SimpleAccountPage, SimpleAiPage, SimpleAppearancePage, SimpleComputerPage, SimpleImportPage, SimpleKeysPage, SimpleSkillsPage, SimpleUpdatesPage, type Disclose, type SimpleDisclosureId, type SimpleSettingsPage } from "./SettingsSimplePages";
 import { cn } from "@/lib/cn";
 import { glassPopupFrameStyle } from "@/lib/glass-popup";
 import { Chevron } from "./chevron";
@@ -57,10 +56,8 @@ export const SECTIONS: Array<{
   { id: "computer", group: "computers", labelKey: "settings.section.computer", icon: Monitor, keywords: ["vm", "virtual", "desktop", "browser", "built-in browser", "profiles", "browser profiles"] },
   { id: "logins", group: "computers", labelKey: "settings.section.logins", icon: LockKeyhole, keywords: ["logins", "login", "passwords", "password", "sign in", "2fa", "one-time code", "totp", "fill_login", "1password", "vault"] },
   { id: "usage", group: "account", labelKey: "settings.section.usage", icon: Coins, keywords: ["tokens", "cost", "billing", "plan", "quota", "remaining", "weekly", "5-hour", "model", "used"] },
-  { id: "backups", group: "account", labelKey: "settings.section.backups", icon: Archive, keywords: ["export", "import", "restore", "full backup", "password", "recovery"] },
-  { id: "import", group: "account", labelKey: "settings.section.import", icon: Download, keywords: ["import", "grok", "grok bot", "x.ai", "cursor", "claude code", "codex", "gemini", "skills", "mcp", "tools", "bring"] },
+  { id: "import", group: "account", labelKey: "settings.section.import", icon: Download, keywords: ["import", "grok", "grok bot", "x.ai", "bring", "transfer"] },
   { id: "people", group: "account", labelKey: "settings.section.people", icon: Users, keywords: ["people", "users", "invite", "sign in", "members", "admins", "access"] },
-  { id: "activity", group: "account", labelKey: "settings.section.activity", icon: ScrollText, keywords: ["activity", "audit", "log", "history", "who changed", "approvals", "decisions", "admin"] },
   { id: "workspaces", group: "account", labelKey: "settings.section.workspaces", icon: Building2, keywords: ["clients", "tenants", "fleet", "workspaces", "installation", "installations"] },
   { id: "experimental", group: "account", labelKey: "settings.section.experimental", icon: FlaskConical, keywords: ["early", "preview", "learn", "skill", "authoring"] },
 ];
@@ -72,8 +69,8 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
     keywords: ["account", "profile", "plan", "people", "open at login", "startup", "analytics", "limits", "recovery"] },
   { id: "appearance", labelKey: "settings.section.appearance", descriptionKey: "settings.simple.page.appearance.description", icon: Palette, sections: ["appearance"],
     keywords: ["theme", "looks", "sidebar", "density", "notifications", "font", "chat width", "language", "send key"] },
-  { id: "data", labelKey: "settings.simple.page.data", descriptionKey: "settings.simple.page.data.description", icon: Archive, sections: ["backups", "import", "activity"],
-    keywords: ["backups", "restore", "export", "import", "activity", "audit", "history"] },
+  { id: "import", labelKey: "settings.section.import", descriptionKey: "settings.simple.page.import.description", icon: Download, sections: ["import"],
+    keywords: ["import", "grok", "grok bot", "x.ai", "bring", "transfer"] },
   { id: "ai", labelKey: "settings.group.ai", descriptionKey: "settings.simple.page.ai.description", icon: Sparkles, sections: ["engines", "decisionModel"],
     keywords: ["effort", "new bots", "decision", "keep warm", "engines", "model"] },
   { id: "skills", labelKey: "settings.section.experimental", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental"],
@@ -136,13 +133,10 @@ export function SettingsModal() {
   useEffect(() => window.ogb?.environments?.onOpenSettings?.(() => setQuery("")), []);
   useEffect(() => window.ogb?.onOpenAppSettings?.(() => setQuery("")), []);
   const q = query.trim().toLowerCase();
-  const ownerOrAdmin = useOwnerOrAdmin();
   const baseSections = SECTIONS.filter((entry) => !remoteActive || entry.id === "companion" || entry.id === "appearance" || entry.id === "desktopWorkspaces")
     .filter((entry) => entry.id !== "desktopWorkspaces" || Boolean(window.ogb?.environments))
-    .filter((entry) => entry.id !== "import" || Boolean(window.ogb))
     .filter((entry) => entry.id !== "workspaces" || workspacesAvailable(state.config))
     .filter((entry) => entry.id !== "people" || (!window.ogb && state.config?.cloudHome !== true))
-    .filter((entry) => entry.id !== "activity" || (!window.ogb && ownerOrAdmin === true));
   const availableSections = baseSections.filter((entry) => entry.id !== "skills" || skillsLibraryEnabled(state.config));
   const visibleSections = availableSections.filter((entry) => sectionMatches(entry, q));
 
@@ -164,7 +158,6 @@ export function SettingsModal() {
     const open = q !== "" || (folds[id] ?? SIMPLE_FOLDED[requested] === id);
     return { id, open, onToggle: () => setFolds((current) => ({ ...current, [id]: !open })) };
   };
-  const [looks, setLooks] = useState(false);
   const [reveal, setReveal] = useState<string | null>(null);
 
   const sectionIndex = currentPage?.sections.indexOf(section) ?? 0;
@@ -300,10 +293,8 @@ export function SettingsModal() {
     const has = (id: AppSettingsSection) => page.sections.includes(id);
     switch (page.id) {
       case "account": return <SimpleAccountPage has={has} />;
-      case "appearance": return looks
-        ? <SimpleLooksPage onBack={() => { setLooks(false); setReveal("appearance"); }} />
-        : <SimpleAppearancePage has={has} onLooks={() => setLooks(true)} disclose={disclose} />;
-      case "data": return <SimpleDataPage has={has} disclose={disclose} />;
+      case "appearance": return <SimpleAppearancePage has={has} />;
+      case "import": return <SimpleImportPage has={has} />;
       case "ai": return <SimpleAiPage has={has} disclose={disclose} />;
       case "skills": return <SimpleSkillsPage has={has} />;
       case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} sms={renderSection("sms")} />;
@@ -315,8 +306,7 @@ export function SettingsModal() {
   };
 
   const close = () => dispatch({ type: "toggleAppSettings", open: false });
-  const looksOpen = looks && currentPage?.id === "appearance";
-  const goTo = (id: AppSettingsSection) => { setLooks(false); openSection(id); };
+  const goTo = (id: AppSettingsSection) => { openSection(id); };
   return (
     <div
       className="glass-popup-frame"
@@ -379,9 +369,9 @@ export function SettingsModal() {
             </Select>
             <div className="hidden min-w-0 sm:block">
               <h2 className="truncate text-[17px] font-medium leading-6 tracking-[-0.008em] text-ink">
-                {looksOpen ? t("settings.simple.page.looks") : currentPage ? t(currentPage.labelKey) : null}
+                {currentPage ? t(currentPage.labelKey) : null}
               </h2>
-              {!looksOpen && currentPage?.descriptionKey && (
+              {currentPage?.descriptionKey && (
                 <p className="mt-0.5 max-w-[64ch] text-[13px] leading-5 text-ink-secondary">{t(currentPage.descriptionKey)}</p>
               )}
             </div>

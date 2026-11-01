@@ -5,6 +5,7 @@ import type { LocaleKey } from "@/locales";
 import { t } from "@/lib/i18n";
 import { appVersion } from "@/lib/app-links";
 import { Button, SettingRow, SettingsDisclosureRow, SettingsGroup, SettingsRows } from "@/components/ui";
+import { GrokImportSettings } from "./GrokImportSettings";
 import { brand } from "../lib/brand";
 import { AnalyticsRow } from "./AnalyticsRow";
 import { UpdatesConsentRow } from "./UpdatesConsent";
@@ -14,21 +15,16 @@ import { DiagnosticsRow } from "./DiagnosticsRow";
 import { DecisionModelSettings } from "./DecisionModelSettings";
 import { EnginesSettings } from "./EnginesSettings";
 import { LocalComputerSection } from "./LocalComputerSection";
-import { ActivitySection } from "./ActivitySection";
 import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
-import { SkinPicker } from "./SkinPicker";
-import { ChatWidthRow, FontRow, SidebarToolsLayoutRow } from "./AppearanceSelectRows";
+import { ChatWidthRow, FontRow } from "./AppearanceSelectRows";
 import { ProfileSummaryRow } from "./ProfileSettings";
 import { DepartmentsSettings } from "./DepartmentsSettings";
-import { ImportSettings } from "./ImportSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
-import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, PinnedCirclesRow, ReplayTourRow, SendKeyRow, UniversalPinsRow, UpdatesRow } from "./AppSettingsRows";
+import { BrowserProfilesRow, BusySendRow, ColorUserBubblesRow, ExperimentalFeaturesRow, LanguageRow, NewBotEffortRow, ReplayTourRow, SendKeyRow, UpdatesRow } from "./AppSettingsRows";
 import { SkillsSection } from "./SkillsSection";
 import { WorkspacesSection } from "./WorkspacesSection";
-import { WorkspaceBackupSettings } from "./WorkspaceBackupSettings";
-import { CompanyBackupSettings } from "./CompanyBackupSettings";
 import { DefaultBotSettings } from "./NewBotDialog";
 import { RoomTurnTimeoutSettings } from "./RoomTurnTimeoutSettings";
 import { McpCallTimeoutSettings } from "./McpCallTimeoutSettings";
@@ -86,7 +82,7 @@ export function SimpleAccountPage({ has }: { has: Has }) {
   );
 }
 
-export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onLooks: () => void; disclose: Disclose }) {
+export function SimpleAppearancePage({ has }: { has: Has }) {
   return (
     <>
       {has("appearance") && (
@@ -98,20 +94,8 @@ export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onL
             <ChatWidthRow />
             <LanguageRow simple />
             <SendKeyRow simple />
-            <SettingRow title={t("settings.simple.looks.title")}>
-              <Button size="sm" type="button" onClick={onLooks}>{t("settings.simple.looks.change")}</Button>
-            </SettingRow>
           </SettingsRows>
         </SettingsGroup>
-      )}
-      {has("appearance") && (
-        <SettingsDisclosureRow title={t("settings.simple.group.sidebar")} subtitle={t("settings.simple.sidebar.subtitle")} block="sidebar" {...disclose("general-sidebar")}>
-          <SettingsRows>
-            <SidebarToolsLayoutRow />
-            <PinnedCirclesRow />
-            <UniversalPinsRow />
-          </SettingsRows>
-        </SettingsDisclosureRow>
       )}
       {has("appearance") && (
         <SettingsGroup label={t("notifications.title")}>
@@ -122,26 +106,14 @@ export function SimpleAppearancePage({ has, onLooks, disclose }: { has: Has; onL
   );
 }
 
-export function SimpleDataPage({ has, disclose }: { has: Has; disclose: Disclose }) {
+export function SimpleImportPage({ has }: { has: Has }) {
   return (
     <>
-      <SettingsDisclosureRow title={t("settings.section.backups")} subtitle={t("settings.simple.backups.subtitle")} block="backups" {...disclose("general-backups")}>
-        <div className="flex flex-col gap-4"><WorkspaceBackupSettings /><CompanyBackupSettings /></div>
-      </SettingsDisclosureRow>
-      {has("import") && <SettingsGroup label={t("settings.section.import")} block="import"><ImportSettings /></SettingsGroup>}
-      {has("activity") && <SettingsGroup label={t("settings.section.activity")} block="activity"><ActivitySection /></SettingsGroup>}
+      {has("import") && <SettingsGroup label={t("settings.section.import")} block="import"><GrokImportSettings /></SettingsGroup>}
     </>
   );
 }
 
-export function SimpleLooksPage({ onBack }: { onBack: () => void }) {
-  return (
-    <>
-      <div><Button size="sm" type="button" onClick={onBack}>{t("settings.simple.looks.back")}</Button></div>
-      <div data-settings-block="looks"><SkinPicker /></div>
-    </>
-  );
-}
 
 export function SimpleAiPage({ has, disclose }: { has: Has; disclose: Disclose }) {
   return (
