@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Keyboard, Search } from "lucide-react";
+import { Keyboard } from "lucide-react";
 
 import {
   filterShortcutGroups,
@@ -58,7 +58,6 @@ export function KeyboardShortcutsModal({ open, onClose }: KeyboardShortcutsModal
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 rounded-full bg-ink/[0.045] px-3 py-1.5 focus-within:ring-1 focus-within:ring-focus">
-          <Search size={14} className="shrink-0 text-ink-secondary" aria-hidden="true" />
           <input
             autoFocus
             value={query}

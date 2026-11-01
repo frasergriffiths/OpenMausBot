@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { SidebarPlaceStatus, useSimplePlace } from "./SidebarFooter";
 import { SidebarAppsButton } from "./SidebarFooterNav";
 import { SidebarProfileMenu, useSimpleAccount, type ArchivedBots } from "./SidebarProfileMenu";
@@ -7,14 +9,16 @@ export function SidebarRailSeparator() {
   return <div aria-hidden="true" data-sidebar-rail-separator="" className="mx-auto my-1.5 h-px w-8 shrink-0 bg-hairline/70" />;
 }
 
-export function SimpleRailFooter({ owner = null, archived }: {
+export function SimpleRailFooter({ owner = null, archived, plus }: {
   owner?: string | null;
   archived?: ArchivedBots;
+  plus?: ReactNode;
 }) {
   const place = useSimplePlace();
   const account = useSimpleAccount(place, owner, archived);
   return (
     <div data-sidebar-rail-footer="" className="relative flex flex-col items-start gap-2 px-3 pb-3 pt-2">
+      {plus && <div className="relative flex shrink-0">{plus}</div>}
       <SidebarAppsButton />
       <UpdateIndicator />
       <SidebarProfileMenu iconOnly rail simple={account} />

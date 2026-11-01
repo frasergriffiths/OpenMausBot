@@ -43,7 +43,8 @@ export function SidebarEdgeToggle({ collapsed, onToggle, style, shown = true, on
       onPointerEnter={() => onHover?.(true)}
       onPointerLeave={() => onHover?.(false)}
       className={cn(
-        "absolute -right-[14px] z-30 hidden h-8 w-[14px] items-center justify-center rounded-r-[4px] border border-l-0 border-hairline/50 bg-panel text-ink-tertiary shadow-[1px_0_2px_rgb(0_0_0/0.06)] hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:flex",
+        "absolute z-50 hidden h-8 w-[18px] items-center justify-center border border-hairline/50 bg-panel text-ink-tertiary shadow-[1px_0_2px_rgb(0_0_0/0.06)] hover:bg-raised hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:flex",
+        collapsed ? "right-0 rounded-l-[4px] border-r-0" : "-right-[14px] z-30 rounded-r-[4px] border-l-0",
         shown ? "opacity-100" : "pointer-events-none opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100 touch:pointer-events-auto touch:opacity-100",
         "transition-opacity duration-150 top-[14px]",
       )}
