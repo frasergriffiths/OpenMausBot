@@ -161,7 +161,7 @@ export type LucideProps = IconProps;
 
 function make(Icon: ComponentType<SVGProps<SVGSVGElement>>) {
   const Glyph = ({ size = 24, className, color, style, strokeWidth, absoluteStrokeWidth, ...rest }: IconProps) => (
-    <Icon aria-hidden className={className} style={{ width: size, height: size, color, ...style }} {...rest} />
+    <Icon aria-hidden className={className} width={size} height={size} style={{ width: size, height: size, color, ...style }} {...rest} />
   );
   return Glyph as LucideIcon;
 }
