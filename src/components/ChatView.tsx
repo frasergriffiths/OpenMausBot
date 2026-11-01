@@ -2,7 +2,7 @@ import { createContext, memo, useCallback, useContext, useEffect, useLayoutEffec
 import { PHONE_LAYOUT, useMediaQuery } from "@/lib/use-media-query";
 import { ThreadLinkContext } from "@/components/ThreadLinkMenu";
 import { useShowThreads } from "@/lib/thread-preferences";
-import { AlertTriangle, ChevronLeft, ChevronRight, Copy, Monitor, RefreshCw, Reply, Square, Webhook } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Monitor, RefreshCw, Reply, Square, Webhook } from "lucide-react";
 import { WorkingDots } from "@/components/WorkingIndicator";
 import { ACTION_ICON, CopyButton, MESSAGE_ROW, MessageActions, messageActionClass, ReplyAction, type MessageMenuItem } from "@/components/MessageActions";
 import { copyText } from "@/lib/copy-text";
@@ -204,11 +204,8 @@ export function ErrorRow({
   if (macCuaReason) return <ChatPermissionNotice reason={capabilities.localComputer.message ?? message} />;
   return (
     <div className="flex justify-start">
-      <div className="w-fit max-w-[min(var(--chat-bubble-max),var(--chat-bubble-pct))] rounded-xl border border-danger/30 bg-danger/10 px-3.5 py-2.5 text-[14px] text-danger">
-        <div className="flex items-start gap-2">
-          <AlertTriangle size={15} className="mt-0.5 shrink-0" />
-          <span className="min-w-0 break-words">{headline}</span>
-        </div>
+      <div className="w-fit max-w-[min(var(--chat-bubble-max),var(--chat-bubble-pct))] rounded-xl bg-danger/10 px-3.5 py-2.5 text-[14px] text-danger">
+        <span className="block min-w-0 break-words">{headline}</span>
         {headline !== message && <details className="mt-2 text-[12px] text-ink-secondary"><summary className="cursor-pointer flex items-center gap-1.5 list-none [&::-webkit-details-marker]:hidden"><Chevron kind="disclosure" size="row" />{t("chat.error.details")}</summary><p className="mt-1 break-words">{message}</p></details>}
         {usageUrl ? (
           <ManageUsageLink href={usageUrl} className={buttonStyles({ size: "xs", className: "mt-2 border-transparent bg-ink text-app hover:brightness-110" })} />
