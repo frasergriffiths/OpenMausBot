@@ -387,7 +387,7 @@ export function SettingsModal() {
             )}
           >
             <LicenseExpiryBanner config={state.config} />
-            {currentPage ? renderSimplePage(currentPage) : null}
+            {currentPage ? <div key={currentPage.id} className="motion-stagger flex flex-col gap-7">{renderSimplePage(currentPage)}</div> : null}
           </div>
         </div>
       </div>
