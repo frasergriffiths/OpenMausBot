@@ -1,5 +1,11 @@
 {
   "title": "Getting started",
   "icon": "Rocket",
-  "pages": ["installation", "organisation", "quick-tour", "first-bot", "using-the-desktop-app-with-my-cloud", "configuration"]
+  "pages": [
+    "installation",
+    "organisation",
+    "quick-tour",
+    "first-bot",
+    "configuration"
+  ]
 }
