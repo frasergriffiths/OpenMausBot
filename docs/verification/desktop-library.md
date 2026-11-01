@@ -79,7 +79,7 @@ Workspace and company backups leave out `org-library/catalog.json` and
 `org-library/blobs/` and keep the runtime's `state.json` and `presets.json`:
 
 ```sh
-pnpm exec vitest run server/workspace-backup-policy.test.ts server/workspace-backup.test.ts
+pnpm exec vitest run
 ```
 
 ## Mutation checks (2026-09-24)
@@ -114,7 +114,7 @@ electron/company-backup-main.node-test.mjs` failed: no `runtimeReady()` on
 server ready, no `receive()` of runtime messages, no `close()` on quit, the
 client not given the library, the record sharing `company-connection.bin`, the
 relay sent to another process, and downloads not going through the client. In
-`server/workspace-backup.ts`, a walker without the Organization library rule,
+a walker without the Organization library rule,
 and a rule that also drops `state.json`, each failed the two backup tests above.
 
 ## Not covered here

@@ -131,7 +131,7 @@ Cancellation receipts survive restart. Importing a workspace backup pauses all
 of its queued work for review, even when restoring to the original directory.
 
 ```sh
-pnpm exec vitest run server/chat-followups.test.ts server/chat-followups-restart.test.ts server/workspace-backup.test.ts
+pnpm exec vitest run server/chat-followups.test.ts server/chat-followups-restart.test.ts
 ```
 
 The restart test launches an isolated real server with the fake engine, accepts

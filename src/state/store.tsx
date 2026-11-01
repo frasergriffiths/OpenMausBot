@@ -544,8 +544,6 @@ export type AppSettingsSection =
   | "logins"
   | "usage"
   | "people"
-  | "activity"
-  | "backups"
   | "workspaces"
   | "skills" | "import" | "updates";
 

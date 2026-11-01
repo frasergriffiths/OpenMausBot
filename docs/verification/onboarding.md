@@ -145,7 +145,7 @@ one button: in Settings → Import, and offered by MausBot's first messages as a
 Desktop app only.
 
 ```sh
-pnpm exec vitest run server/setup-import.test.ts server/imported-skills.test.ts server/toml-lite.test.ts server/routes/setup-import.test.ts server/setup-import.e2e.test.ts src/components/ImportSettings.test.ts src/components/HelperIntro.test.ts src/lib/setup-import.test.ts
+pnpm exec vitest run server/setup-import.test.ts server/imported-skills.test.ts server/toml-lite.test.ts server/routes/setup-import.test.ts server/setup-import.e2e.test.ts src/components/HelperIntro.test.ts src/lib/setup-import.test.ts
 ```
 
 Every test builds its own temporary home; none reads the real `~/.claude`,
@@ -160,8 +160,7 @@ that a headless server (`openmausbot serve`) refuses the step, and checks that t
 get the skills in their turn's index, task folder links and `/name`, that a
 Claude turn with "Also use my Claude Code skills" on sees a Claude Code skill
 once, and that a bot can switch one off for itself. The rows, working, failed
-and with their result, are covered in Settings by
-`src/components/ImportSettings.test.ts`; the chip by
+and with their result, are covered in the welcome step by
 `src/components/HelperIntro.test.ts`. Not covered here: the packaged Electron
 window itself.
 

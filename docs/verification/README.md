@@ -85,8 +85,6 @@ Use only mapped, tested commands:
 - [The organization library](org-library.md)
 - [Preset bots](presets.md)
 - [Teams and shared instructions](teams.md)
-- [Full workspace backups](workspace-backups.md)
-- [Optional company cloud backups](company-backups.md)
 - [Organization library: the desktop channel](desktop-library.md)
 - [Fleet: many workspaces on one server](fleet.md)
 - [Workspaces screen and the fleet agent](workspaces.md)
@@ -292,9 +290,6 @@ desktop routing, cancellation, and computer authority cleanup.
 The [persistence responsiveness benchmark](persistence-performance.md) measures
 synthetic message/log bursts and history scans, with isolated chat, visibility
 and packaged-worker checks. It is not a production capacity qualification.
-
-The [backup responsiveness benchmark](backup-responsiveness.md) compares in-process
-and worker exports using synthetic data, with isolated backup workflow checks.
 
 The [Japanese desktop font recipe](japanese-desktop.md) checks real Firefox and
 XFCE glyph rendering in disposable managed desktops, including fresh recreation.
