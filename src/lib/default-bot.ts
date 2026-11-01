@@ -97,11 +97,10 @@ export function setupSteps(input: { aiReady: boolean; ownBots: number; onCloud: 
   return [
     ...(input.aiReady ? [] : ["ai" as const]),
     ...(fresh ? ["bots" as const, "apps" as const, "phone" as const] : []),
-    ...(fresh && !input.onCloud && !input.remote ? ["cloud" as const] : []),
   ];
 }
 
-export type IntroChip = "ai" | "apps" | "import" | "phone" | "cloud";
+export type IntroChip = "ai" | "apps" | "import";
 
 export interface IntroFacts {
   aiReady: boolean;
@@ -128,8 +127,6 @@ export function introChips(input: IntroFacts): IntroChip[] {
     ...(input.aiReady ? [] : ["ai" as const]),
     ...(fresh && !input.appsConnected ? ["apps" as const] : []),
     ...(fresh && input.importFound ? ["import" as const] : []),
-    ...(fresh && !input.phonePaired ? ["phone" as const] : []),
-    ...(fresh && !input.onCloud && !input.remote ? ["cloud" as const] : []),
   ];
 }
 

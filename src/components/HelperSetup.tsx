@@ -64,8 +64,6 @@ const CHIPS: Record<IntroChip, { label: LocaleKey; icon: LucideIcon }> = {
   ai: { label: "helperIntro.chip.ai", icon: Sparkles },
   apps: { label: "helperIntro.chip.mail", icon: Mail },
   import: { label: "helperIntro.chip.skills", icon: Download },
-  phone: { label: "helperIntro.chip.phone", icon: Smartphone },
-  cloud: { label: "helperIntro.chip.cloud", icon: Cloud },
 };
 
 /** Each chip opens the app's own flow for it; Connect an AI opens its dialog in place (IntroChips). */
@@ -73,8 +71,6 @@ export function chipAction(chip: Exclude<IntroChip, "ai">): Action {
   switch (chip) {
     case "apps": return { type: "togglePlugins", open: true, surface: "apps" };
     case "import": return { type: "toggleAppSettings", open: true, section: "import" };
-    case "phone": return phonePairingSettingsAction();
-    case "cloud": return { type: "openCloudAdd", source: "app_onboarding" };
   }
 }
 
