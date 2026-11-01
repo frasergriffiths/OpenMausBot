@@ -6726,5 +6726,10 @@
   "settings.sms.firstMessageHint": "Twilio sends a real SMS and may charge for it. Reply from your phone to start the conversation.",
   "settings.sms.lastError": "Twilio last reported: {error}",
   "settings.sms.copy": "Copy",
-  "settings.sms.webhookUsePage": "Use this page's address"
+  "settings.sms.webhookUsePage": "Use this page's address",
+  "settings.section.browser": "Browser",
+  "settings.simple.page.browser.description": "The browser your bots use, and the profiles they sign in with.",
+  "settings.keys.providers": "Model providers",
+  "settings.keys.decisionModel": "Decision model",
+  "botPanel.screen.fullscreen": "View the bot screen full screen"
 }
