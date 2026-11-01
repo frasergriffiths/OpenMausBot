@@ -244,15 +244,18 @@ describe("Settings, the one plain UI", () => {
     expect(markers(html)).toContain("skills");
   });
 
-  it("gives API keys and connectors their own page outside the AI group", () => {
+  it("gives API keys and connectors their own page outside the AI group, and SMS to Experimental", () => {
     fixture.section = "connections";
     const html = render();
     expect(currentPage(html)).toBe("keys");
-    // Keys and accounts, then the one SMS integration, on the same page.
-    expect(blocks(html)).toEqual(["connections", "sms"]);
+    expect(blocks(html)).toEqual(["connections"]);
     expect(html).toContain("MARKER:apiKey;");
-    expect(html).toContain("MARKER:sms;");
-    expect(groupLabels(html)).toEqual(["Messaging"]);
+    expect(html).not.toContain("MARKER:sms;");
+    fixture.section = "sms";
+    const experimental = render();
+    expect(currentPage(experimental)).toBe("skills");
+    expect(blocks(experimental)).toContain("sms");
+    expect(experimental).toContain("MARKER:sms;");
   });
 
   it("orders Computer as your bots' computers, your devices, the browser, logins, then Connect from elsewhere", () => {

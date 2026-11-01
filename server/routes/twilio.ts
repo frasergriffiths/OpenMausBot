@@ -14,6 +14,15 @@ export interface TwilioRouteDeps {
 
 const text = (value: unknown): string => (typeof value === "string" ? value : "");
 
+/** The address this page was reached at, when it is one the internet could reach too. */
+function requestOrigin(req: { headers: Record<string, string | string[] | undefined> }): string | null {
+  const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
+  const proto = first(req.headers["x-forwarded-proto"]) === "https" ? "https" : "http";
+  const host = first(req.headers["x-forwarded-host"]) ?? first(req.headers.host) ?? "";
+  if (!host || /^(localhost|127\.|\[::1\]|0\.0\.0\.0)(:|$)/i.test(host)) return null;
+  return proto + "://" + host;
+}
+
 function failure(error: unknown): { status: number; error: string } {
   const status = (error as { status?: unknown })?.status;
   return {
@@ -77,6 +86,27 @@ export function createTwilioRoutes({ sms, bots }: TwilioRouteDeps): RouteHandler
       try {
         const result = await sms.sendFirstMessage();
         return json(res, 200, { sms: result.status, sid: result.sid });
+      } catch (error) {
+        const { status, error: message } = failure(error);
+        return json(res, status, { error: message });
+      }
+    }
+
+    if (path === "/api/twilio/webhook" && method === "POST") {
+      try {
+        const body = await readBody(req, 8 * 1024);
+        const url = body?.useCurrentOrigin === true ? requestOrigin(req) : text(body?.url) || null;
+        if (body?.useCurrentOrigin === true && !url) return json(res, 400, { error: "This page's address is not reachable from the internet. Enter the public address instead." });
+        return json(res, 200, { sms: await sms.saveWebhook({ url, apply: body?.apply !== false }) });
+      } catch (error) {
+        const { status, error: message } = failure(error);
+        return json(res, status, { error: message });
+      }
+    }
+
+    if (path === "/api/twilio/webhook" && method === "DELETE") {
+      try {
+        return json(res, 200, { sms: await sms.saveWebhook({ url: null, apply: false }) });
       } catch (error) {
         const { status, error: message } = failure(error);
         return json(res, status, { error: message });

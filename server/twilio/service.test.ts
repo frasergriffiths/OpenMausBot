@@ -22,6 +22,7 @@ const client = (): TwilioClient => ({
     sent.push(message);
     return { sid: "SM" + String(sent.length), status: "queued", numSegments: 1 };
   },
+  setSmsWebhook: async () => ({ updated: true }),
 });
 
 type Deps = ConstructorParameters<typeof SmsService>[0];
@@ -32,7 +33,7 @@ const make = (dataDir: string, overrides: Partial<Deps> = {}) => new SmsService(
   threadFor: (botId) => "thread-" + botId,
   startTurn: async () => ({ ok: true }),
   lastBotText: () => null,
-  webhook: () => ({ url: URL, error: null }),
+  webhook: () => ({ url: URL, error: null, source: "environment" }),
   client,
   ...overrides,
 });

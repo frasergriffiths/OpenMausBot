@@ -76,10 +76,10 @@ export const SIMPLE_PAGES: SimpleSettingsPage[] = [
     keywords: ["backups", "restore", "export", "import", "activity", "audit", "history"] },
   { id: "ai", labelKey: "settings.group.ai", descriptionKey: "settings.simple.page.ai.description", icon: Sparkles, sections: ["engines", "decisionModel"],
     keywords: ["effort", "new bots", "decision", "keep warm", "engines", "model"] },
-  { id: "skills", labelKey: "settings.section.experimental", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental"],
-    keywords: ["skills", "experimental", "early", "preview", "learn"] },
-  { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections", "sms"],
-    keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys", "sms", "text", "texts", "twilio", "phone", "messaging"] },
+  { id: "skills", labelKey: "settings.section.experimental", descriptionKey: "settings.simple.page.skills.description", icon: BookOpen, sections: ["skills", "experimental", "sms"],
+    keywords: ["skills", "experimental", "early", "preview", "learn", "sms", "text", "texts", "twilio", "phone", "messaging"] },
+  { id: "keys", labelKey: "settings.section.connections", descriptionKey: "settings.simple.page.keys.description", icon: KeyRound, sections: ["connections"],
+    keywords: ["keys", "api", "api key", "api keys", "connectors", "composio", "provider keys"] },
   { id: "computer", labelKey: "settings.simple.page.computer", descriptionKey: "settings.simple.page.computer.description", icon: Monitor, sections: ["companion", "desktopWorkspaces", "computer", "logins", "workspaces"] },
   { id: "updates", labelKey: "settings.simple.page.updates", descriptionKey: "settings.simple.page.updates.description", icon: CloudDownload, sections: ["updates"],
     keywords: ["update", "version", "release", "product updates", "newsletter", "email updates", "welcome", "tour", "diagnostics", "logs", "support"] },
@@ -305,8 +305,8 @@ export function SettingsModal() {
         : <SimpleAppearancePage has={has} onLooks={() => setLooks(true)} disclose={disclose} />;
       case "data": return <SimpleDataPage has={has} disclose={disclose} />;
       case "ai": return <SimpleAiPage has={has} disclose={disclose} />;
-      case "skills": return <SimpleSkillsPage has={has} />;
-      case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} sms={renderSection("sms")} />;
+      case "skills": return <SimpleSkillsPage has={has} sms={renderSection("sms")} />;
+      case "keys": return <SimpleKeysPage has={has} connections={renderSection("connections")} />;
       case "computer": return <SimpleComputerPage has={has} remoteAccess={remoteAccess} servers={renderSection("desktopWorkspaces")} installs={workspacesAvailable(state.config) ? <WorkspacesSection /> : undefined} disclose={disclose} />;
       case "updates": return <SimpleUpdatesPage remoteActive={remoteActive} />;
       default:

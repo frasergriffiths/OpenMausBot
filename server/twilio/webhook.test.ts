@@ -44,10 +44,11 @@ beforeEach(async () => {
     threadFor: () => "thread-1",
     startTurn: async (_botId, text) => { turns.push(text); },
     lastBotText: () => null,
-    webhook: () => ({ url: PUBLIC + SMS_WEBHOOK_PATH, error: null }),
+    webhook: () => ({ url: PUBLIC + SMS_WEBHOOK_PATH, error: null, source: "environment" }),
     client: () => ({
       validate: async () => ({ sid: SID, name: "Acme", status: "active" }),
       send: async () => ({ sid: "SM1", status: "queued", numSegments: 1 }),
+      setSmsWebhook: async () => ({ updated: true }),
     }),
   });
   await sms.connect({ accountSid: SID, authToken: TOKEN, fromNumber: FROM, toNumber: TO, botId: "bot-1" });

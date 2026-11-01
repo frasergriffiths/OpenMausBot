@@ -23,6 +23,14 @@ export async function sendFirstSms(): Promise<{ sms: SmsStatus; sid: string }> {
   return await api<{ sms: SmsStatus; sid: string }>("/api/twilio/first-message", { method: "POST", body: JSON.stringify({ confirm: true }) });
 }
 
+export async function saveSmsWebhook(input: { url?: string; useCurrentOrigin?: boolean }): Promise<SmsStatus> {
+  return (await api<{ sms: SmsStatus }>("/api/twilio/webhook", { method: "POST", body: JSON.stringify(input) })).sms;
+}
+
+export async function clearSmsWebhook(): Promise<SmsStatus> {
+  return (await api<{ sms: SmsStatus }>("/api/twilio/webhook", { method: "DELETE" })).sms;
+}
+
 export async function disconnectSms(): Promise<SmsStatus> {
   return (await api<{ sms: SmsStatus }>("/api/twilio", { method: "DELETE" })).sms;
 }
