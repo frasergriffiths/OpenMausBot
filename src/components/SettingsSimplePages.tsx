@@ -17,7 +17,6 @@ import { LocalComputerSection } from "./LocalComputerSection";
 import { BuiltInBrowserRow } from "./BrowserSettingsRows";
 import { LoginsSettings } from "./LoginsSettings";
 import { ChatWidthRow, FontRow } from "./AppearanceSelectRows";
-import { ProfileSummaryRow } from "./ProfileSettings";
 import { DepartmentsSettings } from "./DepartmentsSettings";
 import { NotificationRows } from "./NotificationSettingsRows";
 import { useServerUpdateItem } from "./SidebarProfileMenu";
@@ -49,13 +48,6 @@ type Has = (id: AppSettingsSection) => boolean;
 export function SimpleAccountPage({ has }: { has: Has }) {
   return (
     <>
-      {has("general") && (
-        <SettingsGroup block="general">
-          <SettingsRows>
-            <ProfileSummaryRow />
-          </SettingsRows>
-        </SettingsGroup>
-      )}
       {has("general") && (
         <SettingsGroup label={t("settings.departments.title")} block="departments">
           <DepartmentsSettings />

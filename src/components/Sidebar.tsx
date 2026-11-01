@@ -1,7 +1,7 @@
 import { OrganizationIdentity } from "./OrganizationIdentity";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch } from "react";
 import { createPortal } from "react-dom";
-import { Archive, Bot as BotIcon, Check, ChevronRight, ClipboardCopy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, PanelLeftClose, PanelLeftOpen, Phone, Pin, Plus, Search, TextQuote, Trash2, Users, X } from "lucide-react";
+import { Archive, Check, ChevronRight, ClipboardCopy, Crown, FolderPlus, Loader2, MoreHorizontal, Pencil, PanelLeftClose, PanelLeftOpen, Phone, Pin, Plus, UserPlus, Search, TextQuote, Trash2, Users, X } from "lucide-react";
 import { api, useStore, formatTime, visibleMessages, currentTaskBot, openBot, openThread, type Action, type AppState, type Bot, type BotProject, type Group, type InstanceInfo, type Message } from "@/state/store";
 import { approvalModeFor } from "../../shared/approval-mode";
 import { turnNowPhrases } from "@/lib/live-activity";
@@ -1244,7 +1244,7 @@ export function Sidebar({ open, onClose, collapseToIcons = false }: {
             role="menuitem"
             className={plusItem}
           >
-            <BotIcon size={16} className="text-ink-secondary" />
+            <UserPlus size={16} className="text-ink-secondary" />
             <span className="flex-1">{t("sidebar.newBotSimple")}</span>
           </button>
           <button

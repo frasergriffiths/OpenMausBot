@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AppWindow, AudioLines, Calendar, ChevronRight, FileText, MessageSquare, ShieldCheck, Tag } from "lucide-react";
+import { AudioLines, Puzzle, Calendar, ChevronRight, FileText, MessageSquare, ShieldCheck, Tag } from "lucide-react";
 
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/i18n";
@@ -192,7 +192,7 @@ export function SettingsPage({ bot, derived, onOpen, editingInstructions = false
       <Card anchor="uses">
         <NavRow
           data-panel-page="apps"
-          icon={AppWindow}
+          icon={Puzzle}
           title={t("botPanel.appsRow")}
           value={enabledApps.length > 0 ? enabledApps.join(", ") : t("botPanel.appsNoneYet")}
           onClick={() => onOpen?.("apps")}
