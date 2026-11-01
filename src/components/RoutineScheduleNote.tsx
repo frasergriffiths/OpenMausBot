@@ -3,7 +3,7 @@ import { buyOfferAllowed, type CloudPlanView } from "@/lib/cloud-plan";
 import { t } from "@/lib/i18n";
 import { useStore } from "@/state/store";
 import { localDesktopPage } from "./onboarding/WelcomeGate";
-import { useCloudPlan } from "./ProIntroduction";
+import { useCloudPlan } from "@/lib/use-cloud-plan";
 
 export type SchedulePlace = { kind: "cloud" } | { kind: "server" } | { kind: "local"; next: "add-cloud" | "open-cloud" | null };
 
