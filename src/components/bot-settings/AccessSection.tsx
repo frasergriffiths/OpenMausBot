@@ -16,7 +16,7 @@ import { CloudBackendPicker } from "../CloudBackendPicker";
 import { PhoneAppsCard } from "./PhoneAppsCard";
 import { ProposalStatus } from "./ProposalStatus";
 import { ToolSelectionCard } from "./ToolSelectionCard";
-import { useCloudPlan } from "../ProIntroduction";
+import { useCloudPlan } from "@/lib/use-cloud-plan";
 import { xResearchAction } from "@/lib/cloud-plan";
 import { HIGHLEVEL_SLUG } from "@/lib/highlevel-sign-in";
 import { useBotApps } from "./useBotApps";
