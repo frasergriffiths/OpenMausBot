@@ -16,25 +16,6 @@ export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   return <textarea {...props} className={cn(CONTROL, "min-h-20 resize-y py-2 leading-relaxed", className)} />;
 }
 
-export function Select({ className, children, ...props }: ComponentProps<"select">) {
-  return (
-    <select
-      {...props}
-      className={cn(
-        CONTROL,
-        "h-9 cursor-pointer appearance-none bg-[length:14px] bg-[right_10px_center] bg-no-repeat pr-8",
-        className,
-      )}
-      style={{
-        backgroundImage:
-          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 5 4 4 4-4'/%3E%3C/svg%3E\")",
-        ...props.style,
-      }}
-    >
-      {children}
-    </select>
-  );
-}
 
 export function Field({
   label,
