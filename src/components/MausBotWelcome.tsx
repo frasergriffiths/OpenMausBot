@@ -21,7 +21,7 @@ import { usePrefersReducedMotion } from "./mascot-clock";
 const LOOK = ["name", "color", "mascotBody", "avatarUrl", "avatarCrop", "avatarZoom", "avatarFocusX", "avatarFocusY"] as const;
 export type WelcomeDraft = Pick<Bot, (typeof LOOK)[number]>;
 const RECEDE_MS = 240;
-const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+const EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
 
 export const welcomeName = (name: string): string => name.trim().slice(0, BOT_PROFILE_LIMITS.name) || DEFAULT_BOT_NAME;
 
@@ -179,7 +179,7 @@ export function MausBotWelcomeCard({ bot, onClose }: { bot: Bot; onClose: () => 
           inert={!editing}
           aria-hidden={!editing}
           data-mausbot-welcome-panel={editing ? "open" : "closed"}
-          className={cn("grid transition-[grid-template-rows,opacity] duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+          className={cn("grid transition-[grid-template-rows,opacity] duration-[250ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none",
             editing ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}
         >
           <div className="min-h-0 overflow-hidden">
