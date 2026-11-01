@@ -193,18 +193,10 @@ export function SimpleKeysPage({ has, connections, sms }: { has: Has; connection
   );
 }
 
-export type RemoteAccessCards = Record<"client" | "domain" | "pairing" | "companion", ReactNode>;
-
-export function SimpleComputerPage({ has, remoteAccess, servers, installs, disclose }: { has: Has; remoteAccess: RemoteAccessCards; servers: ReactNode; installs?: ReactNode; disclose: Disclose }) {
+export function SimpleComputerPage({ has, servers, installs, disclose }: { has: Has; servers: ReactNode; installs?: ReactNode; disclose: Disclose }) {
   return (
     <>
       {has("computer") && <SettingsGroup label={t("settings.simple.computer.bots")} block="computer"><LocalComputerSection /></SettingsGroup>}
-      {has("companion") && (
-        <SettingsGroup label={t("settings.simple.computer.devices")} block="companion">
-          {remoteAccess.pairing}
-          {remoteAccess.companion}
-        </SettingsGroup>
-      )}
       {has("computer") && (
         <SettingsGroup label={t("settings.experimental.browser")} block="browser">
           <SettingsRows><BuiltInBrowserRow /></SettingsRows>
@@ -212,9 +204,8 @@ export function SimpleComputerPage({ has, remoteAccess, servers, installs, discl
         </SettingsGroup>
       )}
       {has("logins") && <div data-settings-block="logins" className="scroll-mt-4"><LoginsSettings /></div>}
-      {(has("companion") || has("desktopWorkspaces") || installs) && (
+      {(has("desktopWorkspaces") || installs) && (
         <SettingsDisclosureRow title={t("settings.simple.computer.elsewhere")} block="elsewhere" {...disclose("computer-elsewhere")}>
-          {has("companion") && <div data-settings-block="remote" className="flex scroll-mt-4 flex-col gap-4 empty:hidden">{remoteAccess.client}{remoteAccess.domain}</div>}
           {has("desktopWorkspaces") && <div data-settings-block="desktopWorkspaces" className="flex scroll-mt-4 flex-col gap-4">{servers}</div>}
           {installs && <div data-settings-block="workspaces" className="scroll-mt-4">{installs}</div>}
         </SettingsDisclosureRow>

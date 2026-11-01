@@ -4,7 +4,16 @@ import { Trash2 } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { api, useStore } from "@/state/store";
 import { phoneAppChips, phonePlatformLabel, phoneRemovePath, usePhones } from "../lib/phones";
-import { relative } from "./CompanionSection";
+
+const relative = (at: number) => {
+  const seconds = Math.round((Date.now() - at) / 1000);
+  if (seconds < 90) return t("remote.time.justNow");
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return t("remote.time.minutes", { count: minutes });
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return t("remote.time.hours", { count: hours });
+  return t("remote.time.days", { count: Math.round(hours / 24) });
+};
 
 export function PhonesList() {
   const { phase, phones, refresh } = usePhones();

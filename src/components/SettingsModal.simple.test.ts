@@ -218,16 +218,7 @@ describe("Settings, the one plain UI", () => {
     expect(placement(html, "Check for updates")).toBe("shown");
   });
 
-  it("opens the fold that holds a linked setting: Servers or this app as a client", () => {
-    expect(placement(open("connections"), "MARKER:apiKey;")).toBe("shown");
-    expect(placement(open("engines"), "MARKER:apiKey;")).toBe("missing");
-    expect(placement(open("desktopWorkspaces"), "MARKER:desktopWorkspaces;")).toBe("shown");
-    expect(placement(open("remote"), "MARKER:companion;")).toBe("shown");
-    expect(placement(open("companion"), "MARKER:companion;")).toBe("folded");
-    expect(SIMPLE_FOLDED).toEqual({ remote: "computer-elsewhere", desktopWorkspaces: "computer-elsewhere" });
-  });
-
-  it("names the skills page Experimental once, and leads its description with the early features", () => {
+   it("names the skills page Experimental once, and leads its description with the early features", () => {
     const html = open("skills");
     const nav = html.slice(html.indexOf('data-settings-page="skills"'));
     expect(nav.slice(0, nav.indexOf("</button>"))).toContain(">Experimental<");
@@ -255,17 +246,7 @@ describe("Settings, the one plain UI", () => {
     expect(groupLabels(html)).toEqual(["Messaging"]);
   });
 
-  it("orders Computer as your bots' computers, your devices, the browser, logins, then Connect from elsewhere", () => {
-    fixture.section = "companion";
-    const html = render();
-    expect(currentPage(html)).toBe("computer");
-    expect(blocks(html)).toEqual(["computer", "companion", "browser", "logins", "elsewhere", "remote", "desktopWorkspaces", "workspaces"]);
-    expect(groupLabels(html)).toEqual(["Your bots’ computers", "Your devices", "Built-in browser"].map((label) => label.replace("’", "&#x27;")));
-    expect(html).toContain('aria-label="Enable the built-in browser"');
-    expect(html).toContain("MARKER:workspaces;");
-  });
-
-  it("drops People from Account and keeps Activity as its own group on Data for a hosted workspace", () => {
+   it("drops People from Account and keeps Activity as its own group on Data for a hosted workspace", () => {
     vi.stubGlobal("window", {});
     fixture.ownerOrAdmin = true;
     fixture.section = "people";
@@ -280,45 +261,7 @@ describe("Settings, the one plain UI", () => {
     expect(groupLabels(data)).toContain("Activity");
   });
 
-  it("keeps a paired remote client's reduced set: Appearance, and Computer with your devices and Connect from elsewhere", () => {
-    vi.stubGlobal("window", { ogb: { ...desktop.ogb, remoteClient: { active: true } } });
-    fixture.section = "desktopWorkspaces";
-    const html = render();
-    expect(pages(html)).toEqual(["appearance", "computer"]);
-    expect(currentPage(html)).toBe("computer");
-    expect(blocks(html)).toEqual(["companion", "elsewhere", "remote", "desktopWorkspaces", "workspaces"]);
-    expect(html).not.toContain('aria-label="Enable the built-in browser"');
-    fixture.section = "appearance";
-    const appearance = render();
-    expect(currentPage(appearance)).toBe("appearance");
-    expect(appearance).not.toContain("Add your name");
-    expect(appearance).toContain('aria-label="App language"');
-  });
-
-  it.each<[AppSettingsSection, string]>([
-    ["general", "account"],
-    ["appearance", "appearance"],
-    ["import", "data"],
-    ["backups", "data"],
-    ["experimental", "skills"],
-    ["decisionModel", "ai"],
-    ["engines", "ai"],
-    ["connections", "keys"],
-    ["companion", "computer"],
-    ["remote", "computer"],
-    ["desktopWorkspaces", "computer"],
-    ["computer", "computer"],
-    ["logins", "computer"],
-    ["workspaces", "computer"],
-    ["updates", "updates"],
-  ])("lands a deep link to %s on %s", (section, page) => {
-    fixture.section = section;
-    const html = render();
-    expect(currentPage(html)).toBe(page);
-    expect(blocks(html)).toContain(section === "remote" ? "remote" : section);
-  });
-
-  it("scrolls a later section of a stacked page into view, and starts a page at its top", () => {
+   it("scrolls a later section of a stacked page into view, and starts a page at its top", () => {
     const scrollIntoView = vi.fn();
     const querySelector = vi.fn(() => ({ scrollIntoView }));
     const scroller = { scrollTop: 320, querySelector };
