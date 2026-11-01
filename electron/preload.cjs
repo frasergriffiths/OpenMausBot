@@ -38,7 +38,7 @@ ipcRenderer.on("app:open-settings", (_event, section) => {
 // The full bridge goes only to the local server's UI; a remote page gets the safe subset, and main enforces the same rule.
 const localOrigin = process.argv.find((arg) => arg.startsWith("--omb-local-origin="))?.slice("--omb-local-origin=".length) ?? null;
 const isLocalPage = !localOrigin || location.origin === localOrigin;
-const REMOTE_SAFE = new Set(["platform", "app", "getCapabilities", "onCapabilitiesChanged", "applySkin", "setUnreadCount", "permStatus", "workspaces", "cloudLending", "cloudPlan", "cloudSendPage", "desktopNotices", "desktopAnalytics", "desktopLanguage", "updatesConsent", "windowControls"]);
+const REMOTE_SAFE = new Set(["platform", "app", "getCapabilities", "onCapabilitiesChanged", "applySkin", "setUnreadCount", "permStatus", "workspaces", "cloudLending", "cloudPlan", "cloudSendPage", "desktopNotices", "desktopLanguage", "updatesConsent", "windowControls"]);
 /** My Cloud's own page once it is the person's home (main checks the sender again): it is this app's page then. */
 const HOME_PAGE = ["home", "onChatLink", "onPackageInstall", "onOpenAppSettings", "exportDiagnostics", "openLogsFolder", "openAtLogin"];
 function updaterOffered() {
@@ -50,10 +50,6 @@ function homePage() {
 function reloadedForUpdate() {
   try { return ipcRenderer.sendSync("home:updating") === true; } catch { return false; }
 }
-function savedAnalyticsChoice() {
-  try { const saved = ipcRenderer.sendSync("desktop-analytics:read"); return typeof saved === "boolean" ? saved : null; } catch { return null; }
-}
-let analyticsChoice;
 function savedLanguageChoice() {
   try { const saved = ipcRenderer.sendSync("desktop-language:read"); return typeof saved === "string" ? saved : null; } catch { return null; }
 }
@@ -473,13 +469,6 @@ const bridge = {
     state: () => ipcRenderer.invoke("desktop-notices:state"),
     seen: id => ipcRenderer.invoke("desktop-notices:seen", String(id)),
     shown: id => ipcRenderer.invoke("desktop-notices:shown", String(id)),
-  },
-  desktopAnalytics: {
-    enabled: () => {
-      if (analyticsChoice === undefined) analyticsChoice = savedAnalyticsChoice();
-      return analyticsChoice;
-    },
-    ...(isLocalPage ? { set: enabled => { analyticsChoice = enabled === true; return ipcRenderer.invoke("desktop-analytics:set", analyticsChoice); } } : {}),
   },
   desktopLanguage: {
     choice: () => {
