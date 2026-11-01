@@ -159,7 +159,7 @@ export function SimpleBrowserPage({ has }: { has: Has }) {
     <div className="flex flex-col gap-7">
       {has("browser") && (
         <SettingsGroup label={t("settings.experimental.browser")} block="browser">
-          <div data-settings-block="browser" className="scroll-mt-4">
+          <div data-settings-block="browser" className="flex scroll-mt-4 flex-col gap-4">
             <SettingsRows><BuiltInBrowserRow /></SettingsRows>
             <BrowserProfilesRow />
           </div>

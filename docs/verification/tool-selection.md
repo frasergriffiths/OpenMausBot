@@ -19,8 +19,6 @@ state, and duplicates a restricted bot atomically. It uses the shared
 verification launcher and the real renderer. These are workflow checks with
 a fake engine, not live-model planning checks.
 
-![Before: Access settings](tool-selection-before.jpg)
-![After: saved tool selection](tool-selection-after.jpg)
 
 The gate checks cover stdio, HTTP and SSE discovery and execution, pagination,
 original names, malformed settings/protocol input, credential-safe errors,
