@@ -139,8 +139,8 @@ describe("in the chat (Simple mode)", () => {
     const first = host.querySelector<HTMLElement>('[data-helper-line="0"]')!;
     expect(first.dataset.chatBubble, "the chat's own Simple bubble").toBe("simple");
     expect(first.className).toContain(SIMPLE_BOT_BUBBLE);
-    expect(chips()).toEqual(["apps", "phone", "cloud"]);
-    expect([...host.querySelectorAll("[data-helper-step]")].map((node) => node.textContent)).toEqual(["Connect email & calendar", "Connect your phone", "Try Cloud"]);
+    expect(chips()).toEqual(["apps"]);
+    expect([...host.querySelectorAll("[data-helper-step]")].map((node) => node.textContent)).toEqual(["Connect email & calendar"]);
     expect(f.followups, "only a first run asks for a follow-up").toEqual([]);
   });
 
@@ -148,10 +148,7 @@ describe("in the chat (Simple mode)", () => {
     f.state = { ...f.state, instances: [claude(false)] };
     await show();
     expect(lines()[3]).toBe(t("helperIntro.followup.noAi"));
-    expect(chips()).toEqual(["ai", "apps", "phone"]);
-    await act(async () => { host.querySelector<HTMLElement>('[data-helper-step="phone"]')!.click(); });
-    expect(f.dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: "toggleAppSettings", section: "companion" }));
-    expect(chips()).toEqual(["ai", "apps", "cloud"]);
+    expect(chips()).toEqual(["ai", "apps"]);
   });
 
   it("opens the Connect an AI dialog in place from its chip, not Settings", async () => {
@@ -174,7 +171,7 @@ describe("in the chat (Simple mode)", () => {
     f.local = true;
     f.found = { skills: [{ name: "pdf", source: "claudeCode" }], tools: [] };
     await show();
-    expect(chips()).toEqual(["apps", "import", "phone"]);
+    expect(chips()).toEqual(["apps", "import"]);
     expect(chipAction("import")).toEqual({ type: "toggleAppSettings", open: true, section: "import" });
   });
 
@@ -186,14 +183,7 @@ describe("in the chat (Simple mode)", () => {
     expect(f.detect).not.toHaveBeenCalled();
   });
 
-  it("counts Try Cloud as the first run's Cloud moment, then opens Add a Cloud", async () => {
-    await show();
-    await act(async () => { host.querySelector<HTMLElement>('[data-helper-step="cloud"]')!.click(); });
-    expect(analytics.track).toHaveBeenCalledWith("onboarding_cloud", { action: "start_trial" });
-    expect(f.dispatch).toHaveBeenCalledWith({ type: "openCloudAdd", source: "app_onboarding" });
-  });
-
-  it("opens the app's own flow for each chip", () => {
+    it("opens the app's own flow for each chip", () => {
     expect(chipAction("apps")).toEqual({ type: "togglePlugins", open: true, surface: "apps" });
   });
 
@@ -228,7 +218,7 @@ describe("as a first run lands in the chat", () => {
     expect(host.querySelector("[data-helper-typing]")).toBeNull();
     expect(chips()).toEqual([]);
     await tick(INTRO_TIMING.chips);
-    expect(chips()).toEqual(["apps", "phone", "cloud"]);
+    expect(chips()).toEqual(["apps"]);
     await show();
     expect(f.followups, "never asked twice").toHaveLength(1);
   });
@@ -254,7 +244,7 @@ describe("as a first run lands in the chat", () => {
     await show();
     expect(f.followups).toHaveLength(1);
     expect(lines()).toHaveLength(4);
-    expect(chips()).toEqual(["apps", "phone", "cloud"]);
+    expect(chips()).toEqual(["apps"]);
   });
 });
 

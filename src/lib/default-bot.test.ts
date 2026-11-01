@@ -53,12 +53,12 @@ describe("what MausBot offers to set up", () => {
     expect(setupSteps({ ...fresh, team: true })).toEqual([]);
   });
 
-  it("in Simple mode, chips for only what its look around found missing, in order: AI, apps, skills, phone, Cloud", () => {
-    expect(introChips(fresh)).toEqual(["ai", "apps", "phone", "cloud"]);
-    expect(introChips({ ...fresh, aiReady: true, importFound: true })).toEqual(["apps", "import", "phone", "cloud"]);
-    expect(introChips({ ...fresh, aiReady: true, appsConnected: true, phonePaired: true })).toEqual(["cloud"]);
-    expect(introChips({ ...fresh, aiReady: true, remote: true })).toEqual(["apps", "phone"]);
-    expect(introChips({ ...fresh, aiReady: true, onCloud: true, importFound: false })).toEqual(["apps", "phone"]);
+  it("in Simple mode, chips for only what its look around found missing: AI, apps, import", () => {
+    expect(introChips(fresh)).toEqual(["ai", "apps"]);
+    expect(introChips({ ...fresh, aiReady: true, importFound: true })).toEqual(["apps", "import"]);
+    expect(introChips({ ...fresh, aiReady: true, appsConnected: true })).toEqual([]);
+    expect(introChips({ ...fresh, aiReady: true, remote: true })).toEqual(["apps"]);
+    expect(introChips({ ...fresh, aiReady: true, onCloud: true, importFound: false })).toEqual(["apps"]);
     expect(INTRO_CHIPS).toBe(3);
   });
 
